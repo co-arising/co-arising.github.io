@@ -1,0 +1,114 @@
+/* co-arising.github.io — design tokens
+   Inherits the editorial palette of the project's internal research pages
+   (paper / ink / signal-red / teal / amber) with dark-mode variants. */
+
+:root {
+  color-scheme: light dark;
+
+  /* surfaces */
+  --bg: #f6f3ec;
+  --bg-raised: #fffdf8;
+  --bg-sink: #ede8dc;
+  --surface-code: #14212b;
+  --ink-on-code: #dce9e6;
+
+  /* ink */
+  --ink: #1c1913;
+  --ink-2: #4c463a;
+  --ink-3: #7d7666;
+
+  /* lines */
+  --line: #d8d1bf;
+  --line-strong: #b9b09a;
+
+  /* signal colors */
+  --red: #b3371c;
+  --red-soft: #f3ddd4;
+  --red-ink: #8f2a12;
+  --teal: #1e5f54;
+  --teal-soft: #d9e8e2;
+  --amber: #96660a;
+  --amber-soft: #f0e3c2;
+  --green-ok: #2c7a52;
+
+  /* semantic aliases for the honest-layering badges */
+  --c-verified: var(--teal);
+  --c-verified-bg: var(--teal-soft);
+  --c-deferred: var(--amber);
+  --c-deferred-bg: var(--amber-soft);
+  --c-boundary: var(--red);
+  --c-boundary-bg: var(--red-soft);
+
+  /* depth */
+  --shadow: 0 1px 2px rgba(28, 25, 19, .06), 0 8px 24px -12px rgba(28, 25, 19, .18);
+
+  /* typography scale */
+  --font-sans: "IBM Plex Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --fs-hero: clamp(40px, 6.2vw, 74px);
+  --fs-h2: clamp(26px, 3.4vw, 38px);
+  --fs-h3: 19px;
+  --fs-body: 16px;
+  --fs-small: 13.5px;
+  --fs-tiny: 12px;
+
+  /* rhythm */
+  --measure: 68ch;
+  --wrap: 1120px;
+  --gap: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16140f;
+    --bg-raised: #201d16;
+    --bg-sink: #100e0a;
+    --surface-code: #0c1319;
+    --ink-on-code: #d8e6e2;
+
+    --ink: #ece5d3;
+    --ink-2: #c3bba6;
+    --ink-3: #8f8772;
+
+    --line: #3a362a;
+    --line-strong: #57523f;
+
+    --red: #e0683f;
+    --red-soft: #40231a;
+    --red-ink: #f0926c;
+    --teal: #5cb3a1;
+    --teal-soft: #1d332e;
+    --amber: #d9a83e;
+    --amber-soft: #3a3018;
+    --green-ok: #6fbf93;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+  }
+}
+
+/* Manual theme override (tri-state: auto / light / dark via [data-theme]). */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f3ec; --bg-raised: #fffdf8; --bg-sink: #ede8dc;
+  --surface-code: #14212b; --ink-on-code: #dce9e6;
+  --ink: #1c1913; --ink-2: #4c463a; --ink-3: #7d7666;
+  --line: #d8d1bf; --line-strong: #b9b09a;
+  --red: #b3371c; --red-soft: #f3ddd4; --red-ink: #8f2a12;
+  --teal: #1e5f54; --teal-soft: #d9e8e2;
+  --amber: #96660a; --amber-soft: #f0e3c2;
+  --green-ok: #2c7a52;
+  --shadow: 0 1px 2px rgba(28, 25, 19, .06), 0 8px 24px -12px rgba(28, 25, 19, .18);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #16140f; --bg-raised: #201d16; --bg-sink: #100e0a;
+  --surface-code: #0c1319; --ink-on-code: #d8e6e2;
+  --ink: #ece5d3; --ink-2: #c3bba6; --ink-3: #8f8772;
+  --line: #3a362a; --line-strong: #57523f;
+  --red: #e0683f; --red-soft: #40231a; --red-ink: #f0926c;
+  --teal: #5cb3a1; --teal-soft: #1d332e;
+  --amber: #d9a83e; --amber-soft: #3a3018;
+  --green-ok: #6fbf93;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+}
