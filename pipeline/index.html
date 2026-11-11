@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>From truth tree to code, and back — co-arising</title>
+  <meta name="description" content="The full lifecycle: compile the truth tree, build the local knowledge graph, generate a compiling CQRS codebase, verify anchors, fill the handwritten zone, and re-verify. Every stage with its command and verified numbers." />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">Lifecycle</p>
+      <h1>Truth tree → code, <span class="accent">and back</span></h1>
+      <p class="thesis">Six stages, each with an exact command and a green/red gate. The loop is closed twice: once forward (tree → graph → code), once backward (code → anchors → tree). The numbers below are the bank worked example, re-captured 2026-11-11.</p>
+    </header>
+
+    <section id="flow">
+      <div class="sec-head"><span class="no">01</span><h2>The six stages</h2></div>
+      <div class="flow" aria-label="Six-stage pipeline">
+        <div class="step"><span class="snum">01 · AUTHOR</span><b>Edit the tree</b><p>YAML atoms only. Agents draft, humans approve — <code>approvedBy</code> recorded per atom.</p></div>
+        <div class="step"><span class="snum">02 · GATE</span><b>Validate + roundtrip</b><p><code>validate</code> 0 hard; <code>roundtrip</code> byte-identical. <span class="badge verified" title="F-01/F-02">157 atoms ✓</span></p></div>
+        <div class="step"><span class="snum">03 · GRAPH</span><b>Compile &amp; push</b><p>Canonical projection → SQLite graph: <span class="badge verified" title="F-03">389 nodes / 413 edges</span>.</p></div>
+        <div class="step"><span class="snum">04 · GENERATE</span><b>CQRS codebase</b><p><code>generate-project</code>: <span class="badge verified" title="F-04">235 files</span>, <span class="badge verified" title="F-06">0 compile errors</span>.</p></div>
+        <div class="step"><span class="snum">05 · HANDWRITE</span><b>Fill the zone</b><p>Ports are generated; behavior goes in the physically separate handwritten module — <span class="badge verified" title="F-08">35 files</span>, complete implementations.</p></div>
+        <div class="step"><span class="snum">06 · VERIFY</span><b>Prove lineage</b><p><code>verify-project</code>: <span class="badge verified" title="F-05">792 anchors</span>; tests <span class="badge verified" title="F-07">23/23</span>.</p></div>
+      </div>
+      <p class="small">And then it loops: change the tree, <code>status-project</code> shows exactly which generated files went stale, <code>generate-project --update</code> refreshes only those, re-running on an unchanged tree writes <strong>0 files</strong> (idempotence is a gate, not a hope).</p>
+    </section>
+
+    <section id="anchors">
+      <div class="sec-head"><span class="no">02</span><h2>Anchors: the part nobody else ships</h2></div>
+      <p class="sec-sub">Generation is common. <strong>Proof of origin</strong> is not. Every generated file carries anchor metadata binding it to the knowledge node that produced it — and the binding is verified by re-reading bytes, not by trusting a manifest.</p>
+      <div class="term">
+        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">two directions, one command each</span></div>
+        <pre><span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
+<span class="o">  knowledge  rule:SetCount (aggregate example/Counter)</span>
+<span class="o">  generated  app/domain/example/Counter.scala  L31–L54   ← span, not guess</span>
+
+<span class="p">$</span> <span class="c">truthsrc query-project --file app/domain/example/Counter.scala --symbol setCount</span>
+<span class="o">  source     slice example/set-count  →  guards  →  rule:SetCount</span>
+
+<span class="p">$</span> <span class="c">truthsrc verify-project --project truthsrc.project.json --out app/</span>
+<span class="ok">✓ passed</span> <span class="o">— every anchor re-verified against file bytes (792 on the bank project)</span></pre>
+      </div>
+      <div class="card-grid cols-3">
+        <div class="card"><span class="tag">Why it matters</span><h3>“Where did this line come from?”</h3><p>A compliance question, a debugging question, and an onboarding question — answered by query, not by archaeology.</p></div>
+        <div class="card"><span class="tag">Why it’s honest</span><h3>Byte-precision, not vibes</h3><p>Anchors record spans; verification re-reads the file. If a human edits generated code, verification reports drift instead of silently re-trusting.</p></div>
+        <div class="card"><span class="tag">Why agents need it</span><h3>No-grep context packs</h3><p>The same anchor graph packages exact upstream types, caller contracts and acceptance scenarios for a handwriting agent — closing the loop for AI collaborators.</p></div>
+      </div>
+    </section>
+
+    <section id="handwritten">
+      <div class="sec-head"><span class="no">03</span><h2>The handwritten zone</h2></div>
+      <p class="sec-sub">The generation philosophy: <strong>generate the ports, leave the behavior to people</strong> (and their agents) — but only in a physically separate module that regeneration can never touch.</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">Generated side</span><h3>Everything structural</h3><p>Aggregates, commands, events, guards (compiled from <code>@rule</code> invariants), proto schemas, ports, test scaffolding — 235 files in the bank project, all regenerable, all anchored.</p></div>
+        <div class="card"><span class="tag">Handwritten side</span><h3>Everything behavioral</h3><p>Effect execution against the mock TA, JDBC wiring, recovery loops, the read-side catch-up, HTTP pages — <strong>35 files, complete implementations</strong> <span class="badge verified" title="F-08">verified</span>, mounted into the build via <code>unmanagedSourceDirectories</code>. No <code>BEGIN MANUAL</code> markers anywhere — the boundary is the filesystem.</p></div>
+      </div>
+      <div class="callout"><b>DRIFT</b><p>When the tree changes, generated files are refreshed; the handwritten zone is never overwritten. The tests stay fixed as expectations — <strong>the generated code must satisfy the handwritten tests, not the other way around</strong>. 23/23 pass today <span class="badge verified" title="F-07">verified</span>.</p></div>
+    </section>
+
+    <section id="engines">
+      <div class="sec-head"><span class="no">04</span><h2>Where saga &amp; Monarch come in</h2></div>
+      <p class="sec-sub">Two engines, two jobs — declared in truth, never confused:</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">saga-core · TCC transactions</span><h3>Cross-aggregate consistency</h3><p>A <code>saga</code> atom declares participants (aggregates), phases (Try / Confirm / Cancel) and compensation. It compiles to saga IR for <a href="https://github.com/MadPolaris/saga-core">saga-core</a> — an Akka Typed, event-sourced TCC coordinator. The bank tree declares <strong>2 sagas</strong>: cash payment (investor outgoing → collection incoming → order commit) and the independent refund.</p></div>
+        <div class="card"><span class="tag">monarch-core · stage queues</span><h3>Flow orchestration</h3><p>A <code>pipeline</code> atom is an ordered business-step queue; steps execute slices (R16). It compiles to a plan for <a href="https://github.com/MadPolaris/monarch-core">monarch-core</a> — a recoverable stage-queue engine with cursor-based resume, journaled by <a href="https://github.com/MadPolaris/monarch-persistence">monarch-persistence</a>. The bank tree declares <strong>4 pipelines</strong> (cash payment, TA submission, SIP dispatch, independent refund).</p></div>
+      </div>
+      <p class="small" style="margin-top:12px">The rule that keeps them straight: <strong>Sagas own transaction boundaries; pipelines own flow order.</strong> They are not interchangeable, and the truth tree refuses to blur them.</p>
+    </section>
+
+    <section id="boundaries">
+      <div class="sec-head"><span class="no">05</span><h2>What this loop does not claim yet</h2></div>
+      <div class="callout red"><b>BOUNDARIES</b><p>
+        <strong>Full-service runtime gate — not passed</strong> (<a class="badge boundary" href="/status/#DEF-06">DEF-06</a>): generated code compiles and all 23 tests pass, but the service02 acceptance run missed one gate — a fresh read-side replay didn’t catch up within 90 seconds. Code, 24 recovery cases, and real-DB initial/restart/refund did pass. &nbsp;·&nbsp;
+        <strong>HTTP smoke of the running service — not yet executed</strong> (<a class="badge boundary" href="/status/#DEF-07">DEF-07</a>). &nbsp;·&nbsp;
+        <strong>BDD/Gherkin specs — designed as a derivative, not built</strong> (<a class="badge deferred" href="/status/#DEF-01">DEF-01</a>): guards + scenarios should generate Gherkin; that projection isn’t implemented.
+      </p></div>
+    </section>
+
+    <section id="try">
+      <div class="sec-head"><span class="no">06</span><h2>Run it yourself</h2></div>
+      <p class="sec-sub">The Counter tutorial walks stages 1–6 on a one-aggregate project in about ten minutes, Node-only. The bank example takes it to full scale. Both are on the <a href="/guide/">hands-on guide</a>.</p>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

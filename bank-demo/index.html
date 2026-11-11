@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bank wealth worked example — co-arising</title>
+  <meta name="description" content="A 100-yuan fund purchase followed through payment, TA confirmation, independent refund and bounded installments — three aggregates, 157 truth atoms, 149 invariants, 2 sagas, 4 pipelines, 235 generated files, 792 verified anchors." />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">Worked example · local teaching demo</p>
+      <h1>One purchase, <span class="accent">every step’s origin</span></h1>
+      <p class="thesis">A customer submits a 100-yuan fund purchase. The money is debited — does that mean the investment succeeded? When the fund company rejects it, why does a separate refund exist? How does each installment of a savings plan reuse those exact rules? This example answers those questions from a truth tree, not from prose.</p>
+      <div class="stat-strip">
+        <div class="stat"><div class="num">3</div><div class="lbl">aggregates: CreditBalance · FundOrder · SipPlan</div></div>
+        <div class="stat"><div class="num">157</div><div class="lbl">truth atoms · 149 <code>@rule</code> invariants <span class="badge verified" title="F-02/F-09">verified</span></div></div>
+        <div class="stat"><div class="num">2+4</div><div class="lbl">sagas + pipelines declared in truth</div></div>
+        <div class="stat"><div class="num">23/23</div><div class="lbl">generated + handwritten tests passing <span class="badge verified" title="F-07">verified</span></div></div>
+      </div>
+    </header>
+
+    <section id="business">
+      <div class="sec-head"><span class="no">01</span><h2>Four business lines, one tree</h2></div>
+      <p class="sec-sub">Each line is a different <em>shape</em> of coordination — which is exactly why they need different truth atoms.</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Line</th><th>The question it answers</th><th>Coordination shape</th><th>Declared in truth as</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">Cash purchase payment</td><td>Debit succeeded — did the investment succeed? (No: payment ≠ subscription.)</td><td>Cross-aggregate transaction with compensation</td><td><code>bank-cash-payment-v1</code> saga — investor outgoing, collection incoming, then order commit; same <code>Money</code>, pinned IDs</td></tr>
+          <tr><td class="nm">Mock TA confirmation</td><td>The transfer agent accepted the order — are the shares mine? (No: acceptance ≠ confirmation.)</td><td>External-system observation with explicit unknown states</td><td>FundOrder slices + formal products: TA effect ports, outcome mappings (<code>confirmed → Observed</code>, timeout → <code>Unknown</code>)</td></tr>
+          <tr><td class="nm">Independent refund</td><td>Why a separate refund saga instead of “undo the payment”?</td><td>A second TCC saga — refund is its own business fact, not a compensation in disguise</td><td><code>bank-independent-refund-v1</code> saga + pipeline</td></tr>
+          <tr><td class="nm">Bounded installment plan</td><td>How does every SIP installment reuse the same rules — and stay bounded?</td><td>Pipeline-driven dispatch with explicit skip/terminal semantics</td><td><code>bank-sip-dispatch-v1</code> pipeline over SipPlan/FundOrder slices</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout"><b>SEMANTIC INVARIANTS</b><p>The tree pins the sentences people get wrong: <strong>payment success ≠ investment success</strong> · <strong>TA acceptance ≠ share confirmation</strong> · <strong>independent refund ≠ compensating a committed payment</strong> · <strong>saga ≠ pipeline</strong>. Each has rules and tests to back it.</p></div>
+    </section>
+
+    <section id="views">
+      <div class="sec-head"><span class="no">02</span><h2>See the graph</h2></div>
+      <p class="sec-sub">Three verified snapshots of the workshop viewer (generated 2026-11-06 by <code>view-project --html</code>) — desktop map, search, and mobile. The full 2.18 MB single-file snapshot is downloadable below; it runs offline from a double-click.</p>
+      <figure style="margin:14px 0">
+        <img src="/assets/img/workshop-desktop.png" alt="Bank wealth knowledge graph workshop view: nodes for aggregates, slices, events and rules laid out as an interactive map" loading="lazy" />
+        <figcaption class="small" style="margin-top:6px">The workshop HTML snapshot — 389 nodes / 413 edges <span class="badge verified" title="F-03">verified</span>, with chapters, evidence panel and search. <a href="/downloads/bank-workshop.html">Download the full snapshot (2.18 MB, opens offline)</a> — note: currently Chinese-language UI (<a class="badge deferred" href="/status/#DEF-10">DEF-10</a>).</figcaption>
+      </figure>
+      <p class="small">Prefer querying to browsing? The <a href="/explorer/">explorer</a> loads the same graph as SQLite in your browser — blast radius, lineage, orphans, free SQL.</p>
+    </section>
+
+    <section id="projections">
+      <div class="sec-head"><span class="no">03</span><h2>Design projections</h2></div>
+      <p class="sec-sub">The tree also renders seven human-facing design views (journeys, screen flow, context map, event flow, cash experience/lifecycle, story map). They are <strong>derived design proposals</strong> — generated from truth, clearly labeled as such, never hand-maintained. Rendered figures land here in the next content pass.</p>
+      <div class="callout teal"><b>WHY THIS MATTERS</b><p>Most tools make you choose: either a design canvas that drifts from the code, or code with no design view. A projection from the truth tree is neither — it is regenerable <em>and</em> readable, and its drift is detectable by re-rendering.</p></div>
+    </section>
+
+    <section id="run">
+      <div class="sec-head"><span class="no">04</span><h2>Run it locally</h2></div>
+      <div class="steps">
+        <div class="step-item"><div><h4>Validate the tree</h4><p class="meta">node ≥ 22.13 · no JVM needed for this step</p><p><code>git clone https://github.com/MadPolaris/bank-wealth-demo && cd bank-wealth-demo && npm run validate</code> — 0 hard findings, roundtrip byte-identical <span class="badge verified" title="F-01/F-02">verified</span>.</p></div></div>
+        <div class="step-item"><div><h4>Generate &amp; compile</h4><p class="meta">JVM + sbt needed from here</p><p><code>npm run project</code> writes <code>generated/current/</code> (235 files); <code>sbt compile</code> inside it: 0 errors across 534 sources <span class="badge verified" title="F-04/F-06">verified</span>; <code>sbt test</code>: 23/23 <span class="badge verified" title="F-07">verified</span>.</p></div></div>
+        <div class="step-item"><div><h4>Verify the anchors</h4><p class="meta">the receipts</p><p><code>truthsrc verify-project</code> re-proves all 792 anchors <span class="badge verified" title="F-05">verified</span> — file bytes against the tree, both directions.</p></div></div>
+      </div>
+      <p class="small">Step-by-step (including Docker variants for the JVM side) is on the <a href="/guide/">hands-on guide</a>.</p>
+    </section>
+
+    <section id="boundaries">
+      <div class="sec-head"><span class="no">05</span><h2>Honest boundaries</h2></div>
+      <div class="callout red"><b>READ BEFORE EVALUATING</b><p>This is a <strong>local teaching demo</strong>. It moves no real money, is not a production banking system, and is not a Palantir-compatible implementation. The full-service runtime gate has <strong>not passed</strong> (<a class="badge boundary" href="/status/#DEF-06">DEF-06</a>: read-side replay missed the 90-second catch-up deadline); <code>sbt run</code> + HTTP smoke is <strong>not yet executed</strong> (<a class="badge boundary" href="/status/#DEF-07">DEF-07</a>); frozen runtime artifacts have no public download channel yet. What <em>is</em> proven: tree gates, graph, generation, compilation, tests, anchors — all verified 2026-11-11 and reproducible from the repo.</p></div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

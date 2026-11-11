@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Knowledge-graph explorer — co-arising</title>
+  <meta name="description" content="The bank wealth knowledge graph (389 nodes / 413 edges) loaded in your browser via sql.js. Blast radius, lineage, orphans, census — as preset queries and a free SQL console. No server, no tracking." />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">This page needs JavaScript (sql.js runs locally in your browser — no network calls). <a href="/">Home</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">Explorer · runs entirely in your browser</p>
+      <h1>Query the <span class="accent">real graph</span></h1>
+      <p class="thesis">This is not mock data: the SQLite file below is the compiled knowledge graph of the bank wealth example — 389 nodes, 413 edges <span class="badge verified" title="F-03">verified 2026-11-11</span> — loaded into your browser with sql.js. No server, no network calls after the page loads, nothing leaves your machine.</p>
+    </header>
+
+    <section id="console">
+      <div class="sec-head"><span class="no">01</span><h2>The console</h2></div>
+      <p class="sec-sub">Pick a preset (with the expected answer) or write your own SQL against <code>nodes(id, kind, name, atom, extra)</code> and <code>edges(seq, from_id, relation, to_id)</code>. Schema is exactly what <code>truthsrc graph --out</code> produces.</p>
+
+      <div class="xp-layout">
+        <aside class="xp-side">
+          <div class="xp-panel">
+            <h4>Data fingerprint</h4>
+            <p class="xp-status" id="xp-status">loading sql.js…</p>
+          </div>
+          <div class="xp-panel">
+            <h4>Preset queries</h4>
+            <ul class="xp-query-list" id="xp-presets">
+              <li><button data-preset="census">Census — kinds &amp; relations</button></li>
+              <li><button data-preset="describe">Describe an aggregate</button></li>
+              <li><button data-preset="blast" id="preset-blast">Blast radius — SipInstallmentFailed</button></li>
+              <li><button data-preset="lineage">Read-model lineage</button></li>
+              <li><button data-preset="orphans" id="preset-orphans">Orphans — unparented knowledge</button></li>
+              <li><button data-preset="sagas">Sagas &amp; pipelines</button></li>
+              <li><button data-preset="invariants">Invariant enforcement</button></li>
+            </ul>
+          </div>
+          <div class="xp-panel">
+            <h4>How to read it</h4>
+            <p class="small">Edges carry the relation name from the <a href="/dsl/#relations">R1–R22 registry</a>. Impact walks only <code>propagates=true</code> relations (the preset SQL encodes them) — mirroring the CLI’s <code>blast_radius</code> semantics: over-report rather than miss.</p>
+          </div>
+        </aside>
+
+        <div class="xp-main">
+          <div class="xp-result" id="xp-result">
+            <h3>Pick a preset to begin</h3>
+            <p class="answer">Or write SQL below and hit Run. Everything executes against the in-memory copy of the bank graph.</p>
+          </div>
+          <div class="xp-panel" style="margin-top:14px">
+            <h4>Free SQL console</h4>
+            <div class="xp-actions">
+              <button class="btn" id="xp-run" type="button">Run ▸</button>
+              <button class="btn ghost" id="xp-clear" type="button">Clear</button>
+              <span class="small" id="xp-timing"></span>
+            </div>
+            <textarea class="xp-sql" id="xp-sql" spellcheck="false" aria-label="SQL query">SELECT kind, COUNT(*) AS n
+FROM nodes
+GROUP BY kind
+ORDER BY n DESC;</textarea>
+          </div>
+          <div class="xp-panel xp-radial" id="xp-radial" hidden>
+            <h4>One-hop neighborhood</h4>
+            <div id="xp-radial-svg"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="rebuild">
+      <div class="sec-head"><span class="no">02</span><h2>Don’t trust us — rebuild it</h2></div>
+      <p class="sec-sub">The file you just queried is a derived cache. Reproduce it from the bank repo (Node ≥ 22.13):</p>
+      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
+cd bank-wealth-demo &amp;&amp; npm install --no-save
+node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out my-copy.sqlite
+# compare node/edge counts with the fingerprint panel above</code></pre>
+      <div class="callout"><b>DEGRADE GRACEFULLY</b><p>If the sqlite file fails to load (offline first visit, very old browser), the presets fall back to their documented expected answers so the page still teaches the query semantics.</p></div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/explorer.js"></script>
+</body>
+</html>

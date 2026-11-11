@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The truth-tree language — co-arising</title>
+  <meta name="description" content="The strategic and scope layers of the truthsrc language: 12 atom kinds, 15 workshop note types, 22 typed relations, governance gates, and a real slice from the bank example." />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">The language · strategic &amp; scope layers</p>
+      <h1>A description language for the <span class="accent">truth tree</span></h1>
+      <p class="thesis">One YAML tree is the only authoring surface: workshop notes flow in through an inbox, formal atoms hold the compiled contract, and a registry of 22 typed relations is the metamodel. This page publishes the language’s strategic layer (contexts, subdomains, the map) and scope layer (kinds, relations, gates). Visual authoring tooling is on the <a href="/status/#DEF-02">ledger</a>.</p>
+    </header>
+
+    <section id="shape">
+      <div class="sec-head"><span class="no">01</span><h2>The shape of a tree</h2></div>
+      <p class="sec-sub">From the bank example — real paths, real counts <span class="badge verified" title="F-10">verified</span>.</p>
+      <pre class="code"><code>truth/bank-wealth/
+├── system.yaml                    # the system root: id, name, responsibility
+├── inbox/                         # workshop intake — notes are DRAFTS, not law
+│   ├── 02-commands/  05-context-map/  06-aggregate-detail/ …   # 13 product slots
+└── contexts/bankwealth/
+    ├── context.yaml               # bounded context + its dependencies (R21)
+    ├── aggregates/
+    │   ├── credit-balance/
+    │   │   ├── aggregate.yaml     # state fields + named @rule invariants
+    │   │   └── slices/initialize-account.slice.yaml
+    │   ├── fund-order/  …         # 27 slices across 3 aggregates
+    │   └── sip-plan/
+    ├── value-objects/             # 59 VOs: Money, AccountId, AmountDecimal…
+    ├── read-models/               # 6 read models with field lineage (R10/R11)
+    ├── policies/                  # event → command reaction rules (R7/R9)
+    ├── stories/                   # 4 user stories
+    ├── use-cases.yaml             # flows realized by slices (R18)
+    ├── pipelines/                 # 4 Monarch-style ordered step queues (R14–R16)
+    ├── sagas/                     # 2 TCC cross-aggregate transactions
+    └── formal-products/           # 36 contracts: ports, hosts, artifact contracts…</code></pre>
+      <div class="callout"><b>RULE ZERO</b><p><strong>The author tree is the only editing surface.</strong> Everything downstream — the compiled canonical, the knowledge graph, generated code, ledgers, anchors — is derived and regenerated. Hand-edited derivations are void by contract. That single rule is what makes every other guarantee possible.</p></div>
+    </section>
+
+    <section id="kinds">
+      <div class="sec-head"><span class="no">02</span><h2>Scope layer: what you can say</h2></div>
+      <p class="sec-sub">Two vocabularies, one registry. Workshop <strong>note types</strong> are the discovery surface (what a wall of sticky notes becomes); <strong>atom kinds</strong> are the compiled contract. <span class="badge verified" title="F-15">verified against lib/shared.mjs</span></p>
+
+      <h3>15 note types — the workshop intake</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Group</th><th>Types</th><th>What they carry</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">Behavior</td><td><code>event</code> · <code>command</code> · <code>policy</code> · <code>timer</code></td><td>Domain events, commands that request change, reaction policies, time triggers — the EventStorming vocabulary.</td></tr>
+          <tr><td class="nm">Structure</td><td><code>aggregate</code> · <code>entity</code> · <code>field</code> · <code>readModel</code></td><td>Consistency boundaries, entities, fields with lineage, read-side projections.</td></tr>
+          <tr><td class="nm">Strategy</td><td><code>context</code> · <code>subdomain</code> · <code>relation</code></td><td>Bounded contexts, core/supporting/generic classification, and inter-context relations — the strategic DDD layer.</td></tr>
+          <tr><td class="nm">People &amp; systems</td><td><code>role</code> · <code>externalSystem</code></td><td>Actors (with the commands they may issue, R12) and external systems at the boundary.</td></tr>
+          <tr><td class="nm">Knowledge</td><td><code>question</code> · <code>story</code></td><td>Open questions / hotspots that must not silently vanish, and user stories awaiting placement.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>12 atom kinds — the compiled contract</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Kind</th><th>File</th><th>Holds</th></tr></thead>
+        <tbody>
+          <tr><td class="nm"><code>note</code></td><td><code>inbox/**</code></td><td>Draft workshop notes of any note type — awaiting human promotion.</td></tr>
+          <tr><td class="nm"><code>aggregate</code></td><td><code>aggregates/&lt;slug&gt;/aggregate.yaml</code></td><td>Identity, state fields, ordered command/event pools, named <code>@rule</code> invariants.</td></tr>
+          <tr><td class="nm"><code>slice</code></td><td><code>slices/&lt;slug&gt;.slice.yaml</code></td><td>The causal unit: one command, its guards, the events it produces, fold assignments, provenance.</td></tr>
+          <tr><td class="nm"><code>value-object</code></td><td><code>value-objects/&lt;slug&gt;.vo.yaml</code></td><td>Typed values — <code>Money</code>, nominal wrappers like <code>AccountId</code>.</td></tr>
+          <tr><td class="nm"><code>read-model</code></td><td><code>read-models/…</code></td><td>Read-side shapes with per-field sources (lineage).</td></tr>
+          <tr><td class="nm"><code>policy</code></td><td><code>policies/…</code></td><td>“When event X then command Y” reaction rules.</td></tr>
+          <tr><td class="nm"><code>story</code> / <code>use-cases</code></td><td><code>stories/…</code> · <code>use-cases.yaml</code></td><td>User stories and the flows that realize them.</td></tr>
+          <tr><td class="nm"><code>pipeline</code></td><td><code>pipelines/&lt;slug&gt;.pipeline.yaml</code></td><td>An ordered business-step queue (steps, never “stages”) — compiled to a Monarch plan.</td></tr>
+          <tr><td class="nm"><code>saga</code></td><td><code>sagas/&lt;slug&gt;.saga.yaml</code></td><td>Cross-aggregate TCC transactions: participants, phases, compensation — compiled to saga-core IR.</td></tr>
+          <tr><td class="nm"><code>scenario</code></td><td><code>scenarios/&lt;slug&gt;.scenario.yaml</code></td><td>Narrative runbooks / demo scripts.</td></tr>
+          <tr><td class="nm"><code>formal-product</code></td><td><code>formal-products/…</code></td><td>Engineering contracts: technical ports, effect hosts, artifact contracts, host computations — what the generated code must satisfy.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="relations">
+      <div class="sec-head"><span class="no">03</span><h2>The relation registry — the metamodel’s spine</h2></div>
+      <p class="sec-sub">22 typed relations. The <code>propagates</code> flag is a human ruling per relation: does this edge carry impact? <code>blast_radius</code> walks exactly the <code>propagates</code> edges — over-reporting rather than missing. <span class="badge verified" title="F-14">verified</span></p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>From</th><th>Relation</th><th>To</th><th>Propagates</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">R1</td><td>aggregate</td><td><code>owns</code></td><td>slice</td><td>✓</td><td>structural ownership</td></tr>
+          <tr><td class="nm">R2</td><td>aggregate</td><td><code>references</code></td><td>aggregate</td><td>✓</td><td>cross-aggregate reference</td></tr>
+          <tr><td class="nm">R3</td><td>aggregate</td><td><code>emits</code></td><td>event</td><td>✓</td><td>event-pool membership</td></tr>
+          <tr><td class="nm">R4</td><td>slice</td><td><code>issues</code></td><td>command</td><td>✓</td><td>one command per slice (1:1)</td></tr>
+          <tr><td class="nm">R5</td><td>slice</td><td><code>emits</code></td><td>event</td><td>✓</td><td>events a slice produces</td></tr>
+          <tr><td class="nm">R6</td><td>command</td><td><code>produces</code></td><td>event</td><td>✓</td><td>causality; conditions live in guards</td></tr>
+          <tr><td class="nm">R7</td><td>event</td><td><code>triggers</code></td><td>policy</td><td>✓</td><td>reaction rules</td></tr>
+          <tr><td class="nm">R8</td><td>policy</td><td><code>constrains</code></td><td>slice</td><td>✓</td><td>policy bounds a slice</td></tr>
+          <tr><td class="nm">R9</td><td>policy</td><td><code>invokes</code></td><td>command</td><td>✓</td><td>policy issues a command</td></tr>
+          <tr><td class="nm">R10</td><td>read-model</td><td><code>derives-from</code></td><td>field</td><td>✓</td><td>read-side lineage</td></tr>
+          <tr><td class="nm">R11</td><td>field</td><td><code>lineage</code></td><td>field</td><td>✓</td><td>field-to-field chains</td></tr>
+          <tr><td class="nm">R12</td><td>role</td><td><code>can-issue</code></td><td>command</td><td>—</td><td>permission, not impact</td></tr>
+          <tr><td class="nm">R13</td><td>read-model</td><td><code>visible-to</code></td><td>role</td><td>—</td><td>visibility</td></tr>
+          <tr><td class="nm">R14</td><td>pipeline</td><td><code>has-step</code></td><td>step</td><td>✓</td><td>ordered steps</td></tr>
+          <tr><td class="nm">R15</td><td>step</td><td><code>performed-by</code></td><td>role</td><td>—</td><td>participation</td></tr>
+          <tr><td class="nm">R16</td><td>step</td><td><code>executes</code></td><td>slice</td><td>✓</td><td>a step runs a slice</td></tr>
+          <tr><td class="nm">R17</td><td>story</td><td><code>covers</code></td><td>use-case</td><td>—</td><td>traceability</td></tr>
+          <tr><td class="nm">R18</td><td>use-case</td><td><code>realized-by</code></td><td>slice</td><td>✓</td><td>flow → slices</td></tr>
+          <tr><td class="nm">R19</td><td>scenario</td><td><code>exercises</code></td><td>pipeline</td><td>—</td><td>runbook path</td></tr>
+          <tr><td class="nm">R20</td><td>value-object</td><td><code>used-by</code></td><td>aggregate</td><td>✓</td><td>type usage</td></tr>
+          <tr><td class="nm">R21</td><td>context</td><td><code>depends-on</code></td><td>context</td><td>✓</td><td>the context map</td></tr>
+          <tr><td class="nm">R22</td><td>aggregate</td><td><code>belongs-to</code></td><td>subdomain</td><td>—</td><td>strategic classification</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small" style="margin-top:10px">Strategic layer in one glance: R21 is the context map; R22 places aggregates in core/supporting/generic subdomains; R12/R13 carry who may act and who sees what. Everything else is behavior — and behavior edges propagate impact.</p>
+    </section>
+
+    <section id="slice">
+      <div class="sec-head"><span class="no">04</span><h2>A real slice, unedited</h2></div>
+      <p class="sec-sub">From <code>truth/bank-wealth/…/credit-balance/slices/initialize-account.slice.yaml</code>. This is the language in its densest form: one command, five guards, one event, folds, provenance.</p>
+      <pre class="code"><code>kind: slice
+aggregate: CreditBalance
+command: InitializeAccount
+payload:
+  {
+    "name": "InitializeAccount",
+    "parameters": [
+      "resource: AccountId @BUSINESS_INPUT",
+      "currency: String @BUSINESS_INPUT",
+      "amount: Money @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject ACCOUNT_ID/ACCOUNT_ID: \"param.resource == state.id\")",
+      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" …\")",
+      "@guard[invariantRef](reject ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
+      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount >= 0.00\")"
+    ],
+    "produces": [ "AccountInitialized" ],
+    "provenance": { "author": "agent-assisted-bank-v1", "approvedBy": "user-approved-p24-p25-bank-joint", … }
+  }
+events:
+  {
+    "AccountInitialized": {
+      "payloads":  [ "resource: AccountId @PROPAGATED", "amount: Money @PROPAGAGED", … ],
+      "bindings":  [ "resource <- param.resource", "amount <- param.amount", … ],
+      "foldAssignments": [
+        "initialized := \"literal:true\"",
+        "accountBalance := @fold[put](key=event.currency, value=event.amount)"
+      ]
+    }
+  }</code></pre>
+      <div class="card-grid cols-3" style="margin-top:16px">
+        <div class="card"><span class="tag">Guards</span><h3>Rules with teeth</h3><p>Each guard cites a named invariant (<code>ACCOUNT_SEED_NONNEGATIVE</code>) and an error code to reject with. “Non-negative balance” is no longer a comment — it compiles into the generated command handler.</p></div>
+        <div class="card"><span class="tag">Bindings</span><h3>Where payloads come from</h3><p>Every event field is either propagated from a parameter or computed — provenance at the field level, which is what read-model lineage (R10/R11) builds on.</p></div>
+        <div class="card"><span class="tag">Folds</span><h3>History becomes state</h3><p><code>foldAssignments</code> define how the event updates aggregate state — the algebra the generated event applier implements.</p></div>
+      </div>
+    </section>
+
+    <section id="gates">
+      <div class="sec-head"><span class="no">05</span><h2>Governance: three gates, not style guides</h2></div>
+      <div class="steps">
+        <div class="step-item"><div><h4><code>validate</code> — 0 hard findings</h4><p class="meta">structural + semantic validation of the author tree</p><p>Unknown kinds, dangling references, an event defined in two places, a slice without its aggregate — all hard findings. Zero is the only acceptable count. Bank tree as of 2026-11-11: <strong>0 hard</strong> <span class="badge verified" title="F-01">verified</span>.</p></div></div>
+        <div class="step-item"><div><h4><code>roundtrip</code> — byte-identical</h4><p class="meta">tree → canonical → tree must reproduce the author files exactly</p><p>This is the anti-formatting-drift gate. If compilation “normalizes” anything, the roundtrip diverges and the gate fails. Bank tree: <strong>157 atoms, byte-identical</strong> <span class="badge verified" title="F-02">verified</span>.</p></div></div>
+        <div class="step-item"><div><h4><code>compile-products</code> — strict contracts</h4><p class="meta">formal products must satisfy their schemas before use</p><p>Ports, saga IR, execution IR: typed, versioned products compiled from the tree with their own validation. Generated code consumes frozen products only.</p></div></div>
+      </div>
+      <div class="callout teal"><b>AGENTS</b><p>The editing contract for AI agents is the same three gates plus stewardship rules: every batch ends <strong>validate AND roundtrip green</strong>; payload text is preserved verbatim; no tool artifacts inside the tree; one event defined in exactly one slice. It ships with the toolchain as <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/AGENTS.md">AGENTS.md</a> and a query <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/skills">skill pack</a>.</p></div>
+    </section>
+
+    <section id="authoring">
+      <div class="sec-head"><span class="no">06</span><h2>What authoring looks like today — and tomorrow</h2></div>
+      <p class="sec-sub">Today the editing surface is YAML files plus three extraction skills (from a codebase, from reachable data, from a one-line description). Visual authoring — importing workshop boards from Qlerify or Miro, reverse-engineering a tree from an existing repo — is designed for but not yet built: <a class="badge deferred" href="/status/#DEF-02">DEF-02</a>.</p>
+      <p class="small">Schema reference: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/SCHEMA.md">SCHEMA.md</a> · authoring guide: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/AUTHORING.md">AUTHORING.md</a> · full tutorial: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/TUTORIAL.md">TUTORIAL.md</a></p>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

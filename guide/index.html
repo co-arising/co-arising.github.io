@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hands-on guide — co-arising</title>
+  <meta name="description" content="From zero to the full loop: environment setup (with Docker fallback), the Counter tutorial, the bank example pipeline, and wiring the MCP server into Claude Code for blast-radius queries." />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">Hands-on · zero to full loop</p>
+      <h1>The guide: <span class="accent">run the whole thing</span></h1>
+      <p class="thesis">Three levels, each with a green light at the end: L1 the Counter tutorial (Node only, ~10 min), L2 the bank example pipeline (add a JVM, ~30 min), L3 wiring the MCP server into Claude Code so an agent plans an incremental change by querying the graph. If any step fails, the last sub-section tells you where the red lines are.</p>
+    </header>
+
+    <section id="env">
+      <div class="sec-head"><span class="no">00</span><h2>Environment — pick one path, both are first-class</h2></div>
+      <p class="sec-sub">The toolchain needs <strong>Node ≥ 22.13.0</strong> (built-in <code>node:sqlite</code> is why). Level 2 additionally needs a JVM (11+) and sbt. Every command below is copy-pasteable.</p>
+
+      <h3>Path A · native Node</h3>
+      <pre class="code"><code># macOS (Homebrew)
+brew install node@22
+
+# or with nvm
+nvm install 22
+node --version   # must print v22.13.0 or newer</code></pre>
+
+      <h3>Path B · Docker (if you don’t want to touch your host Node)</h3>
+      <pre class="code"><code>docker run --rm -it -v "$PWD":/work -w /work node:22 bash
+# you are now on Node 22 inside the container; everything below works unchanged</code></pre>
+
+      <h3>Level 2 only · JVM + sbt</h3>
+      <pre class="code"><code># macOS
+brew install openjdk@11 sbt
+
+# or the Docker variant for JVM work
+docker run --rm -it -v "$PWD":/work -w /work sbtscala/scala-sbt:eclipse-temurin-11.0.24_9_1.10.11_2.13.14 bash</code></pre>
+    </section>
+
+    <section id="install">
+      <div class="sec-head"><span class="no">01</span><h2>Get the toolchain</h2></div>
+      <p class="sec-sub">npm publication is on the ledger (<a class="badge deferred" href="/status/#DEF-03">DEF-03</a>) — until then, a source checkout is the canonical install. Zero npm <em>runtime</em> dependencies means the checkout is the whole toolchain.</p>
+      <pre class="code"><code>git clone https://github.com/co-arising/metarch-truthsrc.git
+npm install --prefix metarch-truthsrc        # dev deps only; runtime is stdlib-only
+
+# smoke test — no SQLite touched, no side effects
+node metarch-truthsrc/bin/truthsrc.js --help</code></pre>
+      <p class="small">Tip: <code>alias truthsrc="node $PWD/metarch-truthsrc/bin/truthsrc.js"</code> makes the rest of this page read literally.</p>
+    </section>
+
+    <section id="l1">
+      <div class="sec-head"><span class="no">02</span><h2>L1 · Counter tutorial — the whole loop in miniature</h2></div>
+      <p class="sec-sub">One aggregate, one slice, one rule. You will author, generate, query the anchor both directions, verify, change the tree, see staleness, and regenerate. Green lights are printed by the tool — trust them, not your eyes.</p>
+      <div class="steps">
+        <div class="step-item"><div><h4>Create the project</h4><p class="meta">refuses to touch an existing directory</p><p><code>node ../metarch-truthsrc/bin/truthsrc.js init counter-lab --format human</code> then <code>cd counter-lab</code>. Look inside: <code>truth/example/…</code> is the whole author tree — <code>aggregate.yaml</code> (state + <code>@rule</code>) and one slice.</p></div></div>
+        <div class="step-item"><div><h4>Plan before you write</h4><p class="meta">nothing is written yet</p><p><code>… generate-project --plan --format human</code> — the plan lists every file it <em>would</em> write. Read it. Generation should never be a surprise.</p></div></div>
+        <div class="step-item"><div><h4>Generate &amp; inspect freshness</h4><p class="meta">green light: inputs=current · evidence=verified · synchronized=true</p><p><code>… generate-project --format human</code> then <code>… status-project --out . --format human</code>. Open a generated file — every one carries its anchor header.</p></div></div>
+        <div class="step-item"><div><h4>Ask both directions</h4><p class="meta">the moment the loop closes</p><p><code>… query-project --knowledge SetCount</code> → the exact file and span. Then <code>… query-project --file &lt;that file&gt; --symbol &lt;symbol&gt;</code> → back to the rule. Knowledge and code, joined.</p></div></div>
+        <div class="step-item"><div><h4>Change the truth, not the code</h4><p class="meta">see staleness, then re-sync</p><p>Edit <code>truth/…/aggregate.yaml</code>: change the count default <code>0</code> → <code>2</code>. <code>status-project</code> now reports <strong>changed</strong>. <code>… generate-project --update --plan</code> shows the diff plan; <code>--update</code> applies it. Run generate again — <strong>written: 0</strong>. Idempotence is the gate.</p></div></div>
+        <div class="step-item"><div><h4>Verify &amp; take the picture</h4><p class="meta">green light: verify passed</p><p><code>… verify-project --out . </code> re-proves every anchor against file bytes. <code>… view-project --out . --html counter-map.html</code> exports a single-file map — open it offline.</p></div></div>
+      </div>
+    </section>
+
+    <section id="l2">
+      <div class="sec-head"><span class="no">03</span><h2>L2 · The bank example at full scale</h2></div>
+      <p class="sec-sub">157 atoms, 3 aggregates, 2 sagas, 4 pipelines — the same six gates, industrial size. From here the green lights are the project’s own acceptance layers.</p>
+      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
+cd bank-wealth-demo
+
+# gate 1+2 — validate &amp; roundtrip (one command; roundtrip is part of the gate)
+npm run validate            # ✅ 0 hard · roundtrip: 157 atoms byte-identical
+
+# gate 3 — compile &amp; build the graph store (389 nodes / 413 edges)
+npm run compile
+node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
+
+# gate 4 — generate the CQRS project (235 files)
+npm run project             # writes generated/current/
+
+# gate 5 — the handwritten zone is already complete in the repo (35 files);
+#          it compiles as part of the generated build:
+cd generated/current &amp;&amp; sbt compile   # ✅ 0 errors, 534 sources
+sbt test                             # ✅ 23/23
+
+# gate 6 — prove every anchor (792)
+cd ../.. &amp;&amp; node ../metarch-truthsrc/bin/truthsrc.js verify-project \
+  --project truthsrc.project.json --out generated/current</code></pre>
+      <div class="callout"><b>WHAT YOU JUST PROVED</b><p>That a 157-atom description of a bank wealth domain compiles, becomes a queryable graph, generates a compiling, tested Scala codebase whose 792 anchors verify against file bytes — <strong>and that you can re-run every step</strong>. The boundary you did NOT cross: running the HTTP service end-to-end (ledger <a class="badge boundary" href="/status/#DEF-06">DEF-06</a> <a class="badge boundary" href="/status/#DEF-07">DEF-07</a>).</p></div>
+    </section>
+
+    <section id="l3">
+      <div class="sec-head"><span class="no">04</span><h2>L3 · Wire the graph into Claude Code (MCP)</h2></div>
+      <p class="sec-sub">This is the agentic payoff: an agent that plans changes by <em>querying the knowledge graph</em> instead of grepping the repo. The MCP server ships 26 read-oriented tools <span class="badge verified" title="F-16">verified</span>.</p>
+
+      <h3>Register the server</h3>
+      <pre class="code"><code># from any directory (path to your metarch-truthsrc checkout)
+claude mcp add truthsrc -- node /absolute/path/to/metarch-truthsrc/bin/truthsrc.js mcp</code></pre>
+
+      <h3>Install the query skill</h3>
+      <p style="max-width:52em">The toolchain ships a skill that teaches an agent the query discipline (budgeted graph walks, following <code>next_actions</code>, over-report semantics of blast_radius). Copy it into your project:</p>
+      <pre class="code"><code>mkdir -p .claude/skills
+cp -r /absolute/path/to/metarch-truthsrc/skills/truthsrc .claude/skills/</code></pre>
+
+      <h3>The exercise: plan an incremental change by blast radius</h3>
+      <div class="steps">
+        <div class="step-item"><div><h4>Give the agent a requirement</h4><p class="meta">in Claude Code, inside bank-wealth-demo</p><p>Try: <em>“We need to change what happens when an SIP installment fails. Before proposing anything, query the truth graph for the blast radius of <code>SipInstallmentFailed</code> and report which slices, read models and pipelines are affected.”</em></p></div></div>
+        <div class="step-item"><div><h4>Watch the discipline work</h4><p class="meta">describe → expand → blast_radius, following next_actions</p><p>The agent should walk propagating edges from the event, enumerate affected guards/read-models/pipelines (dozens of nodes within 3 hops), and only then draft a change proposal <strong>against the tree</strong> — not against code.</p></div></div>
+        <div class="step-item"><div><h4>Apply the editing contract</h4><p class="meta">agents draft; gates judge</p><p>Any tree edit must end with <code>validate</code> (0 hard) <strong>and</strong> <code>roundtrip</code> (byte-identical) green, then <code>generate-project --update --plan</code> to see the regeneration diff before applying. That’s stewardship, mechanically enforced.</p></div></div>
+      </div>
+      <p class="small">Also shipped: skills for extracting a tree from an existing codebase, from reachable data, or bootstrapping workshop drafts from a one-line description — <code>skills/</code> in the toolchain repo.</p>
+    </section>
+
+    <section id="redlines">
+      <div class="sec-head"><span class="no">05</span><h2>Red lines &amp; recovery</h2></div>
+      <div class="callout red"><b>NEVER</b><p><strong>Never hand-edit derived artifacts</strong> — the compiled canonical, <code>.truthsrc/</code>, ledgers, anchors, or generated files. They are regenerated; your edits are void (and detected). If generated code looks wrong, the fix belongs in the tree — that is the entire point. &nbsp;·&nbsp; <strong>Never force past a red gate.</strong> <code>validate</code> findings and roundtrip divergence are information, not obstacles. &nbsp;·&nbsp; <strong>Graph store? Delete freely</strong> — it is a pure cache, rebuild with one <code>graph</code> command.</p></div>
+      <p class="small">Stuck? The toolchain README has a diagnostics section; the <a href="/status/#facts">facts page</a> tells you exactly which claims are verified on which date — if your numbers differ from ours, trust your terminal.</p>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>
