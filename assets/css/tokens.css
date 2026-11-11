@@ -64,6 +64,16 @@
   /* depth */
   --shadow: 0 1px 2px rgba(28, 25, 19, .06), 0 8px 24px -12px rgba(28, 25, 19, .18);
 
+  /* fixed hero band — deliberately NOT theme-inverted: a deep band reads as
+     "cover" in both themes; text on it uses --hero-ink. */
+  --hero-bg-1: #1f1c15;
+  --hero-bg-2: #171410;
+  --hero-bg-3: #241d18;
+  --hero-ink: #f3efe4;
+  --hero-ink-dim: rgba(243, 239, 228, .74);
+  --hero-ink-faint: rgba(243, 239, 228, .55);
+  --hero-line: rgba(243, 239, 228, .26);
+
   /* typography scale */
   --font-sans: "IBM Plex Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;

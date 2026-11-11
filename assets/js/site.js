@@ -70,7 +70,7 @@ const SITE = {
             .join("")
       )
       .join("");
-    nav.innerHTML = `<div class="site-nav"><div class="row">
+    nav.innerHTML = `<div class="topline"></div><div class="site-nav"><div class="row">
       <a class="brand" href="/"><span class="dot"></span>co-arising</a>
       ${links}
       <span class="spacer"></span>

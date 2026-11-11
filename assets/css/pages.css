@@ -1,12 +1,63 @@
 /* co-arising.github.io — page-specific layouts (explorer, dissolve, compare) */
 
-/* ---------- home hero ---------- */
-.home-hero { padding: 72px 0 40px; border-bottom: 3px double var(--line-strong); }
-.home-hero h1 { font-size: var(--fs-hero); font-weight: 800; letter-spacing: -.035em; line-height: 1.04; margin: 0 0 20px; max-width: 900px; }
-.home-hero h1 .accent { color: var(--red); }
-.home-hero .lede { font-size: clamp(17px, 2.1vw, 21px); color: var(--ink-2); max-width: 46em; margin: 0 0 22px; }
-.home-hero .lede strong { color: var(--ink); }
+/* ---------- home hero — the deep band ---------- */
+.home-hero {
+  position: relative;
+  margin: 0 -20px;
+  padding: 72px 20px 48px;
+  border-bottom: 3px double var(--line-strong);
+  background:
+    repeating-linear-gradient(135deg, transparent 0 22px, rgba(92, 179, 161, .07) 22px 24px),
+    linear-gradient(160deg, var(--hero-bg-1) 0%, var(--hero-bg-2) 58%, var(--hero-bg-3) 100%);
+  color: var(--hero-ink-dim);
+}
+.home-hero .kicker { color: color-mix(in srgb, #5cb3a1 80%, #fff); }
+.home-hero h1 { font-size: var(--fs-hero); font-weight: 800; letter-spacing: -.035em; line-height: 1.04; margin: 0 0 20px; max-width: 900px; color: var(--hero-ink); }
+.home-hero h1 .accent { color: #ff9c7a; }
+.home-hero .lede { font-size: clamp(17px, 2.1vw, 21px); color: var(--hero-ink-dim); max-width: 46em; margin: 0 0 22px; }
+.home-hero .lede strong { color: var(--hero-ink); }
 .home-hero .cta-row { margin-top: 26px; }
+.home-hero .btn { background: var(--red); border-color: #ff9c7a; color: #fff; }
+.home-hero .btn.ghost { background: transparent; color: var(--hero-ink); border-color: var(--hero-line); }
+.home-hero .btn.ghost:hover { background: rgba(243, 239, 228, .12); }
+/* stat strip sits on the dark band — inverted cells */
+.home-hero .stat-strip { background: rgba(243, 239, 228, .07); border-color: var(--hero-line); }
+.home-hero .stat { border-right-color: var(--hero-line); }
+.home-hero .stat .num { color: #8ed0b3; }
+.home-hero .stat .lbl { color: var(--hero-ink-faint); }
+.home-hero .stat .badge.verified { background: rgba(92, 179, 161, .25); color: #b8e3cf; }
+/* terminal on the band */
+.home-hero .term { box-shadow: 0 14px 40px rgba(0, 0, 0, .45), 0 0 0 1px rgba(140, 208, 186, .25); }
+
+/* ---------- section rhythm: alternating bands + strong rules ---------- */
+main.wrap > section { padding: 64px 0 10px; }
+main.wrap > section + section::before {
+  content: ""; display: block; height: 1px; margin: -28px 0 34px;
+  background: linear-gradient(90deg, var(--line-strong), var(--line) 40%, transparent);
+}
+.sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; padding-top: 14px; border-top: 3px solid var(--ink); }
+.sec-head .no { font-family: var(--font-mono); font-size: 13px; color: var(--red); font-weight: 600; }
+.sec-sub { color: var(--ink-2); max-width: 52em; margin: 6px 0 26px; }
+.small { font-size: var(--fs-small); color: var(--ink-3); }
+.src { font-size: var(--fs-tiny); color: var(--ink-3); }
+.src a { color: var(--ink-3); border-bottom-color: var(--line-strong); }
+
+.kicker {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--teal);
+  margin: 0 0 12px;
+}
+
+/* ---------- page hero (below injected site nav) — lighter version of the band ---------- */
+.page-hero {
+  position: relative;
+  margin: 0 -20px 8px;
+  padding: 56px 20px 30px;
+  border-bottom: 3px double var(--line-strong);
+  background:
+    repeating-linear-gradient(135deg, transparent 0 22px, color-mix(in srgb, var(--teal) 4%, transparent) 22px 24px),
+    linear-gradient(165deg, var(--bg-sink), var(--bg) 70%);
+}
 
 /* ---------- explorer page ---------- */
 .xp-layout { display: grid; grid-template-columns: 280px 1fr; gap: 18px; margin-top: 22px; }
@@ -70,7 +121,8 @@
 
 /* ---------- guide step list ---------- */
 .steps { counter-reset: step; display: grid; gap: 10px; margin: 18px 0; }
-.step-item { counter-increment: step; background: var(--bg-raised); border: 1px solid var(--line); padding: 16px 20px; display: grid; grid-template-columns: 44px 1fr; gap: 14px; }
+.step-item { counter-increment: step; background: var(--bg-raised); border: 1px solid var(--line); padding: 16px 20px; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; box-shadow: var(--shadow); }
 .step-item::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); font-size: 20px; font-weight: 600; color: var(--teal); }
 .step-item h4 { margin: 0 0 6px; font-size: 16px; }
+.step-item code { overflow-wrap: break-word; word-break: break-all; }
 .step-item .meta { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-bottom: 8px; }

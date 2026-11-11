@@ -21,7 +21,7 @@ a:hover { border-bottom-color: var(--red); }
 a.muted { color: var(--ink-3); border-bottom-color: var(--line-strong); }
 
 h1, h2, h3, h4 { line-height: 1.25; letter-spacing: -.01em; }
-h2 { font-size: var(--fs-h2); font-weight: 700; margin: 0; }
+h2 { font-size: var(--fs-h2); font-weight: 800; margin: 0; letter-spacing: -.02em; }
 h3 { font-size: var(--fs-h3); font-weight: 700; margin: 26px 0 10px; }
 p { margin: 0 0 12px; }
 code { font-family: var(--font-mono); font-size: .87em; background: color-mix(in srgb, var(--bg-sink) 75%, transparent); padding: .08em .32em; border-radius: 4px; }
@@ -43,15 +43,14 @@ section { padding: 52px 0 6px; }
   margin: 0 0 12px;
 }
 
-/* ---------- page hero (below injected site nav) ---------- */
-.page-hero { padding: 56px 0 10px; border-bottom: 3px double var(--line-strong); }
+/* ---------- page hero (band styling lives in pages.css; keep typography here) ---------- */
 .page-hero .over {
   font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .14em;
   color: var(--ink-3); text-transform: uppercase; margin: 0 0 14px;
 }
 .page-hero h1 {
   font-size: clamp(32px, 5vw, 52px); font-weight: 800; line-height: 1.15;
-  margin: 0 0 14px;
+  margin: 0 0 14px; letter-spacing: -.025em;
 }
 .page-hero h1 .accent { color: var(--red); }
 .page-hero .thesis { font-size: clamp(16.5px, 2.2vw, 19.5px); color: var(--ink-2); max-width: 46em; margin: 0; }

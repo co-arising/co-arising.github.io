@@ -7,8 +7,7 @@
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
-.site-nav .row { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
-.site-nav .row::-webkit-scrollbar { display: none; }
+.site-nav .row { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
 .site-nav .brand {
   font-weight: 700; font-size: 15px; white-space: nowrap; padding: 12px 12px 12px 0;
   color: var(--ink); border: 0; display: inline-flex; align-items: center; gap: 8px;
@@ -26,12 +25,16 @@
 .site-nav a.nav-link:hover { color: var(--red); }
 .site-nav a.nav-link[aria-current="page"] { color: var(--red); font-weight: 600; }
 .site-nav .spacer { flex: 1; }
+@media (max-width: 1180px) { .site-nav .spacer { display: none; } }
 .site-nav .theme-btn {
   border: 1px solid var(--line); background: var(--bg-raised); color: var(--ink-2);
   font-family: var(--font-mono); font-size: 12px; padding: 5px 10px; margin-left: 10px;
   cursor: pointer; border-radius: 6px; white-space: nowrap;
 }
 .site-nav .theme-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+
+/* brand topline — three-signal gradient, the org's mark */
+.topline { height: 6px; background: linear-gradient(90deg, var(--red) 0 30%, var(--teal) 30% 72%, var(--amber) 72%); }
 
 /* ---------- site footer (injected by site.js) ---------- */
 .site-footer { border-top: 3px double var(--line-strong); padding: 30px 20px 40px; }
@@ -72,11 +75,11 @@
 .card .foot { font-size: 12px; color: var(--ink-3); border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 10px; }
 
 /* ---------- terminal window ---------- */
-.term { background: var(--surface-code); color: var(--ink-on-code); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); margin: 18px 0; }
-.term-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: color-mix(in srgb, var(--surface-code) 82%, #fff 4%); border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.term { background: var(--surface-code); color: var(--ink-on-code); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow), 0 0 0 1px color-mix(in srgb, var(--teal) 22%, transparent); margin: 18px 0; }
+.term-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: color-mix(in srgb, var(--red) 26%, var(--surface-code)); border-bottom: 1px solid rgba(255, 255, 255, .1); }
 .term-bar .dots { display: inline-flex; gap: 6px; }
-.term-bar .dots i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, .18); }
-.term-bar .title { font-family: var(--font-mono); font-size: 11.5px; color: rgba(220, 233, 230, .55); }
+.term-bar .dots i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, .22); }
+.term-bar .title { font-family: var(--font-mono); font-size: 11.5px; color: rgba(220, 233, 230, .62); }
 .term pre { margin: 0; padding: 16px 18px; overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.75; }
 .term .p { color: #7fd0c8; }           /* prompt */
 .term .c { color: #e8e4d8; }           /* command */
@@ -130,8 +133,10 @@ a.badge { border-bottom: 0; }
 
 /* ---------- feature grid ---------- */
 .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
-.feature { background: var(--bg-raised); border: 1px solid var(--line); padding: 18px 20px; border-top: 3px solid var(--ink); }
-.feature .n { font-family: var(--font-mono); font-size: 11px; color: var(--red); font-weight: 600; }
+.feature { background: var(--bg-raised); border: 1px solid var(--line); padding: 18px 20px; border-top: 3px solid var(--teal); box-shadow: var(--shadow); }
+.feature:nth-child(3n+2) { border-top-color: var(--red); }
+.feature:nth-child(3n) { border-top-color: var(--amber); }
+.feature .n { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); font-weight: 600; }
 .feature h3 { font-size: 16.5px; margin: 8px 0 6px; }
 .feature p { font-size: 13.5px; color: var(--ink-2); margin: 0; }
 @media (max-width: 900px) { .feature-grid { grid-template-columns: 1fr 1fr; } }
