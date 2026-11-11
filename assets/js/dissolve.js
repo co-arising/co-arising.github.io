@@ -1,5 +1,5 @@
 /* co-arising.github.io — the Aggregate Dissolve / Arise demo.
-   Real CreditBalance subgraph (24 nodes / 35 edges) exported from the bank
+   Real CreditBalance subgraph (28 nodes / 35 edges) exported from the bank
    knowledge graph. Two modes:
    - Dissolve: click relations to remove them; a slice whose guards are all
      gone loses its enforcement; the aggregate shell cracks as slices fall.
@@ -131,7 +131,7 @@
     document.getElementById("dz-reset").onclick = () => {
       removed = new Set();
       mode = "dissolve";
-      render("<strong>Reset.</strong> All 35 relations present — 3 slices, 3 commands, 3 events, 14 invariants held by " + slices.length + " enforced slices.");
+      render("<strong>Reset.</strong> All 35 relations present — 3 slices, 3 commands, 3 events, 18 invariants held by " + slices.length + " enforced slices.");
     };
     document.getElementById("dz-remove-guards").onclick = () => {
       EDGES.filter((e) => e.relation === "guarded-by").forEach((e) => removed.add(e.i));
@@ -164,5 +164,5 @@
     });
   }
 
-  render("<strong>This is real data</strong> — the CreditBalance aggregate from the bank worked example, exported from the compiled knowledge graph (24 nodes · 35 edges · guards expanded from slice atoms). <em>Click any edge to remove it.</em> The fastest story: hit “remove ALL guard edges”.");
+  render("<strong>This is real data</strong> — the CreditBalance aggregate from the bank worked example, exported from the compiled knowledge graph (28 nodes · 35 edges · guards expanded from slice atoms). <em>Click any edge to remove it.</em> The fastest story: hit “remove ALL guard edges”.");
 })();

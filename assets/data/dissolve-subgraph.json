@@ -8,6 +8,61 @@
    "name": "CreditBalance"
   },
   {
+   "id": "slice:InitializeAccount",
+   "kind": "slice",
+   "name": "InitializeAccount"
+  },
+  {
+   "id": "command:InitializeAccount",
+   "kind": "command",
+   "name": "InitializeAccount"
+  },
+  {
+   "id": "event:AccountInitialized",
+   "kind": "event",
+   "name": "AccountInitialized"
+  },
+  {
+   "id": "invariant:ACCOUNT_ID",
+   "kind": "invariant",
+   "name": "ACCOUNT_ID",
+   "cond": "param.resource == state.id",
+   "errCode": "ACCOUNT_ID",
+   "onFail": "reject"
+  },
+  {
+   "id": "invariant:ACCOUNT_CURRENCY",
+   "kind": "invariant",
+   "name": "ACCOUNT_CURRENCY",
+   "cond": "param.currency == \"CNY\" && param.amount.currency == param.currency",
+   "errCode": "ACCOUNT_CURRENCY",
+   "onFail": "reject"
+  },
+  {
+   "id": "invariant:ACCOUNT_INIT_CONFLICT",
+   "kind": "invariant",
+   "name": "ACCOUNT_INIT_CONFLICT",
+   "cond": "!state.initialized || state.accountBalance.get(param.currency).contains(param.amount)",
+   "errCode": "ACCOUNT_INIT_CONFLICT",
+   "onFail": "reject"
+  },
+  {
+   "id": "invariant:ACCOUNT_INIT_ONCE",
+   "kind": "invariant",
+   "name": "ACCOUNT_INIT_ONCE",
+   "cond": "!state.initialized",
+   "errCode": "ACCOUNT_INIT_ONCE",
+   "onFail": "succeed-empty"
+  },
+  {
+   "id": "invariant:ACCOUNT_SEED_NONNEGATIVE",
+   "kind": "invariant",
+   "name": "ACCOUNT_SEED_NONNEGATIVE",
+   "cond": "param.amount.amount >= 0.00",
+   "errCode": "ACCOUNT_SEED_NONNEGATIVE",
+   "onFail": "reject"
+  },
+  {
    "id": "slice:ReserveFunds",
    "kind": "slice",
    "name": "ReserveFunds"
@@ -16,6 +71,11 @@
    "id": "command:ReserveFunds",
    "kind": "command",
    "name": "ReserveFunds"
+  },
+  {
+   "id": "event:ReserveFundsConfirmed",
+   "kind": "event",
+   "name": "ReserveFundsConfirmed"
   },
   {
    "id": "invariant:LEDGER_RESOURCE",
@@ -66,15 +126,36 @@
    "onFail": "reject"
   },
   {
-   "id": "invariant:undefined",
+   "id": "invariant:LEDGER_ALREADY_COMMITTED",
    "kind": "invariant",
+   "name": "LEDGER_ALREADY_COMMITTED",
+   "cond": "!state.committedOutgoing.contains(param.txid)",
    "errCode": "LEDGER_ALREADY_COMMITTED",
    "onFail": "succeed-empty"
   },
   {
-   "id": "event:ReserveFundsConfirmed",
-   "kind": "event",
-   "name": "ReserveFundsConfirmed"
+   "id": "invariant:LEDGER_ALREADY_COMPENSATED",
+   "kind": "invariant",
+   "name": "LEDGER_ALREADY_COMPENSATED",
+   "cond": "!state.compensatedOutgoing.contains(param.txid)",
+   "errCode": "LEDGER_ALREADY_COMPENSATED",
+   "onFail": "succeed-empty"
+  },
+  {
+   "id": "invariant:LEDGER_ALREADY_PREPARED",
+   "kind": "invariant",
+   "name": "LEDGER_ALREADY_PREPARED",
+   "cond": "!state.reservedAmount.contains(param.txid)",
+   "errCode": "LEDGER_ALREADY_PREPARED",
+   "onFail": "succeed-empty"
+  },
+  {
+   "id": "invariant:LEDGER_SUFFICIENT",
+   "kind": "invariant",
+   "name": "LEDGER_SUFFICIENT",
+   "cond": "state.accountBalance.sufficient(param.amount)",
+   "errCode": "LEDGER_SUFFICIENT",
+   "onFail": "reject"
   },
   {
    "id": "slice:DeductFunds",
@@ -85,6 +166,19 @@
    "id": "command:DeductFunds",
    "kind": "command",
    "name": "DeductFunds"
+  },
+  {
+   "id": "event:DeductFundsConfirmed",
+   "kind": "event",
+   "name": "DeductFundsConfirmed"
+  },
+  {
+   "id": "invariant:LEDGER_COMMIT_ONCE",
+   "kind": "invariant",
+   "name": "LEDGER_COMMIT_ONCE",
+   "cond": "!state.committedOutgoing.contains(param.txid)",
+   "errCode": "LEDGER_COMMIT_ONCE",
+   "onFail": "succeed-empty"
   },
   {
    "id": "invariant:LEDGER_NOT_COMPENSATED",
@@ -101,69 +195,54 @@
    "cond": "state.reservedAmount.contains(param.txid)",
    "errCode": "LEDGER_PREPARED",
    "onFail": "reject"
-  },
-  {
-   "id": "event:DeductFundsConfirmed",
-   "kind": "event",
-   "name": "DeductFundsConfirmed"
-  },
-  {
-   "id": "slice:InitializeAccount",
-   "kind": "slice",
-   "name": "InitializeAccount"
-  },
-  {
-   "id": "command:InitializeAccount",
-   "kind": "command",
-   "name": "InitializeAccount"
-  },
-  {
-   "id": "invariant:ACCOUNT_ID",
-   "kind": "invariant",
-   "name": "ACCOUNT_ID",
-   "cond": "param.resource == state.id",
-   "errCode": "ACCOUNT_ID",
-   "onFail": "reject"
-  },
-  {
-   "id": "invariant:ACCOUNT_CURRENCY",
-   "kind": "invariant",
-   "name": "ACCOUNT_CURRENCY",
-   "cond": "param.currency == \"CNY\" && param.amount.currency == param.currency",
-   "errCode": "ACCOUNT_CURRENCY",
-   "onFail": "reject"
-  },
-  {
-   "id": "invariant:ACCOUNT_INIT_CONFLICT",
-   "kind": "invariant",
-   "name": "ACCOUNT_INIT_CONFLICT",
-   "cond": "!state.initialized || state.accountBalance.get(param.currency).contains(param.amount)",
-   "errCode": "ACCOUNT_INIT_CONFLICT",
-   "onFail": "reject"
-  },
-  {
-   "id": "invariant:ACCOUNT_INIT_ONCE",
-   "kind": "invariant",
-   "name": "ACCOUNT_INIT_ONCE",
-   "cond": "!state.initialized",
-   "errCode": "ACCOUNT_INIT_ONCE",
-   "onFail": "succeed-empty"
-  },
-  {
-   "id": "invariant:ACCOUNT_SEED_NONNEGATIVE",
-   "kind": "invariant",
-   "name": "ACCOUNT_SEED_NONNEGATIVE",
-   "cond": "param.amount.amount >= 0.00",
-   "errCode": "ACCOUNT_SEED_NONNEGATIVE",
-   "onFail": "reject"
-  },
-  {
-   "id": "event:AccountInitialized",
-   "kind": "event",
-   "name": "AccountInitialized"
   }
  ],
  "edges": [
+  {
+   "from": "aggregate:CreditBalance",
+   "relation": "owns",
+   "to": "slice:InitializeAccount"
+  },
+  {
+   "from": "slice:InitializeAccount",
+   "relation": "issues",
+   "to": "command:InitializeAccount"
+  },
+  {
+   "from": "slice:InitializeAccount",
+   "relation": "emits",
+   "to": "event:AccountInitialized"
+  },
+  {
+   "from": "slice:InitializeAccount",
+   "relation": "guarded-by",
+   "to": "invariant:ACCOUNT_ID"
+  },
+  {
+   "from": "slice:InitializeAccount",
+   "relation": "guarded-by",
+   "to": "invariant:ACCOUNT_CURRENCY"
+  },
+  {
+   "from": "slice:InitializeAccount",
+   "relation": "guarded-by",
+   "to": "invariant:ACCOUNT_INIT_CONFLICT"
+  },
+  {
+   "from": "slice:InitializeAccount",
+   "relation": "guarded-by",
+   "to": "invariant:ACCOUNT_INIT_ONCE"
+  },
+  {
+   "from": "slice:InitializeAccount",
+   "relation": "guarded-by",
+   "to": "invariant:ACCOUNT_SEED_NONNEGATIVE"
+  },
+  {
+   "from": "aggregate:CreditBalance",
+   "relation": "emits",
+   "to": "event:AccountInitialized"
+  },
   {
    "from": "aggregate:CreditBalance",
    "relation": "owns",
@@ -173,6 +252,11 @@
    "from": "slice:ReserveFunds",
    "relation": "issues",
    "to": "command:ReserveFunds"
+  },
+  {
+   "from": "slice:ReserveFunds",
+   "relation": "emits",
+   "to": "event:ReserveFundsConfirmed"
   },
   {
    "from": "slice:ReserveFunds",
@@ -207,27 +291,22 @@
   {
    "from": "slice:ReserveFunds",
    "relation": "guarded-by",
-   "to": "invariant:undefined"
+   "to": "invariant:LEDGER_ALREADY_COMMITTED"
   },
   {
    "from": "slice:ReserveFunds",
    "relation": "guarded-by",
-   "to": "invariant:undefined"
+   "to": "invariant:LEDGER_ALREADY_COMPENSATED"
   },
   {
    "from": "slice:ReserveFunds",
    "relation": "guarded-by",
-   "to": "invariant:undefined"
+   "to": "invariant:LEDGER_ALREADY_PREPARED"
   },
   {
    "from": "slice:ReserveFunds",
    "relation": "guarded-by",
-   "to": "invariant:undefined"
-  },
-  {
-   "from": "slice:ReserveFunds",
-   "relation": "emits",
-   "to": "event:ReserveFundsConfirmed"
+   "to": "invariant:LEDGER_SUFFICIENT"
   },
   {
    "from": "aggregate:CreditBalance",
@@ -243,6 +322,11 @@
    "from": "slice:DeductFunds",
    "relation": "issues",
    "to": "command:DeductFunds"
+  },
+  {
+   "from": "slice:DeductFunds",
+   "relation": "emits",
+   "to": "event:DeductFundsConfirmed"
   },
   {
    "from": "slice:DeductFunds",
@@ -267,7 +351,7 @@
   {
    "from": "slice:DeductFunds",
    "relation": "guarded-by",
-   "to": "invariant:undefined"
+   "to": "invariant:LEDGER_COMMIT_ONCE"
   },
   {
    "from": "slice:DeductFunds",
@@ -285,59 +369,9 @@
    "to": "invariant:LEDGER_RESERVEDAMOUNT_MATCH"
   },
   {
-   "from": "slice:DeductFunds",
-   "relation": "emits",
-   "to": "event:DeductFundsConfirmed"
-  },
-  {
    "from": "aggregate:CreditBalance",
    "relation": "emits",
    "to": "event:DeductFundsConfirmed"
-  },
-  {
-   "from": "aggregate:CreditBalance",
-   "relation": "owns",
-   "to": "slice:InitializeAccount"
-  },
-  {
-   "from": "slice:InitializeAccount",
-   "relation": "issues",
-   "to": "command:InitializeAccount"
-  },
-  {
-   "from": "slice:InitializeAccount",
-   "relation": "guarded-by",
-   "to": "invariant:ACCOUNT_ID"
-  },
-  {
-   "from": "slice:InitializeAccount",
-   "relation": "guarded-by",
-   "to": "invariant:ACCOUNT_CURRENCY"
-  },
-  {
-   "from": "slice:InitializeAccount",
-   "relation": "guarded-by",
-   "to": "invariant:ACCOUNT_INIT_CONFLICT"
-  },
-  {
-   "from": "slice:InitializeAccount",
-   "relation": "guarded-by",
-   "to": "invariant:ACCOUNT_INIT_ONCE"
-  },
-  {
-   "from": "slice:InitializeAccount",
-   "relation": "guarded-by",
-   "to": "invariant:ACCOUNT_SEED_NONNEGATIVE"
-  },
-  {
-   "from": "slice:InitializeAccount",
-   "relation": "emits",
-   "to": "event:AccountInitialized"
-  },
-  {
-   "from": "aggregate:CreditBalance",
-   "relation": "emits",
-   "to": "event:AccountInitialized"
   }
  ]
 }

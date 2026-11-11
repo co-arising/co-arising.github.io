@@ -29,7 +29,7 @@ and re-capture any changed number in SITE-FACTS.md.
 
 One-off export over the same sqlite (see git history of this file for the
 exact script). Node census of the current export: 1 aggregate, 3 slices,
-3 commands, 14 invariants, 3 events / 35 edges — regenerate if the bank
+3 commands, 18 invariants, 3 events / 35 edges — regenerate if the bank
 tree's CreditBalance slices change:
 
 ```bash
