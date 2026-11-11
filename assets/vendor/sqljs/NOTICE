@@ -1,0 +1,15 @@
+Vendored third-party assets in this directory:
+
+## sql.js 1.13.0
+
+- Files: sql-wasm.js, sql-wasm.wasm
+- Source: https://sql.js.org / npm package `sql.js@1.13.0`
+- License: MIT (see LICENSE in this directory)
+- Why vendored: the site runs fully offline — no CDN calls, version pinned, auditable.
+- Usage: `initSqlJs({ locateFile: f => '/assets/vendor/sqljs/' + f })`
+
+## IBM Plex fonts
+
+- Files: in /assets/fonts/
+- Source: Google Fonts (IBM Plex Sans, IBM Plex Mono — latin subset, woff2)
+- License: SIL Open Font License 1.1 (see OFL.txt alongside)

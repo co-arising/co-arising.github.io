@@ -1,0 +1,213 @@
+{
+ "version": "v0.5",
+ "source": "metarch-truthsrc/lib/shared.mjs",
+ "relations": [
+  {
+   "id": "R1",
+   "from": "aggregate",
+   "relation": "owns",
+   "to": "slice",
+   "propagates": true,
+   "description": "结构归属：聚合拥有切片"
+  },
+  {
+   "id": "R2",
+   "from": "aggregate",
+   "relation": "references",
+   "to": "aggregate",
+   "propagates": true,
+   "description": "聚合间引用（引用/基数/业务含义）"
+  },
+  {
+   "id": "R3",
+   "from": "aggregate",
+   "relation": "emits",
+   "to": "event",
+   "propagates": true,
+   "description": "事件池归属"
+  },
+  {
+   "id": "R4",
+   "from": "slice",
+   "relation": "issues",
+   "to": "command",
+   "propagates": true,
+   "description": "切片发出命令"
+  },
+  {
+   "id": "R5",
+   "from": "slice",
+   "relation": "emits",
+   "to": "event",
+   "propagates": true,
+   "description": "切片产生事件（定义归属）"
+  },
+  {
+   "id": "R6",
+   "from": "command",
+   "relation": "produces",
+   "to": "event",
+   "propagates": true,
+   "description": "命令产生事件，条件见 guards"
+  },
+  {
+   "id": "R7",
+   "from": "event",
+   "relation": "triggers",
+   "to": "policy",
+   "propagates": true,
+   "description": "事件触发政策"
+  },
+  {
+   "id": "R8",
+   "from": "policy",
+   "relation": "constrains",
+   "to": "slice",
+   "propagates": true,
+   "description": "政策约束切片"
+  },
+  {
+   "id": "R9",
+   "from": "policy",
+   "relation": "invokes",
+   "to": "command",
+   "propagates": true,
+   "description": "政策调用命令"
+  },
+  {
+   "id": "R10",
+   "from": "read-model",
+   "relation": "derives-from",
+   "to": "field",
+   "propagates": true,
+   "description": "读模型派生自字段（血缘）"
+  },
+  {
+   "id": "R11",
+   "from": "field",
+   "relation": "lineage",
+   "to": "field",
+   "propagates": true,
+   "description": "字段血缘链"
+  },
+  {
+   "id": "R12",
+   "from": "role",
+   "relation": "can-issue",
+   "to": "command",
+   "propagates": false,
+   "description": "角色可发命令（权限，不传播行为影响）"
+  },
+  {
+   "id": "R13",
+   "from": "read-model",
+   "relation": "visible-to",
+   "to": "role",
+   "propagates": false,
+   "description": "读模型对角色可见（权限，不传播行为影响）"
+  },
+  {
+   "id": "R14",
+   "from": "pipeline",
+   "relation": "has-step",
+   "to": "step",
+   "propagates": true,
+   "description": "流程步骤"
+  },
+  {
+   "id": "R15",
+   "from": "step",
+   "relation": "performed-by",
+   "to": "role",
+   "propagates": false,
+   "description": "步骤由角色执行（参与关系）"
+  },
+  {
+   "id": "R16",
+   "from": "step",
+   "relation": "executes",
+   "to": "slice",
+   "propagates": true,
+   "description": "步骤执行切片"
+  },
+  {
+   "id": "R17",
+   "from": "story",
+   "relation": "covers",
+   "to": "use-case",
+   "propagates": false,
+   "description": "用户故事覆盖用例（追溯）"
+  },
+  {
+   "id": "R18",
+   "from": "use-case",
+   "relation": "realized-by",
+   "to": "slice",
+   "propagates": true,
+   "description": "用例由切片实现"
+  },
+  {
+   "id": "R19",
+   "from": "scenario",
+   "relation": "exercises",
+   "to": "pipeline",
+   "propagates": false,
+   "description": "场景演练流程/切片（演练路径）"
+  },
+  {
+   "id": "R20",
+   "from": "value-object",
+   "relation": "used-by",
+   "to": "aggregate",
+   "propagates": true,
+   "description": "值对象被聚合/切片/字段使用"
+  },
+  {
+   "id": "R21",
+   "from": "context",
+   "relation": "depends-on",
+   "to": "context",
+   "propagates": true,
+   "description": "限界上下文依赖"
+  },
+  {
+   "id": "R22",
+   "from": "aggregate",
+   "relation": "belongs-to",
+   "to": "subdomain",
+   "propagates": false,
+   "description": "聚合归属子域"
+  }
+ ],
+ "atomKinds": [
+  "note",
+  "policy",
+  "aggregate",
+  "slice",
+  "value-object",
+  "read-model",
+  "story",
+  "use-cases",
+  "pipeline",
+  "scenario",
+  "saga",
+  "formal-product"
+ ],
+ "noteTypes": [
+  "event",
+  "question",
+  "command",
+  "role",
+  "policy",
+  "aggregate",
+  "entity",
+  "readModel",
+  "timer",
+  "externalSystem",
+  "context",
+  "subdomain",
+  "relation",
+  "field",
+  "story"
+ ]
+}

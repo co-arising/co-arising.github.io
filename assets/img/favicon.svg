@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- co-arising mark: three nodes fully connected (a concept defined by its relations) -->
+  <rect width="64" height="64" rx="14" fill="#b3371c"/>
+  <g stroke="#f6f3ec" stroke-width="3" stroke-linecap="round">
+    <line x1="32" y1="16" x2="16" y2="44"/>
+    <line x1="32" y1="16" x2="48" y2="44"/>
+    <line x1="16" y1="44" x2="48" y2="44"/>
+  </g>
+  <g fill="#f6f3ec">
+    <circle cx="32" cy="16" r="7"/>
+    <circle cx="16" cy="44" r="7"/>
+    <circle cx="48" cy="44" r="7"/>
+  </g>
+  <circle cx="32" cy="35" r="3.5" fill="#b3371c" stroke="#f6f3ec" stroke-width="2"/>
+</svg>

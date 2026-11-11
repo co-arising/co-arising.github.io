@@ -2,6 +2,28 @@
    Inherits the editorial palette of the project's internal research pages
    (paper / ink / signal-red / teal / amber) with dark-mode variants. */
 
+/* Self-hosted fonts (see assets/fonts/OFL.txt) — no external requests. */
+@font-face {
+  font-family: "IBM Plex Sans"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/assets/fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("/assets/fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("/assets/fonts/ibm-plex-sans-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("/assets/fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2");
+}
+
 :root {
   color-scheme: light dark;
 

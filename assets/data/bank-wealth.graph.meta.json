@@ -1,0 +1,10 @@
+{
+  "sha256": "f5178e61cbbf3397527115f633f7138405f13e683406818a1128ee1011c02548",
+  "nodeCount": 389,
+  "edgeCount": 413,
+  "workshop": "bank-wealth-v1",
+  "canonicalSha256Prefix": "bc001ae94a46",
+  "generatedAt": "2026-11-11",
+  "source": "MadPolaris/bank-wealth-demo @ fix/pending-replay-20261111",
+  "rebuild": "cd bank-wealth-demo && truthsrc compile-project --project truthsrc.project.json && truthsrc graph --canonical generated/current/.truthsrc/canonical.json --out <db>"
+}
