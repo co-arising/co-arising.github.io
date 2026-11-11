@@ -65,7 +65,9 @@
 
   /* ---------- render ---------- */
   function render(caption) {
-    let svg = "<svg class='dissolve-svg' viewBox='0 0 " + W + " " + H + "' xmlns='http://www.w3.org/2000/svg' role='img' aria-label='CreditBalance aggregate subgraph'>";
+    /* Label tops of the topmost slice land above y=0 in the layout frame,
+       so the viewBox extends 36px upward to keep them visible. */
+    let svg = "<svg class='dissolve-svg' viewBox='0 -36 " + W + " " + (H + 36) + "' xmlns='http://www.w3.org/2000/svg' role='img' aria-label='CreditBalance aggregate subgraph'>";
     // aggregate shell — cracks as slices lose enforcement
     const alive = enforcedCount();
     const shellOpacity = 0.25 + 0.75 * (alive / slices.length);
