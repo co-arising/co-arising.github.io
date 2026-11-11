@@ -5,12 +5,84 @@
      gone loses its enforcement; the aggregate shell cracks as slices fall.
    - Arise: replay the build-up from scattered workshop notes.
    Deterministic layout (no physics): aggregate center, slices around it,
-   each slice's command/events/guards in a local cluster. */
+   each slice's command/events/guards in a local cluster.
+   Captions/controls are bilingual: the page's <html lang> picks the dict;
+   deep links into the explorer follow the page's edition (/zh/ or root). */
 
 (function () {
   "use strict";
   const stage = document.getElementById("dissolve-stage");
   if (!stage || !window.DISSOLVE_SUBGRAPH) return;
+
+  const ZH = (document.documentElement.getAttribute("lang") || "").toLowerCase().startsWith("zh");
+  const XP = ZH ? "/zh/explorer/" : "/explorer/";
+  const T = ZH ? {
+    modeName: { dissolve: "消解", arise: "涌现" },
+    modeLabel: "模式：",
+    switchTo: (m) => "⇄ 切换到" + m,
+    reset: "↺ 重置",
+    removeAllGuards: "移除全部守卫边",
+    holding: (a, b) => "不变量仍被强制执行的切片：<strong id='dz-count'>" + a + "/" + b + "</strong>",
+    ariaSubgraph: "CreditBalance 聚合子图",
+    guardEdge: "守卫",
+    captions: {
+      intro:
+        "<strong>这是真实数据</strong>——来自银行完整示例的 CreditBalance 聚合，从编译后的知识图谱导出（28 节点 · 35 边 · 守卫由切片原子展开）。<em>点击任意一条边将其移除。</em>最快的玩法：点「移除全部守卫边」。",
+      ariseStart:
+        "<strong>涌现模式。</strong>所有关系都不在场——领域只是一墙工作坊便签。<em>点击任意一条边把它加回来</em>，看结构重新成形。先从 <code>owns</code> 开始（聚合认领它的切片），再 <code>issues</code>，最后 <code>guarded-by</code>。",
+      dissolveStart:
+        "<strong>消解模式。</strong>完整装配的 CreditBalance 聚合——从真实银行图谱导出。<em>点击任意一条边将其移除。</em>试试移除同一个切片的全部 <code>guard</code> 边。",
+      reset:
+        "<strong>已重置。</strong>35 条关系全部在场——3 个切片、3 条命令、3 个事件、18 条不变量，由 NNN 个被强制的切片持有。",
+      allGuardsGone:
+        "<em>守卫全部消失。</em>命令依然通过类型检查，事件依然存在——但<strong>没有任何一处不变量被强制执行</strong>。在本体论里，这些对象仍安坐在它们的分类位上；在 co-arising（缘起）里，聚合已经<em>消解</em>：剩下的只是不受约束的变更。这正是图谱动词 <code>orphans</code> 机械化报告的东西。<a href='" + XP + "#orphans'>在完整图谱上运行 ↗</a>",
+      someGuardsLeft: (a, b) =>
+        "<strong>" + a + "/" + b + "</strong> 个切片仍在强制它们的不变量。继续——或者换个思路：移除 <code>emits</code> 边，会留下永远不会折叠进状态的历史。",
+      edgeRemoved: (a, b) =>
+        "已移除一条关系。聚合仍然成立——<strong>" + a + "/" + b + "</strong> 个切片被完整强制。",
+      dissolved:
+        "<em>聚合已消解。</em>它的碎片只是便签：没有规则的命令、没有折叠的事件。在本体论里，对象仍安坐其分类位——在 co-arising（缘起）里，它不再成立。<a href='" + XP + "#orphans'>运行 orphans ↗</a>",
+      sliceUnchecked: (a, b) =>
+        "一个切片失去了它全部的守卫——它的不变量现在<em>无人检查</em>。聚合完整性：<strong>" + a + "/" + b + "</strong>。",
+      fullyArisen:
+        "<em>完全涌现。</em>命令由切片发出，守卫引用不变量，事件折叠进状态——聚合重新成为一座成立的结构。",
+      forming: (a, b) =>
+        "结构正在成形——<strong>" + a + "/" + b + "</strong> 个切片被完整强制。加上 <code>guarded-by</code> 边，让命令重新拥有规则。",
+    },
+  } : {
+    modeName: { dissolve: "dissolve", arise: "arise" },
+    modeLabel: "mode:",
+    switchTo: (m) => "⇄ switch to " + m,
+    reset: "↺ reset",
+    removeAllGuards: "remove ALL guard edges",
+    holding: (a, b) => "aggregates holding invariants: <strong id='dz-count'>" + a + "/" + b + "</strong>",
+    ariaSubgraph: "CreditBalance aggregate subgraph",
+    guardEdge: "guard",
+    captions: {
+      intro:
+        "<strong>This is real data</strong> — the CreditBalance aggregate from the bank worked example, exported from the compiled knowledge graph (28 nodes · 35 edges · guards expanded from slice atoms). <em>Click any edge to remove it.</em> The fastest story: hit “remove ALL guard edges”.",
+      ariseStart:
+        "<strong>Arise mode.</strong> Every relation is absent — the domain is a wall of workshop notes. <em>Click any edge to add it back</em> and watch structure re-form. Start with <code>owns</code> (the aggregate claims its slices), then <code>issues</code>, then <code>guarded-by</code>.",
+      dissolveStart:
+        "<strong>Dissolve mode.</strong> The CreditBalance aggregate fully assembled — exported from the real bank graph. <em>Click any edge to remove it.</em> Try removing every <code>guard</code> edge of one slice.",
+      reset:
+        "<strong>Reset.</strong> All 35 relations present — 3 slices, 3 commands, 3 events, 18 invariants held by NNN enforced slices.",
+      allGuardsGone:
+        "<em>All guards gone.</em> The commands still type-check, the events still exist — but <strong>no invariant is enforced anywhere</strong>. In an ontology, these objects still sit in their taxon. In co-arising, the aggregate has <em>dissolved</em>: it is now unenforced mutation. This is exactly what the graph verb <code>orphans</code> reports mechanically. <a href='" + XP + "#orphans'>Run it on the full graph ↗</a>",
+      someGuardsLeft: (a, b) =>
+        "<strong>" + a + "/" + b + "</strong> slices still enforce their invariants. Keep going — or switch the caption’s advice: removing <code>emits</code> edges leaves history that never folds into state.",
+      edgeRemoved: (a, b) =>
+        "Relation removed. The aggregate still holds — <strong>" + a + "/" + b + "</strong> slices fully enforced.",
+      dissolved:
+        "<em>The aggregate has dissolved.</em> Its pieces are now just notes: commands without rules, events without folds. In an ontology the object still sits in its taxon — in co-arising it no longer holds. <a href='" + XP + "#orphans'>Run orphans ↗</a>",
+      sliceUnchecked: (a, b) =>
+        "A slice lost all its guards — its invariants are now <em>unchecked</em>. Aggregate integrity: <strong>" + a + "/" + b + "</strong>.",
+      fullyArisen:
+        "<em>Fully arisen.</em> Commands issue from slices, guards cite invariants, events fold into state — the aggregate is a standing structure again.",
+      forming: (a, b) =>
+        "Structure forming — <strong>" + a + "/" + b + "</strong> slices fully enforced. Add <code>guarded-by</code> edges to give commands their rules.",
+    },
+  };
 
   const DATA = window.DISSOLVE_SUBGRAPH;
   const NODES = DATA.nodes;
@@ -67,7 +139,7 @@
   function render(caption) {
     /* Label tops of the topmost slice land above y=0 in the layout frame,
        so the viewBox extends 36px upward to keep them visible. */
-    let svg = "<svg class='dissolve-svg' viewBox='0 -36 " + W + " " + (H + 36) + "' xmlns='http://www.w3.org/2000/svg' role='img' aria-label='CreditBalance aggregate subgraph'>";
+    let svg = "<svg class='dissolve-svg' viewBox='0 -36 " + W + " " + (H + 36) + "' xmlns='http://www.w3.org/2000/svg' role='img' aria-label='" + T.ariaSubgraph + "'>";
     // aggregate shell — cracks as slices lose enforcement
     const alive = enforcedCount();
     const shellOpacity = 0.25 + 0.75 * (alive / slices.length);
@@ -82,7 +154,7 @@
       svg += "<line class='dv-edge" + (gone ? " removed" : "") + "' data-edge='" + e.i + "' x1='" + p1.x + "' y1='" + p1.y + "' x2='" + p2.x + "' y2='" + p2.y + "'/>";
       if (!gone && (e.relation === "guarded-by")) {
         const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
-        svg += "<text x='" + mx + "' y='" + my + "' font-size='8.5' fill='var(--ink-3)' text-anchor='middle'>guard</text>";
+        svg += "<text x='" + mx + "' y='" + my + "' font-size='8.5' fill='var(--ink-3)' text-anchor='middle'>" + T.guardEdge + "</text>";
       }
     });
 
@@ -104,12 +176,12 @@
     svg += "</svg>";
     stage.innerHTML =
       "<div class='dissolve-controls'>" +
-      "<span class='mode'>mode: <strong>" + mode + "</strong></span>" +
-      "<button id='dz-mode'>⇄ switch to " + (mode === "dissolve" ? "arise" : "dissolve") + "</button>" +
-      "<button id='dz-reset'>↺ reset</button>" +
-      "<button id='dz-remove-guards'>remove ALL guard edges</button>" +
+      "<span class='mode'>" + T.modeLabel + " <strong>" + T.modeName[mode] + "</strong></span>" +
+      "<button id='dz-mode'>" + T.switchTo(T.modeName[mode === "dissolve" ? "arise" : "dissolve"]) + "</button>" +
+      "<button id='dz-reset'>" + T.reset + "</button>" +
+      "<button id='dz-remove-guards'>" + T.removeAllGuards + "</button>" +
       "<span style='flex:1'></span>" +
-      "<span class='small'>aggregates holding invariants: <strong id='dz-count'>" + alive + "/" + slices.length + "</strong></span>" +
+      "<span class='small'>" + T.holding(alive, slices.length) + "</span>" +
       "</div>" + svg +
       "<div class='dissolve-caption' id='dz-caption'>" + caption + "</div>";
 
@@ -122,23 +194,23 @@
       if (mode === "arise") {
         // start from everything removed, add back on click
         removed = new Set(EDGES.map((e) => e.i));
-        render("<strong>Arise mode.</strong> Every relation is absent — the domain is a wall of workshop notes. <em>Click any edge to add it back</em> and watch structure re-form. Start with <code>owns</code> (the aggregate claims its slices), then <code>issues</code>, then <code>guarded-by</code>.");
+        render(T.captions.ariseStart);
       } else {
         removed = new Set();
-        render("<strong>Dissolve mode.</strong> The CreditBalance aggregate fully assembled — exported from the real bank graph. <em>Click any edge to remove it.</em> Try removing every <code>guard</code> edge of one slice.");
+        render(T.captions.dissolveStart);
       }
     };
     document.getElementById("dz-reset").onclick = () => {
       removed = new Set();
       mode = "dissolve";
-      render("<strong>Reset.</strong> All 35 relations present — 3 slices, 3 commands, 3 events, 18 invariants held by " + slices.length + " enforced slices.");
+      render(T.captions.reset.replace("NNN", slices.length));
     };
     document.getElementById("dz-remove-guards").onclick = () => {
       EDGES.filter((e) => e.relation === "guarded-by").forEach((e) => removed.add(e.i));
       const alive = enforcedCount();
       render(alive === 0
-        ? "<em>All guards gone.</em> The commands still type-check, the events still exist — but <strong>no invariant is enforced anywhere</strong>. In an ontology, these objects still sit in their taxon. In co-arising, the aggregate has <em>dissolved</em>: it is now unenforced mutation. This is exactly what the graph verb <code>orphans</code> reports mechanically. <a href='/explorer/#orphans'>Run it on the full graph ↗</a>"
-        : "<strong>" + alive + "/" + slices.length + "</strong> slices still enforce their invariants. Keep going — or switch the caption’s advice: removing <code>emits</code> edges leaves history that never folds into state.");
+        ? T.captions.allGuardsGone
+        : T.captions.someGuardsLeft(alive, slices.length));
     };
 
     stage.querySelectorAll(".dv-edge:not(.removed)").forEach((el) => {
@@ -150,19 +222,19 @@
         let cap;
         if (mode === "dissolve") {
           cap = alive === slices.length
-            ? "Relation removed. The aggregate still holds — <strong>" + alive + "/" + slices.length + "</strong> slices fully enforced."
+            ? T.captions.edgeRemoved(alive, slices.length)
             : alive === 0
-              ? "<em>The aggregate has dissolved.</em> Its pieces are now just notes: commands without rules, events without folds. In an ontology the object still sits in its taxon — in co-arising it no longer holds. <a href='/explorer/#orphans'>Run orphans ↗</a>"
-              : "A slice lost all its guards — its invariants are now <em>unchecked</em>. Aggregate integrity: <strong>" + alive + "/" + slices.length + "</strong>.";
+              ? T.captions.dissolved
+              : T.captions.sliceUnchecked(alive, slices.length);
         } else {
           cap = alive === slices.length
-            ? "<em>Fully arisen.</em> Commands issue from slices, guards cite invariants, events fold into state — the aggregate is a standing structure again."
-            : "Structure forming — <strong>" + alive + "/" + slices.length + "</strong> slices fully enforced. Add <code>guarded-by</code> edges to give commands their rules.";
+            ? T.captions.fullyArisen
+            : T.captions.forming(alive, slices.length);
         }
         render(cap);
       });
     });
   }
 
-  render("<strong>This is real data</strong> — the CreditBalance aggregate from the bank worked example, exported from the compiled knowledge graph (28 nodes · 35 edges · guards expanded from slice atoms). <em>Click any edge to remove it.</em> The fastest story: hit “remove ALL guard edges”.");
+  render(T.captions.intro);
 })();

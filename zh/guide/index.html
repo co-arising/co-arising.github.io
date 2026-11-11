@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>实战指南 — co-arising</title>
+  <meta name="description" content="从零到完整闭环：环境搭建（含 Docker 回退）、Counter 教程、银行示例流水线，以及把 MCP 服务器接入 Claude Code 做影响半径查询。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/guide/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/guide/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/guide/" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="站点导航"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">实战 · 从零到完整闭环</p>
+      <h1>指南：<span class="accent">把整件事跑起来</span></h1>
+      <p class="thesis">三个层级，每一层末尾都有一盏绿灯：L1 Counter 教程（只要 Node，约 10 分钟），L2 银行示例流水线（加一个 JVM，约 30 分钟），L3 把 MCP 服务器接入 Claude Code，让智能体靠查询图谱来规划一次增量变更。任何一步失败，最后一节会告诉你红线在哪。</p>
+    </header>
+
+    <section id="env">
+      <div class="sec-head"><span class="no">00</span><h2>环境——两条路任选，都是一等公民</h2></div>
+      <p class="sec-sub">工具链需要 <strong>Node ≥ 22.13.0</strong>（原因正是内置的 <code>node:sqlite</code>）。Level 2 另外需要 JVM（11+）和 sbt。下面每条命令都可以直接复制粘贴。</p>
+
+      <h3>路径 A · 原生 Node</h3>
+      <pre class="code"><code># macOS (Homebrew)
+brew install node@22
+
+# 或用 nvm
+nvm install 22
+node --version   # 必须输出 v22.13.0 或更新</code></pre>
+
+      <h3>路径 B · Docker（不想动宿主机 Node 的话）</h3>
+      <pre class="code"><code>docker run --rm -it -v "$PWD":/work -w /work node:22 bash
+# 现在你在容器里的 Node 22 上；下面的一切原样可用</code></pre>
+
+      <h3>仅 Level 2 需要 · JVM + sbt</h3>
+      <pre class="code"><code># macOS
+brew install openjdk@11 sbt
+
+# 或 JVM 工作的 Docker 变体
+docker run --rm -it -v "$PWD":/work -w /work sbtscala/scala-sbt:eclipse-temurin-11.0.24_9_1.10.11_2.13.14 bash</code></pre>
+    </section>
+
+    <section id="install">
+      <div class="sec-head"><span class="no">01</span><h2>拿到工具链</h2></div>
+      <p class="sec-sub">npm 发布在台账上（<a class="badge deferred" href="/zh/status/#DEF-03">DEF-03</a>）——在那之前，源码检出就是正统的安装方式。零 npm <em>运行时</em>依赖意味着检出即整个工具链。</p>
+      <pre class="code"><code>git clone https://github.com/co-arising/metarch-truthsrc.git
+npm install --prefix metarch-truthsrc        # 只有开发依赖；运行时只用标准库
+
+# 冒烟测试——不碰 SQLite，无副作用
+node metarch-truthsrc/bin/truthsrc.js --help</code></pre>
+      <p class="small">提示：<code>alias truthsrc="node $PWD/metarch-truthsrc/bin/truthsrc.js"</code> 能让本页后面读起来更顺。</p>
+    </section>
+
+    <section id="l1">
+      <div class="sec-head"><span class="no">02</span><h2>L1 · Counter 教程——完整闭环的缩影</h2></div>
+      <p class="sec-sub">一个聚合、一个切片、一条规则。你将编写、生成、双向查询锚点、验证、改树、看到过期、再生成。绿灯由工具打印——信它，别信你的眼睛。</p>
+      <div class="steps">
+        <div class="step-item"><div><h4>创建项目</h4><p class="meta">拒绝碰已存在的目录</p><p><code>node ../metarch-truthsrc/bin/truthsrc.js init counter-lab --format human</code> 然后 <code>cd counter-lab</code>。看看里面：<code>truth/example/…</code> 就是整棵作者树——<code>aggregate.yaml</code>（状态 + <code>@rule</code>）和一个切片。</p></div></div>
+        <div class="step-item"><div><h4>先看计划再落盘</h4><p class="meta">此时什么都没写</p><p><code>… generate-project --plan --format human</code>——计划列出它<em>将要</em>写的每个文件。读它。生成永远不该是惊喜。</p></div></div>
+        <div class="step-item"><div><h4>生成 &amp; 查看新鲜度</h4><p class="meta">绿灯：inputs=current · evidence=verified · synchronized=true</p><p><code>… generate-project --format human</code> 然后 <code>… status-project --out . --format human</code>。打开一个生成文件——每个都带着锚点头。</p></div></div>
+        <div class="step-item"><div><h4>双向追问</h4><p class="meta">闭环合上的那一刻</p><p><code>… query-project --knowledge SetCount</code> → 精确的文件和区间。然后 <code>… query-project --file &lt;那个文件&gt; --symbol &lt;符号&gt;</code> → 回到那条规则。知识与代码，接通了。</p></div></div>
+        <div class="step-item"><div><h4>改真源，不改代码</h4><p class="meta">看到过期，然后重新同步</p><p>编辑 <code>truth/…/aggregate.yaml</code>：把 count 默认值 <code>0</code> 改成 <code>2</code>。<code>status-project</code> 现在报告 <strong>changed</strong>。<code>… generate-project --update --plan</code> 展示 diff 计划；<code>--update</code> 应用它。再跑一次 generate——<strong>写入：0</strong>。幂等就是闸门。</p></div></div>
+        <div class="step-item"><div><h4>验证 &amp; 拍张快照</h4><p class="meta">绿灯：verify passed</p><p><code>… verify-project --out . </code> 对照文件字节重新证明每个锚点。<code>… view-project --out . --html counter-map.html</code> 导出单文件地图——离线也能打开。</p></div></div>
+      </div>
+    </section>
+
+    <section id="l2">
+      <div class="sec-head"><span class="no">03</span><h2>L2 · 全规模的银行示例</h2></div>
+      <p class="sec-sub">157 个原子、3 个聚合、2 个 saga、4 条流水线——同样的六道闸门，工业级体量。从这里开始，绿灯就是项目自己的验收层。</p>
+      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
+cd bank-wealth-demo
+
+# 闸门 1+2 —— validate &amp; roundtrip（一条命令；roundtrip 是闸门的一部分）
+npm run validate            # ✅ 0 硬发现 · roundtrip：157 原子逐字节一致
+
+# 闸门 3 —— 编译并构建图谱存储（389 节点 / 413 边）
+npm run compile
+node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
+
+# 闸门 4 —— 生成 CQRS 项目（235 个文件）
+npm run project             # 写出 generated/current/
+
+# 闸门 5 —— 手写区在仓库里已经是完整的（35 个文件）；
+#          它作为生成构建的一部分一起编译：
+cd generated/current &amp;&amp; sbt compile   # ✅ 0 错误，534 个源文件
+sbt test                             # ✅ 23/23
+
+# 闸门 6 —— 证明每个锚点（792 个）
+cd ../.. &amp;&amp; node ../metarch-truthsrc/bin/truthsrc.js verify-project \
+  --project truthsrc.project.json --out generated/current</code></pre>
+      <div class="callout"><b>你刚刚证明了什么</b><p>一份 157 原子的银行财富领域描述可以编译、变成可查询的图谱、生成可编译且通过测试的 Scala 代码库、其 792 个锚点对照文件字节验证通过——<strong>而且每一步你都能重跑</strong>。你没有跨过的边界：端到端跑起 HTTP 服务（台账 <a class="badge boundary" href="/zh/status/#DEF-06">DEF-06</a> <a class="badge boundary" href="/zh/status/#DEF-07">DEF-07</a>）。</p></div>
+    </section>
+
+    <section id="l3">
+      <div class="sec-head"><span class="no">04</span><h2>L3 · 把图谱接进 Claude Code（MCP）</h2></div>
+      <p class="sec-sub">这是智能体化的回报：一个靠<em>查询知识图谱</em>而不是 grep 仓库来规划变更的智能体。MCP 服务器自带 26 个只读工具 <span class="badge verified" title="F-16">已验证</span>。</p>
+
+      <h3>注册服务器</h3>
+      <pre class="code"><code># 在任意目录执行（路径指向你的 metarch-truthsrc 检出）
+claude mcp add truthsrc -- node /absolute/path/to/metarch-truthsrc/bin/truthsrc.js mcp</code></pre>
+
+      <h3>安装查询技能</h3>
+      <p style="max-width:52em">工具链自带一个技能，教智能体查询纪律（预算化的图谱行走、跟随 <code>next_actions</code>、blast_radius 的宁多报不漏报语义）。把它拷进你的项目：</p>
+      <pre class="code"><code>mkdir -p .claude/skills
+cp -r /absolute/path/to/metarch-truthsrc/skills/truthsrc .claude/skills/</code></pre>
+
+      <h3>练习：按影响半径规划一次增量变更</h3>
+      <div class="steps">
+        <div class="step-item"><div><h4>给智能体一个需求</h4><p class="meta">在 Claude Code 里，位于 bank-wealth-demo</p><p>试试：<em>「我们需要改变定投扣款失败时的行为。在提出任何方案之前，先查询真源图谱中 <code>SipInstallmentFailed</code> 的影响半径，并报告受影响的切片、读模型和流水线。」</em></p></div></div>
+        <div class="step-item"><div><h4>看纪律起作用</h4><p class="meta">describe → expand → blast_radius，跟随 next_actions</p><p>智能体应当沿传导边从事件出发，列出受影响的守卫/读模型/流水线（3 跳内数十个节点），然后才<strong>对着树</strong>起草变更提案——而不是对着代码。</p></div></div>
+        <div class="step-item"><div><h4>套用编辑契约</h4><p class="meta">智能体起草；闸门裁决</p><p>任何树的编辑都必须以 <code>validate</code>（0 硬发现）<strong>和</strong> <code>roundtrip</code>（逐字节一致）全绿收尾，然后 <code>generate-project --update --plan</code> 在应用前看清再生成 diff。这就是守护纪律，机械化执行。</p></div></div>
+      </div>
+      <p class="small">还附带：从既有代码库抽取树、从可达数据抽取树、或从一句话描述引导工作坊草稿的技能——见工具链仓库的 <code>skills/</code>。</p>
+    </section>
+
+    <section id="redlines">
+      <div class="sec-head"><span class="no">05</span><h2>红线与恢复</h2></div>
+      <div class="callout red"><b>绝不</b><p><strong>绝不手工编辑派生产物</strong>——编译后的 canonical、<code>.truthsrc/</code>、台账、锚点、生成文件。它们会被再生成；你的编辑会作废（而且会被发现）。如果生成代码看起来不对，修的地方在树里——这正是全部意义所在。 &nbsp;·&nbsp; <strong>绝不强行闯过红闸门。</strong><code>validate</code> 的发现和 roundtrip 的发散是信息，不是障碍。 &nbsp;·&nbsp; <strong>图谱存储？随便删</strong>——它是纯缓存，一条 <code>graph</code> 命令重建。</p></div>
+      <p class="small">卡住了？工具链 README 有诊断章节；<a href="/zh/status/#facts">事实页</a>精确告诉你哪些声明在哪一天被验证——如果你的数字和我们的不一样，信你的终端。</p>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

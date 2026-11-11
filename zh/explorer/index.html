@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>知识图谱 Explorer — co-arising</title>
+  <meta name="description" content="银行财富知识图谱（389 节点 / 413 边）经 sql.js 在你的浏览器中加载。影响半径、血缘、孤儿、普查——预设查询加自由 SQL 控制台。无服务器，无追踪。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/explorer/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/explorer/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/explorer/" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="站点导航"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">本页需要 JavaScript（sql.js 完全在你的浏览器内本地运行——无任何网络请求）。<a href="/zh/">首页</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">Explorer · 完全在你的浏览器中运行</p>
+      <h1>查询<span class="accent">真实图谱</span></h1>
+      <p class="thesis">这不是 mock 数据：下面的 SQLite 文件就是银行财富示例编译后的知识图谱——389 节点、413 边 <span class="badge verified" title="F-03">2026-11-11 验证</span>——用 sql.js 装进你的浏览器。没有服务器，页面加载后没有网络请求，任何东西都不会离开你的机器。</p>
+    </header>
+
+    <section id="console">
+      <div class="sec-head"><span class="no">01</span><h2>控制台</h2></div>
+      <p class="sec-sub">选一个预设（附期望答案），或对 <code>nodes(id, kind, name, atom, extra)</code> 与 <code>edges(seq, from_id, relation, to_id)</code> 写你自己的 SQL。Schema 就是 <code>truthsrc graph --out</code> 原样产出的东西。</p>
+
+      <div class="xp-layout">
+        <aside class="xp-side">
+          <div class="xp-panel">
+            <h4>数据指纹</h4>
+            <p class="xp-status" id="xp-status">正在加载 sql.js…</p>
+          </div>
+          <div class="xp-panel">
+            <h4>预设查询</h4>
+            <ul class="xp-query-list" id="xp-presets">
+              <li><button data-preset="census">普查——种类与关系</button></li>
+              <li><button data-preset="describe">描述一个聚合</button></li>
+              <li><button data-preset="blast" id="preset-blast">影响半径——SipInstallmentFailed</button></li>
+              <li><button data-preset="lineage">读模型血缘</button></li>
+              <li><button data-preset="orphans" id="preset-orphans">孤儿——无父的知识</button></li>
+              <li><button data-preset="sagas">Saga 与流水线</button></li>
+              <li><button data-preset="invariants">不变量强制</button></li>
+            </ul>
+          </div>
+          <div class="xp-panel">
+            <h4>怎么读</h4>
+            <p class="small">边携带 <a href="/zh/dsl/#relations">R1–R22 注册表</a>里的关系名。影响只沿 <code>propagates=true</code> 的关系行走（预设 SQL 里写死了它们）——与 CLI 的 <code>blast_radius</code> 语义一致：宁可多报，不可漏报。</p>
+          </div>
+        </aside>
+
+        <div class="xp-main">
+          <div class="xp-result" id="xp-result">
+            <h3>先选一个预设</h3>
+            <p class="answer">或者在下方写 SQL 然后点运行。一切都在银行图谱的内存副本上执行。</p>
+          </div>
+          <div class="xp-panel" style="margin-top:14px">
+            <h4>自由 SQL 控制台</h4>
+            <div class="xp-actions">
+              <button class="btn" id="xp-run" type="button">运行 ▸</button>
+              <button class="btn ghost" id="xp-clear" type="button">清空</button>
+              <span class="small" id="xp-timing"></span>
+            </div>
+            <textarea class="xp-sql" id="xp-sql" spellcheck="false" aria-label="SQL 查询">SELECT kind, COUNT(*) AS n
+FROM nodes
+GROUP BY kind
+ORDER BY n DESC;</textarea>
+          </div>
+          <div class="xp-panel xp-radial" id="xp-radial" hidden>
+            <h4>一跳邻域</h4>
+            <div id="xp-radial-svg"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="rebuild">
+      <div class="sec-head"><span class="no">02</span><h2>别信我们——自己重建</h2></div>
+      <p class="sec-sub">你刚刚查询的文件是一份派生缓存。从银行仓库复现它（Node ≥ 22.13）：</p>
+      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
+cd bank-wealth-demo &amp;&amp; npm install --no-save
+node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out my-copy.sqlite
+# 用上方的指纹面板对比节点/边计数</code></pre>
+      <div class="callout"><b>优雅降级</b><p>如果 sqlite 文件加载失败（首次访问离线、浏览器过旧），预设会回退到文档记录的期望答案，页面依然能教会你这些查询的语义。</p></div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/vendor/sqljs/sql-wasm.js"></script>
+  <script src="/assets/js/explorer.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>状态与台账 — co-arising</title>
+  <meta name="description" content="每一条经验证的事实，附采集日期与复现命令；以及一份诚实的挂帐台账。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/status/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/status/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/status/" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="站点导航"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">诚实层</p>
+      <h1>状态、事实与<span class="accent">台账</span></h1>
+      <p class="thesis">这个项目家族把「什么真的能用」当作一等公民产物。本站任何地方用到的每个数字都登记在下面，附复现它的命令；一切还没成真的东西都在台账上，带稳定 ID。</p>
+    </header>
+
+    <section id="facts">
+      <div class="sec-head"><span class="no">01</span><h2>已验证事实</h2></div>
+      <p class="sec-sub">采集于 <strong>2026-11-11</strong>，对象是 <code>bank-wealth-demo</code> @ <code>fix/pending-replay-20261111</code> 与 <code>metarch-truthsrc</code> @ <code>fix/pending-reconciliation-20261111</code>。事实来源：本仓库的 <a href="https://github.com/co-arising/co-arising.github.io/blob/main/SITE-FACTS.md">SITE-FACTS.md</a>（英文主文件）。</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>事实</th><th>值</th><th>复现</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">F-01</td><td>银行真源树可编译</td><td><span class="badge verified">已验证</span> 0 硬发现</td><td><code>npm run validate</code>（bank 仓库）</td></tr>
+          <tr><td class="nm">F-02</td><td>往返逐字节一致</td><td><span class="badge verified">已验证</span> 157 原子</td><td>validate 闸门的一部分</td></tr>
+          <tr><td class="nm">F-03</td><td>知识图谱</td><td><span class="badge verified">已验证</span> 389 节点 / 413 边</td><td><code>truthsrc graph --tree truth/bank-wealth --out &lt;db&gt;</code></td></tr>
+          <tr><td class="nm">F-04</td><td>代码生成</td><td><span class="badge verified">已验证</span> 235 个文件</td><td><code>generate-project</code></td></tr>
+          <tr><td class="nm">F-05</td><td>锚点验证</td><td><span class="badge verified">已验证</span> 通过，792 个锚点</td><td><code>verify-project</code></td></tr>
+          <tr><td class="nm">F-06</td><td>生成的 Scala 可编译</td><td><span class="badge verified">已验证</span> 0 错误 / 534 源文件</td><td><code>sbt compile</code></td></tr>
+          <tr><td class="nm">F-07</td><td>测试套件</td><td><span class="badge verified">已验证</span> 23/23 通过</td><td><code>sbt test</code></td></tr>
+          <tr><td class="nm">F-08</td><td>手写区</td><td><span class="badge verified">已验证</span> 35 个文件，完整实现</td><td>文件系统计数</td></tr>
+          <tr><td class="nm">F-09</td><td>不变量</td><td><span class="badge verified">已验证</span> 3 个聚合共 149 条 <code>@rule</code></td><td>对真源树 grep</td></tr>
+          <tr><td class="nm">F-10</td><td>原子普查</td><td><span class="badge verified">已验证</span> 59 VO · 27 切片 · 36 formal-product · 8 结构 · 4 流水线 · 4 故事 · 6 读模型 · 3 聚合 · 2 saga · …</td><td>文件系统计数</td></tr>
+          <tr><td class="nm">F-13</td><td>工具链足迹</td><td><span class="badge verified">已验证</span> 0 npm 依赖 · Node ≥ 22.13</td><td>package.json</td></tr>
+          <tr><td class="nm">F-14</td><td>关系注册表</td><td><span class="badge verified">已验证</span> 22 条关系，带 propagates 标记</td><td><code>lib/shared.mjs</code></td></tr>
+          <tr><td class="nm">F-16</td><td>MCP 工具</td><td><span class="badge verified">已验证</span> 26 个工具，stdio JSON-RPC</td><td><code>truthsrc mcp</code></td></tr>
+          <tr><td class="nm">F-21</td><td>影响半径，<code>SipInstallmentFailed</code> d3</td><td><span class="badge verified">已验证</span> 55 个节点——站点 SQL 预设 ≡ CLI 动词</td><td>对 bank canonical 运行 MCP <code>blast_radius</code></td></tr>
+          <tr><td class="nm">F-22</td><td>孤儿</td><td><span class="badge verified">已验证</span> 11 个去重的无源事件（23 行 graphstore）</td><td>MCP <code>orphans</code></td></tr>
+          <tr><td class="nm">F-18/19/20</td><td>许可</td><td><span class="badge verified">已验证</span> truthsrc MIT · 引擎 + bank Apache-2.0</td><td>各仓库 LICENSE</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="ledger">
+      <div class="sec-head"><span class="no">02</span><h2>台账——挂帐与未决</h2></div>
+      <p class="sec-sub">不是营销债：是工程诚实。事实来源：<a href="https://github.com/co-arising/co-arising.github.io/blob/main/LEDGER.md">LEDGER.md</a>（英文主文件）。全站引用的条目都链接到这里。</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>类别</th><th>条目</th><th>状态</th><th>备注</th></tr></thead>
+        <tbody>
+          <tr id="DEF-01"><td class="nm">DEF-01</td><td>behavior</td><td>BDD / Gherkin 行为规格</td><td><span class="badge deferred">挂帐</span></td><td>定位为树的衍生物（守卫 + 场景可生成 Gherkin）。</td></tr>
+          <tr id="DEF-02"><td class="nm">DEF-02</td><td>tooling</td><td>可视化真源树编辑（Qlerify / Miro 导入、逆向抽取）</td><td><span class="badge deferred">挂帐</span></td><td>语言层先行；编辑 UX 是另一个讨论。</td></tr>
+          <tr id="DEF-03"><td class="nm">DEF-03</td><td>publishing</td><td>truthsrc npm 发布</td><td><span class="badge boundary">阻塞</span></td><td>目前只有本地 tgz / 源码检出。</td></tr>
+          <tr id="DEF-04"><td class="nm">DEF-04</td><td>publishing</td><td>monarch-* / saga-* 发布到 Maven Central</td><td><span class="badge boundary">阻塞</span></td><td>v0.2 tag 已存在；对账与审计交付物是最后对齐项。</td></tr>
+          <tr id="DEF-05"><td class="nm">DEF-05</td><td>demos</td><td>fab-simulator-demo、bank-batch-transactor-demo 开源</td><td><span class="badge deferred">挂帐</span></td><td>第二轮对齐。</td></tr>
+          <tr id="DEF-06"><td class="nm">DEF-06</td><td>bank-service</td><td>service02 全服务闸门</td><td><span class="badge boundary">未决</span></td><td>读侧回放没赶上 90 秒追平闸门（2026-11-06）；代码、24 个恢复用例、真实库的初始/重启/退款已通过。</td></tr>
+          <tr id="DEF-07"><td class="nm">DEF-07</td><td>bank-service</td><td><code>sbt run</code> + HTTP 冒烟</td><td><span class="badge boundary">未决</span></td><td>尚未在人工会话中执行。</td></tr>
+          <tr id="DEF-08"><td class="nm">DEF-08</td><td>hosting</td><td>免费托管上的演示</td><td><span class="badge deferred">挂帐</span></td><td>需要先过 DEF-06/07；免费档 JVM 内存存疑。</td></tr>
+          <tr id="DEF-09"><td class="nm">DEF-09</td><td>examples</td><td>Saga/Monarch 端到端业务叙事</td><td><span class="badge deferred">挂帐</span></td><td>银行示例两者都声明了；缺一篇专门的横切叙事。</td></tr>
+          <tr id="DEF-10"><td class="nm">DEF-10</td><td>i18n</td><td>中文版站点</td><td><span class="badge verified">已解决 2026-11-11</span></td><td>全站 /zh/ 中文镜像上线。备注更正：workshop HTML 本来就是中文（原条目把这一点记反了，不存在「补英文版」的需求）。</td></tr>
+          <tr id="DEF-11"><td class="nm">DEF-11</td><td>alignment</td><td>各仓库 README 与本站对齐</td><td><span class="badge deferred">挂帐</span></td><td>明确排在本站上线之后的下一阶段。</td></tr>
+          <tr id="DEF-12"><td class="nm">DEF-12</td><td>explorer</td><td>力导向画布；录屏</td><td><span class="badge deferred">挂帐</span></td><td>查询控制台 + 放射视图已覆盖 v1。</td></tr>
+          <tr id="DEF-13"><td class="nm">DEF-13</td><td>naming</td><td>npm scope → <code>@co-arising/truthsrc</code></td><td><span class="badge deferred">挂帐</span></td><td>首次发布（DEF-03）之前零成本。</td></tr>
+          <tr id="DEF-14"><td class="nm">DEF-14</td><td>org</td><td>其余仓库 → co-arising 组织</td><td><span class="badge deferred">挂帐</span></td><td>链接集中在 site.js；迁移只改一行。</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout"><b>纪律</b><p>台账与状态页<strong>在同一个 commit 里更新</strong>。一个数字离开 SITE-FACTS，它就必须离开页面；一个承诺离开台账，它就必须出现在某个仓库里。</p></div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

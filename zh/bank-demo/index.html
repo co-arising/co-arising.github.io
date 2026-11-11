@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>银行财富完整示例 — co-arising</title>
+  <meta name="description" content="一笔 100 元的基金申购，跟穿付款、TA 确认、独立退款与有界定投——3 个聚合、157 个真源原子、149 条不变量、2 个 saga、4 条流水线、235 个生成文件、792 个经验证的锚点。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/bank-demo/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/bank-demo/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/bank-demo/" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="站点导航"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">完整示例 · 本地教学演示</p>
+      <h1>一笔申购，<span class="accent">每一步的出处</span></h1>
+      <p class="thesis">客户提交一笔 100 元的基金申购。钱扣了——投资就成功了吗？基金公司拒绝这笔申购时，为什么会有一个独立的退款？定投计划的每一期如何复用同一批规则？这个示例从真源树回答这些问题，而不是从散文。</p>
+      <div class="stat-strip">
+        <div class="stat"><div class="num">3</div><div class="lbl">个聚合：CreditBalance · FundOrder · SipPlan</div></div>
+        <div class="stat"><div class="num">157</div><div class="lbl">个真源原子 · 149 条 <code>@rule</code> 不变量 <span class="badge verified" title="F-02/F-09">已验证</span></div></div>
+        <div class="stat"><div class="num">2+4</div><div class="lbl">个 saga + 流水线，全部用真源声明</div></div>
+        <div class="stat"><div class="num">23/23</div><div class="lbl">生成 + 手写测试通过 <span class="badge verified" title="F-07">已验证</span></div></div>
+      </div>
+    </header>
+
+    <section id="business">
+      <div class="sec-head"><span class="no">01</span><h2>四条业务线，一棵树</h2></div>
+      <p class="sec-sub">每条线都是一种不同的协调<em>形状</em>——这正是它们各自需要不同真源原子的原因。</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>业务线</th><th>它回答的问题</th><th>协调形状</th><th>在真源中声明为</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">现金申购付款</td><td>扣款成功了——投资就成功了吗？（不：付款 ≠ 认购成功。）</td><td>带补偿的跨聚合事务</td><td><code>bank-cash-payment-v1</code> saga——投资人出金、归集入金，然后订单确认；同一 <code>Money</code>，钉死的 ID</td></tr>
+          <tr><td class="nm">Mock TA 确认</td><td>过户代理受理了订单——份额就是我的了吗？（不：受理 ≠ 确认。）</td><td>带显式未知状态的外部系统观察</td><td>FundOrder 切片 + 形式产物：TA 效果端口、结果映射（<code>confirmed → Observed</code>，超时 → <code>Unknown</code>）</td></tr>
+          <tr><td class="nm">独立退款</td><td>为什么是一个独立的退款 saga，而不是「把付款撤销」？</td><td>第二个 TCC saga——退款是自己的业务事实，不是伪装的补偿</td><td><code>bank-independent-refund-v1</code> saga + 流水线</td></tr>
+          <tr><td class="nm">有界的定投计划</td><td>定投的每一期如何复用同一批规则——并且保持有界？</td><td>流水线驱动派发，带显式跳过/终止语义</td><td><code>bank-sip-dispatch-v1</code> 流水线，覆盖 SipPlan/FundOrder 切片</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout"><b>语义不变量</b><p>这棵树把人们容易说错的那几句话钉死了：<strong>付款成功 ≠ 投资成功</strong> · <strong>TA 受理 ≠ 份额确认</strong> · <strong>独立退款 ≠ 对已提交付款的补偿</strong> · <strong>saga ≠ 流水线</strong>。每句都有规则和测试兜底。</p></div>
+    </section>
+
+    <section id="views">
+      <div class="sec-head"><span class="no">02</span><h2>看这张图</h2></div>
+      <p class="sec-sub">工作坊查看器的三张经验证快照（2026-11-06 由 <code>view-project --html</code> 生成）——桌面地图、搜索、移动端。完整的 2.18 MB 单文件快照可在下方下载；双击即可离线运行。</p>
+      <figure style="margin:14px 0">
+        <img src="/assets/img/workshop-desktop.png" alt="银行财富知识图谱工作坊视图：聚合、切片、事件与规则的节点铺成一张可交互地图" loading="lazy" />
+        <figcaption class="small" style="margin-top:6px">工作坊 HTML 快照——389 节点 / 413 边 <span class="badge verified" title="F-03">已验证</span>，带章节、证据面板与搜索。<a href="/downloads/bank-workshop.html">下载完整快照（2.18 MB，可离线打开）</a>——界面即中文。</figcaption>
+      </figure>
+      <p class="small">比起浏览更喜欢查询？<a href="/zh/explorer/">Explorer</a> 把同一张图谱作为 SQLite 装进你的浏览器——影响半径、血缘、孤儿、自由 SQL。</p>
+    </section>
+
+    <section id="projections">
+      <div class="sec-head"><span class="no">03</span><h2>设计投影</h2></div>
+      <p class="sec-sub">这棵树还渲染七种面向人的设计视图（旅程、屏幕流、上下文地图、事件流、资金体验/生命周期、故事地图）。它们是<strong>派生的设计提案</strong>——从真源生成，明确标注为提案，从不手工维护。渲染图将在下一轮内容更新时放到这里。</p>
+      <div class="callout teal"><b>为什么这很重要</b><p>大多数工具逼你二选一：要么一块和代码漂移的设计画布，要么一份没有任何设计视图的代码。来自真源树的投影两者都不是——它<em>可再生</em>也<em>可读</em>，而且它的漂移可以通过重新渲染被发现。</p></div>
+    </section>
+
+    <section id="run">
+      <div class="sec-head"><span class="no">04</span><h2>在本地跑起来</h2></div>
+      <div class="steps">
+        <div class="step-item"><div><h4>验证树</h4><p class="meta">node ≥ 22.13 · 这一步不需要 JVM</p><p><code>git clone https://github.com/MadPolaris/bank-wealth-demo && cd bank-wealth-demo && npm run validate</code>——0 硬发现，往返逐字节一致 <span class="badge verified" title="F-01/F-02">已验证</span>。</p></div></div>
+        <div class="step-item"><div><h4>生成 &amp; 编译</h4><p class="meta">从这里开始需要 JVM + sbt</p><p><code>npm run project</code> 写出 <code>generated/current/</code>（235 个文件）；在其中 <code>sbt compile</code>：534 个源文件 0 错误 <span class="badge verified" title="F-04/F-06">已验证</span>；<code>sbt test</code>：23/23 <span class="badge verified" title="F-07">已验证</span>。</p></div></div>
+        <div class="step-item"><div><h4>验证锚点</h4><p class="meta">收据在此</p><p><code>truthsrc verify-project</code> 重新证明全部 792 个锚点 <span class="badge verified" title="F-05">已验证</span>——文件字节对照树，双向。</p></div></div>
+      </div>
+      <p class="small">分步教程（含 JVM 侧的 Docker 变体）在<a href="/zh/guide/">实战指南</a>。</p>
+    </section>
+
+    <section id="boundaries">
+      <div class="sec-head"><span class="no">05</span><h2>诚实的边界</h2></div>
+      <div class="callout red"><b>评估前必读</b><p>这是一个<strong>本地教学演示</strong>。它不移动任何真实资金，不是生产级银行系统，也不是与 Palantir 兼容的实现。全服务运行时闸门<strong>未通过</strong>（<a class="badge boundary" href="/zh/status/#DEF-06">DEF-06</a>：读侧回放没赶上 90 秒追平期限）；<code>sbt run</code> + HTTP 冒烟<strong>尚未执行</strong>（<a class="badge boundary" href="/zh/status/#DEF-07">DEF-07</a>）；冻结的运行时制品还没有公开下载渠道。<em>已经</em>被证明的：树的闸门、图谱、生成、编译、测试、锚点——全部于 2026-11-11 验证，且可从仓库复现。</p></div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

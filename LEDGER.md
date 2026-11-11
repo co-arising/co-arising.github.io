@@ -17,7 +17,7 @@ to `/status/#DEF-xx`. Update this file and `/status/` in the same commit.
 | DEF-07 | bank-service | `sbt run` + HTTP smoke of generated project | open | Not yet executed in a manual session | Smoke session completed |
 | DEF-08 | hosting | Bank demo hosted on a free web service | deferred | Requires DEF-06/07 first; free-tier JVM+Akka memory budget is doubtful | Service gate + smoke pass |
 | DEF-09 | examples | End-to-end business example threading Saga/Monarch through the original transfer flow | deferred | The bank example covers saga + monarch declarations; a dedicated cross-cutting narrative is still missing | Example authored in truth |
-| DEF-10 | i18n | Chinese site edition; English version of the workshop HTML (currently zh-CN) | deferred | English-first go-to-market decision (2026-11-11) | Post-launch evaluation |
+| DEF-10 | i18n | Chinese site edition | **resolved 2026-11-11** | Shipped: full `/zh/` Chinese mirror of the site (site.js/explorer.js/dissolve.js bilingual chrome included). Note corrected: the workshop HTML was already zh-CN — the original item text had this recorded inverted, and no English workshop edition was ever required. | — |
 | DEF-11 | alignment | Per-repo README alignment with this site | deferred | Explicitly next-phase work after the site ships | Site approved & stable |
 | DEF-12 | explorer | Force-directed graph canvas; asciinema/screencasts | deferred | Query console + radial view cover v1 needs; no recording toolchain in workspace | Post-launch |
 | DEF-13 | naming | npm scope rename `@madpolaris/truthsrc` → `@co-arising/truthsrc` | deferred | Zero cost before first npm publish (DEF-03) | Before DEF-03 closes |

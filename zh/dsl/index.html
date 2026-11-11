@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>真源树语言 — co-arising</title>
+  <meta name="description" content="truthsrc 语言的战略层与范围层：12 种原子、15 种工作坊笔记类型、22 种带类型的关系、治理闸门，以及银行示例的真实切片。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/dsl/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/dsl/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/dsl/" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="站点导航"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">语言 · 战略层与范围层</p>
+      <h1>一门给<span class="accent">真源树</span>的描述语言</h1>
+      <p class="thesis">一棵 YAML 树是唯一的编辑界面：工作坊笔记经 inbox 流入，形式化原子持有编译后的契约，一张 22 种带类型关系的注册表就是元模型。本页发布语言的战略层（上下文、子域、地图）与范围层（种类、关系、闸门）。可视化编辑工具在<a href="/zh/status/#DEF-02">台账</a>上。</p>
+    </header>
+
+    <section id="shape">
+      <div class="sec-head"><span class="no">01</span><h2>一棵树的形状</h2></div>
+      <p class="sec-sub">来自银行示例——真实路径，真实计数 <span class="badge verified" title="F-10">已验证</span>。</p>
+      <pre class="code"><code>truth/bank-wealth/
+├── system.yaml                    # 系统根：id、名称、职责
+├── inbox/                         # 工作坊入口——笔记是草稿，不是法律
+│   ├── 02-commands/  05-context-map/  06-aggregate-detail/ …   # 13 个产品槽位
+└── contexts/bankwealth/
+    ├── context.yaml               # 限界上下文 + 它的依赖（R21）
+    ├── aggregates/
+    │   ├── credit-balance/
+    │   │   ├── aggregate.yaml     # 状态字段 + 具名的 @rule 不变量
+    │   │   └── slices/initialize-account.slice.yaml
+    │   ├── fund-order/  …         # 3 个聚合共 27 个切片
+    │   └── sip-plan/
+    ├── value-objects/             # 59 个值对象：Money、AccountId、AmountDecimal…
+    ├── read-models/               # 6 个读模型，带字段血缘（R10/R11）
+    ├── policies/                  # 事件 → 命令的反应规则（R7/R9）
+    ├── stories/                   # 4 个用户故事
+    ├── use-cases.yaml             # 由切片实现的流程（R18）
+    ├── pipelines/                 # 4 条 Monarch 风格的有序步骤队列（R14–R16）
+    ├── sagas/                     # 2 个 TCC 跨聚合事务
+    └── formal-products/           # 36 份契约：端口、宿主、制品契约…</code></pre>
+      <div class="callout"><b>第零规则</b><p><strong>作者树是唯一的编辑界面。</strong>下游的一切——编译后的 canonical、知识图谱、生成的代码、台账、锚点——都是派生物，都会被重新生成。手工编辑派生物，按契约作废。这一条规则，是其他一切保证成为可能的原因。</p></div>
+    </section>
+
+    <section id="kinds">
+      <div class="sec-head"><span class="no">02</span><h2>范围层：你能说什么</h2></div>
+      <p class="sec-sub">两套词汇表，一张注册表。工作坊<strong>笔记类型</strong>是发现面（一墙便签的去处）；<strong>原子种类</strong>是编译后的契约。<span class="badge verified" title="F-15">已对照 lib/shared.mjs 验证</span></p>
+
+      <h3>15 种笔记类型——工作坊入口</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>分组</th><th>类型</th><th>承载什么</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">行为</td><td><code>event</code> · <code>command</code> · <code>policy</code> · <code>timer</code></td><td>领域事件、请求变更的命令、反应策略、时间触发器——EventStorming 的词汇。</td></tr>
+          <tr><td class="nm">结构</td><td><code>aggregate</code> · <code>entity</code> · <code>field</code> · <code>readModel</code></td><td>一致性边界、实体、带血缘的字段、读侧投影。</td></tr>
+          <tr><td class="nm">战略</td><td><code>context</code> · <code>subdomain</code> · <code>relation</code></td><td>限界上下文、核心/支撑/通用分类、上下文间关系——DDD 的战略层。</td></tr>
+          <tr><td class="nm">人与系统</td><td><code>role</code> · <code>externalSystem</code></td><td>角色（及其可发出的命令，R12）和边界上的外部系统。</td></tr>
+          <tr><td class="nm">知识</td><td><code>question</code> · <code>story</code></td><td>不许悄悄消失的开放问题 / 热点，以及等待安放的用户故事。</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>12 种原子——编译后的契约</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>种类</th><th>文件</th><th>持有</th></tr></thead>
+        <tbody>
+          <tr><td class="nm"><code>note</code></td><td><code>inbox/**</code></td><td>任意笔记类型的草稿工作坊笔记——等待人工晋升。</td></tr>
+          <tr><td class="nm"><code>aggregate</code></td><td><code>aggregates/&lt;slug&gt;/aggregate.yaml</code></td><td>身份、状态字段、有序的命令/事件池、具名的 <code>@rule</code> 不变量。</td></tr>
+          <tr><td class="nm"><code>slice</code></td><td><code>slices/&lt;slug&gt;.slice.yaml</code></td><td>因果单元：一条命令、它的守卫、它产生的事件、折叠赋值、溯源。</td></tr>
+          <tr><td class="nm"><code>value-object</code></td><td><code>value-objects/&lt;slug&gt;.vo.yaml</code></td><td>带类型的值——<code>Money</code>、<code>AccountId</code> 这类名义包装。</td></tr>
+          <tr><td class="nm"><code>read-model</code></td><td><code>read-models/…</code></td><td>读侧形状，每个字段带来源（血缘）。</td></tr>
+          <tr><td class="nm"><code>policy</code></td><td><code>policies/…</code></td><td>「当事件 X 则命令 Y」的反应规则。</td></tr>
+          <tr><td class="nm"><code>story</code> / <code>use-cases</code></td><td><code>stories/…</code> · <code>use-cases.yaml</code></td><td>用户故事，以及实现它们的流程。</td></tr>
+          <tr><td class="nm"><code>pipeline</code></td><td><code>pipelines/&lt;slug&gt;.pipeline.yaml</code></td><td>有序的业务步骤队列（只有步骤 steps，绝不叫「阶段 stages」）——编译为 Monarch 计划。</td></tr>
+          <tr><td class="nm"><code>saga</code></td><td><code>sagas/&lt;slug&gt;.saga.yaml</code></td><td>跨聚合 TCC 事务：参与者、阶段、补偿——编译为 saga-core IR。</td></tr>
+          <tr><td class="nm"><code>scenario</code></td><td><code>scenarios/&lt;slug&gt;.scenario.yaml</code></td><td>叙事式 runbook / 演示脚本。</td></tr>
+          <tr><td class="nm"><code>formal-product</code></td><td><code>formal-products/…</code></td><td>工程契约：技术端口、效果宿主、制品契约、宿主计算——生成代码必须满足的东西。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="relations">
+      <div class="sec-head"><span class="no">03</span><h2>关系注册表——元模型的脊柱</h2></div>
+      <p class="sec-sub">22 种带类型的关系。<code>propagates</code> 标记是每条关系一次的人工裁定：这条边是否传导影响？<code>blast_radius</code> 恰好沿 <code>propagates</code> 边行走——宁可多报，不可漏报。<span class="badge verified" title="F-14">已验证</span></p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>从</th><th>关系</th><th>到</th><th>传导</th><th>含义</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">R1</td><td>aggregate</td><td><code>owns</code></td><td>slice</td><td>✓</td><td>结构上的拥有</td></tr>
+          <tr><td class="nm">R2</td><td>aggregate</td><td><code>references</code></td><td>aggregate</td><td>✓</td><td>跨聚合引用</td></tr>
+          <tr><td class="nm">R3</td><td>aggregate</td><td><code>emits</code></td><td>event</td><td>✓</td><td>事件池成员</td></tr>
+          <tr><td class="nm">R4</td><td>slice</td><td><code>issues</code></td><td>command</td><td>✓</td><td>每切片一条命令（1:1）</td></tr>
+          <tr><td class="nm">R5</td><td>slice</td><td><code>emits</code></td><td>event</td><td>✓</td><td>切片产生的事件</td></tr>
+          <tr><td class="nm">R6</td><td>command</td><td><code>produces</code></td><td>event</td><td>✓</td><td>因果性；条件在守卫里</td></tr>
+          <tr><td class="nm">R7</td><td>event</td><td><code>triggers</code></td><td>policy</td><td>✓</td><td>反应规则</td></tr>
+          <tr><td class="nm">R8</td><td>policy</td><td><code>constrains</code></td><td>slice</td><td>✓</td><td>策略约束切片</td></tr>
+          <tr><td class="nm">R9</td><td>policy</td><td><code>invokes</code></td><td>command</td><td>✓</td><td>策略发出命令</td></tr>
+          <tr><td class="nm">R10</td><td>read-model</td><td><code>derives-from</code></td><td>field</td><td>✓</td><td>读侧血缘</td></tr>
+          <tr><td class="nm">R11</td><td>field</td><td><code>lineage</code></td><td>field</td><td>✓</td><td>字段到字段的链条</td></tr>
+          <tr><td class="nm">R12</td><td>role</td><td><code>can-issue</code></td><td>command</td><td>—</td><td>是权限，不是影响</td></tr>
+          <tr><td class="nm">R13</td><td>read-model</td><td><code>visible-to</code></td><td>role</td><td>—</td><td>可见性</td></tr>
+          <tr><td class="nm">R14</td><td>pipeline</td><td><code>has-step</code></td><td>step</td><td>✓</td><td>有序步骤</td></tr>
+          <tr><td class="nm">R15</td><td>step</td><td><code>performed-by</code></td><td>role</td><td>—</td><td>参与关系</td></tr>
+          <tr><td class="nm">R16</td><td>step</td><td><code>executes</code></td><td>slice</td><td>✓</td><td>步骤执行切片</td></tr>
+          <tr><td class="nm">R17</td><td>story</td><td><code>covers</code></td><td>use-case</td><td>—</td><td>可追溯性</td></tr>
+          <tr><td class="nm">R18</td><td>use-case</td><td><code>realized-by</code></td><td>slice</td><td>✓</td><td>流程 → 切片</td></tr>
+          <tr><td class="nm">R19</td><td>scenario</td><td><code>exercises</code></td><td>pipeline</td><td>—</td><td>runbook 路径</td></tr>
+          <tr><td class="nm">R20</td><td>value-object</td><td><code>used-by</code></td><td>aggregate</td><td>✓</td><td>类型使用</td></tr>
+          <tr><td class="nm">R21</td><td>context</td><td><code>depends-on</code></td><td>context</td><td>✓</td><td>上下文映射</td></tr>
+          <tr><td class="nm">R22</td><td>aggregate</td><td><code>belongs-to</code></td><td>subdomain</td><td>—</td><td>战略分类</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small" style="margin-top:10px">战略层一眼看尽：R21 是上下文映射；R22 把聚合安放进核心/支撑/通用子域；R12/R13 承载谁能做什么、谁能看见什么。其余全是行为——而行为边传导影响。</p>
+    </section>
+
+    <section id="slice">
+      <div class="sec-head"><span class="no">04</span><h2>一个真实切片，原样未剪</h2></div>
+      <p class="sec-sub">来自 <code>truth/bank-wealth/…/credit-balance/slices/initialize-account.slice.yaml</code>。这是这门语言最密的样子：一条命令、五个守卫、一个事件、折叠、溯源。</p>
+      <pre class="code"><code>kind: slice
+aggregate: CreditBalance
+command: InitializeAccount
+payload:
+  {
+    "name": "InitializeAccount",
+    "parameters": [
+      "resource: AccountId @BUSINESS_INPUT",
+      "currency: String @BUSINESS_INPUT",
+      "amount: Money @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject ACCOUNT_ID/ACCOUNT_ID: \"param.resource == state.id\")",
+      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" …\")",
+      "@guard[invariantRef](reject ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
+      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount >= 0.00\")"
+    ],
+    "produces": [ "AccountInitialized" ],
+    "provenance": { "author": "agent-assisted-bank-v1", "approvedBy": "user-approved-p24-p25-bank-joint", … }
+  }
+events:
+  {
+    "AccountInitialized": {
+      "payloads":  [ "resource: AccountId @PROPAGATED", "amount: Money @PROPAGAGED", … ],
+      "bindings":  [ "resource <- param.resource", "amount <- param.amount", … ],
+      "foldAssignments": [
+        "initialized := \"literal:true\"",
+        "accountBalance := @fold[put](key=event.currency, value=event.amount)"
+      ]
+    }
+  }</code></pre>
+      <div class="card-grid cols-3" style="margin-top:16px">
+        <div class="card"><span class="tag">守卫</span><h3>有牙齿的规则</h3><p>每条守卫引用一条具名不变量（<code>ACCOUNT_SEED_NONNEGATIVE</code>）和一个用于拒绝的错误码。「余额非负」不再是一条注释——它编译进生成的命令处理器。</p></div>
+        <div class="card"><span class="tag">绑定</span><h3>载荷从哪里来</h3><p>每个事件字段要么从参数传播而来，要么是计算出来的——字段级的溯源，这正是读模型血缘（R10/R11）建立其上的东西。</p></div>
+        <div class="card"><span class="tag">折叠</span><h3>历史变成状态</h3><p><code>foldAssignments</code> 定义事件如何更新聚合状态——生成的 event applier 实现的就是这套代数。</p></div>
+      </div>
+    </section>
+
+    <section id="gates">
+      <div class="sec-head"><span class="no">05</span><h2>治理：三道闸门，不是风格指南</h2></div>
+      <div class="steps">
+        <div class="step-item"><div><h4><code>validate</code>——0 个硬发现</h4><p class="meta">对作者树做结构 + 语义验证</p><p>未知种类、悬空引用、事件在两处定义、切片没有所属聚合——全是硬发现。零是唯一可接受的计数。银行树截至 2026-11-11：<strong>0 硬发现</strong> <span class="badge verified" title="F-01">已验证</span>。</p></div></div>
+        <div class="step-item"><div><h4><code>roundtrip</code>——逐字节一致</h4><p class="meta">树 → canonical → 树，必须精确复现作者文件</p><p>这是反格式漂移闸门。如果编译「顺手规范化」了任何东西，往返就会发散、闸门就会失败。银行树：<strong>157 个原子，逐字节一致</strong> <span class="badge verified" title="F-02">已验证</span>。</p></div></div>
+        <div class="step-item"><div><h4><code>compile-products</code>——严格契约</h4><p class="meta">形式产物必须先满足自己的 schema 才能被使用</p><p>端口、saga IR、执行 IR：从树编译而来的带类型、带版本的产物，各有各的验证。生成代码只消费冻结后的产物。</p></div></div>
+      </div>
+      <div class="callout teal"><b>智能体</b><p>给 AI 智能体的编辑契约就是这三道闸门再加守护规则：每一批编辑以 <strong>validate 与 roundtrip 全绿</strong>收尾；payload 文本逐字保留；树内不许出现工具痕迹；一个事件只在一个切片中定义。它随工具链发布为 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/AGENTS.md">AGENTS.md</a> 和一个查询<a href="https://github.com/co-arising/metarch-truthsrc/tree/main/skills">技能包</a>。</p></div>
+    </section>
+
+    <section id="authoring">
+      <div class="sec-head"><span class="no">06</span><h2>今天与明天的编辑体验</h2></div>
+      <p class="sec-sub">今天的编辑界面是 YAML 文件加三个抽取技能（从代码库、从可达数据、从一句话描述）。可视化编辑——从 Qlerify 或 Miro 导入工作坊画板、从既有仓库逆向抽取一棵树——已为它留好设计但尚未构建：<a class="badge deferred" href="/zh/status/#DEF-02">DEF-02</a>。</p>
+      <p class="small">Schema 参考：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/SCHEMA.md">SCHEMA.md</a> · 编写指南：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/AUTHORING.md">AUTHORING.md</a> · 完整教程：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/TUTORIAL.md">TUTORIAL.md</a></p>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

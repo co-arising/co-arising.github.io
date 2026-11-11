@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>为何是 co-arising，而非本体论 — co-arising</title>
+  <meta name="description" content="领域概念不是静态分类。聚合是当命令、事件、状态与守卫在不变量约束下共同成立时所缘起的东西。真源路线的哲学内核。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/why-co-arising/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/why-co-arising/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/why-co-arising/" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="站点导航"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方交互式演示显示其静态回退。<a href="/zh/">首页</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">哲学</p>
+      <h1>为何是 <span class="accent">co-arising</span>，而非本体论</h1>
+      <p class="thesis">在缘起（dependent origination）之中，没有任何事物独立存在：事物因关系而共同生起。领域知识恰恰就是这样运作的——也恰恰因此，对「对象类型」做静态分类总是抓不住它。</p>
+    </header>
+
+    <section id="problem">
+      <div class="sec-head"><span class="no">01</span><h2>我们一再撞上的那堵墙</h2></div>
+      <p class="sec-sub">二十年，从两个相反方向撞上同一堵墙：</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">1999–2004 · 学术界</span><h3>「业务生成代码」造出了玩具</h3><p>模型到代码的研究不断生成出能跑却活不过真实领域接触的东西：没有可强制的规则、没有可追溯性、没有演化路径。那些模型是<strong>没有后果的描述</strong>。</p></div>
+        <div class="card"><span class="tag">2019–2023 · 工业界</span><h3>合规不得不逆向工程血缘</h3><p>拥有数百个微服务的企业没有数据血缘。当法务问「这个数字从哪来」，唯一的办法是<strong>把整个系统反向 grep 一遍</strong>。知识只存在于代码内部——够不着、证不了。</p></div>
+      </div>
+      <p style="margin-top:18px;max-width:52em">两堵墙同根：领域知识被当作代码的<em>文档副产品</em>，而不是反过来。解法不是更好的画图工具，而是让领域描述成为那个被<strong>编译、验证、追溯</strong>的东西——让每一行代码都可证明地来自一段被命名过的知识。</p>
+    </section>
+
+    <section id="ddd">
+      <div class="sec-head"><span class="no">02</span><h2>DDD 早就知道：概念是共生的</h2></div>
+      <p class="sec-sub">这个名字不是装饰——它是对 DDD 一直在说的话的一种读法。</p>
+
+      <h3>战术层：聚合是一道驻波，不是一个类</h3>
+      <p style="max-width:52em">Evans 把聚合定义为<strong>一致性边界</strong>。在真源树里这句话变成字面事实：聚合<em>就是</em>当它的各个切片成立时所缘起的东西——每个切片是一条命令、它的守卫、和它产生的事件；守卫强制聚合的不变量；事件折叠回状态。抽掉任何一条腿，聚合就不再是聚合：</p>
+      <ul style="max-width:52em">
+        <li>没有<strong>守卫</strong>的<strong>命令</strong>——没有规则的变更；不变量没有强制点。</li>
+        <li>没有<strong>折叠赋值</strong>的<strong>事件</strong>——永远不会变成状态的历史。</li>
+        <li>无人引用的<strong>不变量</strong>——死条文；一致性只存在于纸面上。</li>
+      </ul>
+      <p style="max-width:52em">银行树把这点变得具体：<code>CreditBalance</code> 之所以存在，是因为 27 个切片携带着诸如 <code>@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE …)</code> 的守卫，背后是具名的 <code>@rule</code> 不变量——三个聚合共 <strong>149 条</strong> <span class="badge verified" title="F-09">已验证</span>。</p>
+
+      <h3>战略层：结构跟随业务地形</h3>
+      <p style="max-width:52em">战略模式同样的关系性。<strong>核心域 / 支撑域 / 通用域</strong>取决于业务在哪里拥有优势或独特知识——而不是代码的任何属性。<strong>限界上下文</strong>与它的<strong>上下文映射</strong>（客户—供应商、防腐层、开放主机服务……）是从组织结构和上下游的商业格局中共生的。在真源树语言里，它们是一等公民笔记——<code>context</code>、<code>subdomain</code>、<code>relation</code>——用与其他一切相同的注册表相连（R21 上下文依赖、R22 聚合归属于子域）。</p>
+
+      <div class="callout teal"><b>论点</b><p><strong>DDD 的核心洞见就是缘起。</strong>聚合、上下文、子域不是你往里归档东西的类别——它们是从关系中生起的结构（命令→事件、不变量→守卫、业务地形→上下文映射），关系在则结构在，关系断则结构消解。我们的语言只是把这一点变成了机器可检验的。</p></div>
+    </section>
+
+    <section id="demo">
+      <div class="sec-head"><span class="no">03</span><h2>亲手感受：聚合的消解 / 涌现演示</h2></div>
+      <p class="sec-sub">来自银行示例 <code>CreditBalance</code> 聚合的真实子图（从编译后的知识图谱导出）。<strong>消解</strong>：把关系一条条抽走，看聚合失去立足点。<strong>涌现</strong>：从散落的工作坊笔记把它重新搭起来。没有物理引擎，没有比喻——只有注册表里真实存在的关系。</p>
+      <div class="dissolve-stage" id="dissolve-stage">
+        <noscript>
+          <p style="padding:20px;font-size:14px;color:var(--ink-2)">
+            <strong>静态回退：</strong>完整装配时，CreditBalance = 1 个聚合 + N 个切片，每个切片 = 命令 + 守卫 + 事件，所有腿都在，不变量被强制。
+            完全消解时，同样的节点散落成互不相连的工作坊笔记——命令、事件和规则，合在一起不再<em>有意义</em>。
+            启用 JavaScript 可看交互版本。
+          </p>
+        </noscript>
+      </div>
+      <p class="small">边上的标签是 <a href="/zh/dsl/#relations">R1–R22 注册表</a>里真实的关系名。当一条守卫边被抽走，它所强化的不变量就处于<em>无人检查</em>状态——这正是图谱动词 <code>orphans</code> 机械化报告的东西。<a href="/zh/explorer/#orphans">在完整图谱上运行 orphans ↗</a></p>
+    </section>
+
+    <section id="vs-ontology">
+      <div class="sec-head"><span class="no">04</span><h2>隔壁的本体论</h2></div>
+      <p class="sec-sub">业界与这条路最接近的是 Palantir 的 Ontology——差异很有启发性，而非敌意。</p>
+      <div class="versus">
+        <div class="side">
+          <span class="tag" style="font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;color:var(--red);text-transform:uppercase">本体论（闭源）</span>
+          <h3 style="margin-top:6px">带执行层的分类学</h3>
+          <ul style="font-size:14px;color:var(--ink-2);padding-left:18px">
+            <li><strong>对象类型、链接类型、动作类型</strong>——企业的分类学，在 Ontology Manager 里自上而下定义。</li>
+            <li>「表示决策，而不只是数据」——确实漂亮的一句：动作经本体写回数据集。</li>
+            <li>封闭：执行层、语义和格式就是产品本身。没有开放的交换格式，没有退出通道。</li>
+            <li>含义在类型系统中<em>一次性声明</em>——即使每一段重要的关系都已腐坏，对象仍安坐在它们的分类位上。</li>
+          </ul>
+        </div>
+        <div class="mid">vs</div>
+        <div class="side">
+          <span class="tag" style="font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;color:var(--teal);text-transform:uppercase">co-arising（本项目）</span>
+          <h3 style="margin-top:6px">会编译的关系图</h3>
+          <ul style="font-size:14px;color:var(--ink-2);padding-left:18px">
+            <li><strong>22 种带类型的关系</strong>，带显式的影响标记（<code>propagates</code>）——含义活在边上，而边是可执行的输入。</li>
+            <li>同样是决策与数据——但动作层是<strong>生成的开放代码</strong>（读得懂、编得过、带得走的 CQRS/ES Scala）。</li>
+            <li>开放：MIT/Apache-2.0，基于文件的树，SQLite 图谱，任何智能体可经 MCP 访问。</li>
+            <li>含义被<em>持续重新推导</em>：编译器在每次构建时重新证明那些关系；孤儿知识会被检测出来，而不是被归档遗忘。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout"><b>一句话</b><p>在本体论里，一个对象由它在分类学中的位置定义。在 co-arising（缘起）里，一个概念由它的关系定义——<strong>抽掉关系，它就不再有意义</strong>，而工具会确切地告诉你那是何时发生的。</p></div>
+    </section>
+
+    <section id="stewardship">
+      <div class="sec-head"><span class="no">05</span><h2>另外两个承诺</h2></div>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">守护纪律</span><h3>智能体起草，人类定夺</h3><p>AI 智能体极其擅长<em>提议</em>领域结构，又极其不适合为它负责。所以契约是：智能体可以查询、起草、填充；真源树是唯一的编辑界面；每一批编辑都必须以验证闸门全绿收尾；批准是人的行为，并记录进溯源（每个原子上的 <code>approvedBy</code>）。</p></div>
+        <div class="card"><span class="tag">人可核验的生产</span><h3>人仍然能生产和检查</h3><p>这棵树是人读得懂、改得动的 YAML。验证是确定性的。往返转换逐字节一致。机器做量——计数、编译、锚定、查询——人继续对正确性负责。这种分工是特性，不是怀旧。</p></div>
+      </div>
+    </section>
+
+    <section id="naming">
+      <div class="sec-head"><span class="no">06</span><h2>它不是什么，以及这个怪名字</h2></div>
+      <div class="card-grid cols-3">
+        <div class="card"><span class="tag">不是</span><h3>低代码平台</h3><p>没有拖拽积木的画布。产出是真实、可编译、可测试的源代码加一个手写区——因为每个真实系统里最难的那一半，恰恰是低代码接不住的那一半。</p></div>
+        <div class="card"><span class="tag">不是</span><h3>模型到代码的玩具</h3><p>验收标准不是「demo 能跑」。而是：可 diff 的树、逐字节一致的往返、可编译的生成项目、双向证明的锚点——用命令验证，不用感觉。<a href="/zh/pipeline/">看那些闸门 ↗</a></p></div>
+        <div class="card"><span class="tag">不是</span><h3>又一个标准</h3><p>Gherkin、AsyncAPI、OpenAPI、C4 都是好标准——树可以投影上去。自有的那一层刻意很小：领域 IR 和它的关系注册表。<a href="/zh/compare/#protocols">投影表 ↗</a></p></div>
+      </div>
+      <p style="margin-top:20px;max-width:52em" class="small">关于名字：Palantir 在 2011 年造出「Forward Deployed Engineer」这个词，被普遍认为荒谬，他们没有改——今天 FDE 是几百家公司招聘的职位类别。造一个词，然后耐心地持有它，一个词就是这样变成一个品类的。我们在持有 <em>co-arising（缘起）</em>。</p>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/data/dissolve-subgraph.js"></script>
+  <script src="/assets/js/dissolve.js"></script>
+</body>
+</html>

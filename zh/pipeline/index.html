@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>从真源树到代码，再回来 — co-arising</title>
+  <meta name="description" content="完整生命周期：编译真源树、构建本地知识图谱、生成可编译的 CQRS 代码库、验证锚点、填充手写区、再验证。每个阶段都有它的命令和经验证的数字。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/pipeline/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/pipeline/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/pipeline/" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+  <nav id="site-nav" aria-label="站点导航"></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
+
+  <main class="wrap">
+    <header class="page-hero">
+      <p class="over">生命周期</p>
+      <h1>真源树 → 代码，<span class="accent">再回来</span></h1>
+      <p class="thesis">六个阶段，每段一条精确命令、一道绿/红闸门。这个闭环闭合了两次：一次向前（树 → 图谱 → 代码），一次向后（代码 → 锚点 → 树）。以下数字来自银行完整示例，2026-11-11 重新采集。</p>
+    </header>
+
+    <section id="flow">
+      <div class="sec-head"><span class="no">01</span><h2>六个阶段</h2></div>
+      <div class="flow" aria-label="六阶段流水线">
+        <div class="step"><span class="snum">01 · 编写</span><b>编辑树</b><p>只写 YAML 原子。智能体起草，人类批准——每个原子记录 <code>approvedBy</code>。</p></div>
+        <div class="step"><span class="snum">02 · 闸门</span><b>验证 + 往返</b><p><code>validate</code> 0 硬发现；<code>roundtrip</code> 逐字节一致。<span class="badge verified" title="F-01/F-02">157 原子 ✓</span></p></div>
+        <div class="step"><span class="snum">03 · 图谱</span><b>编译 &amp; 推送</b><p>canonical 投影 → SQLite 图谱：<span class="badge verified" title="F-03">389 节点 / 413 边</span>。</p></div>
+        <div class="step"><span class="snum">04 · 生成</span><b>CQRS 代码库</b><p><code>generate-project</code>：<span class="badge verified" title="F-04">235 个文件</span>，<span class="badge verified" title="F-06">0 编译错误</span>。</p></div>
+        <div class="step"><span class="snum">05 · 手写</span><b>填手写区</b><p>端口是生成的；行为进物理隔离的手写模块——<span class="badge verified" title="F-08">35 个文件</span>，完整实现。</p></div>
+        <div class="step"><span class="snum">06 · 验证</span><b>证明血缘</b><p><code>verify-project</code>：<span class="badge verified" title="F-05">792 个锚点</span>；测试 <span class="badge verified" title="F-07">23/23</span>。</p></div>
+      </div>
+      <p class="small">然后它循环：改树，<code>status-project</code> 精确显示哪些生成文件过期了，<code>generate-project --update</code> 只刷新那些，对未改动的树重跑则写入 <strong>0 个文件</strong>（幂等是闸门，不是愿望）。</p>
+    </section>
+
+    <section id="anchors">
+      <div class="sec-head"><span class="no">02</span><h2>锚点：别人都没交付的那部分</h2></div>
+      <p class="sec-sub">代码生成很常见。<strong>出身证明</strong>不常见。每个生成文件都携带锚点元数据，把它绑定到产生它的知识节点——而且这个绑定靠重读字节来验证，不是靠信任一份清单。</p>
+      <div class="term">
+        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">两个方向，各一条命令</span></div>
+        <pre><span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
+<span class="o">  knowledge  rule:SetCount (aggregate example/Counter)</span>
+<span class="o">  generated  app/domain/example/Counter.scala  L31–L54   ← 是区间，不是猜的</span>
+
+<span class="p">$</span> <span class="c">truthsrc query-project --file app/domain/example/Counter.scala --symbol setCount</span>
+<span class="o">  source     slice example/set-count  →  guards  →  rule:SetCount</span>
+
+<span class="p">$</span> <span class="c">truthsrc verify-project --project truthsrc.project.json --out app/</span>
+<span class="ok">✓ 通过</span> <span class="o">— 每个锚点都对照文件字节重新验证（银行项目 792 个）</span></pre>
+      </div>
+      <div class="card-grid cols-3">
+        <div class="card"><span class="tag">为什么重要</span><h3>「这一行从哪来的？」</h3><p>是合规问题、是调试问题，也是新人上手问题——用查询回答，不用考古。</p></div>
+        <div class="card"><span class="tag">为什么诚实</span><h3>字节级精度，不是感觉</h3><p>锚点记录区间；验证重读文件。如果有人改了生成代码，验证会报告漂移，而不是默默继续信任。</p></div>
+        <div class="card"><span class="tag">为什么智能体需要它</span><h3>不用 grep 的上下文包</h3><p>同一张锚点图能为手写智能体打包出精确的上游类型、调用方契约与验收场景——为 AI 协作者闭环。</p></div>
+      </div>
+    </section>
+
+    <section id="handwritten">
+      <div class="sec-head"><span class="no">03</span><h2>手写区</h2></div>
+      <p class="sec-sub">生成哲学：<strong>生成端口，把行为留给人</strong>（和他们的智能体）——但只留在再生成永远碰不到的物理隔离模块里。</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">生成侧</span><h3>一切结构性的东西</h3><p>聚合、命令、事件、守卫（从 <code>@rule</code> 不变量编译而来）、proto schema、端口、测试脚手架——银行项目 235 个文件，全部可再生成，全部有锚点。</p></div>
+        <div class="card"><span class="tag">手写侧</span><h3>一切行为性的东西</h3><p>对 mock TA 的效果执行、JDBC 装配、恢复循环、读侧追赶、HTTP 页面——<strong>35 个文件，完整实现</strong> <span class="badge verified" title="F-08">已验证</span>，经 <code>unmanagedSourceDirectories</code> 挂进构建。没有任何 <code>BEGIN MANUAL</code> 标记——边界就是文件系统本身。</p></div>
+      </div>
+      <div class="callout"><b>漂移</b><p>树变了，生成文件被刷新；手写区永不被覆盖。测试保持为固定的期望——<strong>生成代码必须满足手写测试，而不是反过来</strong>。今天 23/23 通过 <span class="badge verified" title="F-07">已验证</span>。</p></div>
+    </section>
+
+    <section id="engines">
+      <div class="sec-head"><span class="no">04</span><h2>saga 与 Monarch 在哪登场</h2></div>
+      <p class="sec-sub">两个引擎，两种职责——用真源声明，绝不混淆：</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">saga-core · TCC 事务</span><h3>跨聚合一致性</h3><p>一个 <code>saga</code> 原子声明参与者（聚合）、阶段（Try / Confirm / Cancel）和补偿。它编译成 saga IR 交给 <a href="https://github.com/MadPolaris/saga-core">saga-core</a>——一个 Akka Typed、事件溯源的 TCC 协调器。银行树声明了 <strong>2 个 saga</strong>：现金付款（投资人出金 → 归集入金 → 订单确认）和独立退款。</p></div>
+        <div class="card"><span class="tag">monarch-core · 阶段队列</span><h3>流程编排</h3><p>一个 <code>pipeline</code> 原子是有序的业务步骤队列；步骤执行切片（R16）。它编译成计划交给 <a href="https://github.com/MadPolaris/monarch-core">monarch-core</a>——一个可恢复的阶段队列引擎，支持基于游标的续跑，由 <a href="https://github.com/MadPolaris/monarch-persistence">monarch-persistence</a> 做日志持久化。银行树声明了 <strong>4 条流水线</strong>（现金付款、TA 提交、定投派发、独立退款）。</p></div>
+      </div>
+      <p class="small" style="margin-top:12px">把它们分清的规则：<strong>saga 拥有事务边界；流水线拥有流程顺序。</strong>二者不可互换，真源树拒绝含混。</p>
+    </section>
+
+    <section id="boundaries">
+      <div class="sec-head"><span class="no">05</span><h2>这个闭环暂不声称什么</h2></div>
+      <div class="callout red"><b>边界</b><p>
+        <strong>全服务运行时闸门——未通过</strong>（<a class="badge boundary" href="/zh/status/#DEF-06">DEF-06</a>）：生成的代码可编译、23 个测试全过，但 service02 验收跑有一道闸没过——一次全新的读侧回放没在 90 秒内追平。代码、24 个恢复用例、真实库的初始/重启/退款确实通过了。 &nbsp;·&nbsp;
+        <strong>运行中服务的 HTTP 冒烟——尚未执行</strong>（<a class="badge boundary" href="/zh/status/#DEF-07">DEF-07</a>）。 &nbsp;·&nbsp;
+        <strong>BDD/Gherkin 规格——按衍生物设计，未构建</strong>（<a class="badge deferred" href="/zh/status/#DEF-01">DEF-01</a>）：守卫 + 场景应当能生成 Gherkin；该投影尚未实现。
+      </p></div>
+    </section>
+
+    <section id="try">
+      <div class="sec-head"><span class="no">06</span><h2>自己跑一遍</h2></div>
+      <p class="sec-sub">Counter 教程在一个单聚合项目上用大约十分钟走完 1–6 阶段，只需 Node。银行示例把它带到完整规模。两者都在<a href="/zh/guide/">实战指南</a>里。</p>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>
