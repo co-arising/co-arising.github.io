@@ -91,7 +91,8 @@ npm run validate            # ✅ 0 hard · roundtrip: 157 atoms byte-identical
 npm run compile
 node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
 
-# gate 4 — generate the CQRS project (235 files)
+# gate 4 — generate the CQRS project (235 files); the first run also
+#          fetches the pinned 0.3.0 engine jars from Maven Central (sha256-verified)
 npm run project             # writes generated/current/
 
 # gate 5 — the handwritten zone is already complete in the repo (35 files);

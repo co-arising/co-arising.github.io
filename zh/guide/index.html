@@ -91,7 +91,8 @@ npm run validate            # ✅ 0 硬发现 · roundtrip：157 原子逐字节
 npm run compile
 node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
 
-# 闸门 4 —— 生成 CQRS 项目（235 个文件）
+# 闸门 4 —— 生成 CQRS 项目（235 个文件）；首次运行还会从 Maven Central
+#          取回钉定的 0.3.0 引擎 jar（校验 sha256）
 npm run project             # 写出 generated/current/
 
 # 闸门 5 —— 手写区在仓库里已经是完整的（35 个文件）；

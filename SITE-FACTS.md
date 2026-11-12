@@ -26,11 +26,12 @@ Audited: 2026-11-11
 | F-15 | Atom kinds / note types | 12 atom kinds, 15 note types | 2026-11-11 | metarch-truthsrc `lib/shared.mjs` | — |
 | F-16 | MCP tools | 26 tools over stdio JSON-RPC | 2026-11-11 | metarch-truthsrc `mcp/server.mjs` | `truthsrc mcp` |
 | F-17 | Workshop HTML snapshot | single-file, 2.18 MB, offline, lang zh-CN | 2026-11-06 | `view-project --html` output in bank repo target/ | — |
-| F-18 | Engine licenses | monarch-core / monarch-persistence / saga-core: Apache-2.0, tag v0.2 | 2026-11-11 | per-repo LICENSE + `git describe` | — |
+| F-18 | Engine licenses | monarch-core / monarch-persistence / saga-core: Apache-2.0, tag v0.3.0 | 2026-11-12 | per-repo LICENSE + `git describe` | — |
 | F-19 | truthsrc license | MIT | 2026-11-11 | metarch-truthsrc/LICENSE | — |
 | F-20 | Bank repo license | Apache-2.0 (added 2026-11-11) | 2026-11-11 | bank-wealth-demo/LICENSE | — |
 | F-21 | Blast radius of `event:SipInstallmentFailed`, depth 3 | 55 nodes — site SQL preset and CLI `blast_radius` agree | 2026-11-11 | MCP `tools/call blast_radius` over bank canonical | `truthsrc mcp` → `blast_radius {id: event:SipInstallmentFailed, depth: 3}` |
 | F-22 | Orphans in bank graph | 11 distinct sourceless pool events (BankPaymentResult*×5, BankRefundResult*×5, FundTAReceiptObserved); 23 rows in graphstore with qualified pool copies | 2026-11-11 | MCP `orphans` + graphstore SQL cross-check | `truthsrc mcp` → `orphans` |
+| F-23 | Engines 0.3.0 on Maven Central | `net.imadz` saga-core / monarch-core / monarch-persistence `0.3.0` published; jar sha256 `550fbd5c…` / `0c7a25ee…` / `f42f1b99…`; bank full chain re-verified against these bytes (validate 0 hard · 157 atoms · 235 files · sbt 0 errors · tests 23/23 · 792 anchors) | 2026-11-12 | `curl -s https://repo1.maven.org/maven2/net/imadz/&lt;artifact&gt;_2.13/0.3.0/&lt;artifact&gt;_2.13-0.3.0.jar \| shasum -a 256`; bank `npm run validate && npm run project && sbt test` | `npm run runtime:prepare` (bank) |
 
 ## Conventions
 

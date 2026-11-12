@@ -71,7 +71,7 @@
       <div class="sec-head"><span class="no">04</span><h2>在本地跑起来</h2></div>
       <div class="steps">
         <div class="step-item"><div><h4>验证树</h4><p class="meta">node ≥ 22.13 · 这一步不需要 JVM</p><p><code>git clone https://github.com/MadPolaris/bank-wealth-demo && cd bank-wealth-demo && npm run validate</code>——0 硬发现，往返逐字节一致 <span class="badge verified" title="F-01/F-02">已验证</span>。</p></div></div>
-        <div class="step-item"><div><h4>生成 &amp; 编译</h4><p class="meta">从这里开始需要 JVM + sbt</p><p><code>npm run project</code> 写出 <code>generated/current/</code>（235 个文件）；在其中 <code>sbt compile</code>：534 个源文件 0 错误 <span class="badge verified" title="F-04/F-06">已验证</span>；<code>sbt test</code>：23/23 <span class="badge verified" title="F-07">已验证</span>。</p></div></div>
+        <div class="step-item"><div><h4>生成 &amp; 编译</h4><p class="meta">从这里开始需要 JVM + sbt</p><p><code>npm run project</code>——首次运行还会从 Maven Central 取回钉定的 0.3.0 引擎 jar 并校验 sha256——写出 <code>generated/current/</code>（235 个文件）；在其中 <code>sbt compile</code>：534 个源文件 0 错误 <span class="badge verified" title="F-04/F-06">已验证</span>；<code>sbt test</code>：23/23 <span class="badge verified" title="F-07">已验证</span>。</p></div></div>
         <div class="step-item"><div><h4>验证锚点</h4><p class="meta">收据在此</p><p><code>truthsrc verify-project</code> 重新证明全部 792 个锚点 <span class="badge verified" title="F-05">已验证</span>——文件字节对照树，双向。</p></div></div>
       </div>
       <p class="small">分步教程（含 JVM 侧的 Docker 变体）在<a href="/zh/guide/">实战指南</a>。</p>

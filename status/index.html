@@ -52,6 +52,7 @@
           <tr><td class="nm">F-21</td><td>Blast radius, <code>SipInstallmentFailed</code> d3</td><td><span class="badge verified">verified</span> 55 nodes — site SQL preset ≡ CLI verb</td><td>MCP <code>blast_radius</code> over bank canonical</td></tr>
           <tr><td class="nm">F-22</td><td>Orphans</td><td><span class="badge verified">verified</span> 11 distinct sourceless events (23 graphstore rows)</td><td>MCP <code>orphans</code></td></tr>
           <tr><td class="nm">F-18/19/20</td><td>Licenses</td><td><span class="badge verified">verified</span> truthsrc MIT · engines + bank Apache-2.0</td><td>per-repo LICENSE</td></tr>
+          <tr><td class="nm">F-23</td><td>Engines on Maven Central</td><td><span class="badge verified">verified</span> saga-core / monarch-core / monarch-persistence 0.3.0 published; jar sha256 550fbd5c… · 0c7a25ee… · f42f1b99…; bank full chain re-verified on these bytes (0 hard · 157 atoms · 235 files · 0 errors · 23/23 · 792 anchors)</td><td><code>shasum -a 256</code> over repo1.maven.org jars; bank <code>npm run runtime:prepare</code></td></tr>
         </tbody>
       </table></div>
     </section>
@@ -65,7 +66,7 @@
           <tr id="DEF-01"><td class="nm">DEF-01</td><td>behavior</td><td>BDD / Gherkin behavior specs</td><td><span class="badge deferred">deferred</span></td><td>Positioned as a derivative of the tree (guards + scenarios can generate Gherkin).</td></tr>
           <tr id="DEF-02"><td class="nm">DEF-02</td><td>tooling</td><td>Visual truth-tree authoring (Qlerify / Miro import, reverse extraction)</td><td><span class="badge deferred">deferred</span></td><td>Language layer first; editing UX is a separate discussion.</td></tr>
           <tr id="DEF-03"><td class="nm">DEF-03</td><td>publishing</td><td>truthsrc npm release</td><td><span class="badge boundary">blocked</span></td><td>Currently local tgz / source checkout only.</td></tr>
-          <tr id="DEF-04"><td class="nm">DEF-04</td><td>publishing</td><td>monarch-* / saga-* Maven Central release</td><td><span class="badge boundary">blocked</span></td><td>v0.2 tag exists; reconciliation &amp; audit deliverables are the last alignment item.</td></tr>
+          <tr id="DEF-04"><td class="nm">DEF-04</td><td>publishing</td><td>monarch-* / saga-* Maven Central release</td><td><span class="badge verified">resolved 2026-11-12</span></td><td>Shipped: all three engines published as 0.3.0 (tag v0.3.0 → sbt-ci-release → Central Portal); site pins verified against the published bytes. Offline-bundle tooling still pins the retired p23 set — tracked in the ledger.</td></tr>
           <tr id="DEF-05"><td class="nm">DEF-05</td><td>demos</td><td>fab-simulator-demo, bank-batch-transactor-demo open-sourcing</td><td><span class="badge deferred">deferred</span></td><td>Second alignment wave.</td></tr>
           <tr id="DEF-06"><td class="nm">DEF-06</td><td>bank-service</td><td>service02 full-service gate</td><td><span class="badge boundary">open</span></td><td>Read-side replay missed the 90s caught-up gate (2026-11-06); code, 24 recovery cases and real-DB initial/restart/refund did pass.</td></tr>
           <tr id="DEF-07"><td class="nm">DEF-07</td><td>bank-service</td><td><code>sbt run</code> + HTTP smoke</td><td><span class="badge boundary">open</span></td><td>Not yet executed in a manual session.</td></tr>
