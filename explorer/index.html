@@ -32,8 +32,38 @@
       <p class="thesis">This is not mock data: the SQLite file below is the compiled knowledge graph of the bank wealth example — 389 nodes, 413 edges <span class="badge verified" title="F-03">verified 2026-11-11</span> — loaded into your browser with sql.js. Only static assets are downloaded from this site. Query text and results are not sent to a server.</p>
     </header>
 
+    <section id="nodes" class="xp-directory" aria-labelledby="xp-nodes-heading">
+      <div class="sec-head"><span class="no">01</span><h2 id="xp-nodes-heading">Browse the nodes</h2></div>
+      <p class="sec-sub">Search every node by its exact ID or name, then inspect its stored record and relationships. This is the <b>canonical graphstore capture of 2026-11-11</b>, not the project knowledge/anchor database. Qualified aliases remain separate nodes; matching names do not establish shared identity.</p>
+      <div class="xp-filters">
+        <label for="xp-node-search">ID or name <input id="xp-node-search" type="search" maxlength="256" autocomplete="off" aria-controls="xp-node-list" aria-describedby="xp-node-help" /></label>
+        <label for="xp-node-kind">Node kind <select id="xp-node-kind" aria-controls="xp-node-list" disabled><option value="">All kinds — loading from the graph</option></select></label>
+        <button class="btn ghost" id="xp-node-reset" type="button">Reset filters and selection</button>
+        <button class="btn ghost" id="xp-node-cancel" type="button" disabled>Cancel node queries</button>
+      </div>
+      <p class="small" id="xp-node-help">Literal, case-insensitive ID/name substring search (SQLite’s case folding is ASCII); kind and search combine. Filters never change the selected node. All nodes are reachable in pages of 40; each fresh-copy query is cancelled after 5 seconds. SQL drafts are never shared in node URLs.</p>
+      <p id="xp-node-count" role="status" aria-live="polite">Loading the node directory…</p>
+      <div class="xp-node-layout">
+        <div>
+          <ul id="xp-node-list" class="xp-node-list" aria-label="Matching graph nodes" aria-busy="false"></ul>
+          <nav class="xp-node-pagination" aria-label="Node directory pages">
+            <button class="btn ghost" id="xp-node-prev" type="button" aria-controls="xp-node-list" disabled>Previous</button>
+            <span class="small" id="xp-node-page"></span>
+            <button class="btn ghost" id="xp-node-next" type="button" aria-controls="xp-node-list" disabled>Next</button>
+          </nav>
+        </div>
+        <div id="xp-node-detail" class="xp-node-detail xp-panel" tabindex="-1" aria-live="polite" aria-busy="false">
+          <h3>Node inspector</h3>
+          <p>Select a node to inspect its stored record and incoming/outgoing relationships.</p>
+          <p class="small">Code anchors: <b>unavailable — not provided by this snapshot</b>. No author-file paths, line numbers or GitHub source links are inferred. Stored provenance is a declaration, not a verified code location.</p>
+        </div>
+      </div>
+      <p class="small">At most 80 edges per direction, 8192 UTF-8 bytes per displayed atom/provenance field, 512 KiB per response. Totals and truncation are explicit. Stored atoms are plain text, not executed or treated as verified generated output.</p>
+      <noscript><p class="callout">The directory and inspector require JavaScript and the local SQLite engine. No live node results are available without them; use the rebuild instructions below to inspect the snapshot yourself.</p></noscript>
+    </section>
+
     <section id="console">
-      <div class="sec-head"><span class="no">01</span><h2>The console</h2></div>
+      <div class="sec-head"><span class="no">02</span><h2>The console</h2></div>
       <p class="sec-sub">Pick a preset (with the expected answer) or write your own SQL against <code>nodes(id, kind, name, atom, extra)</code> and <code>edges(seq, from_id, relation, to_id)</code>. Schema is exactly what <code>truthsrc graph --out</code> produces.</p>
 
       <div class="xp-layout">
@@ -87,7 +117,7 @@ ORDER BY n DESC;</textarea>
     </section>
 
     <section id="rebuild">
-      <div class="sec-head"><span class="no">02</span><h2>Don’t trust us — rebuild it</h2></div>
+      <div class="sec-head"><span class="no">03</span><h2>Don’t trust us — rebuild it</h2></div>
       <p class="sec-sub">This graphstore is a derived snapshot, not the project knowledge/anchor database. First complete <a href="/guide/#install">the guide’s tool setup</a> in the same shell, then point <code>BANK</code> at your existing matched bank checkout. The output below must be a new file. Current-source counts can differ from this dated snapshot; count equality alone does not establish byte identity.</p>
       <pre class="code" data-example="graph-rebuild"><code>: "${TRUTHSRC_CLI:?Complete the guide tool setup first}"
 : "${BANK:?Set BANK to your matched bank checkout absolute path}"

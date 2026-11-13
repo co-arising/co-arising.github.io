@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hands-on guide — co-arising</title>
-  <meta name="description" content="From zero to the full loop: environment setup (with Docker fallback), the Counter tutorial, the bank example pipeline, and wiring the MCP server into Claude Code for blast-radius queries." />
+  <meta name="description" content="The Node-only Counter loop, an independently expected rule-change exercise, generated-source review, separate bank acceptance prerequisites, and optional MCP collaboration." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -64,7 +64,7 @@ docker run --rm -it -v "$PWD":/work -w /work sbtscala/scala-sbt:eclipse-temurin-
 git clone https://github.com/co-arising/metarch-truthsrc.git
 export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
 node "$TRUTHSRC_CLI" --help</code></pre>
-      <p class="small">Tip: <code>alias truthsrc="node $PWD/metarch-truthsrc/bin/truthsrc.js"</code> makes the rest of this page read literally.</p>
+      <p class="small">Run from your own exercise parent directory; the checkout directory must not exist. Keep the same shell: the absolute CLI path survives directory changes. No npm runtime installation is needed.</p>
     </section>
 
     <section id="l1">
@@ -77,7 +77,7 @@ node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out gene
 node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
 node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human</code></pre>
       <p>The preview lists update actions, not a textual diff. After generation, expect <code>inputs=current</code>, <code>evidence=verified</code> and <code>synchronized=true</code>. These describe source and byte freshness, not Scala or bank behavior execution.</p>
-      <h3>Reverse-query a real location, not a guessed file or line</h3>
+      <h3 id="counter-reverse-query">Reverse-query a real location, not a guessed file or line</h3>
       <p>A span is a half-open UTF-8 byte range, not a line number. This script derives a line from currently verified source and queries it back; it stops rather than inventing a missing location.</p>
       <pre class="code" data-example="counter-reverse"><code>node --input-type=module &lt;&lt;'NODE'
 import { execFileSync } from 'node:child_process';
@@ -110,6 +110,52 @@ node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out genera
 node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human</code></pre>
       <p>Before update, inputs should be <code>changed</code> while existing files may remain <code>unchanged</code>: their bytes still match the last generation. After update, verification passes. The final repeat should report <code>written=0</code> for generated source files, not all evidence writes. Keep old snapshots; use a new filename for a later export.</p>
       <p class="small">On an existing directory or output conflict, preserve it and inspect ownership and inputs. Do not delete directories or hand-edit ledgers to force success. See the tool’s <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/TUTORIAL.md">TUTORIAL.md</a> for the full CLI contract.</p>
+    </section>
+
+    <section id="change-rule">
+      <div class="sec-head"><span class="no">02b</span><h2>Optional · change a business rule, not just a default</h2></div>
+      <p>Continue inside your own <code>counter-lab</code> after the <strong>0→2 loop</strong>. No bank edits, original scaffold edits, JVM, database or MCP are needed. The approved toy requirement is: <strong>SetCount accepts 0 through 100 inclusive</strong>, with a nonempty id. Changing the initial default does not impose this command limit.</p>
+      <h3>Agree on the boundary before changing the rule</h3>
+      <p>Write these independent cases first; do not generate expected answers from the new predicate. Use id <code>toy-counter</code> and old count <code>2</code> for all four. A human approves the business expectation and scope; a test cannot grant that approval.</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Requested count</th><th>Expected decision</th><th>Expected event / state</th></tr></thead>
+        <tbody>
+          <tr><td>-1</td><td>reject · NEGATIVE_COUNT</td><td>No event; old state unchanged.</td></tr>
+          <tr><td>0</td><td>continue</td><td>CountSet(count=0); next count 0.</td></tr>
+          <tr><td>100</td><td>continue</td><td>CountSet(count=100); next count 100.</td></tr>
+          <tr><td>101</td><td>reject · NEGATIVE_COUNT</td><td>No event; old state unchanged.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Save the <a href="/tools/verify-counter-change.mjs">Node-only Counter check</a> outside the author tree. Set <code>COUNTER_CHECK</code> to that file’s absolute path; keep <code>TRUTHSRC_CLI</code> from setup. It needs the complete package’s documented <code>lib/domain-products</code> oracles. Run it <em>before</em> the edit: the original rule should fail the new <code>101</code> expectation.</p>
+      <pre class="code" data-example="counter-range-check" data-example-kind="shell" data-grammar="bash"><code>: "${COUNTER_CHECK:?Set COUNTER_CHECK to the saved verify-counter-change.mjs absolute path}"
+: "${TRUTHSRC_CLI:?Complete the CLI setup first}"
+node "$COUNTER_CHECK" --project "$PWD/truthsrc.project.json"</code></pre>
+      <h3>Edit the existing guard, preserving its identity</h3>
+      <p>In <code>truth/example/contexts/example/aggregates/counter/slices/set-count.slice.yaml</code>, find <code>payload.guards</code>’ existing <code>ref: nonnegative-count</code> row. Change <strong>only</strong> its <code>cond</code> from <code>param.count &gt;= 0</code> to the condition below. Keep the preceding <code>nonempty-id</code> guard, order, <code>ref</code>, <code>errCode</code> and <code>onFail</code>. Do not append a competing second range rule or patch generated Scala.</p>
+      <p>This is the replacement JSON member fragment, not a complete slice/YAML file.</p>
+      <pre class="code" data-example="counter-range-guard" data-example-kind="author"><code>{
+  "kind": "invariantRef",
+  "ref": "nonnegative-count",
+  "errCode": "NEGATIVE_COUNT",
+  "cond": "param.count &gt;= 0 &amp;&amp; param.count &lt;= 100",
+  "onFail": "reject"
+}</code></pre>
+      <p class="small">Reusing this guard deliberately reuses <code>NEGATIVE_COUNT</code> for <em>both</em> -1 and 101, despite its historical name. That is this toy exercise’s error policy, not a recommendation for production API wording. Changing identity/error policy needs its own explicit decision. Zero remains valid.</p>
+      <h3>Check the author inputs, preview, update, then fully verify</h3>
+      <p>All commands below run in <code>counter-lab</code>. Only the toy author edit is manual; generation writes <code>generated/</code> and the project’s derived knowledge/evidence. The update plan lists actions, not a text diff.</p>
+      <pre class="code" data-example="counter-range-update" data-example-kind="shell" data-grammar="bash"><code>node "$TRUTHSRC_CLI" validate --tree truth/example
+node "$TRUTHSRC_CLI" roundtrip --tree truth/example
+node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$COUNTER_CHECK" --project "$PWD/truthsrc.project.json"</code></pre>
+      <p>Now all four cases should pass. The script calls the <strong>public <code>compile-project</code> CLI</strong> to freshly admit the actual modified rule (that command takes <code>--project</code>, not <code>--out</code>). It evaluates those products using the <em>same installed package’s</em> decision, binding and fold oracles, with fixed expected answers. It is not a separately rewritten JavaScript range test. Replay deliberately gets state/event only, not command inputs.</p>
+      <div class="callout"><b>WHAT THIS CHECK DOES NOT PROVE</b><p>Supported here: Counter decision @4 and dependencies/folds @6 at tool <code>cb860b5c</code>, package 0.5.0. Missing package modules, rejected syntax or different profiles must stop the exercise; no fallback arithmetic or fake success. The result is <strong>admitted-product behavior only</strong>, not execution of generated Scala, an HTTP service or bank acceptance. Generated verification cases are not automatically independent business tests.</p></div>
+      <h3>Close the loop in both directions, and read the real code</h3>
+      <p>Follow the forward <code>SetCount</code> query above to current verified locations. Open the actual generated rule and event handler: review the inclusive comparisons, retained reject code, payload binding and event-only assignment. Repeat <a href="#counter-reverse-query">the earlier byte-span-to-line reverse query</a> against the <em>new</em> verified bytes, back to the author declaration. Never reuse an old guessed line number. <code>verify-project</code> checks source/anchor consistency, not execution; target-runtime claims still require separately run generated-code behavioral tests with independently approved expectations.</p>
+      <p>After review, repeat update if desired: zero <em>generated-source</em> writes indicates idempotent synchronization, not zero evidence writes. If ownership, MANUAL boundaries, inputs or output bytes conflict, stop and preserve them. Inspect status and the real diff; use a new explicitly owned exercise directory if needed, never delete output/SQLite/ledgers to force green.</p>
     </section>
 
     <section id="l2">
@@ -160,8 +206,8 @@ cd ../.. &amp;&amp; node "$TRUTHSRC_CLI" verify-project \
     </section>
 
     <section id="l3">
-      <div class="sec-head"><span class="no">04</span><h2>L3 · Wire the graph into Claude Code (MCP)</h2></div>
-      <p class="sec-sub">This is the agentic payoff: an agent that plans changes by <em>querying the knowledge graph</em> instead of grepping the repo. The MCP server ships 26 read-oriented tools <span class="badge verified" title="F-16">verified</span>.</p>
+      <div class="sec-head"><span class="no">04</span><h2>L3 · Optional graph collaboration through MCP</h2></div>
+      <p class="sec-sub">MCP is optional, not a prerequisite for the Counter CLI loop or rule-change exercise. It lets an agent use the declared graph alongside source inspection when planning a change. The server ships 26 read-oriented tools <span class="badge verified" title="F-16">verified</span>.</p>
 
       <h3>Register the server</h3>
       <pre class="code"><code># from any directory (path to your metarch-truthsrc checkout)

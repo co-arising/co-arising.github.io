@@ -60,6 +60,41 @@
     invariants: ["ReserveFunds guard declarations", "The stored slice conditions. Reading declarations does not execute or prove all invariants.", "ReserveFunds parameters, guards and produced events; long cells are explicitly truncated."],
   };
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const nodesText = zh ? {
+    all: "全部类型", empty: "没有匹配的节点。请修改筛选或重置。", choose: "选择一个节点查看其真实记录与双向邻接关系。",
+    unknown: "此快照中没有这个完整 ID。", detail: "节点详情", name: "名称", kind: "类型", outgoing: "出边", incoming: "入边", noEdges: "没有记录的边。",
+    scope: "浏览器本次执行 · canonical graphstore 固定快照，捕获于 2026-11-11。这不是项目知识/回锚数据库；别名保留独立完整 ID。",
+    provenance: "存储的来源声明", noProvenance: "此节点未提供已知 provenance 字段。", provenanceNote: "以下是 atom 中的声明，不是经核验的作者文件位置；sourcePointers 也不视为源码锚点。",
+    extra: "存储的展开元数据", anchor: "代码回锚", unavailable: "unavailable — 此快照未提供代码位置或身份映射。不能推断作者路径、文件行号或 GitHub 源码链接。",
+    atom: "存储的 atom（文本）", atomNote: "仅展示快照记录，不代表已验证生成代码或运行时行为。", clipped: "已截断至最多 8192 UTF-8 字节，文本可能不是完整 JSON。",
+    share: "此节点的分享链接", counts: (n, total, from, to) => `匹配 ${n} / 全部 ${total} 节点 · 显示 ${from}–${to}`,
+    page: (p, count) => `第 ${p} / ${count} 页 · 每页 40 个`, edges: (shown, total) => `显示 ${shown} / ${total}`,
+  } : {
+    all: "All kinds", empty: "No matching nodes. Change the filters or reset.", choose: "Select a node to inspect its stored record and incoming/outgoing relationships.",
+    unknown: "No node with this exact full ID exists in this snapshot.", detail: "Node inspector", name: "Name", kind: "Kind", outgoing: "Outgoing edges", incoming: "Incoming edges", noEdges: "No recorded edges.",
+    scope: "Executed in this browser · canonical graphstore snapshot captured 2026-11-11. Not the project knowledge/anchor database; aliases retain separate full IDs.",
+    provenance: "Stored provenance declarations", noProvenance: "No known provenance fields were provided for this node.", provenanceNote: "These are stored atom declarations, not verified author-file locations; sourcePointers are not treated as code anchors.",
+    extra: "Stored expansion metadata", anchor: "Code anchors", unavailable: "unavailable — not provided by this snapshot. No code-location or identity mapping; author paths, file lines and GitHub source URLs cannot be inferred.",
+    atom: "Stored atom (text)", atomNote: "A snapshot record, not verified generated code or runtime behavior.", clipped: "Truncated to at most 8192 UTF-8 bytes; the text may not be complete JSON.",
+    share: "Share this node", counts: (n, total, from, to) => `${n} matching / ${total} total nodes · showing ${from}–${to}`,
+    page: (p, count) => `Page ${p} / ${count} · 40 per page`, edges: (shown, total) => `${shown} / ${total} shown`,
+  };
+  const nodeSearch = document.getElementById("xp-node-search");
+  const nodeKind = document.getElementById("xp-node-kind");
+  const nodeCount = document.getElementById("xp-node-count");
+  const nodeList = document.getElementById("xp-node-list");
+  const nodeDetail = document.getElementById("xp-node-detail");
+  const nodePrev = document.getElementById("xp-node-prev");
+  const nodeNext = document.getElementById("xp-node-next");
+  const nodePage = document.getElementById("xp-node-page");
+  const nodeCancel = document.getElementById("xp-node-cancel");
+  /* Selection is independent of the console's preset/draft and of directory filters. */
+  let selectedNodeId = null;
+  let kindOptions = "";
+  const directory = { search: "", kind: "", page: 0, pageCount: 0 };
+  const directoryJob = { generation: 0, worker: null, timer: null };
+  const inspectJob = { generation: 0, worker: null, timer: null };
+  let lastLocation = "";
   const keys = new Set(buttons.map((button) => button.dataset.preset));
   let state = "loading";
   let bytes;
@@ -142,16 +177,171 @@
       worker.postMessage({ id, bytes, wasm, request });
     } catch (error) { stop(); heading(text.error, error.message); }
   }
+  function stopNodeJob(job) {
+    job.generation++;
+    clearTimeout(job.timer);
+    if (job.worker) job.worker.terminate();
+    job.worker = null;
+    nodeCancel.disabled = !directoryJob.worker && !inspectJob.worker;
+  }
+  function nodeQuery(job, request, target, showResult, showError) {
+    stopNodeJob(job);
+    target.setAttribute("aria-busy", "false");
+    if (state !== "ready") { showError(state === "loading" ? text.loading : text.failed); return; }
+    const id = job.generation;
+    target.setAttribute("aria-busy", "true");
+    const fail = (message) => {
+      stopNodeJob(job);
+      target.setAttribute("aria-busy", "false");
+      showError(message);
+    };
+    try {
+      job.worker = new Worker("/assets/js/explorer-worker.js");
+      nodeCancel.disabled = false;
+      job.worker.onmessage = (event) => {
+        if (id !== job.generation || event.data.id !== id) return;
+        stopNodeJob(job);
+        target.setAttribute("aria-busy", "false");
+        if (event.data.ok) showResult(event.data.result);
+        else showError(text.error + ": " + event.data.error);
+      };
+      job.worker.onerror = () => { if (id === job.generation) fail(text.error); };
+      job.timer = setTimeout(() => { if (id === job.generation) fail(text.timeout); }, 5000);
+      /* No transfer list: each job gets a fresh clone of the verified originals. */
+      job.worker.postMessage({ id, bytes, wasm, request });
+    } catch (error) { fail(text.error + ": " + error.message); }
+  }
+  function nodeURL(id) {
+    const params = new URLSearchParams(location.search);
+    /* SQL drafts never enter shared URLs, including an untrusted incoming sql key. */
+    for (const key of [...params.keys()]) if (key.toLowerCase() === "sql") params.delete(key);
+    if (id === null) params.delete("node"); else params.set("node", id);
+    const query = params.toString();
+    return location.pathname + (query ? "?" + query : "") + "#nodes";
+  }
+  function locationKey() { return location.pathname + location.search + location.hash; }
+  function shareNode(id) {
+    const url = nodeURL(id);
+    if (url !== locationKey()) history.pushState(null, "", url);
+    lastLocation = locationKey();
+    window.dispatchEvent(new Event("site:locationchange"));
+  }
+  function markSelected() {
+    nodeList.querySelectorAll("button[data-node]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.node === selectedNodeId));
+    });
+  }
+  function nodeButton(node) {
+    return "<button type='button' class='xp-node-button' data-node='" + esc(node.id) + "' aria-controls='xp-node-detail' aria-pressed='" + (node.id === selectedNodeId) + "'><code>" + esc(node.id) + "</code>" +
+      (node.name === undefined ? "" : "<span class='xp-node-name'>" + esc(node.name) + "</span>") +
+      (node.kind === undefined ? "" : "<span class='xp-node-kind'>" + esc(node.kind) + "</span>") + "</button>";
+  }
+  function directoryError(message) {
+    nodeCount.textContent = message;
+    nodeList.innerHTML = "";
+    nodePrev.disabled = nodeNext.disabled = true;
+    nodePage.textContent = "";
+    directory.pageCount = 0;
+  }
+  function loadDirectory() {
+    directoryError(state === "ready" ? text.running : text.loading);
+    nodeQuery(directoryJob, { mode: "directory", search: directory.search, kind: directory.kind, page: directory.page }, nodeList, (data) => {
+      directory.page = data.page;
+      directory.pageCount = data.pageCount;
+      const options = "<option value=''>" + esc(nodesText.all) + "</option>" + data.kinds.map((row) => "<option value='" + esc(row.kind) + "'>" + esc(row.kind) + " (" + row.count + ")</option>").join("");
+      if (kindOptions !== options) { nodeKind.innerHTML = options; kindOptions = options; }
+      nodeKind.value = directory.kind;
+      nodeKind.disabled = false;
+      const from = data.nodes.length ? data.page * data.pageSize + 1 : 0;
+      const to = data.page * data.pageSize + data.nodes.length;
+      nodeCount.textContent = nodesText.counts(data.filtered, data.total, from, to);
+      nodeList.innerHTML = data.nodes.length ? data.nodes.map((node) => "<li>" + nodeButton(node) + "</li>").join("") : "<li class='xp-empty'>" + esc(nodesText.empty) + "</li>";
+      nodePage.textContent = nodesText.page(data.pageCount ? data.page + 1 : 0, data.pageCount);
+      nodePrev.disabled = data.page === 0;
+      nodeNext.disabled = data.page + 1 >= data.pageCount;
+    }, directoryError);
+  }
+  function detailMessage(message) {
+    nodeDetail.innerHTML = "<h3>" + esc(nodesText.detail) + "</h3><p>" + esc(message) + "</p>";
+  }
+  function renderDetail(data) {
+    if (!data.node) { detailMessage(nodesText.unknown); return; }
+    const node = data.node;
+    const fields = (rows) => "<dl class='xp-node-fields'>" + rows.map((row) => "<dt>" + esc(row.field) + "</dt><dd>" + esc(row.value) + "</dd>").join("") + "</dl>";
+    let html = "<h3>" + esc(nodesText.detail) + "</h3><p class='xp-node-id'><code>" + esc(node.id) + "</code></p>";
+    html += fields([{ field: nodesText.kind, value: node.kind }, { field: nodesText.name, value: node.name }]);
+    html += "<p class='small'>" + esc(nodesText.scope) + "</p><p><a class='xp-node-share' href='" + esc(nodeURL(selectedNodeId)) + "'>" + esc(nodesText.share) + "</a></p>";
+    html += "<div class='xp-node-anchors'><h4>" + esc(nodesText.anchor) + "</h4><p>" + esc(nodesText.unavailable) + "</p></div>";
+    html += "<h4>" + esc(nodesText.provenance) + "</h4><p class='small'>" + esc(nodesText.provenanceNote) + "</p>" + (node.provenance.length ? fields(node.provenance) : "<p>" + esc(nodesText.noProvenance) + "</p>");
+    if (node.extra.length) html += "<h4>" + esc(nodesText.extra) + "</h4>" + fields(node.extra);
+    for (const [direction, title] of [["outgoing", nodesText.outgoing], ["incoming", nodesText.incoming]]) {
+      const group = data[direction];
+      html += "<div class='xp-node-edges'><h4>" + esc(title) + "</h4><p class='small'>" + esc(nodesText.edges(group.edges.length, group.total)) + "</p>";
+      html += group.edges.length ? "<ul>" + group.edges.map((edge) => "<li><span class='xp-node-relation'>" + esc(edge.relation) + "</span> " + nodeButton(edge) + "</li>").join("") + "</ul>" : "<p>" + esc(nodesText.noEdges) + "</p>";
+      html += "</div>";
+    }
+    html += "<details class='xp-node-atom'><summary>" + esc(nodesText.atom) + "</summary><p class='small'>" + esc(nodesText.atomNote) + "</p>" + (node.atomTruncated ? "<p class='callout'>" + esc(nodesText.clipped) + "</p>" : "") + "<pre><code>" + esc(node.atom) + "</code></pre></details>";
+    if (data.notices.length) html += "<p class='callout'>" + esc(text.limit + " " + data.notices.join(", ")) + "</p>";
+    nodeDetail.innerHTML = html;
+  }
+  function inspectNode() {
+    detailMessage(state === "ready" ? text.running : text.loading);
+    nodeQuery(inspectJob, { mode: "inspect", id: selectedNodeId }, nodeDetail, renderDetail, detailMessage);
+  }
+  function selectNode(id, share) {
+    selectedNodeId = id;
+    stopNodeJob(inspectJob);
+    nodeDetail.setAttribute("aria-busy", "false");
+    if (share) shareNode(id);
+    markSelected();
+    if (id === null) detailMessage(nodesText.choose);
+    else inspectNode();
+  }
+  function resetNodes() {
+    directory.search = directory.kind = "";
+    directory.page = 0;
+    nodeSearch.value = nodeKind.value = "";
+    selectNode(null, true);
+    loadDirectory();
+  }
+  function restoreLocation() {
+    if (lastLocation === locationKey()) return; // popstate + hashchange may describe the same traversal.
+    lastLocation = locationKey();
+    const id = new URLSearchParams(location.search).get("node");
+    if (id !== selectedNodeId) selectNode(id, false);
+    const key = location.hash.slice(1);
+    if (keys.has(key)) select(key, false);
+  }
+  for (const target of [nodeList, nodeDetail]) target.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-node]");
+    if (button && target.contains(button)) {
+      selectNode(button.dataset.node, true);
+      // Keep keyboard focus on the stable inspector, including adjacency navigation.
+      nodeDetail.focus();
+    }
+  });
+  nodeSearch.addEventListener("input", () => { directory.search = nodeSearch.value; directory.page = 0; loadDirectory(); });
+  nodeKind.addEventListener("change", () => { directory.kind = nodeKind.value; directory.page = 0; loadDirectory(); });
+  document.getElementById("xp-node-reset").addEventListener("click", resetNodes);
+  nodePrev.addEventListener("click", () => { if (directory.page > 0) { directory.page--; loadDirectory(); } });
+  nodeNext.addEventListener("click", () => { if (directory.page + 1 < directory.pageCount) { directory.page++; loadDirectory(); } });
+  nodeCancel.addEventListener("click", () => {
+    if (directoryJob.worker) { stopNodeJob(directoryJob); nodeList.setAttribute("aria-busy", "false"); directoryError(text.stopped); }
+    if (inspectJob.worker) { stopNodeJob(inspectJob); nodeDetail.setAttribute("aria-busy", "false"); detailMessage(text.stopped); }
+  });
+
   function select(key, share) {
     if (!keys.has(key)) return;
     if (share) {
       history.replaceState(null, "", location.pathname + location.search + "#" + key);
+      lastLocation = locationKey();
       window.dispatchEvent(new Event("site:locationchange"));
     }
     execute({ mode: "preset", key });
   }
   buttons.forEach((button) => button.addEventListener("click", () => select(button.dataset.preset, true)));
-  window.addEventListener("hashchange", () => select(location.hash.slice(1), false));
+  window.addEventListener("hashchange", restoreLocation);
+  window.addEventListener("popstate", restoreLocation);
   run.addEventListener("click", () => execute({ mode: "sandbox", sql: input.value }));
   cancel.addEventListener("click", () => { pending = null; stop(text.stopped); });
   document.getElementById("xp-clear").addEventListener("click", () => {
@@ -164,7 +354,8 @@
   });
   run.disabled = true;
   cancel.disabled = true;
-  select(location.hash.slice(1), false);
+  loadDirectory();
+  restoreLocation();
 
   async function fetchBytes(url) {
     const response = await fetch(url);
@@ -187,11 +378,15 @@
       state = "ready";
       status.textContent = text.ready + "\n" + meta.nodeCount + " / " + meta.edgeCount + " · " + meta.generatedAt + "\nsha256 " + digest;
       run.disabled = false;
+      loadDirectory();
+      if (selectedNodeId !== null) inspectNode();
       if (pending) execute(pending);
     } catch (error) {
       state = "error";
       stop();
       status.textContent = text.failed + " (" + String(error.message).slice(0, 300) + ")";
+      loadDirectory();
+      if (selectedNodeId !== null) inspectNode();
       if (pending) execute(pending);
     }
   })();

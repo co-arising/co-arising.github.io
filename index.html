@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>co-arising — domain knowledge that compiles</title>
-  <meta name="description" content="An open truth-source language and toolchain for DDD: write your domain as a truth tree, compile it into a local knowledge graph, generate CQRS code, and anchor every line back to the knowledge that produced it." />
+  <title>co-arising — shared knowledge, verifiable implementation</title>
+  <meta name="description" content="Make domain knowledge shared, implementations verifiable, changes traceable. Explore a real bank declaration or try the Counter truth-source-to-code loop." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -27,50 +27,48 @@
 
   <main id="main-content" class="wrap">
     <header class="home-hero">
-      <p class="kicker">truth source · managed projections · agent access</p>
-      <h1>Domain knowledge<br />that <span class="accent">co-arises</span> — and compiles.</h1>
-      <p class="lede">
-        Write your domain as a <strong>truth tree</strong>: a file-based source of truth for aggregates,
-        commands, events, guards, invariants, sagas and pipelines. Compile it into a local
-        <strong>knowledge graph</strong>. Generate a <strong>compiling CQRS codebase</strong>.
-        Then anchor every generated line <strong>back to the knowledge that produced it</strong> —
-        and hand the rest to your AI agent with proof of where it came from.
-      </p>
-      <div class="cta-row">
-        <a class="btn" href="/guide/">Try it in 10 minutes</a>
-        <a class="btn ghost" href="/why-co-arising/">Why “co-arising”?</a>
-        <a class="btn ghost" href="/explorer/">Query the live graph</a>
-      </div>
-
-      <div class="term"><div class="term-bar"><span class="title">Inside your own Counter project, after the guide’s CLI setup</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
-node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
-node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
-node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</pre></div>
-
-      <div class="stat-strip" aria-label="Verified numbers, audited 2026-11-11">
-        <div class="stat"><div class="num">157</div><div class="lbl">truth atoms in the bank worked example <span class="badge verified" title="F-02">verified</span></div></div>
-        <div class="stat"><div class="num">149</div><div class="lbl">invariants declared as executable rules <span class="badge verified" title="F-09">verified</span></div></div>
-        <div class="stat"><div class="num">235</div><div class="lbl">Scala files generated, 0 compile errors <span class="badge verified" title="F-04, F-06">verified</span></div></div>
-        <div class="stat"><div class="num">792</div><div class="lbl">anchors proving file ↔ knowledge lineage <span class="badge verified" title="F-05">verified</span></div></div>
+      <div class="home-intro">
+        <div>
+          <p class="kicker">co-arising · shared knowledge, accountable change</p>
+          <h1>Make domain knowledge shared,<br />implementations verifiable,<br /><span class="accent">changes traceable.</span></h1>
+          <p class="lede">How do we keep a business decision connected to the code that implements it? Write the concepts, rules and behavior in a readable <strong>truth source</strong>. Generate the supported implementation, keep integration explicit, and trace changes back to their declarations.</p>
+          <div class="cta-row">
+            <a class="btn" href="/bank-demo/">Explore the bank example</a>
+            <a class="btn ghost" href="/guide/#l1">Try Counter</a>
+          </div>
+        </div>
+        <aside class="causal-preview card" aria-labelledby="counter-preview">
+          <span class="tag">A real declaration · not a running console</span>
+          <h2 id="counter-preview">What makes a count change valid?</h2>
+          <ol>
+            <li><strong>Command.</strong> <code>Counter.SetCount</code> receives <code>id</code> and <code>count</code>.</li>
+            <li><strong>Guards.</strong> Require <code>param.id.nonEmpty</code> and <code>param.count &gt;= 0</code>. Failure rejects with <code>EMPTY_ID</code> or <code>NEGATIVE_COUNT</code>.</li>
+            <li><strong>Event + bindings.</strong> On acceptance, <code>CountSet</code> takes its <code>id</code> and <code>count</code> from the command.</li>
+            <li><strong>State fold.</strong> The event sets state <code>id</code> from <code>event.id</code> and <code>count</code> from <code>event.count</code>.</li>
+          </ol>
+          <p class="evidence-note">A reading of the <a href="https://github.com/co-arising/metarch-truthsrc/blob/cb860b5c1f8f038eb073c95cd83b724424c89cc6/scaffold/unified-project/truth/example/contexts/example/aggregates/counter/slices/set-count.slice.yaml">pinned Counter source</a>, not a simulated result. <a href="/dsl/#fold">See the declaration and fold explained</a>.</p>
+        </aside>
       </div>
     </header>
 
     <section id="what">
-      <div class="sec-head"><span class="no">01</span><h2>What this is</h2></div>
-      <p class="sec-sub">A small family of MIT / Apache-2.0 projects around one idea: <strong>the domain description is the source of truth, and code is its projection.</strong> Not the other way around.</p>
+      <div class="sec-head"><span class="no">01</span><h2>Keep the decision and its implementation connected</h2></div>
+      <p class="sec-sub">The smallest useful loop is <strong>truth tree → compiled products → generated code → source anchors</strong>. Each part answers a different question; no single green gate proves the business decision right.</p>
       <div class="feature-grid">
-        <article class="feature"><span class="n">F-01</span><h3>truthsrc — the language &amp; compiler</h3><p>A YAML truth-tree language for DDD: 12 atom kinds, 15 workshop note types, 22 typed relations. Compiles with hard gates, roundtrips byte-identical, zero npm runtime dependencies.</p></article>
-        <article class="feature"><span class="n">F-02</span><h3>A graph you can interrogate</h3><p>Every compile produces a local SQLite knowledge graph. Ask blast radius, lineage, orphans, consistency — from the CLI, from MCP, or <a href="/explorer/">in your browser</a>.</p></article>
-        <article class="feature"><span class="n">F-03</span><h3>Code generation with receipts</h3><p>Generates a compiling CQRS/ES Scala codebase. Every generated file carries an anchor: the exact knowledge node and byte span it came from. <code>verify-project</code> re-proves it.</p></article>
-        <article class="feature"><span class="n">F-04</span><h3>A handwritten zone, by design</h3><p>Ports are generated; behavior is filled in a physically separate handwritten module. 35 handwritten files in the bank example are complete implementations, not stubs.</p></article>
-        <article class="feature"><span class="n">F-05</span><h3>Agents, but with stewardship</h3><p>An MCP server exposes 26 read-oriented tools so coding agents query the graph instead of grepping. Agents draft; humans decide. The tree is the only knowledge-editing surface; explicit technical bindings and handwritten implementations have separate responsibilities.</p></article>
-        <article class="feature"><span class="n">F-06</span><h3>Honest by construction</h3><p>What isn’t done is on the <a href="/status/">ledger</a>, not in the marketing. Independent experience, public material delivery, hosting and BDD derivatives — all tracked separately from technical acceptance.</p></article>
+        <article class="feature"><span class="n">Describe</span><h3>What must remain true?</h3><p>Use a file-based truth tree to name aggregates, commands, events and invariants. People can review the business rules before discussing implementation details.</p></article>
+        <article class="feature"><span class="n">Explore</span><h3>What depends on this?</h3><p>Query declared relationships in a local SQLite knowledge graph. <a href="/explorer/">Explore the bank snapshot</a>; the graph can only show dependencies that have been modeled.</p></article>
+        <article class="feature"><span class="n">Generate</span><h3>Which behavior is declared?</h3><p>Supported guards, event bindings and state folds become code alongside CQRS/ES structure. Generation does not invent missing business policy.</p></article>
+        <article class="feature"><span class="n">Integrate</span><h3>What remains handwritten?</h3><p>Technical bindings and a separate handwritten zone connect the generated project to external effects and host services. Their responsibilities and tests stay explicit.</p></article>
+        <article class="feature"><span class="n">Trace</span><h3>Where did this implementation come from?</h3><p>Source anchors connect knowledge to generated code at the precision supplied. Verification checks freshness and bytes; it is not proof that every line is correct.</p></article>
+        <article class="feature"><span class="n">Review</span><h3>Who approves a change?</h3><p>People and agents can query, propose and test. Humans approve the intended behavior. Technical passes, independent experience and delivery remain separate on the <a href="/status/">status ledger</a>.</p></article>
       </div>
     </section>
 
     <section id="quickstart">
-      <div class="sec-head"><span class="no">02</span><h2>Quickstart</h2></div>
+      <div class="sec-head"><span class="no">02</span><h2>Make one change in your own project</h2></div>
       <p class="sec-sub">Use Node ≥ 22.13 in a new exercise directory. Acquiring the source checkout needs a network; the Counter generation loop needs no JVM or database service. The full walkthrough — including the bank example and the MCP integration — is on the <a href="/guide/">hands-on guide</a>.</p>
+      <details>
+        <summary>Expand the first-generation commands</summary>
       <pre class="code" data-example="home-quickstart"><code>export TRUTHSRC_WORKSPACE="$PWD"
 git clone https://github.com/co-arising/metarch-truthsrc.git
 export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
@@ -80,25 +78,33 @@ node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out gene
 node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
 node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
 node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</code></pre>
+      </details>
     </section>
 
     <section id="map">
-      <div class="sec-head"><span class="no">03</span><h2>Where to go next</h2></div>
-      <div class="card-grid cols-2">
-        <a class="card" href="/why-co-arising/"><span class="tag">Understand</span><h3>Why co-arising, not ontology</h3><p>An aggregate is not a class you draw — it is what arises when commands, events, state and guards hold together under invariants. Includes an interactive dissolve demo on real bank data.</p></a>
-        <a class="card" href="/dsl/"><span class="tag">Understand</span><h3>The truth-tree language</h3><p>The strategic and scope layers: bounded contexts, subdomains, the 22-relation registry, governance gates, and a real slice from the bank tree.</p></a>
-        <a class="card" href="/pipeline/"><span class="tag">See it work</span><h3>Truth tree → code → back</h3><p>Six stages with the exact commands and the verified numbers at each gate: compile, graph, generate, verify anchors, handwritten zone, re-verify.</p></a>
-        <a class="card" href="/bank-demo/"><span class="tag">See it work</span><h3>The bank wealth example</h3><p>One 100-yuan fund purchase, followed through payment, TA confirmation, independent refund and a bounded installment plan — with sagas and pipelines declared in truth.</p></a>
-        <a class="card" href="/explorer/"><span class="tag">See it work</span><h3>Query the real graph</h3><p>The bank knowledge graph (389 nodes / 413 edges), loaded in your browser via sql.js. Blast radius, lineage, orphans — as preset queries and a free SQL console.</p></a>
-        <a class="card" href="/compare/"><span class="tag">Adopt</span><h3>Landscape &amp; protocols</h3><p>How this relates to EventCatalog, ContextMapper, prooph, Qlerify and Palantir’s ontology — and which open standards the truth tree can project onto.</p></a>
+      <div class="sec-head"><span class="no">03</span><h2>Choose the question you came with</h2></div>
+      <div class="card-grid cols-2 reader-paths">
+        <a class="card" href="/why-co-arising/"><span class="tag">Understand</span><h3>Why model relations as well as concepts?</h3><p>Start with DDD consistency boundaries and a small relationship exercise on real bank data.</p></a>
+        <a class="card" href="/dsl/"><span class="tag">Read</span><h3>What does a declaration look like?</h3><p>Follow a command through guards, event bindings and a state fold, then read the broader language.</p></a>
+        <a class="card" href="/pipeline/"><span class="tag">Build</span><h3>Where does generation stop?</h3><p>See knowledge, technical bindings, generated code, handwritten integration and tests in one lifecycle.</p></a>
+        <a class="card" href="/bank-demo/"><span class="tag">Evaluate</span><h3>Does payment mean investment success?</h3><p>Follow payment, TA rejection, independent refund and bounded installments through their declarations.</p></a>
+        <a class="card" href="/explorer/"><span class="tag">Investigate</span><h3>Can I inspect the actual relationships?</h3><p>Browse real nodes and edges, follow a scenario link, or query the shipped SQLite snapshot.</p></a>
+        <a class="card" href="/compare/"><span class="tag">Adopt</span><h3>How does this fit my existing tools?</h3><p>Compare jobs rather than slogans; distinguish current interfaces from proposed standards projections.</p></a>
       </div>
     </section>
 
     <section id="honesty">
-      <div class="sec-head"><span class="no">04</span><h2>What works, what doesn’t — yet</h2></div>
-      <p class="sec-sub">The headline tree, code and anchor counts retain their <strong>2026-11-11</strong> capture in <a href="/status/#facts">SITE-FACTS</a>; they are not new service-run counts. The engines are now published on Maven Central <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>. npm publication, hosting and BDD derivatives remain on the <a href="/status/#ledger">ledger</a>.</p>
+      <div class="sec-head"><span class="no">04</span><h2>Evidence, with its limits in view</h2></div>
+      <p class="sec-sub">The tree, code and anchor counts below retain their <strong>2026-11-11</strong> capture in <a href="/status/#facts">SITE-FACTS</a>; they are not new service-run counts. The engines are now published on Maven Central <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>. npm publication, hosting and BDD derivatives remain on the <a href="/status/#ledger">ledger</a>.</p>
+      <div class="stat-strip" aria-label="Verified numbers, audited 2026-11-11">
+        <div class="stat"><div class="num">157</div><div class="lbl">truth atoms in the bank worked example <a class="badge verified" href="/status/#F-02" data-fact="F-02">F-02</a></div></div>
+        <div class="stat"><div class="num">149</div><div class="lbl">named invariant declarations in the bank source <a class="badge verified" href="/status/#F-09" data-fact="F-09">F-09</a></div></div>
+        <div class="stat"><div class="num">235</div><div class="lbl">generated files; build: 0 compile errors <a class="badge verified" href="/status/#F-04" data-fact="F-04">F-04</a> <a class="badge verified" href="/status/#F-06" data-fact="F-06">F-06</a></div></div>
+        <div class="stat"><div class="num">792</div><div class="lbl">verified source anchors <a class="badge verified" href="/status/#F-05" data-fact="F-05">F-05</a></div></div>
+      </div>
       <div class="callout teal" id="bank-technical"><b>BANK TECHNICAL RESULT</b><p>On 2026-11-12, <code>bank030-relocated-20261112-02</code> passed and rechecked <strong>source / anchors / code / service</strong> <a class="badge verified" href="/status/#F-24" data-fact="F-24">F-24</a>, including real database/HTTP and automated browser observations <a class="badge verified" href="/status/#F-26" data-fact="F-26">F-26</a>. This is candidate-specific technical acceptance, not independent experience (<a href="/status/#DEF-07">DEF-07</a>), public matched-material delivery (<a href="/status/#DEF-15">DEF-15</a>) or human usability acceptance (<a href="/status/#DEF-16">DEF-16</a>). The old service02 failure remains historical (<a href="/status/#DEF-06">DEF-06</a>). Read the <a href="/docs/bank-technical-20261112.md">acceptance scope and prerequisites</a>.</p></div>
       <div class="callout teal"><b>PHILOSOPHY</b><p><strong>Make the evidence boundary visible.</strong> These pages have no build step or npm dependencies; claims link to dated evidence and open items. A summary of privately reviewed reports is not a public reproduction package. <a href="/why-co-arising/">Read why</a>.</p></div>
+      <p class="next-step"><strong>Next: follow a business question.</strong> <a href="/bank-demo/">See why payment and investment success are different facts</a>.</p>
     </section>
   </main>
 

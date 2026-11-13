@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>全景：同类、互补与协议投影 — co-arising</title>
-  <meta name="description" content="真源路线与 EventCatalog、ContextMapper、prooph、Qlerify、EventStorming、Palantir Ontology 的关系——以及真源树能投影到哪些开放标准上。" />
+  <meta name="description" content="按工作任务选择：领域发现、目录、DDD 建模、运行时与追溯。理解互补工具、当前接口及尚在提案中的标准投影。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -27,91 +27,62 @@
 
   <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">全景</p>
-      <h1>同类、互补，与<span class="accent">隔壁的本体论</span></h1>
-      <p class="thesis">这个领域里有好邻居。诚实的定位是：有些工具我们互补，有些我们扩展，有一个我们对「模型」意味着什么持不同意见——但保持尊重。这里比的不是星数，而是每个工具各自身怀什么绝技。</p>
+      <p class="over">选择适配，而非比拼功能表</p>
+      <h1>它适合放在你的<span class="accent">哪一段工作流中？</span></h1>
+      <p class="thesis">保留能帮助团队发现、描述和运行领域的工具。当你还需要把已声明行为与生成实现可审阅地连起来、再追溯回去时，可以考虑真源工作流。这是一项具体职责，不是替换所有建模或数据平台。</p>
+      <p class="page-outline"><a href="#peers">按任务选择</a> · <a href="#protocols">核对当前能力</a> · <a href="#licenses">查看许可</a></p>
     </header>
 
     <section id="peers">
-      <div class="sec-head"><span class="no">01</span><h2>同类们，按职责逐个看</h2></div>
+      <div class="sec-head"><span class="no">01</span><h2>先问清要完成什么工作</h2></div>
+      <p class="sec-sub">下表提供互补的起点，不是完整的厂商能力审计。不因为某个工具所属的类别，就推断它缺少某项功能或集成。</p>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>项目</th><th>它是什么</th><th>许可 / 模式</th><th>我们重叠之处</th><th>我们不同 / 互补之处</th></tr></thead>
+        <thead><tr><th>你的任务</th><th>可以从哪里开始</th><th>真源如何配合</th><th>需要核对的边界</th></tr></thead>
         <tbody>
-          <tr>
-            <td class="nm">EventCatalog<span class="sub">事件驱动系统的 docs-as-code</span></td>
-            <td>把领域、服务、事件与 schema 渲染成可浏览的目录。v4 加了 agent/MCP 层。</td>
-            <td>MIT · open core</td>
-            <td>把事件驱动的知识当一等公民的图谱；MCP 供智能体访问——同一种直觉。</td>
-            <td><strong>这个领域里最干净的一句话对比：</strong>EventCatalog 从<em>你的架构生成文档</em>；我们从<em>知识生成架构本身</em>——并锚定回去。他们的 Code-to-Docs agent 是 代码 → 文档；我们的闭环是 知识 → 代码 → 溯源。天然互补，不是对手。</td>
-          </tr>
-          <tr>
-            <td class="nm">ContextMapper<span class="sub">DDD DSL（CML）</span></td>
-            <td>面向限界上下文、上下文映射、聚合的文本 DSL；生成 PlantUML / MDSL。</td>
-            <td>Apache-2.0 · 学术出身</td>
-            <td>基于文件的 DDD 建模加生成器——精神上最近的祖先。</td>
-            <td>CML 捕捉战略 + 战术的<em>形状</em>；它停在图和契约。我们的树编译成可查询的知识图谱、生成可编译的 CQRS 代码库、并用锚点证明血缘。CML 的产出可以作为真源树下游的投影之一。</td>
-          </tr>
-          <tr>
-            <td class="nm">prooph<span class="sub">PHP CQRS/ES 组件 · Event Engine</span></td>
-            <td>PHP 的事件溯源工具箱；Event Engine 率先做到「写个模型，生成 ES 代码」。</td>
-            <td>MIT · 社区/混合</td>
-            <td>「模型 → 生成的 ES 代码」的抱负——他们证明了需求是真的。</td>
-            <td>他们的受众是 PHP 运行时的管道层；我们做的是任何运行时之上的知识层——带验证闸门、图谱查询、智能体访问和带锚点的往返。不同层，同一个信念。</td>
-          </tr>
-          <tr>
-            <td class="nm">Qlerify<span class="sub">AI 辅助的协作建模 SaaS</span></td>
-            <td>EventStorming 风格画布，AI 提议命令/事件/模型，导出 backlog + OpenAPI。</td>
-            <td>闭源 SaaS</td>
-            <td>AI 辅助发现命令/事件/读模型——漏斗前端重叠。</td>
-            <td>对一份真实 Qlerify 导出的字段级分析：<strong>骨架齐全，行为空缺</strong>——聚合/事件/角色/查询能干净导出（15 种类型中 5 种完整），但不变量、守卫、错误码、saga 和流水线没有表示（其 strategy/decision/GWT 卡片是叙述文本，不是形式化的）。Qlerify 发现共识；真源树把它变成工业级产物。集成——包括反向导出回画布——已为它留好设计，在<a class="badge deferred" href="/zh/status/#DEF-02">DEF-02</a> 台账上。</td>
-          </tr>
-          <tr>
-            <td class="nm">EventStorming / Domain Storytelling<span class="sub">发现方法论</span></td>
-            <td>工作坊形式：橙色事件、蓝色命令、角色、策略——或角色/工作物/活动叙事。</td>
-            <td>是方法，不是工具</td>
-            <td>我们的 <code>inbox</code> 笔记类型就是那套便签词汇——EventStorming 是正统的入口。</td>
-            <td>方法不是事实来源：墙的照片会腐烂。inbox 是工作坊产出的落点——机器可检验的草稿，等待人工晋升——这个发现层我们刻意不竞争，我们消化它。</td>
-          </tr>
-          <tr>
-            <td class="nm">Palantir Ontology<span class="sub">企业语义层</span></td>
-            <td>企业数据之上的对象/链接/动作类型；动作写回；SDK 从类型生成；MCP 暴露。</td>
-            <td>闭源</td>
-            <td>从语义模型生成 SDK；「决策，不只是数据」；智能体访问——直觉高度一致。</td>
-            <td>封闭世界 vs 开放文件：他们的本体是你租用的产品；我们的树是你拥有的 YAML，编译成你带得走的代码。分类学优先 vs 关系优先——本站名字所指的那个哲学分岔。我们借鉴他们的治理思路（用量追踪、分阶段变更）；我们发布整个栈。</td>
-          </tr>
+          <tr><td class="nm">发现共同的业务语言</td><td>EventStorming / Domain Storytelling</td><td>保留讨论与例子，将决策整理成可审阅草稿，再明确已接受的规则与关系。</td><td>文件格式不会取代工作坊方法；从草稿晋升仍是人的决策。</td></tr>
+          <tr><td class="nm">协作建立模型</td><td>Qlerify 等建模画布</td><td>用画布支持讨论；把导入视为权威之前，先逐项审阅导出字段如何映射到声明。</td><td>本站路线尚未交付画布双向集成，延期项见 <a href="/zh/status/#DEF-02">DEF-02</a>；不宣称整个产品的覆盖率分数。</td></tr>
+          <tr><td class="nm">发布架构目录</td><td>EventCatalog</td><td>目录帮助人浏览领域、服务与事件；真源工作流补充自己的已声明行为生成与来源锚点检查。</td><td>职责互补不等于已有自动目录导出器或同步契约。</td></tr>
+          <tr><td class="nm">探索限界上下文与上下文映射</td><td>ContextMapper</td><td>用战略建模讨论边界；本项目把受支持声明连接到图谱与 CQRS/ES 实现。</td><td>CML 投影是方向，不是已交付适配器，也不据此断言 ContextMapper 的能力上限。</td></tr>
+          <tr><td class="nm">实现事件溯源应用</td><td>prooph / Event Engine</td><td>为应用选择合适的语言与运行时。这里已展示的生成目标是 Scala CQRS/ES，Saga 与 Monarch 各有协调职责。</td><td>知识层不会让不同运行时端口自动互换；这里未展示 PHP 生成目标。</td></tr>
+          <tr><td class="nm">连接企业数据与动作</td><td>Palantir Ontology 等语义平台</td><td>语义模型与真源模型都能表达关系和行为；本项目侧重作者文件、生成源码与可检查的来源记录。</td><td>按实际需求评估平台集成与治理；这里不做兼容性、功能对等或退出厂商平台的评估。</td></tr>
         </tbody>
       </table></div>
-      <p class="small" style="margin-top:10px">Qlerify 的覆盖率数字来自对一份真实导出 <code>workflow.json</code> 与我们 15 类型注册表的字段级比对——5 完整 / 6 部分 / 4 缺失。方法与矩阵见项目的研究笔记。</p>
     </section>
 
     <section id="protocols">
-      <div class="sec-head"><span class="no">02</span><h2>协议投影——树是主文件，标准是输出</h2></div>
-      <p class="sec-sub">刻意保持很小的自有层，就是领域 IR 和它的关系注册表。其余一切都是<em>投影</em>——投到业界已经在跑的标准上，按需选择，绝不重复发明。</p>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>层次</th><th>标准</th><th>治理</th><th>许可家族</th><th>从树的投影</th></tr></thead>
-        <tbody>
-          <tr><td class="nm">验收</td><td>Gherkin</td><td>Cucumber 社区</td><td>MIT</td><td>守卫 + 场景 → Given/When/Then feature。<strong>已设计，尚未构建</strong>——<a class="badge deferred" href="/zh/status/#DEF-01">DEF-01</a>。</td></tr>
-          <tr><td class="nm">事件契约</td><td>AsyncAPI 3.x</td><td>Linux 基金会</td><td>Apache-2.0</td><td>事件 + 载荷 schema → channels/operations/messages。计划中的投影。</td></tr>
-          <tr><td class="nm">事件信封</td><td>CloudEvents 1.0</td><td>CNCF（毕业项目）</td><td>Apache-2.0</td><td>所发出事件的信封元数据。计划中的投影。</td></tr>
-          <tr><td class="nm">REST 契约</td><td>OpenAPI 3.x</td><td>OpenAPI Initiative</td><td>Apache-2.0 / CC</td><td>读模型 + 命令 → paths/schemas。计划中的投影。</td></tr>
-          <tr><td class="nm">架构视图</td><td>C4 / Structurizr DSL</td><td>社区 / 单一厂商</td><td>Apache-2.0</td><td>上下文 + 聚合 → system/context/container 图。计划中的投影。</td></tr>
-          <tr><td class="nm">服务拓扑</td><td>Backstage 目录</td><td>CNCF</td><td>Apache-2.0</td><td>上下文、依赖（R21）、外部系统 → 目录实体。计划中的投影。</td></tr>
-          <tr><td class="nm">DDD 建模</td><td>ContextMapper CML</td><td>学术社区</td><td>Apache-2.0</td><td>限界上下文 + 上下文映射 → CML 文件。计划中的投影（见上方同类表）。</td></tr>
-          <tr><td class="nm">智能体传输</td><td>MCP</td><td>AAIF（Anthropic 捐赠）</td><td>MIT</td><td><strong>已交付</strong>：26 个只读工具，经 stdio JSON-RPC <span class="badge verified" title="F-16">已验证</span>——describe、expand、blast_radius、lineage、anchors、orphans、consistency_check + 注册表动词。</td></tr>
-          <tr><td class="nm">本地图谱</td><td>SQLite</td><td>公有领域</td><td>—</td><td><strong>已交付</strong>：每次编译都构建一个可查询的图谱存储——本站的 <a href="/zh/explorer/">Explorer</a> 在你的浏览器里运行它。</td></tr>
-        </tbody>
-      </table></div>
-      <div class="callout"><b>为什么要投影</b><p>投影是可再生的，所以可以为每个消费者采用<em>最好</em>的标准，而不需要树拥有 N 种方言。标准永远不会变成主人；树也永远不会分叉成 N 份各自漂移的文件。（MCP + SQLite 之外的投影生成器，排在台账上运行时闸门之后。）</p></div>
+      <div class="sec-head"><span class="no">02</span><h2>标准已经存在，实现状态要另说</h2></div>
+      <p class="sec-sub">提出合理的标准映射，不等于已经交付并测试了导出器。下方把当前接口与拟议衍生物明确分开。</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">当前接口</span><h3>SQLite 知识图谱</h3><p>本地图谱表示支持真实查询。<a href="/zh/explorer/">Explorer</a> 读取随站点提供的银行快照 <a href="/zh/status/#F-03" data-fact="F-03">F-03</a>，不是你的仓库的实时视图。</p></div>
+        <div class="card"><span class="tag">当前接口</span><h3>MCP 访问</h3><p>工具链经 stdio JSON-RPC 提供面向读取的工具 <a href="/zh/status/#F-16" data-fact="F-16">F-16</a>。这是查询接口，不是下方所有标准的导出能力。</p></div>
+      </div>
+      <details open>
+        <summary>拟议衍生物 · 不是已交付集成</summary>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>任务</th><th>标准或格式</th><th>拟议映射</th><th>本项目状态</th></tr></thead>
+          <tbody>
+            <tr><td class="nm">验收例子</td><td>Gherkin</td><td>场景与已声明行为 → Given / When / Then feature</td><td>已设计，未构建 <a href="/zh/status/#DEF-01">DEF-01</a>。预期行为仍需独立审阅。</td></tr>
+            <tr><td class="nm">事件契约</td><td>AsyncAPI</td><td>事件与载荷 schema → 消息、通道和操作</td><td>拟议投影，不是当前导出能力。</td></tr>
+            <tr><td class="nm">事件信封</td><td>CloudEvents</td><td>事件元数据 → 可互操作信封</td><td>拟议映射，不宣称已符合标准。</td></tr>
+            <tr><td class="nm">HTTP 契约</td><td>OpenAPI</td><td>命令与查询 → 操作和 schema</td><td>拟议投影，不在此宣称已有导出器。</td></tr>
+            <tr><td class="nm">架构视图</td><td>C4 / Structurizr DSL</td><td>显式架构声明 → 系统与容器视图</td><td>拟议投影；仅有领域关系不足以指定部署拓扑。</td></tr>
+            <tr><td class="nm">服务目录</td><td>Backstage catalog</td><td>上下文与已声明依赖 → 目录实体</td><td>拟议投影，不是同步集成。</td></tr>
+            <tr><td class="nm">DDD 建模</td><td>ContextMapper CML</td><td>限界上下文与上下文映射 → CML 声明</td><td>拟议投影，不是双向适配器。</td></tr>
+          </tbody>
+        </table></div>
+      </details>
+      <div class="callout"><b>采用时不扩大承诺</b><p>先从已有接口开始。新增投影之前，先约定身份、语义、信息损失与所有权，再实现导出器。不要让衍生物不知不觉变成另一份可编辑真源。</p></div>
     </section>
 
     <section id="licenses">
-      <div class="sec-head"><span class="no">03</span><h2>许可姿态</h2></div>
+      <div class="sec-head"><span class="no">03</span><h2>分别核对各层的许可</h2></div>
       <div class="card-grid cols-3">
-        <div class="card"><span class="tag">MIT</span><h3>truthsrc 工具链</h3><p>语言、编译器、生成器、MCP 服务器——最大程度复用，给任何工具链的采纳最小摩擦。</p></div>
-        <div class="card"><span class="tag">Apache-2.0</span><h3>引擎与示例</h3><p>saga-core、monarch-core、monarch-persistence、bank-wealth-demo——运行时库与演示资产，带专利授权，与 JVM 生态的惯例一致。</p></div>
-        <div class="card"><span class="tag">CC BY 4.0 + MIT</span><h3>本站</h3><p>内容 CC BY 4.0，代码 MIT——fork 本站、引用观点，署名即可，都欢迎。</p></div>
+        <div class="card"><span class="tag">MIT</span><h3>truthsrc 工具链</h3><p>记录中的工具链许可为 MIT <a href="/zh/status/#F-19" data-fact="F-19">F-19</a>。采用时仍应查看相应版本的许可与声明。</p></div>
+        <div class="card"><span class="tag">Apache-2.0</span><h3>引擎与银行示例</h3><p>saga-core、monarch-core、monarch-persistence <a href="/zh/status/#F-18" data-fact="F-18">F-18</a>，以及 bank-wealth-demo <a href="/zh/status/#F-20" data-fact="F-20">F-20</a>。运行时依赖仍有各自的许可义务。</p></div>
+        <div class="card"><span class="tag">CC BY 4.0 + MIT</span><h3>本站</h3><p>本站内容采用 CC BY 4.0，代码采用 MIT。复用时保留适用的署名与许可声明。</p></div>
       </div>
-      <p class="small" style="margin-top:10px">你生成的代码属于你：生成产物采用你选择的许可——工具链不向下游强加任何东西。<span class="badge verified" title="F-18/F-19/F-20">已按仓库验证</span></p>
+      <p class="evidence-note">分发应用时，应一起核对生成内容、所含脚手架与运行时依赖；生成器采用宽松许可，不等于免除其他层的条款。</p>
+      <p class="next-step"><strong>下一步：用小模型评估工作流。</strong><a href="/zh/guide/#l1">试一遍 Counter 闭环</a>，或<a href="/zh/bank-demo/">不安装任何东西，先读银行场景</a>。</p>
     </section>
   </main>
 

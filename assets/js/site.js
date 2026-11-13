@@ -1,10 +1,6 @@
-/* co-arising.github.io — site chrome.
-   SITE is the single source of truth for every repo URL and nav link.
-   When a repository migrates orgs, edit it here and nowhere else.
-   Bilingual chrome: each page declares its language via <html lang>
-   (root edition "en", /zh/ edition "zh-CN"); display strings live in STR.
-   Nav hrefs stay canonical (English-root); the /zh/ prefix is added here,
-   so a link still needs editing in exactly one place. */
+/* co-arising.github.io — shared repository bases, navigation and bilingual chrome.
+   Static fallbacks and copyable examples retain their own HTML; maintenance checks
+   keep those in sync. Each edition declares its language via <html lang>. */
 
 const SITE = {
   org: "co-arising",
@@ -21,29 +17,23 @@ const SITE = {
   },
   nav: [
     {
-      group: "Understand",
-      groupZh: "理解",
+      group: "Start here",
+      groupZh: "从这里开始",
       items: [
-        { href: "/why-co-arising/", label: "Why co-arising", labelZh: "为何 co-arising" },
-        { href: "/dsl/", label: "The language", labelZh: "真源树语言" },
-      ],
-    },
-    {
-      group: "See it work",
-      groupZh: "看它工作",
-      items: [
-        { href: "/pipeline/", label: "Pipeline", labelZh: "流水线" },
+        { href: "/why-co-arising/", label: "Why co-arising", labelZh: "理念" },
+        { href: "/dsl/", label: "Language", labelZh: "语言" },
         { href: "/bank-demo/", label: "Bank example", labelZh: "银行示例" },
-        { href: "/explorer/", label: "Explorer", labelZh: "Explorer" },
+        { href: "/explorer/", label: "Explorer", labelZh: "探索器" },
+        { href: "/guide/", label: "Get started", labelZh: "开始使用" },
       ],
     },
     {
-      group: "Adopt",
-      groupZh: "采用",
+      group: "Reference & evidence",
+      groupZh: "参考与证据",
       items: [
-        { href: "/compare/", label: "Landscape", labelZh: "全景对比" },
-        { href: "/guide/", label: "Hands-on guide", labelZh: "实战指南" },
-        { href: "/status/", label: "Status", labelZh: "状态与台账" },
+        { href: "/pipeline/", label: "Pipeline", labelZh: "生成流程" },
+        { href: "/compare/", label: "Landscape", labelZh: "工具对比" },
+        { href: "/status/", label: "Status & evidence", labelZh: "状态与证据" },
       ],
     },
   ],
@@ -63,7 +53,7 @@ const STR = {
     copyFailed: "copy failed — select the code",
     skip: "Skip to content",
     footerTagline:
-      "Domain knowledge that co-arises — and compiles. An open organization for truth-source tooling around DDD, event-sourced systems and agentic development.",
+      "Shared domain knowledge, verifiable implementations and traceable changes. Open tooling for people and agents working with DDD and event-sourced systems.",
     siteOnGitHub: "This site on GitHub",
     colRepos: "Repositories",
     colEngines: "Engines",
@@ -83,7 +73,7 @@ const STR = {
     copyFailed: "复制失败，请选择代码",
     skip: "跳至正文",
     footerTagline:
-      "会缘起、可编译的领域知识。一个开放组织，围绕 DDD、事件溯源系统与智能体开发，构建真源（truth source）工具链。",
+      "让业务知识可共识、实现可验证、变更可追溯。面向人和智能体的开放工具链，以 DDD 与事件溯源约束协作开发。",
     siteOnGitHub: "本站在 GitHub 上",
     colRepos: "仓库",
     colEngines: "引擎",
@@ -120,28 +110,34 @@ const STR = {
 
   /* ---------- nav + footer injection ---------- */
   if (nav) {
-    const links = SITE.nav
-      .map(
-        (g) =>
-          `<span class="group-label">${LANG === "zh" ? g.groupZh : g.group}</span>` +
-          g.items
-            .map((it) => {
-              const active = here === it.href ? ' aria-current="page"' : "";
-              const href = LANG === "zh" ? "/zh" + it.href : it.href;
-              const label = LANG === "zh" ? it.labelZh || it.label : it.label;
-              return `<a class="nav-link" href="${href}"${active}>${label}</a>`;
-            })
-            .join("")
-      )
-      .join("");
+    const links = (group) => group.items.map((item) => {
+      const active = here === item.href ? ' aria-current="page"' : "";
+      const href = LANG === "zh" ? "/zh" + item.href : item.href;
+      const label = LANG === "zh" ? item.labelZh : item.label;
+      return `<a class="nav-link" href="${href}"${active}>${label}</a>`;
+    }).join("");
+    const secondary = SITE.nav[1];
+    const inReference = secondary.items.some((item) => item.href === here);
     const langA = LANG === "zh" ? "en" : "zh-CN";
-    nav.innerHTML = `<div class="topline"></div><div class="site-nav"><div class="row">
+    nav.innerHTML = `<div class="topline"></div><div class="site-nav"><div class="row nav-enhanced">
       <a class="brand" href="${LANG === "zh" ? "/zh/" : "/"}"${isRoot ? ' aria-current="page"' : ""}><span class="dot"></span>co-arising</a>
-      ${links}
-      <span class="spacer"></span>
-      <a class="nav-link" id="language-switch" lang="${langA}" hreflang="${langA}" rel="alternate" href="${LANG === "zh" ? "/" : "/zh/"}" title="${T.langSwitchTitle}">${T.langSwitch}</a>
-      <button class="theme-btn" id="theme-toggle" type="button" title="${T.themeTitle}">◐ ${T.themeLabel.auto}</button>
+      <div class="nav-primary">${links(SITE.nav[0])}</div>
+      <div class="nav-actions">
+        <details class="nav-reference${inReference ? " current" : ""}" id="nav-reference">
+          <summary>${LANG === "zh" ? "参考" : "Reference"}</summary>
+          <div class="nav-reference-links">${links(secondary)}</div>
+        </details>
+        <a class="nav-link" id="language-switch" lang="${langA}" hreflang="${langA}" rel="alternate" href="${LANG === "zh" ? "/" : "/zh/"}" title="${T.langSwitchTitle}">${T.langSwitch}</a>
+        <button class="theme-btn" id="theme-toggle" type="button" title="${T.themeTitle}">◐ ${T.themeLabel.auto}</button>
+      </div>
     </div></div>`;
+    const menu = document.getElementById("nav-reference");
+    if (menu) menu.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        menu.open = false;
+        menu.querySelector("summary").focus();
+      }
+    });
   }
 
   if (footer) {

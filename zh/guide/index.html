@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>实战指南 — co-arising</title>
-  <meta name="description" content="从零到完整闭环：环境搭建（含 Docker 回退）、Counter 教程、银行示例流水线，以及把 MCP 服务器接入 Claude Code 做影响半径查询。" />
+  <meta name="description" content="Node-only Counter 闭环、独立预期的规则变更练习、生成源码审阅、单独的银行验收前置，以及可选 MCP 协作。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -77,7 +77,7 @@ node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out gene
 node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
 node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human</code></pre>
       <p>预览只列操作计划，不是文本 diff。生成后应见 <code>inputs=current</code>、<code>evidence=verified</code>、<code>synchronized=true</code>。它们证明来源与字节状态，不证明 Scala 或银行业务已经执行。</p>
-      <h3>从真实位置反查，而不是猜文件或行号</h3>
+      <h3 id="counter-reverse-query">从真实位置反查，而不是猜文件或行号</h3>
       <p>span 是半开 UTF-8 字节区间，不是行号。下面从当前已验证源码换算行号并反查；没有精确命中就停止，不补造位置。</p>
       <pre class="code" data-example="counter-reverse"><code>node --input-type=module &lt;&lt;'NODE'
 import { execFileSync } from 'node:child_process';
@@ -110,6 +110,52 @@ node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out genera
 node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human</code></pre>
       <p>更新前输入应为 <code>changed</code>，已有文件仍可为 <code>unchanged</code>——那只是它们仍等于上次生成的字节。更新后 verify 通过；最后一次重复应为 <code>written=0</code>，只指零生成源码写入，不是零证据写入。旧快照不覆盖；再次导出使用新的文件名。</p>
       <p class="small">已有目录或输出冲突时保留现场，检查归属与输入，不删除目录或手改 ledger 消红。后续 CLI 原文见工具仓 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/TUTORIAL.md">TUTORIAL.md</a>。</p>
+    </section>
+
+    <section id="change-rule">
+      <div class="sec-head"><span class="no">02b</span><h2>可选进阶 · 改一条业务规则，不只改默认值</h2></div>
+      <p>完成 <strong>0→2 闭环</strong>后，继续在自己的 <code>counter-lab</code> 中练习。不改银行、不改工具原始 scaffold，不需 JVM、数据库或 MCP。本练习批准的玩具需求是：id 非空时，<strong>SetCount 接受 0 到 100，含两端</strong>。改变初始默认值，并不会施加这个命令上限。</p>
+      <h3>先确认边界，再改规则</h3>
+      <p>先写下这些独立预期，不要从新条件自动生成答案。四例统一使用 id <code>toy-counter</code>、旧 count <code>2</code>。业务预期与编辑范围由人批准，测试不能代签。</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>请求 count</th><th>预期决策</th><th>预期事件 / 状态</th></tr></thead>
+        <tbody>
+          <tr><td>-1</td><td>reject · NEGATIVE_COUNT</td><td>不产生事件，旧状态不变。</td></tr>
+          <tr><td>0</td><td>continue</td><td>CountSet(count=0)，新 count 为 0。</td></tr>
+          <tr><td>100</td><td>continue</td><td>CountSet(count=100)，新 count 为 100。</td></tr>
+          <tr><td>101</td><td>reject · NEGATIVE_COUNT</td><td>不产生事件，旧状态不变。</td></tr>
+        </tbody>
+      </table></div>
+      <p>把 <a href="/tools/verify-counter-change.mjs">Node-only Counter 检查脚本</a>保存到作者树之外，将 <code>COUNTER_CHECK</code> 设为该文件的绝对路径，并保留安装步骤的 <code>TRUTHSRC_CLI</code>。脚本需要完整工具包中已文档化的 <code>lib/domain-products</code> oracle。<em>修改前</em>先运行：旧规则应在新增的 <code>101</code> 预期处失败。</p>
+      <pre class="code" data-example="counter-range-check" data-example-kind="shell" data-grammar="bash"><code>: "${COUNTER_CHECK:?Set COUNTER_CHECK to the saved verify-counter-change.mjs absolute path}"
+: "${TRUTHSRC_CLI:?Complete the CLI setup first}"
+node "$COUNTER_CHECK" --project "$PWD/truthsrc.project.json"</code></pre>
+      <h3>修改已有守卫，保留其身份</h3>
+      <p>在 <code>truth/example/contexts/example/aggregates/counter/slices/set-count.slice.yaml</code> 的 <code>payload.guards</code> 中找到已有的 <code>ref: nonnegative-count</code> 行。<strong>只把</strong>其中 <code>cond</code> 从 <code>param.count &gt;= 0</code> 改为下方条件。保留前面的 <code>nonempty-id</code> 守卫、顺序、<code>ref</code>、<code>errCode</code> 和 <code>onFail</code>；不追加一条互相竞争的范围规则，也不修改生成的 Scala。</p>
+      <p>这是替换用的 JSON 成员片段，不是完整切片或 YAML 文件。</p>
+      <pre class="code" data-example="counter-range-guard" data-example-kind="author"><code>{
+  "kind": "invariantRef",
+  "ref": "nonnegative-count",
+  "errCode": "NEGATIVE_COUNT",
+  "cond": "param.count &gt;= 0 &amp;&amp; param.count &lt;= 100",
+  "onFail": "reject"
+}</code></pre>
+      <p class="small">复用此守卫意味着 -1 与 101 <em>都</em>返回 <code>NEGATIVE_COUNT</code>，即使其历史名称不够贴切。这是本玩具练习明确保留的错误策略，不是对生产 API 文案的建议。修改身份或错误策略需另行裁定；零始终有效。</p>
+      <h3>检查作者输入、预览、更新，再完整验证</h3>
+      <p>以下命令全部在 <code>counter-lab</code> 执行。手工只改玩具作者输入；生成写入 <code>generated/</code> 及项目派生知识/证据。更新计划列的是操作，不是文本 diff。</p>
+      <pre class="code" data-example="counter-range-update" data-example-kind="shell" data-grammar="bash"><code>node "$TRUTHSRC_CLI" validate --tree truth/example
+node "$TRUTHSRC_CLI" roundtrip --tree truth/example
+node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$COUNTER_CHECK" --project "$PWD/truthsrc.project.json"</code></pre>
+      <p>此时四例应全部通过。脚本调用<strong>公共 <code>compile-project</code> CLI</strong>，重新接纳实际修改后的规则（该命令只收 <code>--project</code>，不收 <code>--out</code>），再用<em>同一安装包</em>的决策、绑定与折叠 oracle 求值，与固定预期对照；不是另写一段 JS 范围判断冒充验证。重放刻意只传 state/event，不传命令输入。</p>
+      <div class="callout"><b>这项检查不证明什么</b><p>本入口支持工具 <code>cb860b5c</code>、包 0.5.0 的 Counter decision @4、dependencies/folds @6。包模块缺失、语法被拒绝或 profile 不同，应停止练习，不能回退到普通算术后假报成功。结果只证明<strong>已接纳产品的行为</strong>，没有执行生成的 Scala、HTTP 服务，也不是银行验收。生成的 verification cases 不自动成为独立业务测试。</p></div>
+      <h3>正反两向闭环，还要读真实代码</h3>
+      <p>从上面的 <code>SetCount</code> 正向查询找到当前已验证位置，打开真实生成规则与事件处理器，检查含端点比较、保留的拒绝码、载荷绑定与仅靠事件的赋值。对<em>新</em>的已验证字节重复<a href="#counter-reverse-query">前面的字节 span 换行号反查</a>，回到作者声明，不复用旧的猜测行号。<code>verify-project</code> 检查来源/锚点一致性，不执行代码；若要声称目标运行时行为，还须另行实际运行生成代码的行为测试，预期仍应独立批准。</p>
+      <p>审阅后可重复 update：零<em>生成源码</em>写入只表示同步幂等，不是零证据写入。遇到归属、MANUAL 边界、输入或输出字节冲突，停止并保留现场，检查 status 与真实 diff；必要时另选明确自有的新练习目录，不删除 output、SQLite 或 ledger 消红。</p>
     </section>
 
     <section id="l2">
@@ -160,8 +206,8 @@ cd ../.. &amp;&amp; node "$TRUTHSRC_CLI" verify-project \
     </section>
 
     <section id="l3">
-      <div class="sec-head"><span class="no">04</span><h2>L3 · 把图谱接进 Claude Code（MCP）</h2></div>
-      <p class="sec-sub">这是智能体化的回报：一个靠<em>查询知识图谱</em>而不是 grep 仓库来规划变更的智能体。MCP 服务器自带 26 个只读工具 <span class="badge verified" title="F-16">已验证</span>。</p>
+      <div class="sec-head"><span class="no">04</span><h2>L3 · 可选：通过 MCP 协作查询图谱</h2></div>
+      <p class="sec-sub">MCP 是可选入口，不是 Counter CLI 闭环或规则变更练习的前置。它让智能体结合已声明的图谱与源码审阅规划变更。服务器提供 26 个读向工具 <span class="badge verified" title="F-16">已验证</span>。</p>
 
       <h3>注册服务器</h3>
       <pre class="code"><code># 在任意目录执行（路径指向你的 metarch-truthsrc 检出）

@@ -32,8 +32,38 @@
       <p class="thesis">这不是 mock 数据：下面的 SQLite 文件就是银行财富示例编译后的知识图谱——389 节点、413 边 <span class="badge verified" title="F-03">2026-11-11 验证</span>——用 sql.js 装进你的浏览器。只从本站下载静态资源，查询文本和结果不发送给服务器。</p>
     </header>
 
+    <section id="nodes" class="xp-directory" aria-labelledby="xp-nodes-heading">
+      <div class="sec-head"><span class="no">01</span><h2 id="xp-nodes-heading">浏览真实节点</h2></div>
+      <p class="sec-sub">按完整 ID 或名称搜索全部节点，查看存储记录及双向关系。这是 <b>2026-11-11 捕获的 canonical graphstore</b>，不是项目知识/回锚数据库。限定别名保持独立节点，同名不等于同一身份。</p>
+      <div class="xp-filters">
+        <label for="xp-node-search">ID 或名称 <input id="xp-node-search" type="search" maxlength="256" autocomplete="off" aria-controls="xp-node-list" aria-describedby="xp-node-help" /></label>
+        <label for="xp-node-kind">节点类型 <select id="xp-node-kind" aria-controls="xp-node-list" disabled><option value="">全部类型 — 正在从图谱加载</option></select></label>
+        <button class="btn ghost" id="xp-node-reset" type="button">重置筛选与选择</button>
+        <button class="btn ghost" id="xp-node-cancel" type="button" disabled>取消节点查询</button>
+      </div>
+      <p class="small" id="xp-node-help">按 ID/名称作字面子串匹配，忽略 ASCII 大小写（SQLite 的大小写折叠范围）；搜索与类型同时生效。筛选不会改变选中的节点。每页 40 个，可访问全部节点；每次在新副本中查询，5 秒后取消。节点分享 URL 不包含 SQL 草稿。</p>
+      <p id="xp-node-count" role="status" aria-live="polite">正在加载节点目录…</p>
+      <div class="xp-node-layout">
+        <div>
+          <ul id="xp-node-list" class="xp-node-list" aria-label="匹配的图节点" aria-busy="false"></ul>
+          <nav class="xp-node-pagination" aria-label="节点目录翻页">
+            <button class="btn ghost" id="xp-node-prev" type="button" aria-controls="xp-node-list" disabled>上一页</button>
+            <span class="small" id="xp-node-page"></span>
+            <button class="btn ghost" id="xp-node-next" type="button" aria-controls="xp-node-list" disabled>下一页</button>
+          </nav>
+        </div>
+        <div id="xp-node-detail" class="xp-node-detail xp-panel" tabindex="-1" aria-live="polite" aria-busy="false">
+          <h3>节点详情</h3>
+          <p>选择一个节点查看其真实记录与双向邻接关系。</p>
+          <p class="small">代码回锚：<b>unavailable — 此快照未提供</b>。不推断作者文件路径、行号或 GitHub 源码链接。存储的 provenance 是声明，不是已验证的代码位置。</p>
+        </div>
+      </div>
+      <p class="small">每个方向最多显示 80 条边，每个 atom/provenance 字段最多 8192 UTF-8 字节，每次响应最多 512 KiB；明确显示总数与截断。存储的 atom 仅作为文本，不执行，也不视为已验证的生成产物。</p>
+      <noscript><p class="callout">目录和详情需要 JavaScript 与本地 SQLite 引擎；未加载时没有真实节点查询结果。可用下方重建说明自行检查快照。</p></noscript>
+    </section>
+
     <section id="console">
-      <div class="sec-head"><span class="no">01</span><h2>控制台</h2></div>
+      <div class="sec-head"><span class="no">02</span><h2>控制台</h2></div>
       <p class="sec-sub">选一个预设（附期望答案），或对 <code>nodes(id, kind, name, atom, extra)</code> 与 <code>edges(seq, from_id, relation, to_id)</code> 写你自己的 SQL。Schema 就是 <code>truthsrc graph --out</code> 原样产出的东西。</p>
 
       <div class="xp-layout">
@@ -87,7 +117,7 @@ ORDER BY n DESC;</textarea>
     </section>
 
     <section id="rebuild">
-      <div class="sec-head"><span class="no">02</span><h2>别信我们——自己重建</h2></div>
+      <div class="sec-head"><span class="no">03</span><h2>别信我们——自己重建</h2></div>
       <p class="sec-sub">这是派生 graphstore 快照，不是项目知识/回锚数据库。先在同一 shell 完成<a href="/zh/guide/#install">指南中的工具准备</a>，再把 <code>BANK</code> 指向已有的配套银行 checkout。下方输出必须是新文件。当前真源的计数可以不同于这份带日期的快照；计数相同也不证明字节一致。</p>
       <pre class="code" data-example="graph-rebuild"><code>: "${TRUTHSRC_CLI:?Complete the guide tool setup first}"
 : "${BANK:?Set BANK to your matched bank checkout absolute path}"

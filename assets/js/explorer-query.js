@@ -15,7 +15,100 @@
     invariants: ["SELECT id,atom AS authored_slice FROM nodes WHERE id='slice:ReserveFunds'"],
   });
 
+  const NODE_LIMITS = Object.freeze({ pageSize: 40, edges: 80, kinds: 64, searchBytes: 1024, kindBytes: 256, idBytes: 8192 });
+  const provenanceFields = ["author", "workshopHeld", "approvedBy", "approval", "sourceVersion", "sourceFlow", "sourceArtifact", "sourcePointers"];
+
+  function validateStructured(request) {
+    const allowed = request.mode === "directory" ? ["mode", "search", "kind", "page"] : ["mode", "id"];
+    if (Object.keys(request).some((key) => !allowed.includes(key))) throw new Error("Unexpected structured query field");
+    const string = (key, limit, fallback) => {
+      const value = request[key] === undefined ? fallback : request[key];
+      if (typeof value !== "string" || encoder.encode(value).length > limit) throw new Error("Invalid structured field: " + key);
+      return value;
+    };
+    if (request.mode === "inspect") return { id: string("id", NODE_LIMITS.idBytes) };
+    const page = request.page === undefined ? 0 : request.page;
+    if (!Number.isSafeInteger(page) || page < 0) throw new Error("Invalid directory page");
+    return { search: string("search", NODE_LIMITS.searchBytes, ""), kind: string("kind", NODE_LIMITS.kindBytes, ""), page };
+  }
+
+  function executeStructured(SQL, bytes, request) {
+    const fields = validateStructured(request);
+    const database = new SQL.Database(new Uint8Array(bytes));
+    const notices = new Set();
+    /* Only these fixed SELECTs run here. User data is bound, never SQL syntax. */
+    const select = (sql, params = []) => {
+      const statement = database.prepare(sql);
+      try {
+        statement.bind(params);
+        const rows = [];
+        while (statement.step()) rows.push(statement.getAsObject());
+        return rows;
+      } finally { statement.free(); }
+    };
+    const exact = (value) => {
+      if (typeof value !== "string" || encoder.encode(value).length > LIMITS.cellBytes) throw new Error("Stored identity exceeds display budget");
+      return value;
+    };
+    const lightNode = (row) => ({ id: exact(row.id), kind: exact(row.kind), name: exact(row.name) });
+    const text = (value) => {
+      const encoded = encoder.encode(value);
+      if (encoded.length <= LIMITS.cellBytes) return value;
+      notices.add("cell");
+      let end = LIMITS.cellBytes - encoder.encode("…").length;
+      while ((encoded[end] & 0xc0) === 0x80) end--;
+      return decoder.decode(encoded.subarray(0, end)) + "…";
+    };
+    const storedFields = (object, keys, prefix = "") => keys.filter((key) => object && Object.hasOwn(object, key) && object[key] !== null)
+      .map((key) => ({ field: prefix + key, value: text(typeof object[key] === "string" ? object[key] : JSON.stringify(object[key])) }));
+    try {
+      let result;
+      if (request.mode === "directory") {
+        /* instr is a literal substring search: quotes, % and _ are not operators. */
+        const where = " WHERE (?='' OR instr(lower(id),lower(?))>0 OR instr(lower(name),lower(?))>0) AND (?='' OR kind=?)";
+        const params = [fields.search, fields.search, fields.search, fields.kind, fields.kind];
+        const total = select("SELECT COUNT(*) AS n FROM nodes")[0].n;
+        const filtered = select("SELECT COUNT(*) AS n FROM nodes" + where, params)[0].n;
+        const pageCount = Math.ceil(filtered / NODE_LIMITS.pageSize);
+        const page = Math.min(fields.page, Math.max(0, pageCount - 1));
+        const kinds = select("SELECT kind,COUNT(*) AS count FROM nodes GROUP BY kind ORDER BY kind LIMIT ?", [NODE_LIMITS.kinds + 1]);
+        if (kinds.length > NODE_LIMITS.kinds) throw new Error("Node kinds exceed directory budget");
+        result = {
+          total, filtered, page, pageCount, pageSize: NODE_LIMITS.pageSize,
+          kinds: kinds.map((row) => ({ kind: exact(row.kind), count: row.count })),
+          nodes: select("SELECT id,kind,name FROM nodes" + where + " ORDER BY id LIMIT ? OFFSET ?", [...params, NODE_LIMITS.pageSize, page * NODE_LIMITS.pageSize]).map(lightNode),
+        };
+      } else {
+        const row = select("SELECT id,kind,name,atom,extra FROM nodes WHERE id=?", [fields.id])[0];
+        result = { node: null, codeAnchors: "unavailable", representation: "canonical graphstore" };
+        if (row) {
+          const atom = JSON.parse(row.atom);
+          const extra = row.extra ? JSON.parse(row.extra) : null;
+          const provenance = storedFields(atom.provenance, provenanceFields, "atom.provenance.");
+          provenance.push(...storedFields(atom.provenance && atom.provenance.serviceIntegration, provenanceFields, "atom.provenance.serviceIntegration."));
+          result.node = { ...lightNode(row), provenance, extra: storedFields(extra, ["qualifiedRef", "sagaId"], "extra."), atom: text(row.atom), atomTruncated: encoder.encode(row.atom).length > LIMITS.cellBytes };
+          const adjacency = (outgoing) => {
+            const where = outgoing ? "e.from_id=?" : "e.to_id=?";
+            const other = outgoing ? "e.to_id" : "e.from_id";
+            const total = select("SELECT COUNT(*) AS n FROM edges e WHERE " + where, [fields.id])[0].n;
+            const edges = select("SELECT e.seq,e.relation," + other + " AS id,n.kind,n.name FROM edges e LEFT JOIN nodes n ON n.id=" + other + " WHERE " + where + " ORDER BY e.seq LIMIT ?", [fields.id, NODE_LIMITS.edges])
+              .map((edge) => ({ seq: edge.seq, relation: exact(edge.relation), id: exact(edge.id), ...(edge.kind === null ? {} : { kind: exact(edge.kind), name: exact(edge.name) }) }));
+            if (total > edges.length) notices.add("edges");
+            return { total, edges };
+          };
+          result.outgoing = adjacency(true);
+          result.incoming = adjacency(false);
+        }
+      }
+      result = { ...result, notices: [...notices], disposable: true };
+      if (encoder.encode(JSON.stringify(result)).length > LIMITS.responseBytes - 4096) throw new Error("Structured response exceeds 512 KiB budget");
+      return result;
+    } finally { database.close(); }
+  }
+
   function execute(SQL, bytes, request) {
+    if (!request || typeof request !== "object" || Array.isArray(request)) throw new Error("Unknown query mode");
+    if (request.mode === "directory" || request.mode === "inspect") return executeStructured(SQL, bytes, request);
     if (request.mode !== "preset" && request.mode !== "sandbox") throw new Error("Unknown query mode");
     const queries = request.mode === "preset"
       ? (Object.hasOwn(PRESETS, request.key) ? PRESETS[request.key] : null)
@@ -92,5 +185,5 @@
       database.close();
     }
   }
-  root.ExplorerQuery = Object.freeze({ LIMITS, PRESETS, execute });
+  root.ExplorerQuery = Object.freeze({ LIMITS, NODE_LIMITS, PRESETS, execute });
 })(globalThis);

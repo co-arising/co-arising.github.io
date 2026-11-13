@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>为何是 co-arising，而非本体论 — co-arising</title>
-  <meta name="description" content="领域概念不是静态分类。聚合是当命令、事件、状态与守卫在不变量约束下共同成立时所缘起的东西。真源路线的哲学内核。" />
+  <title>为何 co-arising —— 概念、行为与一致性</title>
+  <meta name="description" content="领域概念如何与行为保持联系？从 DDD 一致性边界出发，检查已声明的关系，把业务批准的责任留给人。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -27,38 +27,36 @@
 
   <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">哲学</p>
-      <h1>为何是 <span class="accent">co-arising</span>，而非本体论</h1>
-      <p class="thesis">在缘起（dependent origination）之中，没有任何事物独立存在：事物因关系而共同生起。领域知识恰恰就是这样运作的——也恰恰因此，对「对象类型」做静态分类总是抓不住它。</p>
+      <p class="over">理念</p>
+      <h1>一个领域概念的<span class="accent">含义从何而来？</span></h1>
+      <p class="thesis">账户不只是一个名字和一个余额字段。它的含义还取决于：允许发生什么、需要满足哪些条件、哪些事实会改变状态。「co-arising（缘起）」提醒我们，把概念与这些关系放在一起理解。</p>
+      <p class="page-outline"><a href="#ddd">从 DDD 出发</a> · <a href="#demo">做一次关系练习</a> · <a href="#stewardship">让人对决策负责</a></p>
     </header>
 
-    <section id="problem">
-      <div class="sec-head"><span class="no">01</span><h2>我们一再撞上的那堵墙</h2></div>
-      <p class="sec-sub">二十年，从两个相反方向撞上同一堵墙：</p>
+    <section id="problem" class="prose">
+      <div class="sec-head"><span class="no">01</span><h2>让规则与它的后果靠近</h2></div>
+      <p class="sec-sub">有用的模型既帮助人们对行为达成共识，也帮助工程师找到行为在哪里实现。</p>
       <div class="card-grid cols-2">
-        <div class="card"><span class="tag">1999–2004 · 学术界</span><h3>「业务生成代码」造出了玩具</h3><p>模型到代码的研究不断生成出能跑却活不过真实领域接触的东西：没有可强制的规则、没有可追溯性、没有演化路径。那些模型是<strong>没有后果的描述</strong>。</p></div>
-        <div class="card"><span class="tag">2019–2023 · 工业界</span><h3>合规不得不逆向工程血缘</h3><p>拥有数百个微服务的企业没有数据血缘。当法务问「这个数字从哪来」，唯一的办法是<strong>把整个系统反向 grep 一遍</strong>。知识只存在于代码内部——够不着、证不了。</p></div>
+        <div class="card"><span class="tag">实现之前</span><h3>我们究竟同意了什么？</h3><p>图里可以有一个账户，但这并没有决定重复初始化应该被接受、拒绝，还是忽略。条件与结果也需要明确声明。</p></div>
+        <div class="card"><span class="tag">变更之时</span><h3>还需要重新检查什么？</h3><p>修改一条规则，可能影响命令、事件、状态折叠或调用方。已记录的关系为影响分析提供起点，代码检查和测试仍不可少。</p></div>
       </div>
-      <p style="margin-top:18px;max-width:52em">两堵墙同根：领域知识被当作代码的<em>文档副产品</em>，而不是反过来。解法不是更好的画图工具，而是让领域描述成为那个被<strong>编译、验证、追溯</strong>的东西——让每一行代码都可证明地来自一段被命名过的知识。</p>
+      <p>目标不是用编译器代替讨论，而是让决策有可审阅的落点，从中生成受支持的实现，并记录实现的出处。</p>
     </section>
 
-    <section id="ddd">
-      <div class="sec-head"><span class="no">02</span><h2>DDD 早就知道：概念是共生的</h2></div>
-      <p class="sec-sub">这个名字不是装饰——它是对 DDD 一直在说的话的一种读法。</p>
-
-      <h3>战术层：聚合是一道驻波，不是一个类</h3>
-      <p style="max-width:52em">Evans 把聚合定义为<strong>一致性边界</strong>。在真源树里这句话变成字面事实：聚合<em>就是</em>当它的各个切片成立时所缘起的东西——每个切片是一条命令、它的守卫、和它产生的事件；守卫强制聚合的不变量；事件折叠回状态。抽掉任何一条腿，聚合就不再是聚合：</p>
-      <ul style="max-width:52em">
-        <li>没有<strong>守卫</strong>的<strong>命令</strong>——没有规则的变更；不变量没有强制点。</li>
-        <li>没有<strong>折叠赋值</strong>的<strong>事件</strong>——永远不会变成状态的历史。</li>
-        <li>无人引用的<strong>不变量</strong>——死条文；一致性只存在于纸面上。</li>
+    <section id="ddd" class="prose">
+      <div class="sec-head"><span class="no">02</span><h2>以 DDD 的一致性边界为基础</h2></div>
+      <p class="sec-sub">这是把 DDD 关系落实到工程中的一种方式，不是取代 DDD，也不是宣称只有这一种正确解读。</p>
+      <h3>战术层：连起命令、规则与状态</h3>
+      <p>聚合是一致性边界。在受支持的事件溯源模型中，命令经过已声明守卫的检查，接受的命令经绑定产生事件，事件再通过状态折叠演进状态。切片把这些行为放在一起，方便审阅。</p>
+      <ul>
+        <li><strong>守卫</strong>为已声明规则提供执行检查点；没有引用的规则值得调查。</li>
+        <li><strong>绑定</strong>说明事件载荷从哪里来。</li>
+        <li><strong>状态折叠</strong>说明事件如何改变状态。有些事件也可能有意不改变状态。</li>
       </ul>
-      <p style="max-width:52em">银行树把这点变得具体：<code>CreditBalance</code> 之所以存在，是因为 27 个切片携带着诸如 <code>@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE …)</code> 的守卫，背后是具名的 <code>@rule</code> 不变量——三个聚合共 <strong>149 条</strong> <span class="badge verified" title="F-09">已验证</span>。</p>
-
-      <h3>战略层：结构跟随业务地形</h3>
-      <p style="max-width:52em">战略模式同样的关系性。<strong>核心域 / 支撑域 / 通用域</strong>取决于业务在哪里拥有优势或独特知识——而不是代码的任何属性。<strong>限界上下文</strong>与它的<strong>上下文映射</strong>（客户—供应商、防腐层、开放主机服务……）是从组织结构和上下游的商业格局中共生的。在真源树语言里，它们是一等公民笔记——<code>context</code>、<code>subdomain</code>、<code>relation</code>——用与其他一切相同的注册表相连（R21 上下文依赖、R22 聚合归属于子域）。</p>
-
-      <div class="callout teal"><b>论点</b><p><strong>DDD 的核心洞见就是缘起。</strong>聚合、上下文、子域不是你往里归档东西的类别——它们是从关系中生起的结构（命令→事件、不变量→守卫、业务地形→上下文映射），关系在则结构在，关系断则结构消解。我们的语言只是把这一点变成了机器可检验的。</p></div>
+      <p>银行真源中的 <code>CreditBalance</code> 拥有 <code>InitializeAccount</code>、<code>ReserveFunds</code> 等账户行为；订单与定投行为分别属于 <code>FundOrder</code>、<code>SipPlan</code>，并非都由 CreditBalance 拥有。记录中的 <strong>149 条规则是银行各聚合的合计</strong>，不是单个账户聚合的数量 <a class="badge verified" href="/zh/status/#F-09" data-fact="F-09">F-09 · 2026-11-11</a>。</p>
+      <h3>战略层：明确上下文与归属</h3>
+      <p>限界上下文、子域与上下文映射，帮助表达含义在哪里适用，以及团队或系统之间如何依赖。语言记录 <code>context</code>、<code>subdomain</code>、<code>relation</code> 笔记，包括上下文依赖与聚合到子域的归属关系。</p>
+      <div class="callout teal"><b>关注的区别</b><p>名称与类型帮助识别概念；<strong>行为、条件与一致性关系说明概念如何一起工作。</strong>编译器检查受支持的声明，模型是否符合业务仍由人判断。</p></div>
     </section>
 
     <section id="demo">
@@ -67,60 +65,41 @@
       <div class="dissolve-stage" id="dissolve-stage">
         <noscript>
           <p style="padding:20px;font-size:14px;color:var(--ink-2)">
-            <strong>静态回退：</strong>完整装配时，CreditBalance = 1 个聚合 + N 个切片，每个切片 = 命令 + 守卫 + 事件，所有腿都在，不变量被强制。
-            完全消解时，同样的节点散落成互不相连的工作坊笔记——命令、事件和规则，合在一起不再<em>有意义</em>。
-            启用 JavaScript 可看交互版本。
+            <strong>静态回退：</strong>练习把 CreditBalance 与它的切片、命令、事件及已声明守卫边连接起来。移除边只改变图示中的关系覆盖情况，不改变银行实现，也不证明业务正确与否。
+            启用 JavaScript 后，可通过图或清单移除、恢复关系。
           </p>
         </noscript>
       </div>
       <p class="small">这里的守卫边从切片声明展开，缺少一条就表示本练习中的覆盖不完整。另一个<a href="/zh/explorer/#orphans">原始事件生产者查询</a>检查缺失的 <code>produces</code> 边，不检查守卫；它也不会接收本地演示的修改。</p>
     </section>
 
-    <section id="vs-ontology">
-      <div class="sec-head"><span class="no">04</span><h2>隔壁的本体论</h2></div>
-      <p class="sec-sub">业界与这条路最接近的是 Palantir 的 Ontology——差异很有启发性，而非敌意。</p>
-      <div class="versus">
-        <div class="side">
-          <span class="tag" style="font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;color:var(--red);text-transform:uppercase">本体论（闭源）</span>
-          <h3 style="margin-top:6px">带执行层的分类学</h3>
-          <ul style="font-size:14px;color:var(--ink-2);padding-left:18px">
-            <li><strong>对象类型、链接类型、动作类型</strong>——企业的分类学，在 Ontology Manager 里自上而下定义。</li>
-            <li>「表示决策，而不只是数据」——确实漂亮的一句：动作经本体写回数据集。</li>
-            <li>封闭：执行层、语义和格式就是产品本身。没有开放的交换格式，没有退出通道。</li>
-            <li>含义在类型系统中<em>一次性声明</em>——即使每一段重要的关系都已腐坏，对象仍安坐在它们的分类位上。</li>
-          </ul>
-        </div>
-        <div class="mid">vs</div>
-        <div class="side">
-          <span class="tag" style="font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;color:var(--teal);text-transform:uppercase">co-arising（本项目）</span>
-          <h3 style="margin-top:6px">会编译的关系图</h3>
-          <ul style="font-size:14px;color:var(--ink-2);padding-left:18px">
-            <li><strong>22 种带类型的关系</strong>，带显式的影响标记（<code>propagates</code>）——含义活在边上，而边是可执行的输入。</li>
-            <li>同样是决策与数据——但动作层是<strong>生成的开放代码</strong>（读得懂、编得过、带得走的 CQRS/ES Scala）。</li>
-            <li>开放：MIT/Apache-2.0，基于文件的树，SQLite 图谱，任何智能体可经 MCP 访问。</li>
-            <li>含义被<em>持续重新推导</em>：编译器在每次构建时重新证明那些关系；孤儿知识会被检测出来，而不是被归档遗忘。</li>
-          </ul>
-        </div>
+    <section id="vs-ontology" class="prose">
+      <div class="sec-head"><span class="no">04</span><h2>关系不是这条路线的专利</h2></div>
+      <p class="sec-sub">本体与语义平台同样可以表达关系、约束和动作。这里的区别在于工程工作流，而不是「类型」与「含义」的对立。</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">互补的关注点</span><h3>连接企业数据与决策</h3><p>包括 Palantir Ontology 在内的语义平台，围绕企业数据组织概念、链接与动作。是否适用，应看团队的平台、集成与治理需求，而不是假定本体没有关系。</p></div>
+        <div class="card"><span class="tag">本项目的重点</span><h3>审阅文件，派生代码，追溯变更</h3><p>真源工作流从版本化作者文件开始，编译已声明的关系与受支持行为，产出 CQRS/ES 代码，并通过来源锚点把生成位置连接回知识。</p></div>
       </div>
-      <div class="callout"><b>一句话</b><p>在本体论里，一个对象由它在分类学中的位置定义。在 co-arising（缘起）里，一个概念由它的关系定义——<strong>抽掉关系，它就不再有意义</strong>，而工具会确切地告诉你那是何时发生的。</p></div>
+      <div class="callout"><b>按任务选择</b><p>文件优先的真源、明确的生成边界与可检查的来源记录，可能适合你的工程工作流。这不证明与其他平台功能对等或兼容。参见<a href="/zh/compare/#protocols">当前接口与拟议投影</a>。</p></div>
     </section>
 
     <section id="stewardship">
-      <div class="sec-head"><span class="no">05</span><h2>另外两个承诺</h2></div>
+      <div class="sec-head"><span class="no">05</span><h2>检查为决策提供依据，不代替批准</h2></div>
       <div class="card-grid cols-2">
-        <div class="card"><span class="tag">守护纪律</span><h3>智能体起草，人类定夺</h3><p>AI 智能体极其擅长<em>提议</em>领域结构，又极其不适合为它负责。所以契约是：智能体可以查询、起草、填充；真源树是唯一的编辑界面；每一批编辑都必须以验证闸门全绿收尾；批准是人的行为，并记录进溯源（每个原子上的 <code>approvedBy</code>）。</p></div>
-        <div class="card"><span class="tag">人可核验的生产</span><h3>人仍然能生产和检查</h3><p>这棵树是人读得懂、改得动的 YAML。验证是确定性的。往返转换逐字节一致。机器做量——计数、编译、锚定、查询——人继续对正确性负责。这种分工是特性，不是怀旧。</p></div>
+        <div class="card"><span class="tag">守护纪律</span><h3>智能体起草，人来决定</h3><p>人与智能体都可以调查关系、提出修改。业务预期由人确认，证据由人审阅。通过项目实际采用的审阅与溯源流程记录决策；闸门全绿不等于已经批准。</p></div>
+        <div class="card"><span class="tag">编辑边界</span><h3>改在正确的来源上</h3><p>真源树是知识编辑面。显式技术绑定与手写实现区是职责不同的独立输入。先验证所改的层，再依据独立约定的预期测试行为。</p></div>
       </div>
     </section>
 
-    <section id="naming">
-      <div class="sec-head"><span class="no">06</span><h2>它不是什么，以及这个怪名字</h2></div>
+    <section id="naming" class="prose">
+      <div class="sec-head"><span class="no">06</span><h2>用一个名字提醒工作方式</h2></div>
+      <p>「co-arising（缘起）」邀请我们把概念与其条件、关系一起看。落实到工程中，就是让业务陈述、已声明行为与实现，在持续演进时仍然相连。</p>
       <div class="card-grid cols-3">
-        <div class="card"><span class="tag">不是</span><h3>低代码平台</h3><p>没有拖拽积木的画布。产出是真实、可编译、可测试的源代码加一个手写区——因为每个真实系统里最难的那一半，恰恰是低代码接不住的那一半。</p></div>
-        <div class="card"><span class="tag">不是</span><h3>模型到代码的玩具</h3><p>验收标准不是「demo 能跑」。而是：可 diff 的树、逐字节一致的往返、可编译的生成项目、双向证明的锚点——用命令验证，不用感觉。<a href="/zh/pipeline/">看那些闸门 ↗</a></p></div>
-        <div class="card"><span class="tag">不是</span><h3>又一个标准</h3><p>Gherkin、AsyncAPI、OpenAPI、C4 都是好标准——树可以投影上去。自有的那一层刻意很小：领域 IR 和它的关系注册表。<a href="/zh/compare/#protocols">投影表 ↗</a></p></div>
+        <div class="card"><span class="tag">可读真源</span><h3>保留讨论的依据</h3><p>文件可审阅、可比较差异，但领域发现、例子与判断不会因此变得多余。</p></div>
+        <div class="card"><span class="tag">有界自动化</span><h3>知道检查了什么</h3><p>验证、编译、测试和锚点各自检查不同性质。<a href="/zh/pipeline/">沿流水线看职责</a>。</p></div>
+        <div class="card"><span class="tag">开放协作</span><h3>保留有用的标准</h3><p>按任务采用标准；提出导出方向不等于集成已经交付。<a href="/zh/compare/#protocols">查看投影状态</a>。</p></div>
       </div>
-      <p style="margin-top:20px;max-width:52em" class="small">关于名字：Palantir 在 2011 年造出「Forward Deployed Engineer」这个词，被普遍认为荒谬，他们没有改——今天 FDE 是几百家公司招聘的职位类别。造一个词，然后耐心地持有它，一个词就是这样变成一个品类的。我们在持有 <em>co-arising（缘起）</em>。</p>
+      <p class="next-step"><strong>下一步：读一份声明。</strong><a href="/zh/dsl/#fold">跟随 Counter 从守卫走到状态折叠</a>。</p>
     </section>
   </main>
 

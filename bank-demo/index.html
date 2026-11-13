@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bank wealth worked example — co-arising</title>
-  <meta name="description" content="A 100-yuan fund purchase followed through payment, TA confirmation, independent refund and bounded installments — three aggregates, 157 truth atoms, 149 invariants, 2 sagas, 4 pipelines, 235 generated files, 792 verified anchors." />
+  <meta name="description" content="Does payment mean investment success? Read the bank declarations for cash payment, TA rejection and independent refund, bounded installments, and unknown outcomes. Static guide, not a live bank." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -27,30 +27,40 @@
 
   <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">Worked example · local teaching demo</p>
-      <h1>One purchase, <span class="accent">every step’s origin</span></h1>
-      <p class="thesis">A customer submits a 100-yuan fund purchase. The money is debited — does that mean the investment succeeded? When the fund company rejects it, why does a separate refund exist? How does each installment of a savings plan reuse those exact rules? This example answers those questions from a truth tree, not from prose.</p>
-      <div class="stat-strip">
-        <div class="stat"><div class="num">3</div><div class="lbl">aggregates: CreditBalance · FundOrder · SipPlan</div></div>
-        <div class="stat"><div class="num">157</div><div class="lbl">truth atoms · 149 <code>@rule</code> invariants <span class="badge verified" title="F-02/F-09">verified</span></div></div>
-        <div class="stat"><div class="num">2+4</div><div class="lbl">sagas + pipelines declared in truth</div></div>
-        <div class="stat"><div class="num">23/23</div><div class="lbl">generated unit tests · 2026-11-11 <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a></div></div>
-      </div>
+      <p class="over">Bank wealth · a declaration guide</p>
+      <h1>The payment went through.<br /><span class="accent">Did the investment succeed?</span></h1>
+      <p class="thesis">Not yet. Payment, fund-company confirmation and a possible refund are different business facts. Follow their declarations to see why they need different consistency boundaries—and how each installment reuses them.</p>
+      <p class="evidence-note"><strong>This page is a static guide, not a live bank backend or browser simulation.</strong> The linked graph is the shipped declaration snapshot. The separately tested local demo uses a mock transfer agent (TA), not a real fund-company connection.</p>
+      <p class="page-outline"><a href="#business">Choose a business question</a> · <a href="#views">Inspect the source views</a> · <a href="#technical-acceptance">Read technical acceptance</a></p>
     </header>
 
     <section id="business">
-      <div class="sec-head"><span class="no">01</span><h2>Four business lines, one tree</h2></div>
-      <p class="sec-sub">Each line is a different <em>shape</em> of coordination — which is exactly why they need different truth atoms.</p>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Line</th><th>The question it answers</th><th>Coordination shape</th><th>Declared in truth as</th></tr></thead>
-        <tbody>
-          <tr><td class="nm">Cash purchase payment</td><td>Debit succeeded — did the investment succeed? (No: payment ≠ subscription.)</td><td>Cross-aggregate transaction with compensation</td><td><code>bank-cash-payment-v1</code> saga — investor outgoing, collection incoming, then order commit; same <code>Money</code>, pinned IDs</td></tr>
-          <tr><td class="nm">Mock TA confirmation</td><td>The transfer agent accepted the order — are the shares mine? (No: acceptance ≠ confirmation.)</td><td>External-system observation with explicit unknown states</td><td>FundOrder slices + formal products: TA effect ports, outcome mappings (<code>confirmed → Observed</code>, timeout → <code>Unknown</code>)</td></tr>
-          <tr><td class="nm">Independent refund</td><td>Why a separate refund saga instead of “undo the payment”?</td><td>A second TCC saga — refund is its own business fact, not a compensation in disguise</td><td><code>bank-independent-refund-v1</code> saga + pipeline</td></tr>
-          <tr><td class="nm">Bounded installment plan</td><td>How does every SIP installment reuse the same rules — and stay bounded?</td><td>Pipeline-driven dispatch with explicit skip/terminal semantics</td><td><code>bank-sip-dispatch-v1</code> pipeline over SipPlan/FundOrder slices</td></tr>
-        </tbody>
-      </table></div>
-      <div class="callout"><b>SEMANTIC INVARIANTS</b><p>The tree pins the sentences people get wrong: <strong>payment success ≠ investment success</strong> · <strong>TA acceptance ≠ share confirmation</strong> · <strong>independent refund ≠ compensating a committed payment</strong> · <strong>saga ≠ pipeline</strong>. Each has rules and tests to back it.</p></div>
+      <div class="sec-head"><span class="no">01</span><h2>Four questions to take into the source</h2></div>
+      <p class="sec-sub">The arrows below are a <strong>reading order through declarations</strong>, not an execution trace or proof that one graph edge causes the next action. Links select actual nodes in the 2026-11-11 SQLite snapshot <a href="/status/#F-03" data-fact="F-03">F-03</a>.</p>
+      <div class="card-grid cols-2 scenario-grid">
+        <article class="card scenario-card" id="scenario-payment">
+          <span class="tag">Payment</span><h3>What did the debit actually establish?</h3>
+          <p>The cash entry invokes a payment saga coordinating investor funds, the collection account and the order. A successful payment is not TA confirmation and does not establish ownership of fund shares.</p>
+          <p class="foot"><a href="/explorer/?node=pipeline%3Abank-cash-payment-v1#nodes">Read the cash entry</a> → <a href="/explorer/?node=saga%3Abank-cash-payment-v1#nodes">Inspect the payment saga</a></p>
+        </article>
+        <article class="card scenario-card" id="scenario-refund">
+          <span class="tag">TA rejection + refund</span><h3>Why is the refund a new transaction?</h3>
+          <p>The refund request checks the selected successful payment and a rejected TA status. It starts an independent refund business flow; it is not compensation for the already committed payment. The refund saga has its own outcomes.</p>
+          <p class="foot"><a href="/explorer/?node=slice%3ARecordFundTARejected#nodes">TA rejection</a> → <a href="/explorer/?node=slice%3ARequestFundPurchaseRefund#nodes">Refund request guards</a> → <a href="/explorer/?node=saga%3Abank-independent-refund-v1#nodes">Independent refund saga</a></p>
+        </article>
+        <article class="card scenario-card" id="scenario-sip">
+          <span class="tag">Bounded installments · SIP</span><h3>How does an installment reuse the payment rules?</h3>
+          <p>A sealed finite schedule and a retained occurrence identify what may be dispatched into the cash flow. Dispatch success is not investment success; correlated business terminals update installment results.</p>
+          <p class="foot"><a href="/explorer/?node=slice%3ASealSipSchedule#nodes">Seal the schedule</a> → <a href="/explorer/?node=slice%3ATriggerSipInstallment#nodes">Admit an installment</a> → <a href="/explorer/?node=pipeline%3Abank-sip-dispatch-v1#nodes">Dispatch to cash</a></p>
+          <details><summary>What does pausing change?</summary><p><a href="/explorer/?node=slice%3ASkipPausedSipDueSlot#nodes">Read the paused-slot skip guards</a>. This is explicit slot classification, not a policy of automatically pausing after three failures.</p></details>
+        </article>
+        <article class="card scenario-card" id="scenario-unknown">
+          <span class="tag">Unknown outcomes</span><h3>What if the result is not known?</h3>
+          <p>“Unknown” must not be relabeled “failed” or “succeeded.” TA observations and installment progress have explicit unknown declarations. The cash and SIP plans require reconciliation before resuming an unknown effect; a missing answer is not permission to repeat a debit.</p>
+          <p class="foot"><a href="/explorer/?node=slice%3ARecordFundTAUnknown#nodes">Inspect TA unknown observation</a> · <a href="/explorer/?node=slice%3ARecordSipInstallmentOutcomeUnknown#nodes">Inspect installment unknown progress</a></p>
+        </article>
+      </div>
+      <div class="callout"><b>KEEP THESE DISTINCTIONS</b><p><strong>Payment success ≠ investment success</strong> · <strong>TA acceptance ≠ share confirmation</strong> · <strong>independent refund ≠ compensation of a committed payment</strong> · <strong>saga transaction boundary ≠ pipeline flow order</strong>. Read the declarations here; use the separately scoped acceptance below for execution evidence.</p></div>
     </section>
 
     <section id="views">
@@ -64,20 +74,26 @@
     </section>
 
     <section id="projections">
-      <div class="sec-head"><span class="no">03</span><h2>Design projections</h2></div>
-      <p class="sec-sub">The tree also renders seven human-facing design views (journeys, screen flow, context map, event flow, cash experience/lifecycle, story map). They are <strong>derived design proposals</strong> — generated from truth, clearly labeled as such, never hand-maintained. Rendered figures land here in the next content pass.</p>
-      <div class="callout teal"><b>WHY THIS MATTERS</b><p>Most tools make you choose: either a design canvas that drifts from the code, or code with no design view. A projection from the truth tree is neither — it is regenerable <em>and</em> readable, and its drift is detectable by re-rendering.</p></div>
+      <div class="sec-head"><span class="no">03</span><h2>Read the views as projections, not approvals</h2></div>
+      <p class="sec-sub">A journey, context map or event-flow view offers another way to discuss the model. It remains a derived design view, not a new source of business truth or evidence that a service ran.</p>
+      <div class="callout teal"><b>KEEP THE SOURCE IN REACH</b><p>Use the historical workshop’s chapters, search and evidence panel to move between explanations. Use the Explorer to inspect its own declared snapshot. Do not infer matching code locations from shared names across the two exports.</p></div>
     </section>
 
     <section id="run">
-      <div class="sec-head"><span class="no">04</span><h2>Local generation — not formal workshop acceptance</h2></div>
-      <p class="sec-sub">The counts below are the <strong>2026-11-11</strong> generation/build/anchor capture, not counts from the newer service run. <code>npm run project</code> is a convenience entry point; its engine download does not supply the formal workshop’s archive and sealed runtime materials.</p>
-      <div class="steps">
-        <div class="step-item"><div><h4>Validate the tree</h4><p class="meta">Node ≥ 22.13 · no JVM needed for this step</p><p><code>git clone https://github.com/MadPolaris/bank-wealth-demo &amp;&amp; cd bank-wealth-demo &amp;&amp; npm run validate</code> — 0 hard findings, roundtrip byte-identical <span class="badge verified" title="F-01/F-02">verified</span>.</p></div></div>
-        <div class="step-item"><div><h4>Generate &amp; compile</h4><p class="meta">JVM + sbt for compilation</p><p><code>npm run project</code> writes <code>generated/current/</code>; its first run can fetch the pinned 0.3.0 engines from Maven Central and verify SHA-256 <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>. Historical output: 235 files; <code>sbt compile</code>: 0 errors across 534 sources <span class="badge verified" title="F-04/F-06">verified</span>; <code>sbt test</code>: 23/23 <strong>generated unit tests</strong>, not independent handwritten business tests <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a>.</p></div></div>
-        <div class="step-item"><div><h4>Verify the anchors</h4><p class="meta">the receipts</p><p><code>truthsrc verify-project</code> rechecks file bytes against the tree; the historical capture verified 792 anchors <span class="badge verified" title="F-05">verified</span>.</p></div></div>
+      <div class="sec-head"><span class="no">04</span><h2>From source browsing to local generation</h2></div>
+      <p class="sec-sub">Start with the <a href="https://github.com/MadPolaris/bank-wealth-demo">bank source repository</a>. For commands and prerequisites, use the <a href="/guide/#bank-prerequisites">guide’s bank path</a>, not this page as a runbook. Repository contents can evolve; the figures here retain the <strong>2026-11-11</strong> capture.</p>
+      <div class="stat-strip">
+        <div class="stat"><div class="num">3</div><div class="lbl">aggregates: CreditBalance · FundOrder · SipPlan</div></div>
+        <div class="stat"><div class="num">157</div><div class="lbl">truth atoms · 149 <code>@rule</code> invariants <a href="/status/#F-02" data-fact="F-02">F-02</a> / <a href="/status/#F-09" data-fact="F-09">F-09</a></div></div>
+        <div class="stat"><div class="num">2+4</div><div class="lbl">sagas + pipelines declared in truth</div></div>
+        <div class="stat"><div class="num">23/23</div><div class="lbl">generated unit tests · 2026-11-11 <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a></div></div>
       </div>
-      <p class="small">For formal source / anchors / code / service scopes, read the <a href="/guide/#bank-prerequisites">guide’s material and environment prerequisites</a>. This is not a one-command public service reproduction.</p>
+      <details>
+        <summary>Generation evidence and its material boundary</summary>
+        <p>Source validation recorded 0 hard findings and byte-identical roundtrip <a href="/status/#F-01" data-fact="F-01">F-01</a> / <a href="/status/#F-02" data-fact="F-02">F-02</a>. The build recorded 235 generated files <a href="/status/#F-04" data-fact="F-04">F-04</a>, 0 errors across 534 sources <a href="/status/#F-06" data-fact="F-06">F-06</a> and 792 verified anchors <a href="/status/#F-05" data-fact="F-05">F-05</a>. The 23/23 result is generated unit tests, not independent handwritten business tests <a href="/status/#F-07" data-fact="F-07">F-07</a>.</p>
+        <p><code>npm run project</code> writes <code>generated/current/</code>; its convenience path can fetch pinned 0.3.0 engines from Maven Central and verify SHA-256 <a href="/status/#F-23" data-fact="F-23">F-23</a>. That does not supply the formal workshop archive and sealed runtime materials or constitute formal service acceptance.</p>
+      </details>
+      <p class="evidence-note">The formal source / anchors / code / service scopes have distinct inputs and environments. This is not a one-command public service reproduction.</p>
     </section>
 
     <section id="boundaries">
@@ -91,6 +107,8 @@
       </ul>
       <div class="callout red"><b>NOT A BROADER SIGN-OFF</b><p>This remains a <strong>local teaching demo</strong>: no real money, no production certification or real fund-company connection, and no Palantir compatibility claim. The historical P23/service02 replay failure remains failed (<a href="/status/#DEF-06">DEF-06</a>); it does not describe the new technical candidate.</p><p><strong>Independent start/status/page-operation/stop experience remains open</strong> (<a href="/status/#DEF-07">DEF-07</a>): session03 did not reach readiness, later slot cleanup was not a pass, and the later fix candidate is recorded as unexecuted. Automated HTTP/browser observations do not sign off that experience or the original manual <code>sbt run</code> smoke.</p><p>The engines are public on Maven Central <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>, but <strong>matched-material delivery</strong> (<a href="/status/#DEF-15">DEF-15</a>), <strong>human acceptance</strong> (<a href="/status/#DEF-16">DEF-16</a>), family observations (<a href="/status/#DEF-17">DEF-17</a>), retry/backoff/deadline debt (<a href="/status/#DEF-18">DEF-18</a>), targeted Inspector negatives and extra Node CI/typecheck (<a href="/status/#DEF-19">DEF-19</a>), and legacy offline-bundle migration (<a href="/status/#DEF-20">DEF-20</a>) remain separate, unclosed items.</p></div>
     </section>
+
+    <p class="next-step"><strong>Next: inspect the evidence.</strong> <a href="/status/#F-24">Read the candidate’s technical facts and remaining acceptance gates</a>.</p>
   </main>
 
   <footer id="site-footer"></footer>
