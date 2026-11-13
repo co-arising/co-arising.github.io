@@ -27,7 +27,7 @@
     <header class="page-hero">
       <p class="over">Lifecycle</p>
       <h1>Truth tree → code, <span class="accent">and back</span></h1>
-      <p class="thesis">Six stages, each with an exact command and a green/red gate. The loop is closed twice: once forward (tree → graph → code), once backward (code → anchors → tree). The numbers below are the bank worked example, re-captured 2026-11-11.</p>
+      <p class="thesis">Six stages, each with an exact command and a green/red gate. The loop is closed twice: once forward (tree → graph → code), once backward (code → anchors → tree). The stage counts below retain the bank example’s 2026-11-11 capture; the <a href="#boundaries">newer technical acceptance</a> is separate and does not re-date those counts.</p>
     </header>
 
     <section id="flow">
@@ -38,9 +38,9 @@
         <div class="step"><span class="snum">03 · GRAPH</span><b>Compile &amp; push</b><p>Canonical projection → SQLite graph: <span class="badge verified" title="F-03">389 nodes / 413 edges</span>.</p></div>
         <div class="step"><span class="snum">04 · GENERATE</span><b>CQRS codebase</b><p><code>generate-project</code>: <span class="badge verified" title="F-04">235 files</span>, <span class="badge verified" title="F-06">0 compile errors</span>.</p></div>
         <div class="step"><span class="snum">05 · HANDWRITE</span><b>Fill the zone</b><p>Ports are generated; behavior goes in the physically separate handwritten module — <span class="badge verified" title="F-08">35 files</span>, complete implementations.</p></div>
-        <div class="step"><span class="snum">06 · VERIFY</span><b>Prove lineage</b><p><code>verify-project</code>: <span class="badge verified" title="F-05">792 anchors</span>; tests <span class="badge verified" title="F-07">23/23</span>.</p></div>
+        <div class="step"><span class="snum">06 · VERIFY</span><b>Prove lineage</b><p><code>verify-project</code>: <span class="badge verified" title="F-05">792 anchors</span>; generated unit tests <a class="badge verified" href="/status/#F-07" data-fact="F-07">23/23</a>.</p></div>
       </div>
-      <p class="small">And then it loops: change the tree, <code>status-project</code> shows exactly which generated files went stale, <code>generate-project --update</code> refreshes only those, re-running on an unchanged tree writes <strong>0 files</strong> (idempotence is a gate, not a hope).</p>
+      <p class="small">And then it loops: change the tree, <code>status-project</code> shows which generated files went stale, and <code>generate-project --update</code> refreshes them. In the separately reviewed Counter update, repeating it on unchanged inputs wrote <strong>0 generated-source files</strong> — not zero graph/evidence writes <a class="badge verified" href="/status/#F-29" data-fact="F-29">F-29</a>.</p>
     </section>
 
     <section id="anchors">
@@ -72,7 +72,7 @@
         <div class="card"><span class="tag">Generated side</span><h3>Everything structural</h3><p>Aggregates, commands, events, guards (compiled from <code>@rule</code> invariants), proto schemas, ports, test scaffolding — 235 files in the bank project, all regenerable, all anchored.</p></div>
         <div class="card"><span class="tag">Handwritten side</span><h3>Everything behavioral</h3><p>Effect execution against the mock TA, JDBC wiring, recovery loops, the read-side catch-up, HTTP pages — <strong>35 files, complete implementations</strong> <span class="badge verified" title="F-08">verified</span>, mounted into the build via <code>unmanagedSourceDirectories</code>. No <code>BEGIN MANUAL</code> markers anywhere — the boundary is the filesystem.</p></div>
       </div>
-      <div class="callout"><b>DRIFT</b><p>When the tree changes, generated files are refreshed; the handwritten zone is never overwritten. The tests stay fixed as expectations — <strong>the generated code must satisfy the handwritten tests, not the other way around</strong>. 23/23 pass today <span class="badge verified" title="F-07">verified</span>.</p></div>
+      <div class="callout"><b>TEST SCOPE</b><p>When the tree changes, generated files are refreshed; the handwritten zone is not overwritten. The <strong>23/23 result from 2026-11-11 is generated unit tests</strong> <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a>: handwritten production sources compile with that build, but this is not evidence of independent handwritten test expectations. In the newer technical candidate, actor <strong>64</strong> and readside <strong>47</strong> passed with fixed business expectations; those scopes <strong>share 23 generated tests</strong> and must not be summed as distinct cases <a class="badge verified" href="/status/#F-25" data-fact="F-25">F-25</a>.</p></div>
     </section>
 
     <section id="engines">
@@ -86,12 +86,9 @@
     </section>
 
     <section id="boundaries">
-      <div class="sec-head"><span class="no">05</span><h2>What this loop does not claim yet</h2></div>
-      <div class="callout red"><b>BOUNDARIES</b><p>
-        <strong>Full-service runtime gate — not passed</strong> (<a class="badge boundary" href="/status/#DEF-06">DEF-06</a>): generated code compiles and all 23 tests pass, but the service02 acceptance run missed one gate — a fresh read-side replay didn’t catch up within 90 seconds. Code, 24 recovery cases, and real-DB initial/restart/refund did pass. &nbsp;·&nbsp;
-        <strong>HTTP smoke of the running service — not yet executed</strong> (<a class="badge boundary" href="/status/#DEF-07">DEF-07</a>). &nbsp;·&nbsp;
-        <strong>BDD/Gherkin specs — designed as a derivative, not built</strong> (<a class="badge deferred" href="/status/#DEF-01">DEF-01</a>): guards + scenarios should generate Gherkin; that projection isn’t implemented.
-      </p></div>
+      <div class="sec-head"><span class="no">05</span><h2>Current technical result, separate acceptance boundaries</h2></div>
+      <div class="callout teal"><b>NEW CANDIDATE, NOT A REWRITTEN OLD RUN</b><p>On 2026-11-12, <code>bank030-relocated-20261112-02</code> passed and rechecked <strong>source / anchors / code / service</strong> <a class="badge verified" href="/status/#F-24" data-fact="F-24">F-24</a>, including real database/HTTP and automated browser observations <a class="badge verified" href="/status/#F-26" data-fact="F-26">F-26</a>. Its fresh SQL rebuild reached readiness in <strong>66.847 s within the unchanged 90 s gate</strong> <a class="badge verified" href="/status/#F-27" data-fact="F-27">F-27</a>. Native Darwin x64 / JDK11, one owner; inputs were unchanged and that owner’s resources and lease were released <a class="badge verified" href="/status/#F-28" data-fact="F-28">F-28</a>. See the <a href="/docs/bank-technical-20261112.md">sanitized scope and evidence summary</a>. The old P23/service02 failure remains historical (<a href="/status/#DEF-06">DEF-06</a>).</p></div>
+      <div class="callout red"><b>STILL SEPARATE</b><p><strong>Independent service experience</strong> remains open (<a href="/status/#DEF-07">DEF-07</a>): session03 readiness failed; slot cleanup was not a pass, and the later fix candidate is unexecuted. Technical HTTP/browser passes do not close <strong>public material delivery</strong> (<a href="/status/#DEF-15">DEF-15</a>) or <strong>human usability</strong> (<a href="/status/#DEF-16">DEF-16</a>). Family observations (<a href="/status/#DEF-17">DEF-17</a>), retry/backoff/deadline debt (<a href="/status/#DEF-18">DEF-18</a>), targeted negatives and extra Node CI/typecheck (<a href="/status/#DEF-19">DEF-19</a>), and legacy offline-bundle migration (<a href="/status/#DEF-20">DEF-20</a>) are not signed off by the bank run.</p><p><strong>BDD/Gherkin specs remain an unbuilt derivative</strong> (<a href="/status/#DEF-01">DEF-01</a>). Formal workshop verification also needs the <a href="/guide/#bank-prerequisites">explicit paired materials and scope-specific environment</a>; the convenience generation path is not a substitute.</p></div>
     </section>
 
     <section id="try">

@@ -32,7 +32,7 @@
         <div class="stat"><div class="num">3</div><div class="lbl">个聚合：CreditBalance · FundOrder · SipPlan</div></div>
         <div class="stat"><div class="num">157</div><div class="lbl">个真源原子 · 149 条 <code>@rule</code> 不变量 <span class="badge verified" title="F-02/F-09">已验证</span></div></div>
         <div class="stat"><div class="num">2+4</div><div class="lbl">个 saga + 流水线，全部用真源声明</div></div>
-        <div class="stat"><div class="num">23/23</div><div class="lbl">生成 + 手写测试通过 <span class="badge verified" title="F-07">已验证</span></div></div>
+        <div class="stat"><div class="num">23/23</div><div class="lbl">生成单元测试 · 2026-11-11 <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a></div></div>
       </div>
     </header>
 
@@ -53,12 +53,12 @@
 
     <section id="views">
       <div class="sec-head"><span class="no">02</span><h2>看这张图</h2></div>
-      <p class="sec-sub">工作坊查看器的三张经验证快照（2026-11-06 由 <code>view-project --html</code> 生成）——桌面地图、搜索、移动端。完整的 2.18 MB 单文件快照可在下方下载；双击即可离线运行。</p>
+      <p class="sec-sub">这是较早的工作坊查看器快照，2026-11-06 由 <code>view-project --html</code> 生成。中文单文件快照保留章节、证据面板与搜索，可离线打开；它不是新的技术验收 run。</p>
       <figure style="margin:14px 0">
         <img src="/assets/img/workshop-desktop.png" alt="银行财富知识图谱工作坊视图：聚合、切片、事件与规则的节点铺成一张可交互地图" loading="lazy" />
-        <figcaption class="small" style="margin-top:6px">工作坊 HTML 快照——389 节点 / 413 边 <span class="badge verified" title="F-03">已验证</span>，带章节、证据面板与搜索。<a href="/downloads/bank-workshop.html">下载完整快照（2.18 MB，可离线打开）</a>——界面即中文。</figcaption>
+        <figcaption class="small" style="margin-top:6px">工作坊导出子集包含 <strong>120 节点 / 183 边</strong>，来自 <strong>861 节点 / 737 边</strong>的图谱 <a class="badge verified" href="/zh/status/#F-17" data-fact="F-17">F-17</a>。<a href="/downloads/bank-workshop.html">下载历史中文快照（2.18 MB，可离线打开）</a>——不是完整图谱导出，也不是当前技术验收报告。</figcaption>
       </figure>
-      <p class="small">比起浏览更喜欢查询？<a href="/zh/explorer/">Explorer</a> 把同一张图谱作为 SQLite 装进你的浏览器——影响半径、血缘、孤儿、自由 SQL。</p>
+      <p class="small">比起浏览更喜欢查询？<a href="/zh/explorer/">Explorer</a> 加载的是<strong>另一份 2026-11-11 采集</strong>：389 节点 / 413 边 <a class="badge verified" href="/zh/status/#F-03" data-fact="F-03">F-03</a>，以 SQLite 供浏览器查询——影响半径、血缘、孤儿、自由 SQL。</p>
     </section>
 
     <section id="projections">
@@ -68,18 +68,26 @@
     </section>
 
     <section id="run">
-      <div class="sec-head"><span class="no">04</span><h2>在本地跑起来</h2></div>
+      <div class="sec-head"><span class="no">04</span><h2>本地生成——不等于正式工作坊验收</h2></div>
+      <p class="sec-sub">以下数字是 <strong>2026-11-11</strong> 的生成/构建/锚点采集，不是新服务 run 的计数。<code>npm run project</code> 是便捷入口；它能下载引擎，不代表已具备正式工作坊的归档与封存运行时材料。</p>
       <div class="steps">
-        <div class="step-item"><div><h4>验证树</h4><p class="meta">node ≥ 22.13 · 这一步不需要 JVM</p><p><code>git clone https://github.com/MadPolaris/bank-wealth-demo && cd bank-wealth-demo && npm run validate</code>——0 硬发现，往返逐字节一致 <span class="badge verified" title="F-01/F-02">已验证</span>。</p></div></div>
-        <div class="step-item"><div><h4>生成 &amp; 编译</h4><p class="meta">从这里开始需要 JVM + sbt</p><p><code>npm run project</code>——首次运行还会从 Maven Central 取回钉定的 0.3.0 引擎 jar 并校验 sha256——写出 <code>generated/current/</code>（235 个文件）；在其中 <code>sbt compile</code>：534 个源文件 0 错误 <span class="badge verified" title="F-04/F-06">已验证</span>；<code>sbt test</code>：23/23 <span class="badge verified" title="F-07">已验证</span>。</p></div></div>
-        <div class="step-item"><div><h4>验证锚点</h4><p class="meta">收据在此</p><p><code>truthsrc verify-project</code> 重新证明全部 792 个锚点 <span class="badge verified" title="F-05">已验证</span>——文件字节对照树，双向。</p></div></div>
+        <div class="step-item"><div><h4>验证树</h4><p class="meta">Node ≥ 22.13 · 这一步不需要 JVM</p><p><code>git clone https://github.com/MadPolaris/bank-wealth-demo &amp;&amp; cd bank-wealth-demo &amp;&amp; npm run validate</code>——0 硬发现，往返逐字节一致 <span class="badge verified" title="F-01/F-02">已验证</span>。</p></div></div>
+        <div class="step-item"><div><h4>生成 &amp; 编译</h4><p class="meta">编译需要 JVM + sbt</p><p><code>npm run project</code> 写出 <code>generated/current/</code>；首次运行可从 Maven Central 取回钉定的 0.3.0 引擎并校验 SHA-256 <a class="badge verified" href="/zh/status/#F-23" data-fact="F-23">F-23</a>。历史输出：235 个文件；<code>sbt compile</code>：534 个源文件 0 错误 <span class="badge verified" title="F-04/F-06">已验证</span>；<code>sbt test</code>：23/23 项<strong>生成单元测试</strong>，不是独立手写业务测试 <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a>。</p></div></div>
+        <div class="step-item"><div><h4>验证锚点</h4><p class="meta">收据在此</p><p><code>truthsrc verify-project</code> 对照真源重验文件字节；历史采集验证了 792 个锚点 <span class="badge verified" title="F-05">已验证</span>。</p></div></div>
       </div>
-      <p class="small">分步教程（含 JVM 侧的 Docker 变体）在<a href="/zh/guide/">实战指南</a>。</p>
+      <p class="small">正式 source / anchors / code / service 范围请先读<a href="/zh/guide/#bank-prerequisites">指南中的材料与环境前置</a>。这不是一条命令即可公开复演服务的承诺。</p>
     </section>
 
     <section id="boundaries">
-      <div class="sec-head"><span class="no">05</span><h2>诚实的边界</h2></div>
-      <div class="callout red"><b>评估前必读</b><p>这是一个<strong>本地教学演示</strong>。它不移动任何真实资金，不是生产级银行系统，也不是与 Palantir 兼容的实现。全服务运行时闸门<strong>未通过</strong>（<a class="badge boundary" href="/zh/status/#DEF-06">DEF-06</a>：读侧回放没赶上 90 秒追平期限）；<code>sbt run</code> + HTTP 冒烟<strong>尚未执行</strong>（<a class="badge boundary" href="/zh/status/#DEF-07">DEF-07</a>）；冻结的运行时制品还没有公开下载渠道。<em>已经</em>被证明的：树的闸门、图谱、生成、编译、测试、锚点——全部于 2026-11-11 验证，且可从仓库复现。</p></div>
+      <div class="sec-head"><span class="no">05</span><h2>技术验收与诚实边界</h2></div>
+      <div class="callout teal" id="technical-acceptance"><b>已通过的候选 · 2026-11-12</b><p><code>bank030-relocated-20261112-02</code> 在配对源码实际移址后，<strong>source / anchors / code / service</strong> 均通过并复核；<code>fullPipelinePassed=true</code>，diagnostics 为空 <a class="badge verified" href="/zh/status/#F-24" data-fact="F-24">F-24</a>。<a href="/docs/bank-technical-20261112.md#中文">脱敏技术摘要</a>记录范围与报告身份；它不是原始报告，也不是公开复现包。</p></div>
+      <ul>
+        <li>actor：<strong>64 项通过</strong>；readside：<strong>47 项通过</strong>。两组<strong>共享 23 项生成测试</strong>，不是 111 个互不重复用例 <a class="badge verified" href="/zh/status/#F-25" data-fact="F-25">F-25</a>。</li>
+        <li><strong>24 个三 JVM 恢复窗口（72 次 JVM 执行）</strong>，保留固定 barrier 与独立金融预期；<strong>4 阶段真实数据库/HTTP、3 次自动浏览器观测及 5 个 MySQL 负例</strong>通过 <a class="badge verified" href="/zh/status/#F-26" data-fact="F-26">F-26</a>。</li>
+        <li>新 SQL 重建 readiness：<strong>66.847 秒，处于未放宽的 90 秒门限内</strong>。这是移址候选的本轮观测，不是一般性能承诺 <a class="badge verified" href="/zh/status/#F-27" data-fact="F-27">F-27</a>。</li>
+        <li><strong>原生 Darwin x64 / JDK11、单 owner</strong>；输入未变，所属资源退出、租约已归还。仅描述 owner-02 <a class="badge verified" href="/zh/status/#F-28" data-fact="F-28">F-28</a>。</li>
+      </ul>
+      <div class="callout red"><b>不等于更广范围的签收</b><p>这仍是<strong>本地教学演示</strong>：不移动真实资金，不是生产认证或真实基金公司接入，也不声称与 Palantir 兼容。历史 P23/service02 回放失败仍保留为失败（<a href="/zh/status/#DEF-06">DEF-06</a>），不能用它概括新技术候选。</p><p><strong>独立 start/status/页面操作/stop 体验仍未签收</strong>（<a href="/zh/status/#DEF-07">DEF-07</a>）：session03 未达到 readiness，之后清理占位不是通过，后续修补候选记录为未执行。自动 HTTP/浏览器观测不代签独立体验或原始手工 <code>sbt run</code> 冒烟。</p><p>引擎已在 Maven Central 公开 <a class="badge verified" href="/zh/status/#F-23" data-fact="F-23">F-23</a>，但<strong>配对材料交付</strong>（<a href="/zh/status/#DEF-15">DEF-15</a>）、<strong>真人验收</strong>（<a href="/zh/status/#DEF-16">DEF-16</a>）、家族观察（<a href="/zh/status/#DEF-17">DEF-17</a>）、retry/backoff/deadline 债务（<a href="/zh/status/#DEF-18">DEF-18</a>）、特定 Inspector 负控与额外 Node CI/typecheck（<a href="/zh/status/#DEF-19">DEF-19</a>）、旧离线包迁移（<a href="/zh/status/#DEF-20">DEF-20</a>）仍是独立且未关闭的事项。</p></div>
     </section>
   </main>
 

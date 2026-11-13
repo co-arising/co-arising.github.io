@@ -1,5 +1,11 @@
 # Pre-deploy checks
 
+Run `python3 -B tools/check-site.py` first (standard library only, read-only, no network).
+It checks page pairs, links/anchors, fact and ledger IDs, local assets, graph SHA/counts,
+and private paths in public text. Missing self-canonical metadata is a warning until
+that migration is complete; `--strict` makes it fail. A passing static check is not
+a browser or bank-runtime acceptance result.
+
 Manual checklist, run against a local server (`python3 -m http.server 8000`
 from this repo root — `file://` will CORS-block the sqlite fetch).
 
@@ -24,6 +30,11 @@ from this repo root — `file://` will CORS-block the sqlite fetch).
       zh `/zh/status/`)
 - [ ] SITE-FACTS.md F-xx list matches badges used across pages
 - [ ] LEDGER.md rows match the status-page tables (EN + zh) — same-commit rule
+- [ ] F-24–F-29 identify their candidate/date, not a whole-site or production pass
+- [ ] Current SQL rebuild is 66.847 s; actor64/readside47 share 23 tests
+- [ ] Historical P23 failure, new technical pass, independent experience and public/human delivery are separate
+- [ ] Public evidence summary contains no internal paths, logs, session credentials or raw failure records
+- [ ] `--runtime-supply` applies to the correct workshop scopes; source and sealed sessions do not accept unused overrides
 
 ## Explorer
 

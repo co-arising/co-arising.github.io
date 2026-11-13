@@ -67,7 +67,7 @@
         <article class="feature"><span class="n">F-03</span><h3>带收据的代码生成</h3><p>生成可编译的 CQRS/ES Scala 代码库。每个生成文件都携带锚点：它来自哪个知识节点、哪个字节区间，一清二楚。<code>verify-project</code> 会重新证明这一点。</p></article>
         <article class="feature"><span class="n">F-04</span><h3>刻意保留的手写区</h3><p>端口是生成的；行为填在物理隔离的手写模块里。银行示例中的 35 个手写文件是完整实现，不是占位桩。</p></article>
         <article class="feature"><span class="n">F-05</span><h3>智能体可用，但有守护纪律</h3><p>一个 MCP 服务器暴露 26 个只读工具，让编码智能体查询图谱，而不是到处 grep。智能体起草，人类定夺。真源树始终是唯一的编辑界面。</p></article>
-        <article class="feature"><span class="n">F-06</span><h3>构造性地诚实</h3><p>没做完的东西在<a href="/zh/status/">台账</a>上，不在营销话术里。全服务运行时闸门、托管、BDD 衍生物——全部带 ID 追踪。</p></article>
+        <article class="feature"><span class="n">F-06</span><h3>构造性地诚实</h3><p>没做完的东西在<a href="/zh/status/">台账</a>上，不在营销话术里。独立体验、公开材料交付、托管与 BDD 衍生物——全部与技术验收分开追踪。</p></article>
       </div>
     </section>
 
@@ -102,8 +102,9 @@ node ../metarch-truthsrc/bin/truthsrc.js query-project --knowledge SetCount</cod
 
     <section id="honesty">
       <div class="sec-head"><span class="no">04</span><h2>哪些能用，哪些还不能——暂时</h2></div>
-      <p class="sec-sub">上文的每个数字都在 <strong>2026-11-11</strong> 重新采集，登记在 <a href="/zh/status/#facts">SITE-FACTS</a>。还不能用的东西在<a href="/zh/status/#ledger">台账</a>上：全服务运行时闸门（一次读侧回放没赶上 90 秒期限）、生成服务的 HTTP 冒烟、npm/Maven 发布、托管，以及作为衍生物的 BDD 规格。</p>
-      <div class="callout teal"><b>哲学</b><p><strong>本站自身就是证明。</strong>零构建步骤、零 npm 依赖、每个事实都能用命令复现——这些页面实践着工具链所倡导的。<a href="/zh/why-co-arising/">读读为什么</a>。</p></div>
+      <p class="sec-sub">首页的真源、代码与锚点数字保留 <strong>2026-11-11</strong> 的采集日期，登记在 <a href="/zh/status/#facts">SITE-FACTS</a>；它们不是新服务验收的计数。引擎现已发布到 Maven Central <a class="badge verified" href="/zh/status/#F-23" data-fact="F-23">F-23</a>。npm 发布、托管与 BDD 衍生物仍在<a href="/zh/status/#ledger">台账</a>上。</p>
+      <div class="callout teal" id="bank-technical"><b>银行技术结果</b><p>2026-11-12，<code>bank030-relocated-20261112-02</code> 的 <strong>source / anchors / code / service</strong> 均通过并复核 <a class="badge verified" href="/zh/status/#F-24" data-fact="F-24">F-24</a>，包括真实数据库/HTTP 与自动浏览器观测 <a class="badge verified" href="/zh/status/#F-26" data-fact="F-26">F-26</a>。这仅是该候选的技术验收，不是独立体验（<a href="/zh/status/#DEF-07">DEF-07</a>）、公开配对材料交付（<a href="/zh/status/#DEF-15">DEF-15</a>）或真人可用性签收（<a href="/zh/status/#DEF-16">DEF-16</a>）。旧 service02 失败保留为历史事实（<a href="/zh/status/#DEF-06">DEF-06</a>）。详见<a href="/docs/bank-technical-20261112.md#中文">验收范围与前置条件</a>。</p></div>
+      <div class="callout teal"><b>哲学</b><p><strong>把证据边界写清楚。</strong>这些页面不需要构建步骤或 npm 依赖；声明链接到带日期的证据与待办。维护者核对私有报告的摘要，不等于公开复现包。<a href="/zh/why-co-arising/">读读为什么</a>。</p></div>
     </section>
   </main>
 

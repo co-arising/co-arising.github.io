@@ -27,12 +27,12 @@
     <header class="page-hero">
       <p class="over">实战 · 从零到完整闭环</p>
       <h1>指南：<span class="accent">把整件事跑起来</span></h1>
-      <p class="thesis">三个层级，每一层末尾都有一盏绿灯：L1 Counter 教程（只要 Node，约 10 分钟），L2 银行示例流水线（加一个 JVM，约 30 分钟），L3 把 MCP 服务器接入 Claude Code，让智能体靠查询图谱来规划一次增量变更。任何一步失败，最后一节会告诉你红线在哪。</p>
+      <p class="thesis">三个层级：L1 是只需 Node 的 Counter 教程，L2 区分银行生成路径与正式工作坊前置条件，L3 通过 MCP 查询图谱。<strong>本地生成命令不等于正式服务验收。</strong>下文分别说明银行的新技术通过与仍未签收的独立体验。</p>
     </header>
 
     <section id="env">
-      <div class="sec-head"><span class="no">00</span><h2>环境——两条路任选，都是一等公民</h2></div>
-      <p class="sec-sub">工具链需要 <strong>Node ≥ 22.13.0</strong>（原因正是内置的 <code>node:sqlite</code>）。Level 2 另外需要 JVM（11+）和 sbt。下面每条命令都可以直接复制粘贴。</p>
+      <div class="sec-head"><span class="no">00</span><h2>环境——先选范围</h2></div>
+      <p class="sec-sub">Node-only 教程与银行 source 范围需要 <strong>Node ≥ 22.13.0</strong>（<code>node:sqlite</code>）<a class="badge verified" href="/zh/status/#F-13" data-fact="F-13">F-13</a>。编译生成的 Scala 需要 JVM 与 sbt。<strong>正式 anchors/code/service 验收还需要显式配对材料</strong>；正式 code/service 范围限于原生 Darwin x64 / JDK11 <a class="badge verified" href="/zh/status/#F-28" data-fact="F-28">F-28</a>。将命令视为验收入口前，先读<a href="#bank-prerequisites">前置条件</a>。</p>
 
       <h3>路径 A · 原生 Node</h3>
       <pre class="code"><code># macOS (Homebrew)
@@ -42,11 +42,11 @@ brew install node@22
 nvm install 22
 node --version   # 必须输出 v22.13.0 或更新</code></pre>
 
-      <h3>路径 B · Docker（不想动宿主机 Node 的话）</h3>
-      <pre class="code"><code>docker run --rm -it -v "$PWD":/work -w /work node:22 bash
-# 现在你在容器里的 Node 22 上；下面的一切原样可用</code></pre>
+      <h3>路径 B · Docker 用于 Node-only 工作</h3>
+      <pre class="code"><code>docker run --rm -it -v "$PWD":/work -w /work node:22 bash</code></pre>
+      <p class="small">这个容器是 Node 工作的一种选择，不能代替银行 code/service 已验收的原生环境。</p>
 
-      <h3>仅 Level 2 需要 · JVM + sbt</h3>
+      <h3>便捷 Scala 编译 · JVM + sbt</h3>
       <pre class="code"><code># macOS
 brew install openjdk@11 sbt
 
@@ -56,7 +56,8 @@ docker run --rm -it -v "$PWD":/work -w /work sbtscala/scala-sbt:eclipse-temurin-
 
     <section id="install">
       <div class="sec-head"><span class="no">01</span><h2>拿到工具链</h2></div>
-      <p class="sec-sub">npm 发布在台账上（<a class="badge deferred" href="/zh/status/#DEF-03">DEF-03</a>）——在那之前，源码检出就是正统的安装方式。零 npm <em>运行时</em>依赖意味着检出即整个工具链。</p>
+      <p class="sec-sub">npm 发布仍未完成（<a class="badge deferred" href="/zh/status/#DEF-03">DEF-03</a>）；这里展示源码检出入口。零 npm <em>运行时</em>依赖不包含银行工作坊的固定编译工具链、第三方依赖或运行时供给。只检出源码不等于取得完整配对验收候选（<a href="/zh/status/#DEF-15">DEF-15</a>）。</p>
+      <p class="small">2026-11-12 另行复核：配套 <strong>CLI 工具包 0.5.0</strong> 的包 pin 校验、功能性离线安装、真实 prefix 移址与 Counter <strong>0→2</strong> 更新通过，共 <strong>40 项命令观测</strong> <a class="badge verified" href="/zh/status/#F-29" data-fact="F-29">F-29</a>。它与引擎 <strong>0.3.0</strong> <a class="badge verified" href="/zh/status/#F-23" data-fact="F-23">F-23</a>、公开包交付及真人新人验收是不同维度。重复更新的零写入只指生成源码，不是图/证据零写入。详见<a href="/docs/bank-technical-20261112.md#中文">证据摘要</a>。</p>
       <pre class="code"><code>git clone https://github.com/co-arising/metarch-truthsrc.git
 npm install --prefix metarch-truthsrc        # 只有开发依赖；运行时只用标准库
 
@@ -79,31 +80,48 @@ node metarch-truthsrc/bin/truthsrc.js --help</code></pre>
     </section>
 
     <section id="l2">
-      <div class="sec-head"><span class="no">03</span><h2>L2 · 全规模的银行示例</h2></div>
-      <p class="sec-sub">157 个原子、3 个聚合、2 个 saga、4 条流水线——同样的六道闸门，工业级体量。从这里开始，绿灯就是项目自己的验收层。</p>
+      <div class="sec-head"><span class="no">03</span><h2>L2 · 银行生成与正式工作坊范围</h2></div>
+      <div class="callout red" id="bank-prerequisites"><b>前置条件——不是安装捷径</b><p><strong>Node-only 真源检查、便捷生成与正式工作坊验收是不同入口。</strong>便捷 <code>npm run project</code> 可取得引擎，但正式 anchors/code/service <strong>同时</strong>要求显式 clean1134 归档和已准备的 runtime-supply 目录。配套 CLI、完整配对源码材料及归档尚无确认的公开交付渠道（<a href="/zh/status/#DEF-15">DEF-15</a>）。不要把本页当成一条命令即可公开复演的承诺。</p></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>正式范围</th><th>必需输入与环境</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">source</td><td>自己的银行 checkout、完整相邻配套工具 checkout 与 Node。不需要 JVM、数据库或浏览器。<strong>拒绝无用的 <code>--archive</code> 和 <code>--runtime-supply</code> 参数。</strong></td></tr>
+          <tr><td class="nm">anchors</td><td>source 输入，加上<strong><code>--archive</code>：已有 clean1134 归档的绝对路径</strong>（固定编译器/工具链与第三方依赖），以及<strong><code>--runtime-supply</code>：已有且已准备的 0.3.0 <code>receipt.json</code> + <code>maven/</code> 目录绝对路径</strong>，与项目匹配 <a class="badge verified" href="/zh/status/#F-23" data-fact="F-23">F-23</a>。两者缺一不可。</td></tr>
+          <tr><td class="nm">code</td><td>上述两份供给，加上原生 Darwin x64、由 <code>--java-home</code> 显式选择的已安装 x64 JDK11，以及 sandbox/Python 前置 <a class="badge verified" href="/zh/status/#F-28" data-fact="F-28">F-28</a>。</td></tr>
+          <tr><td class="nm">service</td><td>code 全部前置，再加新的独占资源租约、可用 Docker/socket 与固定数据库镜像，以及显式 Playwright module 和 <code>chrome-headless-shell</code> 路径。service 不能省略浏览器。</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">正式验收<strong>不会隐式下载、prepare 或回退 P23</strong>。组合供给时排除归档中的旧引擎，选择独立锁定的 runtime supply；不重签原归档。旧离线包迁移仍单列（<a href="/zh/status/#DEF-20">DEF-20</a>）。详见<a href="/docs/bank-technical-20261112.md#中文">已验范围与材料契约</a>。</p>
+
+      <h3 id="workshop-preflight">仅前置检查——先设置自己的真实路径</h3>
+      <p>在自己的银行 checkout 根目录运行，并已取得相邻配套工具 checkout。将 <code>BANK</code> 设置为该 checkout 的绝对路径。code 范围还需将 <code>ARCHIVE</code>、<code>RUNTIME_SUPPLY</code> 与 <code>JAVA_HOME_BANK</code> 设置为上述<strong>已存在的本地绝对路径</strong>。这些是必填变量，不是下载地址或随页提供的文件。</p>
+      <p class="small">source 前置检查不带 archive/runtime 参数。</p>
+      <pre class="code"><code>: "${BANK:?Set BANK to your own bank checkout absolute path}"
+node "$BANK/tools/bank-workshop.mjs" doctor --through source --format human</code></pre>
+      <p class="small">code 前置检查显式选择两份供给与已安装的 JDK。</p>
+      <pre class="code"><code>: "${BANK:?Set BANK to your own bank checkout absolute path}"
+: "${ARCHIVE:?Set ARCHIVE to the existing clean1134 archive absolute path}"
+: "${RUNTIME_SUPPLY:?Set RUNTIME_SUPPLY to the prepared 0.3.0 supply directory absolute path}"
+: "${JAVA_HOME_BANK:?Set JAVA_HOME_BANK to the installed x64 JDK11 absolute path}"
+node "$BANK/tools/bank-workshop.mjs" doctor --through code \
+  --archive "$ARCHIVE" --runtime-supply "$RUNTIME_SUPPLY" \
+  --java-home "$JAVA_HOME_BANK" --format human</code></pre>
+      <p><strong>Doctor 是前置检查，不是验收。</strong>后续 <code>verify</code> 必须在银行 <code>target/</code> 下从未使用的直接子目录创建新 run，父目录须已存在，路径须为规范绝对路径。不得复用旧 run。不带 <code>--run</code> 的 doctor 不检查该父目录。report/view 与独立 session start/status/stop 使用 run 的<strong>封存供给</strong>；session 拒绝 archive/runtime-supply override。后续修补需要新执行证据，不能给旧报告改标签。</p>
+
+      <h3 id="bank-convenience">便捷生成——不是工作坊验收配方</h3>
+      <p>已有本地路径验证真源、生成至 <code>generated/current/</code>，将手写生产源码与生成项目一起编译，并验证锚点。首次生成可从 Maven Central 下载 SHA-256 钉定的引擎；这不证明上述正式供给已齐备，也不启动或签收服务。</p>
       <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
 cd bank-wealth-demo
-
-# 闸门 1+2 —— validate &amp; roundtrip（一条命令；roundtrip 是闸门的一部分）
-npm run validate            # ✅ 0 硬发现 · roundtrip：157 原子逐字节一致
-
-# 闸门 3 —— 编译并构建图谱存储（389 节点 / 413 边）
+npm run validate
 npm run compile
 node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
-
-# 闸门 4 —— 生成 CQRS 项目（235 个文件）；首次运行还会从 Maven Central
-#          取回钉定的 0.3.0 引擎 jar（校验 sha256）
-npm run project             # 写出 generated/current/
-
-# 闸门 5 —— 手写区在仓库里已经是完整的（35 个文件）；
-#          它作为生成构建的一部分一起编译：
-cd generated/current &amp;&amp; sbt compile   # ✅ 0 错误，534 个源文件
-sbt test                             # ✅ 23/23
-
-# 闸门 6 —— 证明每个锚点（792 个）
+npm run project
+cd generated/current &amp;&amp; sbt compile
+sbt test
 cd ../.. &amp;&amp; node ../metarch-truthsrc/bin/truthsrc.js verify-project \
   --project truthsrc.project.json --out generated/current</code></pre>
-      <div class="callout"><b>你刚刚证明了什么</b><p>一份 157 原子的银行财富领域描述可以编译、变成可查询的图谱、生成可编译且通过测试的 Scala 代码库、其 792 个锚点对照文件字节验证通过——<strong>而且每一步你都能重跑</strong>。你没有跨过的边界：端到端跑起 HTTP 服务（台账 <a class="badge boundary" href="/zh/status/#DEF-06">DEF-06</a> <a class="badge boundary" href="/zh/status/#DEF-07">DEF-07</a>）。</p></div>
+      <p class="small"><strong>历史采集，2026-11-11：</strong>0 硬发现、157 个原子往返逐字节一致 <a class="badge verified" href="/zh/status/#F-01" data-fact="F-01">F-01</a> <a class="badge verified" href="/zh/status/#F-02" data-fact="F-02">F-02</a>；235 个生成文件 <a class="badge verified" href="/zh/status/#F-04" data-fact="F-04">F-04</a>；534 个源文件、0 编译错误 <a class="badge verified" href="/zh/status/#F-06" data-fact="F-06">F-06</a>；<strong>23/23 项生成单元测试，不是独立手写测试</strong> <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a>；792 个锚点通过验证 <a class="badge verified" href="/zh/status/#F-05" data-fact="F-05">F-05</a>。不声称新服务候选仍有这些相同计数。</p>
+      <div class="callout teal"><b>当前技术证据，不是你的 run 的结果</b><p><code>bank030-relocated-20261112-02</code> 在 2026-11-12 的 source / anchors / code / service 均通过并复核 <a class="badge verified" href="/zh/status/#F-24" data-fact="F-24">F-24</a>，包括真实数据库/HTTP 与自动浏览器观测 <a class="badge verified" href="/zh/status/#F-26" data-fact="F-26">F-26</a>。旧 P23/service02 失败仍是历史事实（<a href="/zh/status/#DEF-06">DEF-06</a>）。独立体验仍未签收：session03 未达 readiness，清理不是通过，后续修补候选未执行（<a href="/zh/status/#DEF-07">DEF-07</a>）。公开材料（<a href="/zh/status/#DEF-15">DEF-15</a>）与真人验收（<a href="/zh/status/#DEF-16">DEF-16</a>）不由该技术结果代签。详见<a href="/zh/bank-demo/#technical-acceptance">银行分层结果与剩余边界</a>。</p></div>
     </section>
 
     <section id="l3">

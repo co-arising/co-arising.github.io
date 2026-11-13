@@ -48,6 +48,7 @@ const SITE = {
     },
   ],
   audited: "2026-11-11",
+  contentUpdated: "2026-11-13",
 };
 
 const STR = {
@@ -66,7 +67,7 @@ const STR = {
     colHonesty: "Honesty",
     statusLabel: "Verified facts &amp; ledger",
     colophon1: "© 2026 co-arising contributors · site content CC BY 4.0 · site code MIT",
-    colophon2: `Last audited ${SITE.audited} · zero build, zero npm — this site practices what it documents`,
+    colophon2: `Content updated ${SITE.contentUpdated} · evidence dates and scope are recorded per fact · zero-build static site`,
   },
   zh: {
     langSwitch: "EN",
@@ -83,7 +84,7 @@ const STR = {
     colHonesty: "诚实层",
     statusLabel: "已验证事实与台账",
     colophon1: "© 2026 co-arising 贡献者 · 站点内容 CC BY 4.0 · 站点代码 MIT",
-    colophon2: `最近审计 ${SITE.audited} · 零构建、零 npm —— 本站亲身实践它所文档化的一切`,
+    colophon2: `内容更新 ${SITE.contentUpdated} · 证据日期与范围逐项登记 · 零构建静态站`,
   },
 };
 

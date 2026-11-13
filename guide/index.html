@@ -27,12 +27,12 @@
     <header class="page-hero">
       <p class="over">Hands-on · zero to full loop</p>
       <h1>The guide: <span class="accent">run the whole thing</span></h1>
-      <p class="thesis">Three levels, each with a green light at the end: L1 the Counter tutorial (Node only, ~10 min), L2 the bank example pipeline (add a JVM, ~30 min), L3 wiring the MCP server into Claude Code so an agent plans an incremental change by querying the graph. If any step fails, the last sub-section tells you where the red lines are.</p>
+      <p class="thesis">Three levels: L1 the Node-only Counter tutorial, L2 the bank generation path and its separate formal workshop prerequisites, and L3 graph queries through MCP. <strong>A local generation command is not a formal service acceptance run.</strong> The bank’s newer technical pass and the still-open independent experience are described separately below.</p>
     </header>
 
     <section id="env">
-      <div class="sec-head"><span class="no">00</span><h2>Environment — pick one path, both are first-class</h2></div>
-      <p class="sec-sub">The toolchain needs <strong>Node ≥ 22.13.0</strong> (built-in <code>node:sqlite</code> is why). Level 2 additionally needs a JVM (11+) and sbt. Every command below is copy-pasteable.</p>
+      <div class="sec-head"><span class="no">00</span><h2>Environment — choose the scope first</h2></div>
+      <p class="sec-sub">The Node-only tutorial and bank source scope need <strong>Node ≥ 22.13.0</strong> (<code>node:sqlite</code>) <a class="badge verified" href="/status/#F-13" data-fact="F-13">F-13</a>. Compiling generated Scala needs a JVM and sbt. <strong>Formal anchors/code/service verification additionally needs explicit matched materials</strong>; formal code/service is scoped to native Darwin x64 / JDK11 <a class="badge verified" href="/status/#F-28" data-fact="F-28">F-28</a>. Read <a href="#bank-prerequisites">the prerequisites</a> before treating any command as an acceptance path.</p>
 
       <h3>Path A · native Node</h3>
       <pre class="code"><code># macOS (Homebrew)
@@ -42,11 +42,11 @@ brew install node@22
 nvm install 22
 node --version   # must print v22.13.0 or newer</code></pre>
 
-      <h3>Path B · Docker (if you don’t want to touch your host Node)</h3>
-      <pre class="code"><code>docker run --rm -it -v "$PWD":/work -w /work node:22 bash
-# you are now on Node 22 inside the container; everything below works unchanged</code></pre>
+      <h3>Path B · Docker for Node-only work</h3>
+      <pre class="code"><code>docker run --rm -it -v "$PWD":/work -w /work node:22 bash</code></pre>
+      <p class="small">This container is an option for Node work, not a substitute for the accepted native bank code/service environment.</p>
 
-      <h3>Level 2 only · JVM + sbt</h3>
+      <h3>Convenience Scala compilation · JVM + sbt</h3>
       <pre class="code"><code># macOS
 brew install openjdk@11 sbt
 
@@ -56,7 +56,8 @@ docker run --rm -it -v "$PWD":/work -w /work sbtscala/scala-sbt:eclipse-temurin-
 
     <section id="install">
       <div class="sec-head"><span class="no">01</span><h2>Get the toolchain</h2></div>
-      <p class="sec-sub">npm publication is on the ledger (<a class="badge deferred" href="/status/#DEF-03">DEF-03</a>) — until then, a source checkout is the canonical install. Zero npm <em>runtime</em> dependencies means the checkout is the whole toolchain.</p>
+      <p class="sec-sub">npm publication is still pending (<a class="badge deferred" href="/status/#DEF-03">DEF-03</a>); a source checkout is the entry point shown here. Zero npm <em>runtime</em> dependencies does not include the bank workshop’s frozen compiler, third-party dependencies or runtime supply. A checkout alone is not the complete paired acceptance candidate (<a href="/status/#DEF-15">DEF-15</a>).</p>
+      <p class="small">Separately reviewed on 2026-11-12: the matched <strong>CLI package 0.5.0</strong> passed package-pin verification, functional offline installation, actual prefix relocation and the Counter <strong>0→2</strong> update, with <strong>40 command observations</strong> <a class="badge verified" href="/status/#F-29" data-fact="F-29">F-29</a>. This is distinct from engines <strong>0.3.0</strong> <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>, public package delivery and human newcomer acceptance. Repeated update’s zero writes means generated-source files only, not graph/evidence writes. See the <a href="/docs/bank-technical-20261112.md">evidence summary</a>.</p>
       <pre class="code"><code>git clone https://github.com/co-arising/metarch-truthsrc.git
 npm install --prefix metarch-truthsrc        # dev deps only; runtime is stdlib-only
 
@@ -79,31 +80,48 @@ node metarch-truthsrc/bin/truthsrc.js --help</code></pre>
     </section>
 
     <section id="l2">
-      <div class="sec-head"><span class="no">03</span><h2>L2 · The bank example at full scale</h2></div>
-      <p class="sec-sub">157 atoms, 3 aggregates, 2 sagas, 4 pipelines — the same six gates, industrial size. From here the green lights are the project’s own acceptance layers.</p>
+      <div class="sec-head"><span class="no">03</span><h2>L2 · Bank generation and formal workshop scopes</h2></div>
+      <div class="callout red" id="bank-prerequisites"><b>PREREQUISITES — NOT AN INSTALLATION SHORTCUT</b><p><strong>Node-only source checks, convenience generation and formal workshop acceptance are different entry points.</strong> The convenient <code>npm run project</code> may obtain engines, but formal anchors/code/service requires <strong>both</strong> an explicit clean1134 archive and an already prepared runtime-supply directory. The matched CLI, complete paired source materials and archive have no confirmed public delivery channel (<a href="/status/#DEF-15">DEF-15</a>). Do not treat this page as a one-command public reproduction.</p></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Formal scope</th><th>Required inputs and environment</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">source</td><td>Your bank checkout, the complete adjacent matched tool checkout and Node. No JVM, database or browser. <strong>Rejects unused <code>--archive</code> and <code>--runtime-supply</code> flags.</strong></td></tr>
+          <tr><td class="nm">anchors</td><td>Source inputs plus <strong><code>--archive</code>: an absolute path to the existing clean1134 archive</strong> (frozen compiler/toolchain and third-party dependencies), and <strong><code>--runtime-supply</code>: an absolute path to the existing prepared 0.3.0 <code>receipt.json</code> + <code>maven/</code> directory</strong>, matching the project <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>. Neither is optional.</td></tr>
+          <tr><td class="nm">code</td><td>Both supplies above, plus native Darwin x64, an installed x64 JDK11 selected by <code>--java-home</code>, and the sandbox/Python prerequisites <a class="badge verified" href="/status/#F-28" data-fact="F-28">F-28</a>.</td></tr>
+          <tr><td class="nm">service</td><td>All code prerequisites, plus a new exclusive resource lease, available Docker/socket and pinned database images, and explicit Playwright module and <code>chrome-headless-shell</code> paths. Service scope cannot omit the browser.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">Formal verification does <strong>not implicitly download, prepare or fall back to P23</strong>. The composed supply excludes the archive’s old engines and selects the separately locked runtime supply; the archive is not re-signed. The legacy offline-bundle migration remains separate (<a href="/status/#DEF-20">DEF-20</a>). See the <a href="/docs/bank-technical-20261112.md">accepted scope and material contract</a>.</p>
+
+      <h3 id="workshop-preflight">Preflight only — set your own real paths first</h3>
+      <p>Run from your own bank checkout root with its matched adjacent tool checkout. Set <code>BANK</code> to that checkout’s absolute path. For code scope, also set <code>ARCHIVE</code>, <code>RUNTIME_SUPPLY</code> and <code>JAVA_HOME_BANK</code> to <strong>existing, absolute local paths</strong> described above. These are required variables, not download locations or supplied files.</p>
+      <p class="small">Source preflight has no archive/runtime flags.</p>
+      <pre class="code"><code>: "${BANK:?Set BANK to your own bank checkout absolute path}"
+node "$BANK/tools/bank-workshop.mjs" doctor --through source --format human</code></pre>
+      <p class="small">Code preflight explicitly selects both supplies and the installed JDK.</p>
+      <pre class="code"><code>: "${BANK:?Set BANK to your own bank checkout absolute path}"
+: "${ARCHIVE:?Set ARCHIVE to the existing clean1134 archive absolute path}"
+: "${RUNTIME_SUPPLY:?Set RUNTIME_SUPPLY to the prepared 0.3.0 supply directory absolute path}"
+: "${JAVA_HOME_BANK:?Set JAVA_HOME_BANK to the installed x64 JDK11 absolute path}"
+node "$BANK/tools/bank-workshop.mjs" doctor --through code \
+  --archive "$ARCHIVE" --runtime-supply "$RUNTIME_SUPPLY" \
+  --java-home "$JAVA_HOME_BANK" --format human</code></pre>
+      <p><strong>Doctor is preflight, not acceptance.</strong> A subsequent <code>verify</code> must create a fresh run in a never-used direct child of the bank’s <code>target/</code>, with an existing parent and a canonical absolute path. Do not reuse an old run. Doctor without <code>--run</code> does not check that parent. Report/view and independent session start/status/stop use the run’s <strong>sealed supply</strong>; session commands reject archive/runtime-supply overrides. A later fix needs new execution evidence, not a relabelled report.</p>
+
+      <h3 id="bank-convenience">Convenience generation — not the workshop recipe</h3>
+      <p>The existing local path validates, generates into <code>generated/current/</code>, compiles handwritten production sources with the generated project, and verifies anchors. Its first generation may fetch SHA-256-pinned engines from Maven Central. It does not establish that the formal supplies above are present, and it does not start or accept the service.</p>
       <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
 cd bank-wealth-demo
-
-# gate 1+2 — validate &amp; roundtrip (one command; roundtrip is part of the gate)
-npm run validate            # ✅ 0 hard · roundtrip: 157 atoms byte-identical
-
-# gate 3 — compile &amp; build the graph store (389 nodes / 413 edges)
+npm run validate
 npm run compile
 node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
-
-# gate 4 — generate the CQRS project (235 files); the first run also
-#          fetches the pinned 0.3.0 engine jars from Maven Central (sha256-verified)
-npm run project             # writes generated/current/
-
-# gate 5 — the handwritten zone is already complete in the repo (35 files);
-#          it compiles as part of the generated build:
-cd generated/current &amp;&amp; sbt compile   # ✅ 0 errors, 534 sources
-sbt test                             # ✅ 23/23
-
-# gate 6 — prove every anchor (792)
+npm run project
+cd generated/current &amp;&amp; sbt compile
+sbt test
 cd ../.. &amp;&amp; node ../metarch-truthsrc/bin/truthsrc.js verify-project \
   --project truthsrc.project.json --out generated/current</code></pre>
-      <div class="callout"><b>WHAT YOU JUST PROVED</b><p>That a 157-atom description of a bank wealth domain compiles, becomes a queryable graph, generates a compiling, tested Scala codebase whose 792 anchors verify against file bytes — <strong>and that you can re-run every step</strong>. The boundary you did NOT cross: running the HTTP service end-to-end (ledger <a class="badge boundary" href="/status/#DEF-06">DEF-06</a> <a class="badge boundary" href="/status/#DEF-07">DEF-07</a>).</p></div>
+      <p class="small"><strong>Historical capture, 2026-11-11:</strong> 0 hard findings and 157 byte-identical roundtrip atoms <a class="badge verified" href="/status/#F-01" data-fact="F-01">F-01</a> <a class="badge verified" href="/status/#F-02" data-fact="F-02">F-02</a>; 235 generated files <a class="badge verified" href="/status/#F-04" data-fact="F-04">F-04</a>; 0 compile errors across 534 sources <a class="badge verified" href="/status/#F-06" data-fact="F-06">F-06</a>; <strong>23/23 generated unit tests, not independent handwritten tests</strong> <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a>; 792 verified anchors <a class="badge verified" href="/status/#F-05" data-fact="F-05">F-05</a>. These counts are not asserted for the newer service candidate.</p>
+      <div class="callout teal"><b>CURRENT TECHNICAL EVIDENCE, NOT YOUR RUN’S RESULT</b><p><code>bank030-relocated-20261112-02</code> passed and rechecked source / anchors / code / service on 2026-11-12 <a class="badge verified" href="/status/#F-24" data-fact="F-24">F-24</a>, including real database/HTTP and automated browser observations <a class="badge verified" href="/status/#F-26" data-fact="F-26">F-26</a>. The old P23/service02 failure stays historical (<a href="/status/#DEF-06">DEF-06</a>). Independent experience remains open: session03 did not reach readiness, cleanup was not a pass, and the later fix candidate is unexecuted (<a href="/status/#DEF-07">DEF-07</a>). Public materials (<a href="/status/#DEF-15">DEF-15</a>) and human acceptance (<a href="/status/#DEF-16">DEF-16</a>) are not signed off by that technical result. See <a href="/bank-demo/#technical-acceptance">the bank’s scoped results and remaining boundaries</a>.</p></div>
     </section>
 
     <section id="l3">

@@ -69,7 +69,7 @@
         <article class="feature"><span class="n">F-03</span><h3>Code generation with receipts</h3><p>Generates a compiling CQRS/ES Scala codebase. Every generated file carries an anchor: the exact knowledge node and byte span it came from. <code>verify-project</code> re-proves it.</p></article>
         <article class="feature"><span class="n">F-04</span><h3>A handwritten zone, by design</h3><p>Ports are generated; behavior is filled in a physically separate handwritten module. 35 handwritten files in the bank example are complete implementations, not stubs.</p></article>
         <article class="feature"><span class="n">F-05</span><h3>Agents, but with stewardship</h3><p>An MCP server exposes 26 read-oriented tools so coding agents query the graph instead of grepping. Agents draft; humans decide. The tree stays the only editing surface.</p></article>
-        <article class="feature"><span class="n">F-06</span><h3>Honest by construction</h3><p>What isn’t done is on the <a href="/status/">ledger</a>, not in the marketing. Full-service runtime gates, hosting, BDD derivatives — all tracked with IDs.</p></article>
+        <article class="feature"><span class="n">F-06</span><h3>Honest by construction</h3><p>What isn’t done is on the <a href="/status/">ledger</a>, not in the marketing. Independent experience, public material delivery, hosting and BDD derivatives — all tracked separately from technical acceptance.</p></article>
       </div>
     </section>
 
@@ -104,8 +104,9 @@ node ../metarch-truthsrc/bin/truthsrc.js query-project --knowledge SetCount</cod
 
     <section id="honesty">
       <div class="sec-head"><span class="no">04</span><h2>What works, what doesn’t — yet</h2></div>
-      <p class="sec-sub">Every number above was re-captured on <strong>2026-11-11</strong> and is listed in <a href="/status/#facts">SITE-FACTS</a>. The things that don’t work yet are on the <a href="/status/#ledger">ledger</a>: the full-service runtime gate (a read-side replay missed a 90-second deadline), HTTP smoke of the generated service, npm/Maven publishing, hosting, and BDD specs as derivatives.</p>
-      <div class="callout teal"><b>PHILOSOPHY</b><p><strong>The site itself is the proof.</strong> Zero build step, zero npm dependencies, every fact traceable to a command — these pages practice what the toolchain preaches. <a href="/why-co-arising/">Read why</a>.</p></div>
+      <p class="sec-sub">The headline tree, code and anchor counts retain their <strong>2026-11-11</strong> capture in <a href="/status/#facts">SITE-FACTS</a>; they are not new service-run counts. The engines are now published on Maven Central <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>. npm publication, hosting and BDD derivatives remain on the <a href="/status/#ledger">ledger</a>.</p>
+      <div class="callout teal" id="bank-technical"><b>BANK TECHNICAL RESULT</b><p>On 2026-11-12, <code>bank030-relocated-20261112-02</code> passed and rechecked <strong>source / anchors / code / service</strong> <a class="badge verified" href="/status/#F-24" data-fact="F-24">F-24</a>, including real database/HTTP and automated browser observations <a class="badge verified" href="/status/#F-26" data-fact="F-26">F-26</a>. This is candidate-specific technical acceptance, not independent experience (<a href="/status/#DEF-07">DEF-07</a>), public matched-material delivery (<a href="/status/#DEF-15">DEF-15</a>) or human usability acceptance (<a href="/status/#DEF-16">DEF-16</a>). The old service02 failure remains historical (<a href="/status/#DEF-06">DEF-06</a>). Read the <a href="/docs/bank-technical-20261112.md">acceptance scope and prerequisites</a>.</p></div>
+      <div class="callout teal"><b>PHILOSOPHY</b><p><strong>Make the evidence boundary visible.</strong> These pages have no build step or npm dependencies; claims link to dated evidence and open items. A summary of privately reviewed reports is not a public reproduction package. <a href="/why-co-arising/">Read why</a>.</p></div>
     </section>
   </main>
 

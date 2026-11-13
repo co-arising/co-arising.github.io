@@ -27,7 +27,7 @@
     <header class="page-hero">
       <p class="over">生命周期</p>
       <h1>真源树 → 代码，<span class="accent">再回来</span></h1>
-      <p class="thesis">六个阶段，每段一条精确命令、一道绿/红闸门。这个闭环闭合了两次：一次向前（树 → 图谱 → 代码），一次向后（代码 → 锚点 → 树）。以下数字来自银行完整示例，2026-11-11 重新采集。</p>
+      <p class="thesis">六个阶段，每段一条精确命令、一道绿/红闸门。闭环闭合两次：一次向前（树 → 图谱 → 代码），一次向后（代码 → 锚点 → 树）。以下阶段数字保留银行示例 2026-11-11 的采集日期；<a href="#boundaries">更新的技术验收</a>单独陈述，不给旧计数换日期。</p>
     </header>
 
     <section id="flow">
@@ -38,9 +38,9 @@
         <div class="step"><span class="snum">03 · 图谱</span><b>编译 &amp; 推送</b><p>canonical 投影 → SQLite 图谱：<span class="badge verified" title="F-03">389 节点 / 413 边</span>。</p></div>
         <div class="step"><span class="snum">04 · 生成</span><b>CQRS 代码库</b><p><code>generate-project</code>：<span class="badge verified" title="F-04">235 个文件</span>，<span class="badge verified" title="F-06">0 编译错误</span>。</p></div>
         <div class="step"><span class="snum">05 · 手写</span><b>填手写区</b><p>端口是生成的；行为进物理隔离的手写模块——<span class="badge verified" title="F-08">35 个文件</span>，完整实现。</p></div>
-        <div class="step"><span class="snum">06 · 验证</span><b>证明血缘</b><p><code>verify-project</code>：<span class="badge verified" title="F-05">792 个锚点</span>；测试 <span class="badge verified" title="F-07">23/23</span>。</p></div>
+        <div class="step"><span class="snum">06 · 验证</span><b>证明血缘</b><p><code>verify-project</code>：<span class="badge verified" title="F-05">792 个锚点</span>；生成单元测试 <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">23/23</a>。</p></div>
       </div>
-      <p class="small">然后它循环：改树，<code>status-project</code> 精确显示哪些生成文件过期了，<code>generate-project --update</code> 只刷新那些，对未改动的树重跑则写入 <strong>0 个文件</strong>（幂等是闸门，不是愿望）。</p>
+      <p class="small">然后它循环：改树，<code>status-project</code> 显示哪些生成文件过期，<code>generate-project --update</code> 刷新它们。另行复核的 Counter 更新在输入未变时重复执行，写入 <strong>0 个生成源码文件</strong>——不是图/证据零写入 <a class="badge verified" href="/zh/status/#F-29" data-fact="F-29">F-29</a>。</p>
     </section>
 
     <section id="anchors">
@@ -72,7 +72,7 @@
         <div class="card"><span class="tag">生成侧</span><h3>一切结构性的东西</h3><p>聚合、命令、事件、守卫（从 <code>@rule</code> 不变量编译而来）、proto schema、端口、测试脚手架——银行项目 235 个文件，全部可再生成，全部有锚点。</p></div>
         <div class="card"><span class="tag">手写侧</span><h3>一切行为性的东西</h3><p>对 mock TA 的效果执行、JDBC 装配、恢复循环、读侧追赶、HTTP 页面——<strong>35 个文件，完整实现</strong> <span class="badge verified" title="F-08">已验证</span>，经 <code>unmanagedSourceDirectories</code> 挂进构建。没有任何 <code>BEGIN MANUAL</code> 标记——边界就是文件系统本身。</p></div>
       </div>
-      <div class="callout"><b>漂移</b><p>树变了，生成文件被刷新；手写区永不被覆盖。测试保持为固定的期望——<strong>生成代码必须满足手写测试，而不是反过来</strong>。今天 23/23 通过 <span class="badge verified" title="F-07">已验证</span>。</p></div>
+      <div class="callout"><b>测试范围</b><p>树变了，生成文件被刷新；手写区不被覆盖。<strong>2026-11-11 的 23/23 是生成单元测试</strong> <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a>：手写生产源码随构建编译，不代表独立手写测试预期已验证。新技术候选的 actor <strong>64 项</strong>、readside <strong>47 项</strong>通过，保留固定业务预期；两组<strong>共享 23 项生成测试</strong>，不能相加当作互不重复用例 <a class="badge verified" href="/zh/status/#F-25" data-fact="F-25">F-25</a>。</p></div>
     </section>
 
     <section id="engines">
@@ -86,12 +86,9 @@
     </section>
 
     <section id="boundaries">
-      <div class="sec-head"><span class="no">05</span><h2>这个闭环暂不声称什么</h2></div>
-      <div class="callout red"><b>边界</b><p>
-        <strong>全服务运行时闸门——未通过</strong>（<a class="badge boundary" href="/zh/status/#DEF-06">DEF-06</a>）：生成的代码可编译、23 个测试全过，但 service02 验收跑有一道闸没过——一次全新的读侧回放没在 90 秒内追平。代码、24 个恢复用例、真实库的初始/重启/退款确实通过了。 &nbsp;·&nbsp;
-        <strong>运行中服务的 HTTP 冒烟——尚未执行</strong>（<a class="badge boundary" href="/zh/status/#DEF-07">DEF-07</a>）。 &nbsp;·&nbsp;
-        <strong>BDD/Gherkin 规格——按衍生物设计，未构建</strong>（<a class="badge deferred" href="/zh/status/#DEF-01">DEF-01</a>）：守卫 + 场景应当能生成 Gherkin；该投影尚未实现。
-      </p></div>
+      <div class="sec-head"><span class="no">05</span><h2>当前技术结果与独立验收边界</h2></div>
+      <div class="callout teal"><b>新候选，不改写旧报告</b><p>2026-11-12，<code>bank030-relocated-20261112-02</code> 的 <strong>source / anchors / code / service</strong> 均通过并复核 <a class="badge verified" href="/zh/status/#F-24" data-fact="F-24">F-24</a>，包括真实数据库/HTTP 与自动浏览器观测 <a class="badge verified" href="/zh/status/#F-26" data-fact="F-26">F-26</a>。本轮新 SQL 重建 <strong>66.847 秒达到 readiness，未放宽 90 秒门限</strong> <a class="badge verified" href="/zh/status/#F-27" data-fact="F-27">F-27</a>。范围是原生 Darwin x64 / JDK11、单 owner；输入未变，该 owner 的资源与租约已释放 <a class="badge verified" href="/zh/status/#F-28" data-fact="F-28">F-28</a>。详见<a href="/docs/bank-technical-20261112.md#中文">脱敏范围与证据摘要</a>。旧 P23/service02 失败保留为历史事实（<a href="/zh/status/#DEF-06">DEF-06</a>）。</p></div>
+      <div class="callout red"><b>仍须分别签收</b><p><strong>独立服务体验</strong>仍未签收（<a href="/zh/status/#DEF-07">DEF-07</a>）：session03 readiness 失败；清理占位不是通过，后续修补候选未执行。技术 HTTP/浏览器通过不关闭<strong>公开材料交付</strong>（<a href="/zh/status/#DEF-15">DEF-15</a>）或<strong>真人可用性</strong>（<a href="/zh/status/#DEF-16">DEF-16</a>）。家族观察（<a href="/zh/status/#DEF-17">DEF-17</a>）、retry/backoff/deadline 债务（<a href="/zh/status/#DEF-18">DEF-18</a>）、特定负控与额外 Node CI/typecheck（<a href="/zh/status/#DEF-19">DEF-19</a>）、旧离线包迁移（<a href="/zh/status/#DEF-20">DEF-20</a>）也不由银行 run 代签。</p><p><strong>BDD/Gherkin 规格仍是未构建的衍生物</strong>（<a href="/zh/status/#DEF-01">DEF-01</a>）。正式工作坊验收还需要<a href="/zh/guide/#bank-prerequisites">显式配对材料与分层环境前置</a>；便捷生成路径不能代替。</p></div>
     </section>
 
     <section id="try">
