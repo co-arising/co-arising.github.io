@@ -59,6 +59,9 @@ const STR = {
     themeLabel: { auto: "auto", light: "light", dark: "dark" },
     copy: "copy",
     copied: "copied",
+    copying: "copying…",
+    copyFailed: "copy failed — select the code",
+    skip: "Skip to content",
     footerTagline:
       "Domain knowledge that co-arises — and compiles. An open organization for truth-source tooling around DDD, event-sourced systems and agentic development.",
     siteOnGitHub: "This site on GitHub",
@@ -76,6 +79,9 @@ const STR = {
     themeLabel: { auto: "自动", light: "浅色", dark: "深色" },
     copy: "复制",
     copied: "已复制",
+    copying: "复制中…",
+    copyFailed: "复制失败，请选择代码",
+    skip: "跳至正文",
     footerTagline:
       "会缘起、可编译的领域知识。一个开放组织，围绕 DDD、事件溯源系统与智能体开发，构建真源（truth source）工具链。",
     siteOnGitHub: "本站在 GitHub 上",
@@ -98,16 +104,18 @@ const STR = {
   const T = STR[LANG];
   const nav = document.getElementById("site-nav");
   const footer = document.getElementById("site-footer");
-  const hereRaw = location.pathname.replace(/index\.html$/, "");
-  /* canonical (English-root) path of the current page: /zh/ pages map back */
-  const here = LANG === "zh" ? hereRaw.replace(/^\/zh/, "") || "/" : hereRaw;
-  const isRoot = here === "/" || here === "";
+  /* The document, not a missing request's pathname, identifies the 404. */
+  const routes = new Set(["/", ...SITE.nav.flatMap((group) => group.items.map((item) => item.href))]);
+  const rawPath = location.pathname.replace(/index\.html$/, "");
+  const stripped = rawPath.replace(/^\/zh(?=\/|$)/, "") || "/";
+  const normalized = stripped.endsWith("/") ? stripped : stripped + "/";
+  const notFound = document.body.dataset.page === "not-found" || !routes.has(normalized);
+  const here = notFound ? null : normalized;
+  const isRoot = here === "/";
 
-  /* the same page in the other language, carrying query + hash */
   const counterpart = () => {
-    const tail = (location.search || "") + (location.hash || "");
-    if (LANG === "zh") return (here === "/" ? "/" : hereRaw.replace(/^\/zh/, "") || "/") + tail;
-    return (hereRaw === "/" ? "/zh/" : "/zh" + hereRaw) + tail;
+    const base = LANG === "zh" ? (here || "/") : "/zh" + (here || "/");
+    return base + (notFound ? "" : (location.search || "") + (location.hash || ""));
   };
 
   /* ---------- nav + footer injection ---------- */
@@ -118,12 +126,7 @@ const STR = {
           `<span class="group-label">${LANG === "zh" ? g.groupZh : g.group}</span>` +
           g.items
             .map((it) => {
-              const active =
-                isRoot && it.href === "/"
-                  ? ' aria-current="page"'
-                  : here.startsWith(it.href)
-                    ? ' aria-current="page"'
-                    : "";
+              const active = here === it.href ? ' aria-current="page"' : "";
               const href = LANG === "zh" ? "/zh" + it.href : it.href;
               const label = LANG === "zh" ? it.labelZh || it.label : it.label;
               return `<a class="nav-link" href="${href}"${active}>${label}</a>`;
@@ -133,10 +136,10 @@ const STR = {
       .join("");
     const langA = LANG === "zh" ? "en" : "zh-CN";
     nav.innerHTML = `<div class="topline"></div><div class="site-nav"><div class="row">
-      <a class="brand" href="${LANG === "zh" ? "/zh/" : "/"}"><span class="dot"></span>co-arising</a>
+      <a class="brand" href="${LANG === "zh" ? "/zh/" : "/"}"${isRoot ? ' aria-current="page"' : ""}><span class="dot"></span>co-arising</a>
       ${links}
       <span class="spacer"></span>
-      <a class="nav-link" lang="${langA}" hreflang="${langA}" rel="alternate" href="${counterpart()}" title="${T.langSwitchTitle}">${T.langSwitch}</a>
+      <a class="nav-link" id="language-switch" lang="${langA}" hreflang="${langA}" rel="alternate" href="${LANG === "zh" ? "/" : "/zh/"}" title="${T.langSwitchTitle}">${T.langSwitch}</a>
       <button class="theme-btn" id="theme-toggle" type="button" title="${T.themeTitle}">◐ ${T.themeLabel.auto}</button>
     </div></div>`;
   }
@@ -179,14 +182,44 @@ const STR = {
     </div></div>`;
   }
 
+  /* Wrapped navigation changes height on narrow screens and after font loading. */
+  if (nav && typeof nav.getBoundingClientRect === "function") {
+    const updateNavOffset = () => document.documentElement.style.setProperty("--nav-offset", Math.ceil(nav.getBoundingClientRect().height + 12) + "px");
+    updateNavOffset();
+    window.addEventListener("resize", updateNavOffset);
+    if (typeof ResizeObserver === "function") new ResizeObserver(updateNavOffset).observe(nav);
+    window.addEventListener("load", () => {
+      updateNavOffset();
+      let id;
+      try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) { return; }
+      const target = id && document.getElementById(id);
+      if (target) target.scrollIntoView({ block: "start", behavior: "instant" });
+    });
+  }
+
+  const languageLink = document.getElementById("language-switch");
+  const updateLanguageLink = () => { if (languageLink) languageLink.setAttribute("href", counterpart()); };
+  updateLanguageLink();
+  window.addEventListener("hashchange", updateLanguageLink);
+  window.addEventListener("popstate", updateLanguageLink);
+  window.addEventListener("site:locationchange", updateLanguageLink);
+  if (languageLink) {
+    languageLink.addEventListener("pointerdown", updateLanguageLink);
+    languageLink.addEventListener("click", updateLanguageLink);
+  }
+
   /* ---------- tri-state theme: auto → light → dark ---------- */
   const btn = document.getElementById("theme-toggle");
   const order = ["auto", "light", "dark"];
-  let theme = localStorage.getItem("theme") || "auto";
+  let theme = "auto";
+  try {
+    const saved = localStorage.getItem("theme");
+    if (order.includes(saved)) theme = saved;
+  } catch (e) { /* Storage is optional, including blocked reads. */ }
   const apply = () => {
     document.documentElement.setAttribute("data-theme", theme);
     if (btn) btn.textContent = "◐ " + T.themeLabel[theme];
-    try { localStorage.setItem("theme", theme); } catch (e) { /* private mode */ }
+    try { localStorage.setItem("theme", theme); } catch (e) { /* in-memory theme */ }
   };
   apply();
   if (btn) {
@@ -196,28 +229,63 @@ const STR = {
     });
   }
 
-  /* ---------- copy buttons on code blocks ---------- */
-  document.querySelectorAll("pre.code, .term pre").forEach((pre) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "copy-btn";
-    btn.textContent = T.copy;
-    btn.addEventListener("click", () => {
-      const text = pre.innerText;
-      const done = () => { btn.textContent = T.copied; btn.classList.add("done"); setTimeout(() => { btn.textContent = T.copy; btn.classList.remove("done"); }, 1400); };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
-      } else {
-        fallbackCopy(text, done);
-      }
+  /* Controls never become part of the payload; terminal transcripts are not commands. */
+  document.querySelectorAll("pre.code").forEach((pre) => {
+    const code = pre.querySelector("code");
+    if (!code || pre.dataset.copy === "none") return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "copy-btn";
+    button.textContent = T.copy;
+    button.setAttribute("aria-label", T.copy);
+    const status = document.createElement("span");
+    status.className = "sr-only";
+    status.setAttribute("role", "status");
+    let timer;
+    let copying = false;
+    button.addEventListener("click", async () => {
+      if (copying) return;
+      copying = true;
+      clearTimeout(timer);
+      button.textContent = T.copying;
+      button.classList.remove("done");
+      let copied = false;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          try { await navigator.clipboard.writeText(code.textContent); copied = true; }
+          catch (e) { copied = fallbackCopy(code.textContent); }
+        } else copied = fallbackCopy(code.textContent);
+      } catch (e) { copied = false; }
+      copying = false;
+      const message = copied ? T.copied : T.copyFailed;
+      button.textContent = message;
+      button.classList.toggle("done", copied);
+      status.textContent = message;
+      timer = setTimeout(() => {
+        button.textContent = T.copy;
+        button.classList.remove("done");
+        status.textContent = "";
+      }, copied ? 1400 : 4000);
     });
-    pre.appendChild(btn);
+    pre.appendChild(button);
+    pre.appendChild(status);
   });
-  function fallbackCopy(text, done) {
+  function fallbackCopy(text) {
+    const previous = document.activeElement;
     const ta = document.createElement("textarea");
-    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand("copy"); done(); } catch (e) { /* noop */ }
-    document.body.removeChild(ta);
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    ta.setAttribute("readonly", "");
+    document.body.appendChild(ta);
+    ta.select();
+    let copied = false;
+    try { copied = document.execCommand("copy") === true; }
+    catch (e) { /* manual selection remains available */ }
+    finally {
+      ta.remove();
+      if (previous && typeof previous.focus === "function") previous.focus({ preventScroll: true });
+    }
+    return copied;
   }
 })();

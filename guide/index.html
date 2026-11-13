@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/guide/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/guide/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/guide/" />
+  <link rel="canonical" href="https://co-arising.github.io/guide/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">Hands-on · zero to full loop</p>
       <h1>The guide: <span class="accent">run the whole thing</span></h1>
@@ -58,25 +60,56 @@ docker run --rm -it -v "$PWD":/work -w /work sbtscala/scala-sbt:eclipse-temurin-
       <div class="sec-head"><span class="no">01</span><h2>Get the toolchain</h2></div>
       <p class="sec-sub">npm publication is still pending (<a class="badge deferred" href="/status/#DEF-03">DEF-03</a>); a source checkout is the entry point shown here. Zero npm <em>runtime</em> dependencies does not include the bank workshop’s frozen compiler, third-party dependencies or runtime supply. A checkout alone is not the complete paired acceptance candidate (<a href="/status/#DEF-15">DEF-15</a>).</p>
       <p class="small">Separately reviewed on 2026-11-12: the matched <strong>CLI package 0.5.0</strong> passed package-pin verification, functional offline installation, actual prefix relocation and the Counter <strong>0→2</strong> update, with <strong>40 command observations</strong> <a class="badge verified" href="/status/#F-29" data-fact="F-29">F-29</a>. This is distinct from engines <strong>0.3.0</strong> <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>, public package delivery and human newcomer acceptance. Repeated update’s zero writes means generated-source files only, not graph/evidence writes. See the <a href="/docs/bank-technical-20261112.md">evidence summary</a>.</p>
-      <pre class="code"><code>git clone https://github.com/co-arising/metarch-truthsrc.git
-npm install --prefix metarch-truthsrc        # dev deps only; runtime is stdlib-only
-
-# smoke test — no SQLite touched, no side effects
-node metarch-truthsrc/bin/truthsrc.js --help</code></pre>
+      <pre class="code" data-example="install-source"><code>export TRUTHSRC_WORKSPACE="$PWD"
+git clone https://github.com/co-arising/metarch-truthsrc.git
+export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
+node "$TRUTHSRC_CLI" --help</code></pre>
       <p class="small">Tip: <code>alias truthsrc="node $PWD/metarch-truthsrc/bin/truthsrc.js"</code> makes the rest of this page read literally.</p>
     </section>
 
     <section id="l1">
-      <div class="sec-head"><span class="no">02</span><h2>L1 · Counter tutorial — the whole loop in miniature</h2></div>
-      <p class="sec-sub">One aggregate, one slice, one rule. You will author, generate, query the anchor both directions, verify, change the tree, see staleness, and regenerate. Green lights are printed by the tool — trust them, not your eyes.</p>
-      <div class="steps">
-        <div class="step-item"><div><h4>Create the project</h4><p class="meta">refuses to touch an existing directory</p><p><code>node ../metarch-truthsrc/bin/truthsrc.js init counter-lab --format human</code> then <code>cd counter-lab</code>. Look inside: <code>truth/example/…</code> is the whole author tree — <code>aggregate.yaml</code> (state + <code>@rule</code>) and one slice.</p></div></div>
-        <div class="step-item"><div><h4>Plan before you write</h4><p class="meta">nothing is written yet</p><p><code>… generate-project --plan --format human</code> — the plan lists every file it <em>would</em> write. Read it. Generation should never be a surprise.</p></div></div>
-        <div class="step-item"><div><h4>Generate &amp; inspect freshness</h4><p class="meta">green light: inputs=current · evidence=verified · synchronized=true</p><p><code>… generate-project --format human</code> then <code>… status-project --out . --format human</code>. Open a generated file — every one carries its anchor header.</p></div></div>
-        <div class="step-item"><div><h4>Ask both directions</h4><p class="meta">the moment the loop closes</p><p><code>… query-project --knowledge SetCount</code> → the exact file and span. Then <code>… query-project --file &lt;that file&gt; --symbol &lt;symbol&gt;</code> → back to the rule. Knowledge and code, joined.</p></div></div>
-        <div class="step-item"><div><h4>Change the truth, not the code</h4><p class="meta">see staleness, then re-sync</p><p>Edit <code>truth/…/aggregate.yaml</code>: change the count default <code>0</code> → <code>2</code>. <code>status-project</code> now reports <strong>changed</strong>. <code>… generate-project --update --plan</code> shows the diff plan; <code>--update</code> applies it. Run generate again — <strong>written: 0</strong>. Idempotence is the gate.</p></div></div>
-        <div class="step-item"><div><h4>Verify &amp; take the picture</h4><p class="meta">green light: verify passed</p><p><code>… verify-project --out . </code> re-proves every anchor against file bytes. <code>… view-project --out . --html counter-map.html</code> exports a single-file map — open it offline.</p></div></div>
-      </div>
+      <div class="sec-head"><span class="no">02</span><h2>L1 · Counter: generate once, then change once</h2></div>
+      <p>After preparing the tool above, remain in the exercise parent directory. <code>counter-lab</code> must not exist. Every command names its project and a separate generated-output directory.</p>
+      <pre class="code" data-example="counter-first"><code>node "$TRUTHSRC_CLI" init counter-lab --format human
+cd counter-lab
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human</code></pre>
+      <p>The preview lists update actions, not a textual diff. After generation, expect <code>inputs=current</code>, <code>evidence=verified</code> and <code>synchronized=true</code>. These describe source and byte freshness, not Scala or bank behavior execution.</p>
+      <h3>Reverse-query a real location, not a guessed file or line</h3>
+      <p>A span is a half-open UTF-8 byte range, not a line number. This script derives a line from currently verified source and queries it back; it stops rather than inventing a missing location.</p>
+      <pre class="code" data-example="counter-reverse"><code>node --input-type=module &lt;&lt;'NODE'
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+const cli = process.env.TRUTHSRC_CLI;
+if (!cli) throw new Error('TRUTHSRC_CLI is required');
+const base = ['--project', 'truthsrc.project.json', '--out', 'generated'];
+const forward = JSON.parse(execFileSync(process.execPath, [cli, 'query-project', ...base,
+  '--knowledge', 'SetCount', '--format', 'json'], { encoding: 'utf8' }));
+const loc = forward.result.flatMap(row =&gt; row.locations).find(item =&gt;
+  item.file.endsWith('CounterRules.scala') &amp;&amp; item.verification.spanVerified &amp;&amp;
+  item.freshness === 'current-bytes' &amp;&amp; item.span.text.startsWith('  def SetCount('));
+if (!loc) throw new Error('No verified current SetCount span; inspect status first');
+const bytes = readFileSync(join('generated', loc.file));
+const line = bytes.subarray(0, loc.span.start).toString('utf8').split('\n').length;
+process.stdout.write(execFileSync(process.execPath, [cli, 'query-project', ...base,
+  '--file', loc.file, '--line', String(line), '--format', 'human'], { encoding: 'utf8' }));
+NODE</code></pre>
+      <h3>Verify and export an offline snapshot</h3>
+      <pre class="code" data-example="counter-verify"><code>node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" view-project --project truthsrc.project.json --out generated --html counter-map.html --knowledge SetCount --format human</code></pre>
+      <p>Open the newly created <code>counter-map.html</code>. It is a fixed read-only snapshot, not a live view of disk changes.</p>
+      <h3>Change the initial value, see staleness, then synchronize</h3>
+      <p>In <code>truth/example/contexts/example/aggregates/counter/aggregate.yaml</code>, change only count’s <code>"default": "0"</code> to <code>"default": "2"</code>. Still inside <code>counter-lab</code>, run:</p>
+      <pre class="code" data-example="counter-update"><code>node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human</code></pre>
+      <p>Before update, inputs should be <code>changed</code> while existing files may remain <code>unchanged</code>: their bytes still match the last generation. After update, verification passes. The final repeat should report <code>written=0</code> for generated source files, not all evidence writes. Keep old snapshots; use a new filename for a later export.</p>
+      <p class="small">On an existing directory or output conflict, preserve it and inspect ownership and inputs. Do not delete directories or hand-edit ledgers to force success. See the tool’s <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/TUTORIAL.md">TUTORIAL.md</a> for the full CLI contract.</p>
     </section>
 
     <section id="l2">
@@ -110,15 +143,17 @@ node "$BANK/tools/bank-workshop.mjs" doctor --through code \
 
       <h3 id="bank-convenience">Convenience generation — not the workshop recipe</h3>
       <p>The existing local path validates, generates into <code>generated/current/</code>, compiles handwritten production sources with the generated project, and verifies anchors. Its first generation may fetch SHA-256-pinned engines from Maven Central. It does not establish that the formal supplies above are present, and it does not start or accept the service.</p>
-      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
+      <pre class="code" data-example="bank-convenience"><code>: "${TRUTHSRC_WORKSPACE:?Complete the source setup first}"
+cd "$TRUTHSRC_WORKSPACE"
+git clone https://github.com/MadPolaris/bank-wealth-demo.git
 cd bank-wealth-demo
 npm run validate
 npm run compile
-node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
+node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out bank.graph.sqlite
 npm run project
 cd generated/current &amp;&amp; sbt compile
 sbt test
-cd ../.. &amp;&amp; node ../metarch-truthsrc/bin/truthsrc.js verify-project \
+cd ../.. &amp;&amp; node "$TRUTHSRC_CLI" verify-project \
   --project truthsrc.project.json --out generated/current</code></pre>
       <p class="small"><strong>Historical capture, 2026-11-11:</strong> 0 hard findings and 157 byte-identical roundtrip atoms <a class="badge verified" href="/status/#F-01" data-fact="F-01">F-01</a> <a class="badge verified" href="/status/#F-02" data-fact="F-02">F-02</a>; 235 generated files <a class="badge verified" href="/status/#F-04" data-fact="F-04">F-04</a>; 0 compile errors across 534 sources <a class="badge verified" href="/status/#F-06" data-fact="F-06">F-06</a>; <strong>23/23 generated unit tests, not independent handwritten tests</strong> <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a>; 792 verified anchors <a class="badge verified" href="/status/#F-05" data-fact="F-05">F-05</a>. These counts are not asserted for the newer service candidate.</p>
       <div class="callout teal"><b>CURRENT TECHNICAL EVIDENCE, NOT YOUR RUN’S RESULT</b><p><code>bank030-relocated-20261112-02</code> passed and rechecked source / anchors / code / service on 2026-11-12 <a class="badge verified" href="/status/#F-24" data-fact="F-24">F-24</a>, including real database/HTTP and automated browser observations <a class="badge verified" href="/status/#F-26" data-fact="F-26">F-26</a>. The old P23/service02 failure stays historical (<a href="/status/#DEF-06">DEF-06</a>). Independent experience remains open: session03 did not reach readiness, cleanup was not a pass, and the later fix candidate is unexecuted (<a href="/status/#DEF-07">DEF-07</a>). Public materials (<a href="/status/#DEF-15">DEF-15</a>) and human acceptance (<a href="/status/#DEF-16">DEF-16</a>) are not signed off by that technical result. See <a href="/bank-demo/#technical-acceptance">the bank’s scoped results and remaining boundaries</a>.</p></div>
@@ -140,15 +175,15 @@ cp -r /absolute/path/to/metarch-truthsrc/skills/truthsrc .claude/skills/</code><
       <h3>The exercise: plan an incremental change by blast radius</h3>
       <div class="steps">
         <div class="step-item"><div><h4>Give the agent a requirement</h4><p class="meta">in Claude Code, inside bank-wealth-demo</p><p>Try: <em>“We need to change what happens when an SIP installment fails. Before proposing anything, query the truth graph for the blast radius of <code>SipInstallmentFailed</code> and report which slices, read models and pipelines are affected.”</em></p></div></div>
-        <div class="step-item"><div><h4>Watch the discipline work</h4><p class="meta">describe → expand → blast_radius, following next_actions</p><p>The agent should walk propagating edges from the event, enumerate affected guards/read-models/pipelines (dozens of nodes within 3 hops), and only then draft a change proposal <strong>against the tree</strong> — not against code.</p></div></div>
-        <div class="step-item"><div><h4>Apply the editing contract</h4><p class="meta">agents draft; gates judge</p><p>Any tree edit must end with <code>validate</code> (0 hard) <strong>and</strong> <code>roundtrip</code> (byte-identical) green, then <code>generate-project --update --plan</code> to see the regeneration diff before applying. That’s stewardship, mechanically enforced.</p></div></div>
+        <div class="step-item"><div><h4>Watch the discipline work</h4><p class="meta">describe → expand → blast_radius, following next_actions</p><p>The agent should report nodes actually reached, traversal limits and missing modeled connections. The website’s 55-node snapshot result contains aggregates, commands, events and slices—not read models or pipelines <a href="/status/#F-21" data-fact="F-21">F-21</a>. Review those dependencies separately before drafting a proposal against the appropriate author inputs.</p></div></div>
+        <div class="step-item"><div><h4>Apply the editing contract</h4><p class="meta">agents draft; humans approve; gates check</p><p>A human approves the business expectation and editing scope. Validate and roundtrip check their specified contracts; neither approves business meaning. Preview update actions with <code>generate-project --project truthsrc.project.json --out generated/current --update --plan</code>, then run the relevant behavioral checks and anchor verification. The plan is not a textual diff.</p></div></div>
       </div>
       <p class="small">Also shipped: skills for extracting a tree from an existing codebase, from reachable data, or bootstrapping workshop drafts from a one-line description — <code>skills/</code> in the toolchain repo.</p>
     </section>
 
     <section id="redlines">
       <div class="sec-head"><span class="no">05</span><h2>Red lines &amp; recovery</h2></div>
-      <div class="callout red"><b>NEVER</b><p><strong>Never hand-edit derived artifacts</strong> — the compiled canonical, <code>.truthsrc/</code>, ledgers, anchors, or generated files. They are regenerated; your edits are void (and detected). If generated code looks wrong, the fix belongs in the tree — that is the entire point. &nbsp;·&nbsp; <strong>Never force past a red gate.</strong> <code>validate</code> findings and roundtrip divergence are information, not obstacles. &nbsp;·&nbsp; <strong>Graph store? Delete freely</strong> — it is a pure cache, rebuild with one <code>graph</code> command.</p></div>
+      <div class="callout red"><b>NEVER</b><p><strong>Do not patch derived artifacts or force past failed gates.</strong> Business meaning belongs in the author tree; technical choices in bindings; parsing/generation defects in the shared toolchain; external effects in supported handwritten implementations. Preserve conflicts and failed evidence. A graphstore cache and the project knowledge/anchor database are different assets: one graph command cannot recover every kind of evidence. Do not delete SQLite files indiscriminately.</p></div>
       <p class="small">Stuck? The toolchain README has a diagnostics section; the <a href="/status/#facts">facts page</a> tells you exactly which claims are verified on which date — if your numbers differ from ours, trust your terminal.</p>
     </section>
   </main>

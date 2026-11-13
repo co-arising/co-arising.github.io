@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/pipeline/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/pipeline/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/pipeline/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/pipeline/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">生命周期</p>
       <h1>真源树 → 代码，<span class="accent">再回来</span></h1>
@@ -37,27 +39,19 @@
         <div class="step"><span class="snum">02 · 闸门</span><b>验证 + 往返</b><p><code>validate</code> 0 硬发现；<code>roundtrip</code> 逐字节一致。<span class="badge verified" title="F-01/F-02">157 原子 ✓</span></p></div>
         <div class="step"><span class="snum">03 · 图谱</span><b>编译 &amp; 推送</b><p>canonical 投影 → SQLite 图谱：<span class="badge verified" title="F-03">389 节点 / 413 边</span>。</p></div>
         <div class="step"><span class="snum">04 · 生成</span><b>CQRS 代码库</b><p><code>generate-project</code>：<span class="badge verified" title="F-04">235 个文件</span>，<span class="badge verified" title="F-06">0 编译错误</span>。</p></div>
-        <div class="step"><span class="snum">05 · 手写</span><b>填手写区</b><p>端口是生成的；行为进物理隔离的手写模块——<span class="badge verified" title="F-08">35 个文件</span>，完整实现。</p></div>
+        <div class="step"><span class="snum">05 · 手写</span><b>填手写区</b><p>端口与已声明的守卫、fold 由生成器实现；剩余计算和集成进入物理隔离的手写模块——<span class="badge verified" title="F-08">35 个文件</span>，完整实现。</p></div>
         <div class="step"><span class="snum">06 · 验证</span><b>证明血缘</b><p><code>verify-project</code>：<span class="badge verified" title="F-05">792 个锚点</span>；生成单元测试 <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">23/23</a>。</p></div>
       </div>
-      <p class="small">然后它循环：改树，<code>status-project</code> 显示哪些生成文件过期，<code>generate-project --update</code> 刷新它们。另行复核的 Counter 更新在输入未变时重复执行，写入 <strong>0 个生成源码文件</strong>——不是图/证据零写入 <a class="badge verified" href="/zh/status/#F-29" data-fact="F-29">F-29</a>。</p>
+      <p class="small">输入过期与输出字节变化是两回事：<code>status-project</code> 分别报告输入和已有生成文件的状态；<code>generate-project --update --plan</code> 给出将要执行的更新动作，不是文本 diff。反查行号要从匹配源码的 UTF-8 span 换算，不猜固定文件/行号。</p>
     </section>
 
     <section id="anchors">
       <div class="sec-head"><span class="no">02</span><h2>锚点：别人都没交付的那部分</h2></div>
       <p class="sec-sub">代码生成很常见。<strong>出身证明</strong>不常见。每个生成文件都携带锚点元数据，把它绑定到产生它的知识节点——而且这个绑定靠重读字节来验证，不是靠信任一份清单。</p>
-      <div class="term">
-        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">两个方向，各一条命令</span></div>
-        <pre><span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
-<span class="o">  knowledge  rule:SetCount (aggregate example/Counter)</span>
-<span class="o">  generated  app/domain/example/Counter.scala  L31–L54   ← 是区间，不是猜的</span>
-
-<span class="p">$</span> <span class="c">truthsrc query-project --file app/domain/example/Counter.scala --symbol setCount</span>
-<span class="o">  source     slice example/set-count  →  guards  →  rule:SetCount</span>
-
-<span class="p">$</span> <span class="c">truthsrc verify-project --project truthsrc.project.json --out app/</span>
-<span class="ok">✓ 通过</span> <span class="o">— 每个锚点都对照文件字节重新验证（银行项目 792 个）</span></pre>
-      </div>
+      <div class="term"><div class="term-bar"><span class="title">在自己的 Counter 项目中；具体反查步骤见指南</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</pre></div>
       <div class="card-grid cols-3">
         <div class="card"><span class="tag">为什么重要</span><h3>「这一行从哪来的？」</h3><p>是合规问题、是调试问题，也是新人上手问题——用查询回答，不用考古。</p></div>
         <div class="card"><span class="tag">为什么诚实</span><h3>字节级精度，不是感觉</h3><p>锚点记录区间；验证重读文件。如果有人改了生成代码，验证会报告漂移，而不是默默继续信任。</p></div>
@@ -67,10 +61,10 @@
 
     <section id="handwritten">
       <div class="sec-head"><span class="no">03</span><h2>手写区</h2></div>
-      <p class="sec-sub">生成哲学：<strong>生成端口，把行为留给人</strong>（和他们的智能体）——但只留在再生成永远碰不到的物理隔离模块里。</p>
+      <p class="sec-sub">生成哲学：<strong>生成结构与已声明领域行为，剩余计算和外部集成由人实现</strong>（和他们的智能体）——但只留在再生成永远碰不到的物理隔离模块里。</p>
       <div class="card-grid cols-2">
-        <div class="card"><span class="tag">生成侧</span><h3>一切结构性的东西</h3><p>聚合、命令、事件、守卫（从 <code>@rule</code> 不变量编译而来）、proto schema、端口、测试脚手架——银行项目 235 个文件，全部可再生成，全部有锚点。</p></div>
-        <div class="card"><span class="tag">手写侧</span><h3>一切行为性的东西</h3><p>对 mock TA 的效果执行、JDBC 装配、恢复循环、读侧追赶、HTTP 页面——<strong>35 个文件，完整实现</strong> <span class="badge verified" title="F-08">已验证</span>，经 <code>unmanagedSourceDirectories</code> 挂进构建。没有任何 <code>BEGIN MANUAL</code> 标记——边界就是文件系统本身。</p></div>
+        <div class="card"><span class="tag">生成侧</span><h3>结构与已声明领域行为</h3><p>聚合、命令、事件、守卫（从 <code>@rule</code> 不变量编译而来）、proto schema、端口、测试脚手架——银行项目 235 个文件，全部可再生成，全部有锚点。</p></div>
+        <div class="card"><span class="tag">手写侧</span><h3>外部效果与剩余集成</h3><p>对 mock TA 的效果执行、JDBC 装配、恢复循环、读侧追赶、HTTP 页面——<strong>35 个文件，完整实现</strong> <span class="badge verified" title="F-08">已验证</span>，经 <code>unmanagedSourceDirectories</code> 挂进构建。没有任何 <code>BEGIN MANUAL</code> 标记——边界就是文件系统本身。</p></div>
       </div>
       <div class="callout"><b>测试范围</b><p>树变了，生成文件被刷新；手写区不被覆盖。<strong>2026-11-11 的 23/23 是生成单元测试</strong> <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a>：手写生产源码随构建编译，不代表独立手写测试预期已验证。新技术候选的 actor <strong>64 项</strong>、readside <strong>47 项</strong>通过，保留固定业务预期；两组<strong>共享 23 项生成测试</strong>，不能相加当作互不重复用例 <a class="badge verified" href="/zh/status/#F-25" data-fact="F-25">F-25</a>。</p></div>
     </section>

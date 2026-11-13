@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/why-co-arising/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/why-co-arising/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/why-co-arising/" />
+  <link rel="canonical" href="https://co-arising.github.io/why-co-arising/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — the interactive demo below shows its static fallback. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">Philosophy</p>
       <h1>Why <span class="accent">co-arising</span>, not ontology</h1>
@@ -61,7 +63,7 @@
 
     <section id="demo">
       <div class="sec-head"><span class="no">03</span><h2>Feel it: the aggregate dissolve / arise demo</h2></div>
-      <p class="sec-sub">Real subgraph from the bank example’s <code>CreditBalance</code> aggregate (exported from the compiled knowledge graph). <strong>Dissolve</strong>: pull the relations out one by one and watch the aggregate lose its footing. <strong>Arise</strong>: build it back from scattered workshop notes. No physics engine, no metaphor — just the actual relations from the registry.</p>
+      <p class="sec-sub">A relationship exercise over the exported <code>CreditBalance</code> subgraph. Remove or restore edges using the diagram or the keyboard-accessible checklist. It measures declared guard coverage, not execution of the bank rules. All edits stay in this exercise; they do not change the source tree or the Explorer database.</p>
       <div class="dissolve-stage" id="dissolve-stage">
         <noscript>
           <p style="padding:20px;font-size:14px;color:var(--ink-2)">
@@ -71,7 +73,7 @@
           </p>
         </noscript>
       </div>
-      <p class="small">The edge labels are real relation names from the <a href="/dsl/#relations">R1–R22 registry</a>. When a guard edge is gone, the invariant it enforced is <em>unchecked</em> — which is precisely what the graph verb <code>orphans</code> reports mechanically. <a href="/explorer/#orphans">Run orphans on the full graph ↗</a></p>
+      <p class="small">Guard edges here are expanded from slice declarations. Losing one means incomplete coverage in this exercise. The separate <a href="/explorer/#orphans">raw event-producer query</a> checks for missing <code>produces</code> edges, not missing guards; it does not receive these local edits.</p>
     </section>
 
     <section id="vs-ontology">
@@ -125,6 +127,7 @@
   <footer id="site-footer"></footer>
   <script src="/assets/js/site.js"></script>
   <script src="/assets/data/dissolve-subgraph.js"></script>
+  <script src="/assets/js/dissolve-model.js"></script>
   <script src="/assets/js/dissolve.js"></script>
 </body>
 </html>

@@ -1,79 +1,102 @@
-# Pre-deploy checks
+# Local checks and publication checklist
 
-Run `python3 -B tools/check-site.py` first (standard library only, read-only, no network).
-It checks page pairs, links/anchors, fact and ledger IDs, local assets, graph SHA/counts,
-and private paths in public text. Missing self-canonical metadata is a warning until
-that migration is complete; `--strict` makes it fail. A passing static check is not
-a browser or bank-runtime acceptance result.
+Run these commands from the site repository. Deployment still requires no build step;
+the following are maintenance tools, not browser runtime dependencies.
 
-Manual checklist, run against a local server (`python3 -m http.server 8000`
-from this repo root — `file://` will CORS-block the sqlite fetch).
+## Automated checks
 
-## Pages
+```sh
+python3 -B tools/check-site.py --strict
+node tools/check-examples.mjs
+node --test tools/tests/*.test.mjs
+```
 
-- [ ] Every page loads: `/`, `/why-co-arising/`, `/dsl/`, `/pipeline/`,
-      `/bank-demo/`, `/explorer/`, `/compare/`, `/guide/`, `/status/`, `/404.html`
-- [ ] Every zh page loads: `/zh/` plus the same nine paths under `/zh/…`
-- [ ] Nav current-page highlight correct on each page (EN and zh)
-- [ ] Footer repo links resolve (truthsrc → co-arising org; engines/bank → MadPolaris)
-- [ ] Theme tri-state cycles auto → light → dark; persists across reload
-- [ ] Nav 中/EN switch lands on the counterpart page (same page, other language),
-      carrying `#hash` and `?query`; no dead `/zh` + double-slash corners
+- The static checker uses the Python standard library. It checks 18 content pages
+  plus 404, bilingual IDs, canonical/hreflang, local links, registered F/DEF IDs,
+  asset existence, graph bytes/counts and private paths in public prose. It does
+  not certify every prose claim or third-party URL.
+- The example checker compares nine marked EN/ZH payloads, explicit project/output
+  flags and the captured source fingerprint. To also compare the captured slice
+  with an existing bank checkout, use
+  `node tools/check-examples.mjs --bank-root /absolute/bank-wealth-demo`.
+  It reads that checkout without modifying or compiling it. A mismatch requires
+  reviewing the new source and both pages; do not merely replace the hash.
+- Node tests cover graph-query isolation, real SQL behavior and limits, guard
+  coverage, page routing, copy payloads and failed browser storage/clipboard paths.
+  Node 22 is the recorded validation environment. These tests do not run bank/JVM
+  services and do not replace native browser observation.
 
-## Honesty layer
+## Browser observation
 
-- [ ] No quantitative claim without a `title="F-xx"` badge or an inline fact ref
-      (EN and zh pages carry the same F-xx IDs and the same numbers)
-- [ ] `grep -rhoE '[0-9]+' index.html */index.html zh/index.html zh/*/index.html`
-      sanity pass on suspicious numbers — zh numbers must equal EN numbers
-- [ ] Every `/status/#DEF-xx` anchor exists on the status page (EN `/status/`,
-      zh `/zh/status/`)
-- [ ] SITE-FACTS.md F-xx list matches badges used across pages
-- [ ] LEDGER.md rows match the status-page tables (EN + zh) — same-commit rule
-- [ ] F-24–F-29 identify their candidate/date, not a whole-site or production pass
-- [ ] Current SQL rebuild is 66.847 s; actor64/readside47 share 23 tests
-- [ ] Historical P23 failure, new technical pass, independent experience and public/human delivery are separate
-- [ ] Public evidence summary contains no internal paths, logs, session credentials or raw failure records
-- [ ] `--runtime-supply` applies to the correct workshop scopes; source and sealed sessions do not accept unused overrides
+With Python Playwright and its Chromium browser already installed:
 
-## Explorer
+```sh
+python3 -B tools/browser-checks.py
+```
 
-- [ ] sql.js loads offline (DevTools → Network → Offline → reload)
-- [ ] All 7 presets run and their stated expected answers match results
-      (EN `/explorer/` and zh `/zh/explorer/`; zh shows Chinese titles/prose)
-- [ ] Free SQL console: census query returns 389-node graph numbers
-- [ ] Radial view renders for a describe result
+The driver starts its own static server on **127.0.0.1 with an ephemeral port**, drives
+the actual pages and Worker, and stops both browser and server. It retains screenshots
+and `report.json` in a new system temporary directory and prints the location. It does
+not install dependencies, publish files or use existing bank resources. Use the Python
+interpreter that owns your Playwright installation, not an unrelated Python on PATH.
 
-## Dissolve demo
+Covered surfaces: all content routes, language fragments and 404, exact EN/ZH clipboard
+payloads, denied storage/clipboard, keyboard guard changes and full Arise reconstruction,
+seven SQL presets, disposable writes, empty/error/truncated results, cancellation,
+slow initial loads, wrong database hashes, no-JavaScript content and narrow-screen overflow.
 
-- [ ] Dissolve mode: removing ALL guard edges of a slice flags that slice
-- [ ] Arise mode rebuilds to full assembly
-- [ ] Fallback text visible with JS disabled
-- [ ] zh `/zh/why-co-arising/`: Chinese captions/controls; caption deep links
-      point at `/zh/explorer/#orphans`, not the EN path
+Chromium has been exercised. WebKit, human screen-reader review, a fresh public tool
+installation and bank service acceptance remain separate checks. Do not claim them from
+a Chromium report. Manual screenshots should record viewport/theme when reviewing
+visual differences.
 
-## Chinese edition (zh)
+For a manual preview, bind only to localhost:
 
-- [ ] `<html lang="zh-CN">` on all nine zh pages; EN pages stay `lang="en"`
-- [ ] hreflang pairs present in both heads (en / zh-CN / x-default)
-- [ ] zh nav labels come from site.js (`labelZh`) — no duplicated link lists
-- [ ] explorer.js / dissolve.js pick the dictionary from `<html lang>`, not
-      from `location.pathname`
-- [ ] `/zh/` pages link internal pages to `/zh/…` (no accidental EN hops),
-      while `/assets/…`, `/downloads/bank-workshop.html` and GitHub links stay
-      site-root absolute
-- [ ] No untranslated English prose left in zh page bodies (spot-read each page)
+```sh
+python3 -m http.server 8000 --bind 127.0.0.1
+```
 
-## Assets
+`file://` is not the Explorer entry: its database/WASM require same-origin HTTP.
+The downloaded workshop HTML is a separate self-contained offline snapshot.
 
-- [ ] `assets/data/bank-wealth.graph.sqlite` sha256 matches meta.json
-- [ ] `downloads/bank-workshop.html` opens offline from disk (zh-CN, self-contained)
-- [ ] Total repo weight < 8 MB excluding .git
+## Content and evidence
 
-## Deployment
+- [ ] EN/ZH code payloads, fact IDs, source references and failure boundaries agree.
+- [ ] F-24–F-29 retain candidate/date/platform scope. SQL rebuild is 66.847 s;
+      actor64/readside47 share 23 generated tests.
+- [ ] Historical P23 failure, current technical pass, independent experience,
+      public materials and human acceptance remain separate.
+- [ ] Raw orphan nodes (23 rows / 13 names) are not equated with 11 canonical
+      sourceless events. Lineage is model-to-declared-source, not a field-level proof.
+- [ ] No private audit paths, raw logs, credentials or session login material are
+      copied into public pages or the sanitized summary.
+- [ ] `--runtime-supply` is documented only for the correct workshop scopes;
+      source rejects unused supplies and sessions use sealed run inputs.
+- [ ] Content update dates do not re-date old verification captures.
 
-- [ ] `.nojekyll` present at root
-- [ ] Pushed to `co-arising/co-arising.github.io` main branch
-- [ ] https://co-arising.github.io/ serves; social card preview (OG png) correct
-- [ ] No external network calls anywhere (grep for `https://` in JS/HTML —
-      links to GitHub/docs are fine; `fetch`/`src=` to CDNs are not)
+## Interaction and accessibility
+
+- [ ] Static navigation and prose remain available with JS disabled or unavailable.
+- [ ] Language switching retains current supported query/fragment state; unknown
+      paths recover to language homes rather than adding repeated `/zh` prefixes.
+- [ ] Theme remains usable without localStorage. Copy does not include control text;
+      denied copying is not labelled successful.
+- [ ] Partial guard loss differs from complete/no coverage; keyboard controls can
+      remove and restore every relation without losing focus.
+- [ ] Free SQL uses a new disposable Worker database for every run. Changes are
+      discarded; preset data and original bytes remain intact. This is isolation,
+      not an SQL read-only authorizer or an arbitrary-input memory-safety guarantee.
+- [ ] Text/result limits and cancellation are visible; late results cannot overwrite
+      a newer selection. An unavailable graph shows unexecuted expectations.
+- [ ] Text contrast, visible focus, 200% zoom, reduced motion and mobile reading have
+      been checked for the actual changed screens. No broad WCAG-certification claim.
+
+## Assets and publication (explicit authorization required)
+
+- [ ] Graph SHA-256 matches metadata; derived data is regenerated, not hand-edited.
+- [ ] Reading pages do not load the database/WASM or workshop snapshot.
+- [ ] Runtime assets are local; external GitHub/documentation links are not runtime
+      requests. A cold offline visit is not guaranteed without prior asset caching.
+- [ ] `.nojekyll` remains present; no framework/build/CDN dependency was introduced.
+- [ ] Review the final diff and staged file list; do not include temporary evidence.
+- [ ] Commit/push only when authorized, then separately check the live deployment.

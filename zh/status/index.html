@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/status/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/status/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/status/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/status/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">诚实层</p>
       <h1>状态、事实与<span class="accent">台账</span></h1>
@@ -68,7 +70,7 @@
           <tr id="F-17"><th scope="row" class="nm">F-17</th><td>工作坊 HTML 快照，不同于 Explorer 图</td><td><span class="badge verified" title="F-17">快照范围已核对</span> 单文件、2.18 MB、离线、zh-CN；导出 120 节点 / 183 边，项目视图声明总量 861 / 737；省略 741 节点</td><td><time datetime="2026-11-06">2026-11-06</time>；范围核对于 <time datetime="2026-11-13">2026-11-13</time></td><td><a href="/downloads/bank-workshop.html">快照</a>内嵌的 <code>workshop-view</code> 属于 <code>truthsrc.project-view/v1</code>，不是 <a href="#F-03">F-03 graphstore</a>。核对导出数组、总量与截断字段；该历史快照不含新的服务验收报告。</td></tr>
           <tr><th scope="row" class="nm"><span id="F-18">F-18</span> / <span id="F-19">F-19</span> / <span id="F-20">F-20</span></th><td>许可</td><td><span class="badge verified" title="F-18, F-19, F-20">已验证</span> 引擎：Apache-2.0，tag v0.3.0 · truthsrc：MIT · bank：Apache-2.0</td><td>F-18：<time datetime="2026-11-12">2026-11-12</time><br />F-19/20：<time datetime="2026-11-11">2026-11-11</time></td><td>各仓库 LICENSE；引擎 tag</td></tr>
           <tr id="F-21"><th scope="row" class="nm">F-21</th><td>影响半径，<code>SipInstallmentFailed</code> d3</td><td><span class="badge verified" title="F-21">已验证</span> 55 个节点——站点 SQL 预设 ≡ CLI 动词</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>对 bank canonical 运行 MCP <code>blast_radius</code></td></tr>
-          <tr id="F-22"><th scope="row" class="nm">F-22</th><td>孤儿</td><td><span class="badge verified" title="F-22">已验证</span> 11 个去重的无源事件（23 行 graphstore）</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>MCP <code>orphans</code></td></tr>
+          <tr id="F-22"><th scope="row" class="nm">F-22</th><td>孤儿</td><td><span class="badge verified" title="F-22">已验证</span> canonical：11 个无源事件。原始查询：23 节点 / 13 个名称，其中 2 个限定请求别名有本地生产者</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>MCP <code>orphans</code></td></tr>
           <tr id="F-23"><th scope="row" class="nm">F-23</th><td>引擎已上架 Maven Central</td><td><span class="badge verified" title="F-23">发布已核验</span> <code>net.imadz</code> saga-core / monarch-core / monarch-persistence 0.3.0；JAR SHA-256 550fbd5c… / 0c7a25ee… / f42f1b99…。发布不等于银行服务验收。</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>公开 JAR/POM 响应与固定字节；取得指定版本制品并对比 SHA-256。<a href="/docs/bank-technical-20261112.md#中文">验收摘要</a></td></tr>
           <tr id="F-24"><th scope="row" class="nm">F-24</th><td>银行移址技术验收</td><td><span class="badge verified" title="F-24">通过并复核</span> source / anchors / code / service；<code>fullPipelinePassed=true</code>；diagnostics 为空</td><td><time datetime="2026-11-12">2026-11-12</time></td><td><code>bank030-relocated-20261112-02</code>；bank <code>ce51d0e6</code> 加 16 项固定 source overlay，tool <code>cb860b5c</code>。<a href="/docs/bank-technical-20261112.md#中文">范围与前置条件</a>：仍需私有配对材料，不承诺公开一键复演。</td></tr>
           <tr id="F-25"><th scope="row" class="nm">F-25</th><td>Actor 与 readside 测试范围</td><td><span class="badge verified" title="F-25">通过</span> actor 64 项；readside 47 项；共享 23 项生成测试，不是 111 个独立用例</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>同一移址候选；<code>verify --through service</code> 分别构建 actor/readside，保留已批准的固定业务预期。仍须满足 <a href="#F-24">F-24 前置条件</a>。</td></tr>

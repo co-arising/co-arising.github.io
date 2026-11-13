@@ -37,7 +37,7 @@
   /* ink */
   --ink: #1c1913;
   --ink-2: #4c463a;
-  --ink-3: #7d7666;
+  --ink-3: #686052;
 
   /* lines */
   --line: #d8d1bf;
@@ -49,7 +49,7 @@
   --red-ink: #8f2a12;
   --teal: #1e5f54;
   --teal-soft: #d9e8e2;
-  --amber: #96660a;
+  --amber: #795108;
   --amber-soft: #f0e3c2;
   --green-ok: #2c7a52;
 
@@ -75,7 +75,9 @@
   --hero-line: rgba(243, 239, 228, .26);
 
   /* typography scale */
-  --font-sans: "IBM Plex Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --button-bg: #a63118;
+  --button-ink: #fff;
+  --font-sans: "IBM Plex Sans", -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --fs-hero: clamp(40px, 6.2vw, 74px);
   --fs-h2: clamp(26px, 3.4vw, 38px);
@@ -123,11 +125,11 @@
   color-scheme: light;
   --bg: #f6f3ec; --bg-raised: #fffdf8; --bg-sink: #ede8dc;
   --surface-code: #14212b; --ink-on-code: #dce9e6;
-  --ink: #1c1913; --ink-2: #4c463a; --ink-3: #7d7666;
+  --ink: #1c1913; --ink-2: #4c463a; --ink-3: #686052;
   --line: #d8d1bf; --line-strong: #b9b09a;
   --red: #b3371c; --red-soft: #f3ddd4; --red-ink: #8f2a12;
   --teal: #1e5f54; --teal-soft: #d9e8e2;
-  --amber: #96660a; --amber-soft: #f0e3c2;
+  --amber: #795108; --amber-soft: #f0e3c2;
   --green-ok: #2c7a52;
   --shadow: 0 1px 2px rgba(28, 25, 19, .06), 0 8px 24px -12px rgba(28, 25, 19, .18);
 }

@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——你看到的是纯内容。导航：<a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源树语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">Explorer</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">实战指南</a> · <a href="/zh/status/">状态</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="home-hero">
       <p class="kicker">真源 · 托管投影 · 智能体访问</p>
       <h1>领域知识，<br />因<span class="accent">缘起</span>共生——且可编译。</h1>
@@ -38,17 +40,10 @@
         <a class="btn ghost" href="/zh/explorer/">查询真实图谱</a>
       </div>
 
-      <div class="term" role="img" aria-label="终端会话：初始化项目、生成代码、追问一条规则从哪来">
-        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">truthsrc —— 完整闭环，零 npm 依赖</span></div>
-        <pre><span class="p">$</span> <span class="c">truthsrc init counter-lab --format human</span>
-<span class="p">$</span> <span class="c">truthsrc generate-project --project truthsrc.project.json --out app/</span>
-<span class="ok">✓</span> <span class="o">已生成——然后验证每个文件都能回溯到树：</span>
-<span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
-<span class="o">  rule      SetCount.count >= 0</span>
-<span class="o">  generated app/domain/Counter.scala#L31-L54   ← 精确的字节区间</span>
-<span class="p">$</span> <span class="c">truthsrc verify-project --project … --out app/</span>
-<span class="ok">✓ 通过——792 个锚点全部验证（银行示例）</span></pre>
-      </div>
+      <div class="term"><div class="term-bar"><span class="title">在自己的 Counter 目录中；先完成指南的 CLI 准备</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</pre></div>
 
       <div class="stat-strip" aria-label="经验证的数字，2026-11-11 审计">
         <div class="stat"><div class="num">157</div><div class="lbl">银行完整示例中的真源原子 <span class="badge verified" title="F-02">已验证</span></div></div>
@@ -66,26 +61,23 @@
         <article class="feature"><span class="n">F-02</span><h3>一张可以盘问的图谱</h3><p>每次编译产出本地 SQLite 知识图谱。影响半径、血缘、孤儿、一致性——从 CLI 问、从 MCP 问，或者<a href="/zh/explorer/">在浏览器里问</a>。</p></article>
         <article class="feature"><span class="n">F-03</span><h3>带收据的代码生成</h3><p>生成可编译的 CQRS/ES Scala 代码库。每个生成文件都携带锚点：它来自哪个知识节点、哪个字节区间，一清二楚。<code>verify-project</code> 会重新证明这一点。</p></article>
         <article class="feature"><span class="n">F-04</span><h3>刻意保留的手写区</h3><p>端口是生成的；行为填在物理隔离的手写模块里。银行示例中的 35 个手写文件是完整实现，不是占位桩。</p></article>
-        <article class="feature"><span class="n">F-05</span><h3>智能体可用，但有守护纪律</h3><p>一个 MCP 服务器暴露 26 个只读工具，让编码智能体查询图谱，而不是到处 grep。智能体起草，人类定夺。真源树始终是唯一的编辑界面。</p></article>
+        <article class="feature"><span class="n">F-05</span><h3>智能体可用，但有守护纪律</h3><p>一个 MCP 服务器暴露 26 个只读工具，让编码智能体查询图谱，而不是到处 grep。智能体起草，人类定夺。真源树是唯一的知识编辑面；技术绑定与手写实现各有独立职责。</p></article>
         <article class="feature"><span class="n">F-06</span><h3>构造性地诚实</h3><p>没做完的东西在<a href="/zh/status/">台账</a>上，不在营销话术里。独立体验、公开材料交付、托管与 BDD 衍生物——全部与技术验收分开追踪。</p></article>
       </div>
     </section>
 
     <section id="quickstart">
       <div class="sec-head"><span class="no">02</span><h2>快速开始</h2></div>
-      <p class="sec-sub">Node ≥ 22.13 是唯一要求。不需要 JVM、不需要数据库、不联网。包含银行示例与 MCP 集成的完整教程在<a href="/zh/guide/">实战指南</a>。</p>
-      <pre class="code"><code># 1 · 拿到工具链（源码检出；npm 发布在台账上）
+      <p class="sec-sub">在新的练习目录中使用 Node ≥ 22.13。取得工具源码需要网络；Counter 生成闭环不需要 JVM 或数据库服务。包含银行示例与 MCP 集成的完整教程在<a href="/zh/guide/">实战指南</a>。</p>
+      <pre class="code" data-example="home-quickstart"><code>export TRUTHSRC_WORKSPACE="$PWD"
 git clone https://github.com/co-arising/metarch-truthsrc.git
-npm install --prefix metarch-truthsrc
-
-# 2 · 创建第一个项目，在写入任何东西之前先看计划
-node metarch-truthsrc/bin/truthsrc.js init counter-lab --format human
+export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
+node "$TRUTHSRC_CLI" init counter-lab --format human
 cd counter-lab
-node ../metarch-truthsrc/bin/truthsrc.js generate-project --plan --format human
-
-# 3 · 生成，然后追问一条规则住在生成代码的哪里
-node ../metarch-truthsrc/bin/truthsrc.js generate-project --format human
-node ../metarch-truthsrc/bin/truthsrc.js query-project --knowledge SetCount</code></pre>
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</code></pre>
     </section>
 
     <section id="map">

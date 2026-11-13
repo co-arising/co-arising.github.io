@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/" />
+  <link rel="canonical" href="https://co-arising.github.io/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — you get the plain content. The nav: <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">The language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="home-hero">
       <p class="kicker">truth source · managed projections · agent access</p>
       <h1>Domain knowledge<br />that <span class="accent">co-arises</span> — and compiles.</h1>
@@ -40,17 +42,10 @@
         <a class="btn ghost" href="/explorer/">Query the live graph</a>
       </div>
 
-      <div class="term" role="img" aria-label="Terminal session: init a project, generate code, ask where a rule came from">
-        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">truthsrc — the whole loop, zero npm dependencies</span></div>
-        <pre><span class="p">$</span> <span class="c">truthsrc init counter-lab --format human</span>
-<span class="p">$</span> <span class="c">truthsrc generate-project --project truthsrc.project.json --out app/</span>
-<span class="ok">✓</span> <span class="o">generated — then verify every file traces back to the tree:</span>
-<span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
-<span class="o">  rule      SetCount.count >= 0</span>
-<span class="o">  generated app/domain/Counter.scala#L31-L54   ← the exact span</span>
-<span class="p">$</span> <span class="c">truthsrc verify-project --project … --out app/</span>
-<span class="ok">✓ passed — 792 anchors verified (on the bank example)</span></pre>
-      </div>
+      <div class="term"><div class="term-bar"><span class="title">Inside your own Counter project, after the guide’s CLI setup</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</pre></div>
 
       <div class="stat-strip" aria-label="Verified numbers, audited 2026-11-11">
         <div class="stat"><div class="num">157</div><div class="lbl">truth atoms in the bank worked example <span class="badge verified" title="F-02">verified</span></div></div>
@@ -68,26 +63,23 @@
         <article class="feature"><span class="n">F-02</span><h3>A graph you can interrogate</h3><p>Every compile produces a local SQLite knowledge graph. Ask blast radius, lineage, orphans, consistency — from the CLI, from MCP, or <a href="/explorer/">in your browser</a>.</p></article>
         <article class="feature"><span class="n">F-03</span><h3>Code generation with receipts</h3><p>Generates a compiling CQRS/ES Scala codebase. Every generated file carries an anchor: the exact knowledge node and byte span it came from. <code>verify-project</code> re-proves it.</p></article>
         <article class="feature"><span class="n">F-04</span><h3>A handwritten zone, by design</h3><p>Ports are generated; behavior is filled in a physically separate handwritten module. 35 handwritten files in the bank example are complete implementations, not stubs.</p></article>
-        <article class="feature"><span class="n">F-05</span><h3>Agents, but with stewardship</h3><p>An MCP server exposes 26 read-oriented tools so coding agents query the graph instead of grepping. Agents draft; humans decide. The tree stays the only editing surface.</p></article>
+        <article class="feature"><span class="n">F-05</span><h3>Agents, but with stewardship</h3><p>An MCP server exposes 26 read-oriented tools so coding agents query the graph instead of grepping. Agents draft; humans decide. The tree is the only knowledge-editing surface; explicit technical bindings and handwritten implementations have separate responsibilities.</p></article>
         <article class="feature"><span class="n">F-06</span><h3>Honest by construction</h3><p>What isn’t done is on the <a href="/status/">ledger</a>, not in the marketing. Independent experience, public material delivery, hosting and BDD derivatives — all tracked separately from technical acceptance.</p></article>
       </div>
     </section>
 
     <section id="quickstart">
       <div class="sec-head"><span class="no">02</span><h2>Quickstart</h2></div>
-      <p class="sec-sub">Node ≥ 22.13 is the only requirement. No JVM, no database, no network. The full walkthrough — including the bank example and the MCP integration — is on the <a href="/guide/">hands-on guide</a>.</p>
-      <pre class="code"><code># 1 · get the toolchain (source checkout; npm release is on the ledger)
+      <p class="sec-sub">Use Node ≥ 22.13 in a new exercise directory. Acquiring the source checkout needs a network; the Counter generation loop needs no JVM or database service. The full walkthrough — including the bank example and the MCP integration — is on the <a href="/guide/">hands-on guide</a>.</p>
+      <pre class="code" data-example="home-quickstart"><code>export TRUTHSRC_WORKSPACE="$PWD"
 git clone https://github.com/co-arising/metarch-truthsrc.git
-npm install --prefix metarch-truthsrc
-
-# 2 · create your first project and look at the plan before anything is written
-node metarch-truthsrc/bin/truthsrc.js init counter-lab --format human
+export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
+node "$TRUTHSRC_CLI" init counter-lab --format human
 cd counter-lab
-node ../metarch-truthsrc/bin/truthsrc.js generate-project --plan --format human
-
-# 3 · generate, then ask where a rule lives in the generated code
-node ../metarch-truthsrc/bin/truthsrc.js generate-project --format human
-node ../metarch-truthsrc/bin/truthsrc.js query-project --knowledge SetCount</code></pre>
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</code></pre>
     </section>
 
     <section id="map">

@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/pipeline/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/pipeline/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/pipeline/" />
+  <link rel="canonical" href="https://co-arising.github.io/pipeline/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">Lifecycle</p>
       <h1>Truth tree → code, <span class="accent">and back</span></h1>
@@ -37,27 +39,19 @@
         <div class="step"><span class="snum">02 · GATE</span><b>Validate + roundtrip</b><p><code>validate</code> 0 hard; <code>roundtrip</code> byte-identical. <span class="badge verified" title="F-01/F-02">157 atoms ✓</span></p></div>
         <div class="step"><span class="snum">03 · GRAPH</span><b>Compile &amp; push</b><p>Canonical projection → SQLite graph: <span class="badge verified" title="F-03">389 nodes / 413 edges</span>.</p></div>
         <div class="step"><span class="snum">04 · GENERATE</span><b>CQRS codebase</b><p><code>generate-project</code>: <span class="badge verified" title="F-04">235 files</span>, <span class="badge verified" title="F-06">0 compile errors</span>.</p></div>
-        <div class="step"><span class="snum">05 · HANDWRITE</span><b>Fill the zone</b><p>Ports are generated; behavior goes in the physically separate handwritten module — <span class="badge verified" title="F-08">35 files</span>, complete implementations.</p></div>
+        <div class="step"><span class="snum">05 · HANDWRITE</span><b>Fill the zone</b><p>Ports and declared guards/folds are generated; remaining implementation goes in the physically separate handwritten module — <span class="badge verified" title="F-08">35 files</span>, complete implementations.</p></div>
         <div class="step"><span class="snum">06 · VERIFY</span><b>Prove lineage</b><p><code>verify-project</code>: <span class="badge verified" title="F-05">792 anchors</span>; generated unit tests <a class="badge verified" href="/status/#F-07" data-fact="F-07">23/23</a>.</p></div>
       </div>
-      <p class="small">And then it loops: change the tree, <code>status-project</code> shows which generated files went stale, and <code>generate-project --update</code> refreshes them. In the separately reviewed Counter update, repeating it on unchanged inputs wrote <strong>0 generated-source files</strong> — not zero graph/evidence writes <a class="badge verified" href="/status/#F-29" data-fact="F-29">F-29</a>.</p>
+      <p class="small"><code>status-project</code> distinguishes changed inputs from output-byte drift; <code>generate-project --update --plan</code> lists prospective actions, not a textual diff. Derive reverse-query line numbers from a verified UTF-8 span and matching source bytes, never a guessed filename or line.</p>
     </section>
 
     <section id="anchors">
       <div class="sec-head"><span class="no">02</span><h2>Anchors: the part nobody else ships</h2></div>
       <p class="sec-sub">Generation is common. <strong>Proof of origin</strong> is not. Every generated file carries anchor metadata binding it to the knowledge node that produced it — and the binding is verified by re-reading bytes, not by trusting a manifest.</p>
-      <div class="term">
-        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">two directions, one command each</span></div>
-        <pre><span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
-<span class="o">  knowledge  rule:SetCount (aggregate example/Counter)</span>
-<span class="o">  generated  app/domain/example/Counter.scala  L31–L54   ← span, not guess</span>
-
-<span class="p">$</span> <span class="c">truthsrc query-project --file app/domain/example/Counter.scala --symbol setCount</span>
-<span class="o">  source     slice example/set-count  →  guards  →  rule:SetCount</span>
-
-<span class="p">$</span> <span class="c">truthsrc verify-project --project truthsrc.project.json --out app/</span>
-<span class="ok">✓ passed</span> <span class="o">— every anchor re-verified against file bytes (792 on the bank project)</span></pre>
-      </div>
+      <div class="term"><div class="term-bar"><span class="title">In your own Counter project; reverse-query steps are in the guide</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</pre></div>
       <div class="card-grid cols-3">
         <div class="card"><span class="tag">Why it matters</span><h3>“Where did this line come from?”</h3><p>A compliance question, a debugging question, and an onboarding question — answered by query, not by archaeology.</p></div>
         <div class="card"><span class="tag">Why it’s honest</span><h3>Byte-precision, not vibes</h3><p>Anchors record spans; verification re-reads the file. If a human edits generated code, verification reports drift instead of silently re-trusting.</p></div>
@@ -67,10 +61,10 @@
 
     <section id="handwritten">
       <div class="sec-head"><span class="no">03</span><h2>The handwritten zone</h2></div>
-      <p class="sec-sub">The generation philosophy: <strong>generate the ports, leave the behavior to people</strong> (and their agents) — but only in a physically separate module that regeneration can never touch.</p>
+      <p class="sec-sub">The generation philosophy: <strong>generate structure and declared domain behavior; handwrite remaining computations and integration</strong> (and their agents) — but only in a physically separate module that regeneration can never touch.</p>
       <div class="card-grid cols-2">
-        <div class="card"><span class="tag">Generated side</span><h3>Everything structural</h3><p>Aggregates, commands, events, guards (compiled from <code>@rule</code> invariants), proto schemas, ports, test scaffolding — 235 files in the bank project, all regenerable, all anchored.</p></div>
-        <div class="card"><span class="tag">Handwritten side</span><h3>Everything behavioral</h3><p>Effect execution against the mock TA, JDBC wiring, recovery loops, the read-side catch-up, HTTP pages — <strong>35 files, complete implementations</strong> <span class="badge verified" title="F-08">verified</span>, mounted into the build via <code>unmanagedSourceDirectories</code>. No <code>BEGIN MANUAL</code> markers anywhere — the boundary is the filesystem.</p></div>
+        <div class="card"><span class="tag">Generated side</span><h3>Structure and declared domain behavior</h3><p>Aggregates, commands, events, guards (compiled from <code>@rule</code> invariants), proto schemas, ports, test scaffolding — 235 files in the bank project, all regenerable, all anchored.</p></div>
+        <div class="card"><span class="tag">Handwritten side</span><h3>External effects and remaining integration</h3><p>Effect execution against the mock TA, JDBC wiring, recovery loops, the read-side catch-up, HTTP pages — <strong>35 files, complete implementations</strong> <span class="badge verified" title="F-08">verified</span>, mounted into the build via <code>unmanagedSourceDirectories</code>. No <code>BEGIN MANUAL</code> markers anywhere — the boundary is the filesystem.</p></div>
       </div>
       <div class="callout"><b>TEST SCOPE</b><p>When the tree changes, generated files are refreshed; the handwritten zone is not overwritten. The <strong>23/23 result from 2026-11-11 is generated unit tests</strong> <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a>: handwritten production sources compile with that build, but this is not evidence of independent handwritten test expectations. In the newer technical candidate, actor <strong>64</strong> and readside <strong>47</strong> passed with fixed business expectations; those scopes <strong>share 23 generated tests</strong> and must not be summed as distinct cases <a class="badge verified" href="/status/#F-25" data-fact="F-25">F-25</a>.</p></div>
     </section>

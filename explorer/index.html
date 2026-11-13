@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/explorer/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/explorer/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/explorer/" />
+  <link rel="canonical" href="https://co-arising.github.io/explorer/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,14 +21,15 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
-  <noscript><div class="wrap" style="padding-top:16px"><p class="small">This page needs JavaScript (sql.js runs locally in your browser — no network calls). <a href="/">Home</a></p></div></noscript>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">This page needs JavaScript (queries run locally after static assets are downloaded). <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">Explorer · runs entirely in your browser</p>
       <h1>Query the <span class="accent">real graph</span></h1>
-      <p class="thesis">This is not mock data: the SQLite file below is the compiled knowledge graph of the bank wealth example — 389 nodes, 413 edges <span class="badge verified" title="F-03">verified 2026-11-11</span> — loaded into your browser with sql.js. No server, no network calls after the page loads, nothing leaves your machine.</p>
+      <p class="thesis">This is not mock data: the SQLite file below is the compiled knowledge graph of the bank wealth example — 389 nodes, 413 edges <span class="badge verified" title="F-03">verified 2026-11-11</span> — loaded into your browser with sql.js. Only static assets are downloaded from this site. Query text and results are not sent to a server.</p>
     </header>
 
     <section id="console">
@@ -38,7 +40,7 @@
         <aside class="xp-side">
           <div class="xp-panel">
             <h4>Data fingerprint</h4>
-            <p class="xp-status" id="xp-status">loading sql.js…</p>
+            <p class="xp-status" id="xp-status" role="status">loading sql.js…</p>
           </div>
           <div class="xp-panel">
             <h4>Preset queries</h4>
@@ -47,26 +49,27 @@
               <li><button data-preset="describe">Describe an aggregate</button></li>
               <li><button data-preset="blast" id="preset-blast">Blast radius — SipInstallmentFailed</button></li>
               <li><button data-preset="lineage">Read-model lineage</button></li>
-              <li><button data-preset="orphans" id="preset-orphans">Orphans — unparented knowledge</button></li>
+              <li><button data-preset="orphans" id="preset-orphans">Raw events without incoming produces</button></li>
               <li><button data-preset="sagas">Sagas &amp; pipelines</button></li>
-              <li><button data-preset="invariants">Invariant enforcement</button></li>
+              <li><button data-preset="invariants">Guard declarations</button></li>
             </ul>
           </div>
           <div class="xp-panel">
             <h4>How to read it</h4>
-            <p class="small">Edges carry the relation name from the <a href="/dsl/#relations">R1–R22 registry</a>. Impact walks only <code>propagates=true</code> relations (the preset SQL encodes them) — mirroring the CLI’s <code>blast_radius</code> semantics: over-report rather than miss.</p>
+            <p class="small">Results follow modeled edges only. Impact traversal does not prove complete dependency coverage; raw aliases, documentary sources and canonical semantics are distinguished.</p>
           </div>
         </aside>
 
         <div class="xp-main">
-          <div class="xp-result" id="xp-result">
+          <div class="xp-result" id="xp-result" aria-live="polite" aria-busy="false">
             <h3>Pick a preset to begin</h3>
             <p class="answer">Or write SQL below and hit Run. Everything executes against the in-memory copy of the bank graph.</p>
           </div>
           <div class="xp-panel" style="margin-top:14px">
-            <h4>Free SQL console</h4>
+            <h4>Disposable SQL sandbox</h4><p class="small">Each run uses a fresh local copy. SQL is real; changes are discarded and cannot affect presets. Limits: 16 KiB SQL, 4 result sets, 200 rows per set, 32 columns, 8 KiB per cell, 512 KiB response; cancellation after 5 seconds. Later statements may not run after truncation.</p>
             <div class="xp-actions">
               <button class="btn" id="xp-run" type="button">Run ▸</button>
+              <button class="btn ghost" id="xp-cancel" type="button" disabled>Cancel</button>
               <button class="btn ghost" id="xp-clear" type="button">Clear</button>
               <span class="small" id="xp-timing"></span>
             </div>
@@ -85,18 +88,17 @@ ORDER BY n DESC;</textarea>
 
     <section id="rebuild">
       <div class="sec-head"><span class="no">02</span><h2>Don’t trust us — rebuild it</h2></div>
-      <p class="sec-sub">The file you just queried is a derived cache. Reproduce it from the bank repo (Node ≥ 22.13):</p>
-      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
-cd bank-wealth-demo &amp;&amp; npm install --no-save
-node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out my-copy.sqlite
-# compare node/edge counts with the fingerprint panel above</code></pre>
+      <p class="sec-sub">This graphstore is a derived snapshot, not the project knowledge/anchor database. First complete <a href="/guide/#install">the guide’s tool setup</a> in the same shell, then point <code>BANK</code> at your existing matched bank checkout. The output below must be a new file. Current-source counts can differ from this dated snapshot; count equality alone does not establish byte identity.</p>
+      <pre class="code" data-example="graph-rebuild"><code>: "${TRUTHSRC_CLI:?Complete the guide tool setup first}"
+: "${BANK:?Set BANK to your matched bank checkout absolute path}"
+cd "$BANK"
+node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out my-copy.sqlite</code></pre>
       <div class="callout"><b>DEGRADE GRACEFULLY</b><p>If the sqlite file fails to load (offline first visit, very old browser), the presets fall back to their documented expected answers so the page still teaches the query semantics.</p></div>
     </section>
   </main>
 
   <footer id="site-footer"></footer>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/vendor/sqljs/sql-wasm.js"></script>
   <script src="/assets/js/explorer.js"></script>
 </body>
 </html>

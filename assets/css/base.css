@@ -1,7 +1,7 @@
 /* co-arising.github.io — base: reset, typography, layout primitives */
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--nav-offset, 84px); }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 body {
@@ -58,3 +58,20 @@ section { padding: 52px 0 6px; }
 /* ---------- injected chrome (nav + footer) ---------- */
 #site-nav { position: sticky; top: 0; z-index: 30; }
 #site-footer { margin-top: 64px; }
+
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; left: 12px; top: -100px; z-index: 100; background: var(--bg-raised); padding: 10px 16px; }
+.skip-link:focus { top: 8px; }
+main, header, section, .card, .feature, .site-footer .cols > div { min-width: 0; }
+p, li, td, .thesis { overflow-wrap: anywhere; }
+html:lang(zh-CN) h1, html:lang(zh-CN) h2 { letter-spacing: 0; line-height: 1.3; }
+html:lang(zh-CN) .kicker, html:lang(zh-CN) .over { letter-spacing: .04em; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+@media (max-width: 620px) {
+  .callout { grid-template-columns: minmax(0, 1fr); }
+  .callout b { white-space: normal; }
+}

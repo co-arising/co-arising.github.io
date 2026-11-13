@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/dsl/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/dsl/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/dsl/" />
+  <link rel="canonical" href="https://co-arising.github.io/dsl/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">The language · strategic &amp; scope layers</p>
       <h1>A description language for the <span class="accent">truth tree</span></h1>
@@ -127,7 +129,9 @@
     <section id="slice">
       <div class="sec-head"><span class="no">04</span><h2>A real slice, unedited</h2></div>
       <p class="sec-sub">From <code>truth/bank-wealth/…/credit-balance/slices/initialize-account.slice.yaml</code>. This is the language in its densest form: one command, five guards, one event, folds, provenance.</p>
-      <pre class="code"><code>kind: slice
+      <pre class="code" data-example="initialize-account-file" data-source-file="truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/initialize-account.slice.yaml" data-source-sha256="fdb6f4e2690dd68c55f595ad6aa66c43cc55b77ed2b03d0124bc615060eb0ebf"><code># ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
 aggregate: CreditBalance
 command: InitializeAccount
 payload:
@@ -140,26 +144,44 @@ payload:
     ],
     "guards": [
       "@guard[invariantRef](reject ACCOUNT_ID/ACCOUNT_ID: \"param.resource == state.id\")",
-      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" …\")",
-      "@guard[invariantRef](reject ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
-      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount >= 0.00\")"
+      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" &amp;&amp; param.amount.currency == param.currency\")",
+      "@guard[invariantRef](reject ACCOUNT_INIT_CONFLICT/ACCOUNT_INIT_CONFLICT: \"!state.initialized || state.accountBalance.get(param.currency).contains(param.amount)\")",
+      "@guard[invariantRef](succeed-empty ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
+      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount &gt;= 0.00\")"
     ],
-    "produces": [ "AccountInitialized" ],
-    "provenance": { "author": "agent-assisted-bank-v1", "approvedBy": "user-approved-p24-p25-bank-joint", … }
+    "produces": [
+      "AccountInitialized"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "approvedBy": "user-approved-p24-p25-bank-joint",
+      "sourceVersion": "bank-v1-p23-design-2"
+    }
   }
 events:
   {
     "AccountInitialized": {
-      "payloads":  [ "resource: AccountId @PROPAGATED", "amount: Money @PROPAGAGED", … ],
-      "bindings":  [ "resource <- param.resource", "amount <- param.amount", … ],
+      "name": "AccountInitialized",
+      "payloads": [
+        "resource: AccountId @PROPAGATED",
+        "currency: String @PROPAGATED",
+        "amount: Money @PROPAGATED"
+      ],
+      "bindings": [
+        "resource &lt;- param.resource",
+        "currency &lt;- param.currency",
+        "amount &lt;- param.amount"
+      ],
       "foldAssignments": [
         "initialized := \"literal:true\"",
         "accountBalance := @fold[put](key=event.currency, value=event.amount)"
       ]
     }
-  }</code></pre>
+  }
+</code></pre>
       <div class="card-grid cols-3" style="margin-top:16px">
-        <div class="card"><span class="tag">Guards</span><h3>Rules with teeth</h3><p>Each guard cites a named invariant (<code>ACCOUNT_SEED_NONNEGATIVE</code>) and an error code to reject with. “Non-negative balance” is no longer a comment — it compiles into the generated command handler.</p></div>
+        <div class="card"><span class="tag">Guards</span><h3>Rules with teeth</h3><p>Guards retain their order and their false-predicate outcome: <code>reject</code> rejects, while <code>succeed-empty</code> ends an idempotent retry without another event. “Non-negative balance” is no longer a comment — it compiles into the generated command handler.</p></div>
         <div class="card"><span class="tag">Bindings</span><h3>Where payloads come from</h3><p>Every event field is either propagated from a parameter or computed — provenance at the field level, which is what read-model lineage (R10/R11) builds on.</p></div>
         <div class="card"><span class="tag">Folds</span><h3>History becomes state</h3><p><code>foldAssignments</code> define how the event updates aggregate state — the algebra the generated event applier implements.</p></div>
       </div>

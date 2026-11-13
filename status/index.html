@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/status/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/status/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/status/" />
+  <link rel="canonical" href="https://co-arising.github.io/status/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">Honesty layer</p>
       <h1>Status, facts &amp; the <span class="accent">ledger</span></h1>
@@ -68,7 +70,7 @@
           <tr id="F-17"><th scope="row" class="nm">F-17</th><td>Workshop HTML snapshot, distinct from Explorer</td><td><span class="badge verified" title="F-17">snapshot scope checked</span> Single-file, 2.18 MB, offline, zh-CN; 120 exported nodes / 183 edges, declared project-view totals 861 / 737; 741 nodes omitted</td><td><time datetime="2026-11-06">2026-11-06</time>; scope checked <time datetime="2026-11-13">2026-11-13</time></td><td>Embedded <code>workshop-view</code> in <a href="/downloads/bank-workshop.html">the snapshot</a>: <code>truthsrc.project-view/v1</code>, not the <a href="#F-03">F-03 graphstore</a>. Inspect exported arrays, totals and truncation; this historical snapshot does not contain the new service-acceptance report.</td></tr>
           <tr><th scope="row" class="nm"><span id="F-18">F-18</span> / <span id="F-19">F-19</span> / <span id="F-20">F-20</span></th><td>Licenses</td><td><span class="badge verified" title="F-18, F-19, F-20">verified</span> Engines: Apache-2.0, tag v0.3.0 · truthsrc: MIT · bank: Apache-2.0</td><td>F-18: <time datetime="2026-11-12">2026-11-12</time><br />F-19/20: <time datetime="2026-11-11">2026-11-11</time></td><td>per-repo LICENSE; engine tags</td></tr>
           <tr id="F-21"><th scope="row" class="nm">F-21</th><td>Blast radius, <code>SipInstallmentFailed</code> d3</td><td><span class="badge verified" title="F-21">verified</span> 55 nodes — site SQL preset ≡ CLI verb</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>MCP <code>blast_radius</code> over bank canonical</td></tr>
-          <tr id="F-22"><th scope="row" class="nm">F-22</th><td>Orphans</td><td><span class="badge verified" title="F-22">verified</span> 11 distinct sourceless events (23 graphstore rows)</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>MCP <code>orphans</code></td></tr>
+          <tr id="F-22"><th scope="row" class="nm">F-22</th><td>Orphans</td><td><span class="badge verified" title="F-22">verified</span> Canonical: 11 sourceless events. Raw query: 23 nodes / 13 names, including 2 qualified request aliases with local producers</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>MCP <code>orphans</code></td></tr>
           <tr id="F-23"><th scope="row" class="nm">F-23</th><td>Engines on Maven Central</td><td><span class="badge verified" title="F-23">publication verified</span> <code>net.imadz</code> saga-core / monarch-core / monarch-persistence 0.3.0; JAR SHA-256 550fbd5c… / 0c7a25ee… / f42f1b99…. Publication is not bank service acceptance.</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>Public JAR/POM responses and pinned bytes; fetch versioned artifacts and compare SHA-256. <a href="/docs/bank-technical-20261112.md#english">Acceptance summary</a></td></tr>
           <tr id="F-24"><th scope="row" class="nm">F-24</th><td>Relocated bank technical acceptance</td><td><span class="badge verified" title="F-24">passed and rechecked</span> Source / anchors / code / service; <code>fullPipelinePassed=true</code>; no diagnostics</td><td><time datetime="2026-11-12">2026-11-12</time></td><td><code>bank030-relocated-20261112-02</code>; bank <code>ce51d0e6</code> plus 16 pinned source-overlay files, tool <code>cb860b5c</code>. <a href="/docs/bank-technical-20261112.md#english">Scope and prerequisites</a>: private paired materials required, not a public one-command reproduction.</td></tr>
           <tr id="F-25"><th scope="row" class="nm">F-25</th><td>Actor and readside test scopes</td><td><span class="badge verified" title="F-25">passed</span> Actor 64; readside 47; share 23 generated tests, not 111 distinct cases</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>Same relocated candidate; separate actor/readside builds in <code>verify --through service</code>; approved fixed business expectations retained. <a href="#F-24">F-24 prerequisites</a> apply.</td></tr>

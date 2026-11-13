@@ -9,14 +9,15 @@
   <link rel="stylesheet" href="/assets/css/base.css" />
   <link rel="stylesheet" href="/assets/css/components.css" />
 </head>
-<body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
-  <main class="wrap" style="padding-top:80px;padding-bottom:80px">
+<body data-page="not-found">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
+  <main id="main-content" class="wrap" style="padding-top:80px;padding-bottom:80px">
     <p class="kicker">404 — orphan node</p>
     <h1 style="font-size:clamp(34px,6vw,58px);font-weight:800;margin:0 0 14px">This page never co-arised.</h1>
-    <p style="max-width:46em;color:var(--ink-2);font-size:18px">There is no knowledge node at this address — nothing references it, so it dissolved. In our graph that is exactly what <code>orphans</code> detects.</p>
-    <p style="max-width:46em;color:var(--ink-2);font-size:18px" lang="zh-CN">这个地址上没有知识节点——没有任何东西引用它，于是它消解了。在我们的图谱里，这正是 <code>orphans</code> 所检测的东西。中文版：<a href="/zh/" lang="zh-CN">首页</a>。</p>
-    <p style="margin-top:26px"><a class="btn" href="/">Back to the home node</a><a class="btn ghost" href="/explorer/">Run orphans in the explorer</a><a class="btn ghost" href="/zh/" lang="zh-CN">中文版首页</a></p>
+    <p style="max-width:46em;color:var(--ink-2);font-size:18px">This address does not match a page on this site. Choose a language homepage below; this HTTP error is separate from the Explorer’s event-producer diagnostic.</p>
+    <p style="max-width:46em;color:var(--ink-2);font-size:18px" lang="zh-CN">这个地址不对应本站页面。请从下方选择语言首页；HTTP 404 与 Explorer 的事件生产者诊断是不同概念。中文版：<a href="/zh/" lang="zh-CN">首页</a>。</p>
+    <p style="margin-top:26px"><a class="btn" href="/">Back to the home node</a><a class="btn ghost" href="/explorer/">Explore the graph</a><a class="btn ghost" href="/zh/" lang="zh-CN">中文版首页</a></p>
   </main>
   <footer id="site-footer"></footer>
   <script src="/assets/js/site.js"></script>

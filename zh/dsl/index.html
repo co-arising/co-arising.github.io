@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/dsl/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/dsl/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/dsl/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/dsl/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">语言 · 战略层与范围层</p>
       <h1>一门给<span class="accent">真源树</span>的描述语言</h1>
@@ -127,7 +129,9 @@
     <section id="slice">
       <div class="sec-head"><span class="no">04</span><h2>一个真实切片，原样未剪</h2></div>
       <p class="sec-sub">来自 <code>truth/bank-wealth/…/credit-balance/slices/initialize-account.slice.yaml</code>。这是这门语言最密的样子：一条命令、五个守卫、一个事件、折叠、溯源。</p>
-      <pre class="code"><code>kind: slice
+      <pre class="code" data-example="initialize-account-file" data-source-file="truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/initialize-account.slice.yaml" data-source-sha256="fdb6f4e2690dd68c55f595ad6aa66c43cc55b77ed2b03d0124bc615060eb0ebf"><code># ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
 aggregate: CreditBalance
 command: InitializeAccount
 payload:
@@ -140,26 +144,44 @@ payload:
     ],
     "guards": [
       "@guard[invariantRef](reject ACCOUNT_ID/ACCOUNT_ID: \"param.resource == state.id\")",
-      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" …\")",
-      "@guard[invariantRef](reject ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
-      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount >= 0.00\")"
+      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" &amp;&amp; param.amount.currency == param.currency\")",
+      "@guard[invariantRef](reject ACCOUNT_INIT_CONFLICT/ACCOUNT_INIT_CONFLICT: \"!state.initialized || state.accountBalance.get(param.currency).contains(param.amount)\")",
+      "@guard[invariantRef](succeed-empty ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
+      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount &gt;= 0.00\")"
     ],
-    "produces": [ "AccountInitialized" ],
-    "provenance": { "author": "agent-assisted-bank-v1", "approvedBy": "user-approved-p24-p25-bank-joint", … }
+    "produces": [
+      "AccountInitialized"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "approvedBy": "user-approved-p24-p25-bank-joint",
+      "sourceVersion": "bank-v1-p23-design-2"
+    }
   }
 events:
   {
     "AccountInitialized": {
-      "payloads":  [ "resource: AccountId @PROPAGATED", "amount: Money @PROPAGAGED", … ],
-      "bindings":  [ "resource <- param.resource", "amount <- param.amount", … ],
+      "name": "AccountInitialized",
+      "payloads": [
+        "resource: AccountId @PROPAGATED",
+        "currency: String @PROPAGATED",
+        "amount: Money @PROPAGATED"
+      ],
+      "bindings": [
+        "resource &lt;- param.resource",
+        "currency &lt;- param.currency",
+        "amount &lt;- param.amount"
+      ],
       "foldAssignments": [
         "initialized := \"literal:true\"",
         "accountBalance := @fold[put](key=event.currency, value=event.amount)"
       ]
     }
-  }</code></pre>
+  }
+</code></pre>
       <div class="card-grid cols-3" style="margin-top:16px">
-        <div class="card"><span class="tag">守卫</span><h3>有牙齿的规则</h3><p>每条守卫引用一条具名不变量（<code>ACCOUNT_SEED_NONNEGATIVE</code>）和一个用于拒绝的错误码。「余额非负」不再是一条注释——它编译进生成的命令处理器。</p></div>
+        <div class="card"><span class="tag">守卫</span><h3>有牙齿的规则</h3><p>守卫保留声明顺序与条件为假时的结果：<code>reject</code> 表示拒绝，<code>succeed-empty</code> 表示幂等重试成功且不再发出事件。「余额非负」不再是一条注释——它编译进生成的命令处理器。</p></div>
         <div class="card"><span class="tag">绑定</span><h3>载荷从哪里来</h3><p>每个事件字段要么从参数传播而来，要么是计算出来的——字段级的溯源，这正是读模型血缘（R10/R11）建立其上的东西。</p></div>
         <div class="card"><span class="tag">折叠</span><h3>历史变成状态</h3><p><code>foldAssignments</code> 定义事件如何更新聚合状态——生成的 event applier 实现的就是这套代数。</p></div>
       </div>

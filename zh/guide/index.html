@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/guide/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/guide/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/guide/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/guide/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">实战 · 从零到完整闭环</p>
       <h1>指南：<span class="accent">把整件事跑起来</span></h1>
@@ -58,25 +60,56 @@ docker run --rm -it -v "$PWD":/work -w /work sbtscala/scala-sbt:eclipse-temurin-
       <div class="sec-head"><span class="no">01</span><h2>拿到工具链</h2></div>
       <p class="sec-sub">npm 发布仍未完成（<a class="badge deferred" href="/zh/status/#DEF-03">DEF-03</a>）；这里展示源码检出入口。零 npm <em>运行时</em>依赖不包含银行工作坊的固定编译工具链、第三方依赖或运行时供给。只检出源码不等于取得完整配对验收候选（<a href="/zh/status/#DEF-15">DEF-15</a>）。</p>
       <p class="small">2026-11-12 另行复核：配套 <strong>CLI 工具包 0.5.0</strong> 的包 pin 校验、功能性离线安装、真实 prefix 移址与 Counter <strong>0→2</strong> 更新通过，共 <strong>40 项命令观测</strong> <a class="badge verified" href="/zh/status/#F-29" data-fact="F-29">F-29</a>。它与引擎 <strong>0.3.0</strong> <a class="badge verified" href="/zh/status/#F-23" data-fact="F-23">F-23</a>、公开包交付及真人新人验收是不同维度。重复更新的零写入只指生成源码，不是图/证据零写入。详见<a href="/docs/bank-technical-20261112.md#中文">证据摘要</a>。</p>
-      <pre class="code"><code>git clone https://github.com/co-arising/metarch-truthsrc.git
-npm install --prefix metarch-truthsrc        # 只有开发依赖；运行时只用标准库
-
-# 冒烟测试——不碰 SQLite，无副作用
-node metarch-truthsrc/bin/truthsrc.js --help</code></pre>
-      <p class="small">提示：<code>alias truthsrc="node $PWD/metarch-truthsrc/bin/truthsrc.js"</code> 能让本页后面读起来更顺。</p>
+      <pre class="code" data-example="install-source"><code>export TRUTHSRC_WORKSPACE="$PWD"
+git clone https://github.com/co-arising/metarch-truthsrc.git
+export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
+node "$TRUTHSRC_CLI" --help</code></pre>
+      <p class="small">在自己的练习区父目录运行；目录必须不存在。保持同一 shell，绝对路径变量在切换目录后仍有效；无需 npm 安装运行依赖。</p>
     </section>
 
     <section id="l1">
-      <div class="sec-head"><span class="no">02</span><h2>L1 · Counter 教程——完整闭环的缩影</h2></div>
-      <p class="sec-sub">一个聚合、一个切片、一条规则。你将编写、生成、双向查询锚点、验证、改树、看到过期、再生成。绿灯由工具打印——信它，别信你的眼睛。</p>
-      <div class="steps">
-        <div class="step-item"><div><h4>创建项目</h4><p class="meta">拒绝碰已存在的目录</p><p><code>node ../metarch-truthsrc/bin/truthsrc.js init counter-lab --format human</code> 然后 <code>cd counter-lab</code>。看看里面：<code>truth/example/…</code> 就是整棵作者树——<code>aggregate.yaml</code>（状态 + <code>@rule</code>）和一个切片。</p></div></div>
-        <div class="step-item"><div><h4>先看计划再落盘</h4><p class="meta">此时什么都没写</p><p><code>… generate-project --plan --format human</code>——计划列出它<em>将要</em>写的每个文件。读它。生成永远不该是惊喜。</p></div></div>
-        <div class="step-item"><div><h4>生成 &amp; 查看新鲜度</h4><p class="meta">绿灯：inputs=current · evidence=verified · synchronized=true</p><p><code>… generate-project --format human</code> 然后 <code>… status-project --out . --format human</code>。打开一个生成文件——每个都带着锚点头。</p></div></div>
-        <div class="step-item"><div><h4>双向追问</h4><p class="meta">闭环合上的那一刻</p><p><code>… query-project --knowledge SetCount</code> → 精确的文件和区间。然后 <code>… query-project --file &lt;那个文件&gt; --symbol &lt;符号&gt;</code> → 回到那条规则。知识与代码，接通了。</p></div></div>
-        <div class="step-item"><div><h4>改真源，不改代码</h4><p class="meta">看到过期，然后重新同步</p><p>编辑 <code>truth/…/aggregate.yaml</code>：把 count 默认值 <code>0</code> 改成 <code>2</code>。<code>status-project</code> 现在报告 <strong>changed</strong>。<code>… generate-project --update --plan</code> 展示 diff 计划；<code>--update</code> 应用它。再跑一次 generate——<strong>写入：0</strong>。幂等就是闸门。</p></div></div>
-        <div class="step-item"><div><h4>验证 &amp; 拍张快照</h4><p class="meta">绿灯：verify passed</p><p><code>… verify-project --out . </code> 对照文件字节重新证明每个锚点。<code>… view-project --out . --html counter-map.html</code> 导出单文件地图——离线也能打开。</p></div></div>
-      </div>
+      <div class="sec-head"><span class="no">02</span><h2>L1 · Counter：生成一次，再修改一次</h2></div>
+      <p>完成上面的工具准备后，仍在练习区父目录。<code>counter-lab</code> 必须不存在。下列命令显式指定项目与生成目录，不向作者根写入产物。</p>
+      <pre class="code" data-example="counter-first"><code>node "$TRUTHSRC_CLI" init counter-lab --format human
+cd counter-lab
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human</code></pre>
+      <p>预览只列操作计划，不是文本 diff。生成后应见 <code>inputs=current</code>、<code>evidence=verified</code>、<code>synchronized=true</code>。它们证明来源与字节状态，不证明 Scala 或银行业务已经执行。</p>
+      <h3>从真实位置反查，而不是猜文件或行号</h3>
+      <p>span 是半开 UTF-8 字节区间，不是行号。下面从当前已验证源码换算行号并反查；没有精确命中就停止，不补造位置。</p>
+      <pre class="code" data-example="counter-reverse"><code>node --input-type=module &lt;&lt;'NODE'
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+const cli = process.env.TRUTHSRC_CLI;
+if (!cli) throw new Error('TRUTHSRC_CLI is required');
+const base = ['--project', 'truthsrc.project.json', '--out', 'generated'];
+const forward = JSON.parse(execFileSync(process.execPath, [cli, 'query-project', ...base,
+  '--knowledge', 'SetCount', '--format', 'json'], { encoding: 'utf8' }));
+const loc = forward.result.flatMap(row =&gt; row.locations).find(item =&gt;
+  item.file.endsWith('CounterRules.scala') &amp;&amp; item.verification.spanVerified &amp;&amp;
+  item.freshness === 'current-bytes' &amp;&amp; item.span.text.startsWith('  def SetCount('));
+if (!loc) throw new Error('No verified current SetCount span; inspect status first');
+const bytes = readFileSync(join('generated', loc.file));
+const line = bytes.subarray(0, loc.span.start).toString('utf8').split('\n').length;
+process.stdout.write(execFileSync(process.execPath, [cli, 'query-project', ...base,
+  '--file', loc.file, '--line', String(line), '--format', 'human'], { encoding: 'utf8' }));
+NODE</code></pre>
+      <h3>验证与离线快照</h3>
+      <pre class="code" data-example="counter-verify"><code>node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" view-project --project truthsrc.project.json --out generated --html counter-map.html --knowledge SetCount --format human</code></pre>
+      <p>打开新生成的 <code>counter-map.html</code>。它是固定只读快照，不会随磁盘自动刷新。</p>
+      <h3>改初始值，观察过期，再同步</h3>
+      <p>在 <code>truth/example/contexts/example/aggregates/counter/aggregate.yaml</code> 中，只将 count 的 <code>"default": "0"</code> 改为 <code>"default": "2"</code>；仍在 <code>counter-lab</code> 执行：</p>
+      <pre class="code" data-example="counter-update"><code>node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human</code></pre>
+      <p>更新前输入应为 <code>changed</code>，已有文件仍可为 <code>unchanged</code>——那只是它们仍等于上次生成的字节。更新后 verify 通过；最后一次重复应为 <code>written=0</code>，只指零生成源码写入，不是零证据写入。旧快照不覆盖；再次导出使用新的文件名。</p>
+      <p class="small">已有目录或输出冲突时保留现场，检查归属与输入，不删除目录或手改 ledger 消红。后续 CLI 原文见工具仓 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/TUTORIAL.md">TUTORIAL.md</a>。</p>
     </section>
 
     <section id="l2">
@@ -110,15 +143,17 @@ node "$BANK/tools/bank-workshop.mjs" doctor --through code \
 
       <h3 id="bank-convenience">便捷生成——不是工作坊验收配方</h3>
       <p>已有本地路径验证真源、生成至 <code>generated/current/</code>，将手写生产源码与生成项目一起编译，并验证锚点。首次生成可从 Maven Central 下载 SHA-256 钉定的引擎；这不证明上述正式供给已齐备，也不启动或签收服务。</p>
-      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
+      <pre class="code" data-example="bank-convenience"><code>: "${TRUTHSRC_WORKSPACE:?Complete the source setup first}"
+cd "$TRUTHSRC_WORKSPACE"
+git clone https://github.com/MadPolaris/bank-wealth-demo.git
 cd bank-wealth-demo
 npm run validate
 npm run compile
-node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
+node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out bank.graph.sqlite
 npm run project
 cd generated/current &amp;&amp; sbt compile
 sbt test
-cd ../.. &amp;&amp; node ../metarch-truthsrc/bin/truthsrc.js verify-project \
+cd ../.. &amp;&amp; node "$TRUTHSRC_CLI" verify-project \
   --project truthsrc.project.json --out generated/current</code></pre>
       <p class="small"><strong>历史采集，2026-11-11：</strong>0 硬发现、157 个原子往返逐字节一致 <a class="badge verified" href="/zh/status/#F-01" data-fact="F-01">F-01</a> <a class="badge verified" href="/zh/status/#F-02" data-fact="F-02">F-02</a>；235 个生成文件 <a class="badge verified" href="/zh/status/#F-04" data-fact="F-04">F-04</a>；534 个源文件、0 编译错误 <a class="badge verified" href="/zh/status/#F-06" data-fact="F-06">F-06</a>；<strong>23/23 项生成单元测试，不是独立手写测试</strong> <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a>；792 个锚点通过验证 <a class="badge verified" href="/zh/status/#F-05" data-fact="F-05">F-05</a>。不声称新服务候选仍有这些相同计数。</p>
       <div class="callout teal"><b>当前技术证据，不是你的 run 的结果</b><p><code>bank030-relocated-20261112-02</code> 在 2026-11-12 的 source / anchors / code / service 均通过并复核 <a class="badge verified" href="/zh/status/#F-24" data-fact="F-24">F-24</a>，包括真实数据库/HTTP 与自动浏览器观测 <a class="badge verified" href="/zh/status/#F-26" data-fact="F-26">F-26</a>。旧 P23/service02 失败仍是历史事实（<a href="/zh/status/#DEF-06">DEF-06</a>）。独立体验仍未签收：session03 未达 readiness，清理不是通过，后续修补候选未执行（<a href="/zh/status/#DEF-07">DEF-07</a>）。公开材料（<a href="/zh/status/#DEF-15">DEF-15</a>）与真人验收（<a href="/zh/status/#DEF-16">DEF-16</a>）不由该技术结果代签。详见<a href="/zh/bank-demo/#technical-acceptance">银行分层结果与剩余边界</a>。</p></div>
@@ -140,15 +175,15 @@ cp -r /absolute/path/to/metarch-truthsrc/skills/truthsrc .claude/skills/</code><
       <h3>练习：按影响半径规划一次增量变更</h3>
       <div class="steps">
         <div class="step-item"><div><h4>给智能体一个需求</h4><p class="meta">在 Claude Code 里，位于 bank-wealth-demo</p><p>试试：<em>「我们需要改变定投扣款失败时的行为。在提出任何方案之前，先查询真源图谱中 <code>SipInstallmentFailed</code> 的影响半径，并报告受影响的切片、读模型和流水线。」</em></p></div></div>
-        <div class="step-item"><div><h4>看纪律起作用</h4><p class="meta">describe → expand → blast_radius，跟随 next_actions</p><p>智能体应当沿传导边从事件出发，列出受影响的守卫/读模型/流水线（3 跳内数十个节点），然后才<strong>对着树</strong>起草变更提案——而不是对着代码。</p></div></div>
-        <div class="step-item"><div><h4>套用编辑契约</h4><p class="meta">智能体起草；闸门裁决</p><p>任何树的编辑都必须以 <code>validate</code>（0 硬发现）<strong>和</strong> <code>roundtrip</code>（逐字节一致）全绿收尾，然后 <code>generate-project --update --plan</code> 在应用前看清再生成 diff。这就是守护纪律，机械化执行。</p></div></div>
+        <div class="step-item"><div><h4>看纪律起作用</h4><p class="meta">describe → expand → blast_radius，跟随 next_actions</p><p>智能体应报告实际到达的节点、遍历限制与尚未建模的连接。本站快照的 55 节点结果只有聚合、命令、事件和切片，没有读模型或流水线 <a href="/zh/status/#F-21" data-fact="F-21">F-21</a>；这些依赖要另外审阅，再对正确的作者输入起草提案。</p></div></div>
+        <div class="step-item"><div><h4>套用编辑契约</h4><p class="meta">智能体起草；人确认；闸门检查</p><p>由人确认业务预期与编辑范围。validate 和 roundtrip 检查各自的契约，不代替业务审批。用 <code>generate-project --project truthsrc.project.json --out generated/current --update --plan</code> 预览更新动作，再运行对应行为检查与回锚验证。计划不是文本 diff。</p></div></div>
       </div>
       <p class="small">还附带：从既有代码库抽取树、从可达数据抽取树、或从一句话描述引导工作坊草稿的技能——见工具链仓库的 <code>skills/</code>。</p>
     </section>
 
     <section id="redlines">
       <div class="sec-head"><span class="no">05</span><h2>红线与恢复</h2></div>
-      <div class="callout red"><b>绝不</b><p><strong>绝不手工编辑派生产物</strong>——编译后的 canonical、<code>.truthsrc/</code>、台账、锚点、生成文件。它们会被再生成；你的编辑会作废（而且会被发现）。如果生成代码看起来不对，修的地方在树里——这正是全部意义所在。 &nbsp;·&nbsp; <strong>绝不强行闯过红闸门。</strong><code>validate</code> 的发现和 roundtrip 的发散是信息，不是障碍。 &nbsp;·&nbsp; <strong>图谱存储？随便删</strong>——它是纯缓存，一条 <code>graph</code> 命令重建。</p></div>
+      <div class="callout red"><b>绝不</b><p><strong>不要手改派生物或强行绕过红闸门。</strong>业务含义改真源，技术选择改绑定，解析/生成错误修共享工具链，外部效果改合法手写实现。保留冲突与失败证据。普通 graphstore 缓存与带回锚的项目知识库不是同一种资产；不能用一条 graph 命令替代所有恢复步骤，更不要随意删 SQLite。</p></div>
       <p class="small">卡住了？工具链 README 有诊断章节；<a href="/zh/status/#facts">事实页</a>精确告诉你哪些声明在哪一天被验证——如果你的数字和我们的不一样，信你的终端。</p>
     </section>
   </main>

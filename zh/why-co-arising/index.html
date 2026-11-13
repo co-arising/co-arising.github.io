@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/why-co-arising/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/why-co-arising/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/why-co-arising/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/why-co-arising/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,10 +21,11 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方交互式演示显示其静态回退。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">哲学</p>
       <h1>为何是 <span class="accent">co-arising</span>，而非本体论</h1>
@@ -61,7 +63,7 @@
 
     <section id="demo">
       <div class="sec-head"><span class="no">03</span><h2>亲手感受：聚合的消解 / 涌现演示</h2></div>
-      <p class="sec-sub">来自银行示例 <code>CreditBalance</code> 聚合的真实子图（从编译后的知识图谱导出）。<strong>消解</strong>：把关系一条条抽走，看聚合失去立足点。<strong>涌现</strong>：从散落的工作坊笔记把它重新搭起来。没有物理引擎，没有比喻——只有注册表里真实存在的关系。</p>
+      <p class="sec-sub">基于导出的 <code>CreditBalance</code> 子图进行关系练习。可以点击图中的边，也可以用键盘操作下方清单，移除或恢复关系。这里统计的是已声明守卫的覆盖情况，不是实际执行银行规则；变化仅留在本次练习，不修改真源树或 Explorer 数据库。</p>
       <div class="dissolve-stage" id="dissolve-stage">
         <noscript>
           <p style="padding:20px;font-size:14px;color:var(--ink-2)">
@@ -71,7 +73,7 @@
           </p>
         </noscript>
       </div>
-      <p class="small">边上的标签是 <a href="/zh/dsl/#relations">R1–R22 注册表</a>里真实的关系名。当一条守卫边被抽走，它所强化的不变量就处于<em>无人检查</em>状态——这正是图谱动词 <code>orphans</code> 机械化报告的东西。<a href="/zh/explorer/#orphans">在完整图谱上运行 orphans ↗</a></p>
+      <p class="small">这里的守卫边从切片声明展开，缺少一条就表示本练习中的覆盖不完整。另一个<a href="/zh/explorer/#orphans">原始事件生产者查询</a>检查缺失的 <code>produces</code> 边，不检查守卫；它也不会接收本地演示的修改。</p>
     </section>
 
     <section id="vs-ontology">
@@ -125,6 +127,7 @@
   <footer id="site-footer"></footer>
   <script src="/assets/js/site.js"></script>
   <script src="/assets/data/dissolve-subgraph.js"></script>
+  <script src="/assets/js/dissolve-model.js"></script>
   <script src="/assets/js/dissolve.js"></script>
 </body>
 </html>
