@@ -134,7 +134,8 @@ a.badge { border-bottom: 0; }
 /* callouts */
 .callout { display: grid; grid-template-columns: auto 1fr; gap: 14px; background: var(--amber-soft); border-top: 3px solid var(--amber); padding: 16px 18px; margin: 22px 0; }
 .callout b { font-family: var(--font-mono); font-size: 12px; color: var(--amber); white-space: nowrap; }
-.callout p { margin: 0; font-size: 14px; color: var(--ink-2); }
+.callout p { grid-column: 2; margin: 0; font-size: 14px; color: var(--ink-2); }
+.callout p + p { margin-top: 8px; }
 .callout p strong { color: var(--ink); }
 .callout.red { background: var(--red-soft); border-top-color: var(--red); }
 .callout.red b { color: var(--red-ink); }
