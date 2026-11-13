@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/explorer/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/explorer/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/explorer/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/explorer/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,25 +21,56 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
-  <noscript><div class="wrap" style="padding-top:16px"><p class="small">本页需要 JavaScript（sql.js 完全在你的浏览器内本地运行——无任何网络请求）。<a href="/zh/">首页</a></p></div></noscript>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
+  <noscript><div class="wrap" style="padding-top:16px"><p class="small">本页需要 JavaScript（下载静态资源后，查询完全在你的浏览器内运行）。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">Explorer · 完全在你的浏览器中运行</p>
       <h1>查询<span class="accent">真实图谱</span></h1>
-      <p class="thesis">这不是 mock 数据：下面的 SQLite 文件就是银行财富示例编译后的知识图谱——389 节点、413 边 <span class="badge verified" title="F-03">2026-11-11 验证</span>——用 sql.js 装进你的浏览器。没有服务器，页面加载后没有网络请求，任何东西都不会离开你的机器。</p>
+      <p class="thesis">这不是 mock 数据：下面的 SQLite 文件就是银行财富示例编译后的知识图谱——389 节点、413 边 <span class="badge verified" title="F-03">2026-11-11 验证</span>——用 sql.js 装进你的浏览器。只从本站下载静态资源，查询文本和结果不发送给服务器。</p>
     </header>
 
+    <section id="nodes" class="xp-directory" aria-labelledby="xp-nodes-heading">
+      <div class="sec-head"><span class="no">01</span><h2 id="xp-nodes-heading">浏览真实节点</h2></div>
+      <p class="sec-sub">按完整 ID 或名称搜索全部节点，查看存储记录及双向关系。这是 <b>2026-11-11 捕获的 canonical graphstore</b>，不是项目知识/回锚数据库。限定别名保持独立节点，同名不等于同一身份。</p>
+      <div class="xp-filters">
+        <label for="xp-node-search">ID 或名称 <input id="xp-node-search" type="search" maxlength="256" autocomplete="off" aria-controls="xp-node-list" aria-describedby="xp-node-help" /></label>
+        <label for="xp-node-kind">节点类型 <select id="xp-node-kind" aria-controls="xp-node-list" disabled><option value="">全部类型 — 正在从图谱加载</option></select></label>
+        <button class="btn ghost" id="xp-node-reset" type="button">重置筛选与选择</button>
+        <button class="btn ghost" id="xp-node-cancel" type="button" disabled>取消节点查询</button>
+      </div>
+      <p class="small" id="xp-node-help">按 ID/名称作字面子串匹配，忽略 ASCII 大小写（SQLite 的大小写折叠范围）；搜索与类型同时生效。筛选不会改变选中的节点。每页 40 个，可访问全部节点；每次在新副本中查询，5 秒后取消。节点分享 URL 不包含 SQL 草稿。</p>
+      <p id="xp-node-count" role="status" aria-live="polite">正在加载节点目录…</p>
+      <div class="xp-node-layout">
+        <div>
+          <ul id="xp-node-list" class="xp-node-list" aria-label="匹配的图节点" aria-busy="false"></ul>
+          <nav class="xp-node-pagination" aria-label="节点目录翻页">
+            <button class="btn ghost" id="xp-node-prev" type="button" aria-controls="xp-node-list" disabled>上一页</button>
+            <span class="small" id="xp-node-page"></span>
+            <button class="btn ghost" id="xp-node-next" type="button" aria-controls="xp-node-list" disabled>下一页</button>
+          </nav>
+        </div>
+        <div id="xp-node-detail" class="xp-node-detail xp-panel" tabindex="-1" aria-live="polite" aria-busy="false">
+          <h3>节点详情</h3>
+          <p>选择一个节点查看其真实记录与双向邻接关系。</p>
+          <p class="small">代码回锚：<b>unavailable — 此快照未提供</b>。不推断作者文件路径、行号或 GitHub 源码链接。存储的 provenance 是声明，不是已验证的代码位置。</p>
+        </div>
+      </div>
+      <p class="small">每个方向最多显示 80 条边，每个 atom/provenance 字段最多 8192 UTF-8 字节，每次响应最多 512 KiB；明确显示总数与截断。存储的 atom 仅作为文本，不执行，也不视为已验证的生成产物。</p>
+      <noscript><p class="callout">目录和详情需要 JavaScript 与本地 SQLite 引擎；未加载时没有真实节点查询结果。可用下方重建说明自行检查快照。</p></noscript>
+    </section>
+
     <section id="console">
-      <div class="sec-head"><span class="no">01</span><h2>控制台</h2></div>
+      <div class="sec-head"><span class="no">02</span><h2>控制台</h2></div>
       <p class="sec-sub">选一个预设（附期望答案），或对 <code>nodes(id, kind, name, atom, extra)</code> 与 <code>edges(seq, from_id, relation, to_id)</code> 写你自己的 SQL。Schema 就是 <code>truthsrc graph --out</code> 原样产出的东西。</p>
 
       <div class="xp-layout">
         <aside class="xp-side">
           <div class="xp-panel">
             <h4>数据指纹</h4>
-            <p class="xp-status" id="xp-status">正在加载 sql.js…</p>
+            <p class="xp-status" id="xp-status" role="status">正在加载 sql.js…</p>
           </div>
           <div class="xp-panel">
             <h4>预设查询</h4>
@@ -47,26 +79,27 @@
               <li><button data-preset="describe">描述一个聚合</button></li>
               <li><button data-preset="blast" id="preset-blast">影响半径——SipInstallmentFailed</button></li>
               <li><button data-preset="lineage">读模型血缘</button></li>
-              <li><button data-preset="orphans" id="preset-orphans">孤儿——无父的知识</button></li>
+              <li><button data-preset="orphans" id="preset-orphans">无 incoming produces 的原始事件</button></li>
               <li><button data-preset="sagas">Saga 与流水线</button></li>
-              <li><button data-preset="invariants">不变量强制</button></li>
+              <li><button data-preset="invariants">守卫声明</button></li>
             </ul>
           </div>
           <div class="xp-panel">
             <h4>怎么读</h4>
-            <p class="small">边携带 <a href="/zh/dsl/#relations">R1–R22 注册表</a>里的关系名。影响只沿 <code>propagates=true</code> 的关系行走（预设 SQL 里写死了它们）——与 CLI 的 <code>blast_radius</code> 语义一致：宁可多报，不可漏报。</p>
+            <p class="small">关系以已建模的图边为准。影响查询不保证覆盖所有真实依赖；原始别名节点、文档来源与 canonical 语义分别说明。</p>
           </div>
         </aside>
 
         <div class="xp-main">
-          <div class="xp-result" id="xp-result">
+          <div class="xp-result" id="xp-result" aria-live="polite" aria-busy="false">
             <h3>先选一个预设</h3>
             <p class="answer">或者在下方写 SQL 然后点运行。一切都在银行图谱的内存副本上执行。</p>
           </div>
           <div class="xp-panel" style="margin-top:14px">
-            <h4>自由 SQL 控制台</h4>
+            <h4>一次性 SQL 沙盒</h4><p class="small">每次运行使用新的本地副本；执行真实 SQL，修改不保存，也不影响预设。限制：SQL 16 KiB、4 结果集、每集200行/32列、每单元8 KiB、响应512 KiB；5秒后取消。截断时后续语句可能不执行。</p>
             <div class="xp-actions">
               <button class="btn" id="xp-run" type="button">运行 ▸</button>
+              <button class="btn ghost" id="xp-cancel" type="button" disabled>取消</button>
               <button class="btn ghost" id="xp-clear" type="button">清空</button>
               <span class="small" id="xp-timing"></span>
             </div>
@@ -84,19 +117,18 @@ ORDER BY n DESC;</textarea>
     </section>
 
     <section id="rebuild">
-      <div class="sec-head"><span class="no">02</span><h2>别信我们——自己重建</h2></div>
-      <p class="sec-sub">你刚刚查询的文件是一份派生缓存。从银行仓库复现它（Node ≥ 22.13）：</p>
-      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
-cd bank-wealth-demo &amp;&amp; npm install --no-save
-node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out my-copy.sqlite
-# 用上方的指纹面板对比节点/边计数</code></pre>
+      <div class="sec-head"><span class="no">03</span><h2>别信我们——自己重建</h2></div>
+      <p class="sec-sub">这是派生 graphstore 快照，不是项目知识/回锚数据库。先在同一 shell 完成<a href="/zh/guide/#install">指南中的工具准备</a>，再把 <code>BANK</code> 指向已有的配套银行 checkout。下方输出必须是新文件。当前真源的计数可以不同于这份带日期的快照；计数相同也不证明字节一致。</p>
+      <pre class="code" data-example="graph-rebuild"><code>: "${TRUTHSRC_CLI:?Complete the guide tool setup first}"
+: "${BANK:?Set BANK to your matched bank checkout absolute path}"
+cd "$BANK"
+node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out my-copy.sqlite</code></pre>
       <div class="callout"><b>优雅降级</b><p>如果 sqlite 文件加载失败（首次访问离线、浏览器过旧），预设会回退到文档记录的期望答案，页面依然能教会你这些查询的语义。</p></div>
     </section>
   </main>
 
   <footer id="site-footer"></footer>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/vendor/sqljs/sql-wasm.js"></script>
   <script src="/assets/js/explorer.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>From truth tree to code, and back — co-arising</title>
-  <meta name="description" content="The full lifecycle: compile the truth tree, build the local knowledge graph, generate a compiling CQRS codebase, verify anchors, fill the handwritten zone, and re-verify. Every stage with its command and verified numbers." />
+  <meta name="description" content="What is generated, what remains handwritten, and what does verification prove? Follow the truth-source lifecycle and its explicit editing, testing and source-anchor boundaries." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/pipeline/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/pipeline/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/pipeline/" />
+  <link rel="canonical" href="https://co-arising.github.io/pipeline/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,59 +21,63 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">Lifecycle</p>
-      <h1>Truth tree → code, <span class="accent">and back</span></h1>
-      <p class="thesis">Six stages, each with an exact command and a green/red gate. The loop is closed twice: once forward (tree → graph → code), once backward (code → anchors → tree). The numbers below are the bank worked example, re-captured 2026-11-11.</p>
+      <p class="over">The engineering loop</p>
+      <h1>What is generated,<br />and <span class="accent">what remains yours?</span></h1>
+      <p class="thesis">Keep domain knowledge, technical bindings and handwritten integration in their proper places. Compile the declarations, inspect the generated changes, test the behavior, then trace the implementation back to its source.</p>
+      <p class="page-outline"><a href="#flow">Follow the lifecycle</a> · <a href="#anchors">Read anchor precision</a> · <a href="#boundaries">Check the evidence boundaries</a></p>
     </header>
 
     <section id="flow">
-      <div class="sec-head"><span class="no">01</span><h2>The six stages</h2></div>
+      <div class="sec-head"><span class="no">01</span><h2>A lifecycle with explicit responsibilities</h2></div>
       <div class="flow" aria-label="Six-stage pipeline">
-        <div class="step"><span class="snum">01 · AUTHOR</span><b>Edit the tree</b><p>YAML atoms only. Agents draft, humans approve — <code>approvedBy</code> recorded per atom.</p></div>
-        <div class="step"><span class="snum">02 · GATE</span><b>Validate + roundtrip</b><p><code>validate</code> 0 hard; <code>roundtrip</code> byte-identical. <span class="badge verified" title="F-01/F-02">157 atoms ✓</span></p></div>
-        <div class="step"><span class="snum">03 · GRAPH</span><b>Compile &amp; push</b><p>Canonical projection → SQLite graph: <span class="badge verified" title="F-03">389 nodes / 413 edges</span>.</p></div>
-        <div class="step"><span class="snum">04 · GENERATE</span><b>CQRS codebase</b><p><code>generate-project</code>: <span class="badge verified" title="F-04">235 files</span>, <span class="badge verified" title="F-06">0 compile errors</span>.</p></div>
-        <div class="step"><span class="snum">05 · HANDWRITE</span><b>Fill the zone</b><p>Ports are generated; behavior goes in the physically separate handwritten module — <span class="badge verified" title="F-08">35 files</span>, complete implementations.</p></div>
-        <div class="step"><span class="snum">06 · VERIFY</span><b>Prove lineage</b><p><code>verify-project</code>: <span class="badge verified" title="F-05">792 anchors</span>; tests <span class="badge verified" title="F-07">23/23</span>.</p></div>
+        <div class="step"><span class="snum">01 · AUTHOR</span><b>Agree on the behavior</b><p>Edit the truth tree for knowledge. Review the business expectation; record human approval through the project’s review process.</p></div>
+        <div class="step"><span class="snum">02 · GATE</span><b>Validate the source</b><p>Validation checks structure and supported semantics; roundtrip checks preservation. Neither substitutes for a business test.</p></div>
+        <div class="step"><span class="snum">03 · COMPILE</span><b>Derive products and graph</b><p>Compile declarations into products and build the queryable graph. Do not hand-edit these derived knowledge representations.</p></div>
+        <div class="step"><span class="snum">04 · GENERATE</span><b>Preview, then write</b><p>Use the project’s technical bindings. Inspect the generation plan before writing supported behavior and structural code.</p></div>
+        <div class="step"><span class="snum">05 · INTEGRATE</span><b>Implement host responsibilities</b><p>Keep external effects and remaining computations in the separate handwritten zone. Test them against agreed outcomes.</p></div>
+        <div class="step"><span class="snum">06 · VERIFY</span><b>Check code and origin</b><p>Compile and run the appropriate tests. Verify source anchors and output freshness; investigate drift before updating.</p></div>
       </div>
-      <p class="small">And then it loops: change the tree, <code>status-project</code> shows exactly which generated files went stale, <code>generate-project --update</code> refreshes only those, re-running on an unchanged tree writes <strong>0 files</strong> (idempotence is a gate, not a hope).</p>
+      <p class="small"><code>status-project</code> distinguishes changed inputs from output-byte drift; <code>generate-project --update --plan</code> lists prospective actions, not a textual diff. Derive reverse-query line numbers from a verified UTF-8 span and matching source bytes, never a guessed filename or line.</p>
+      <details>
+        <summary>Recorded bank generation evidence · 2026-11-11</summary>
+        <p class="evidence-note">Validation: 0 hard findings <a href="/status/#F-01" data-fact="F-01">F-01</a>; 157 atoms and byte-identical roundtrip <a href="/status/#F-02" data-fact="F-02">F-02</a>; graph: 389 nodes / 413 edges <a href="/status/#F-03" data-fact="F-03">F-03</a>; 235 generated files <a href="/status/#F-04" data-fact="F-04">F-04</a>; 0 compile errors <a href="/status/#F-06" data-fact="F-06">F-06</a>; 792 verified anchors <a href="/status/#F-05" data-fact="F-05">F-05</a>. These retain their capture date; the <a href="#boundaries">newer service acceptance</a> is separate.</p>
+      </details>
     </section>
 
     <section id="anchors">
-      <div class="sec-head"><span class="no">02</span><h2>Anchors: the part nobody else ships</h2></div>
-      <p class="sec-sub">Generation is common. <strong>Proof of origin</strong> is not. Every generated file carries anchor metadata binding it to the knowledge node that produced it — and the binding is verified by re-reading bytes, not by trusting a manifest.</p>
-      <div class="term">
-        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">two directions, one command each</span></div>
-        <pre><span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
-<span class="o">  knowledge  rule:SetCount (aggregate example/Counter)</span>
-<span class="o">  generated  app/domain/example/Counter.scala  L31–L54   ← span, not guess</span>
-
-<span class="p">$</span> <span class="c">truthsrc query-project --file app/domain/example/Counter.scala --symbol setCount</span>
-<span class="o">  source     slice example/set-count  →  guards  →  rule:SetCount</span>
-
-<span class="p">$</span> <span class="c">truthsrc verify-project --project truthsrc.project.json --out app/</span>
-<span class="ok">✓ passed</span> <span class="o">— every anchor re-verified against file bytes (792 on the bank project)</span></pre>
-      </div>
+      <div class="sec-head"><span class="no">02</span><h2>Ask where an implementation came from</h2></div>
+      <p class="sec-sub">A source anchor connects a knowledge declaration to a generated location. The useful answer includes <strong>identity, precision and freshness</strong>—not just a plausible filename.</p>
       <div class="card-grid cols-3">
-        <div class="card"><span class="tag">Why it matters</span><h3>“Where did this line come from?”</h3><p>A compliance question, a debugging question, and an onboarding question — answered by query, not by archaeology.</p></div>
-        <div class="card"><span class="tag">Why it’s honest</span><h3>Byte-precision, not vibes</h3><p>Anchors record spans; verification re-reads the file. If a human edits generated code, verification reports drift instead of silently re-trusting.</p></div>
-        <div class="card"><span class="tag">Why agents need it</span><h3>No-grep context packs</h3><p>The same anchor graph packages exact upstream types, caller contracts and acceptance scenarios for a handwriting agent — closing the loop for AI collaborators.</p></div>
+        <div class="card"><span class="tag">Origin</span><h3>A relation, not a correctness proof</h3><p>An anchor supports “this location came from this declaration.” It does not establish that the declaration was approved or that every line of the program is correct.</p></div>
+        <div class="card"><span class="tag">Precision</span><h3>Span and file are different answers</h3><p>A <code>span</code> identifies a byte range; <code>file</code> identifies only a file. Treat <code>ambiguous</code> or <code>unavailable</code> as a limit, not permission to guess a line.</p></div>
+        <div class="card"><span class="tag">Freshness</span><h3>Check the matching bytes</h3><p>Use source fingerprints and verification before translating a UTF-8 byte span into a line number. A graph snapshot without matching code locations cannot supply a precise code jump.</p></div>
       </div>
+      <p class="prose">The <a href="/guide/#l1">Counter guide</a> walks both query directions using an actual verified location. It also explains stale inputs, output drift and updates. A canonical graph, a project knowledge graph and a workshop export are different representations; do not splice their identities together by name.</p>
+      <details>
+        <summary>Counter command reminder · after the guide’s setup</summary>
+      <div class="term"><div class="term-bar"><span class="title">In your own Counter project; reverse-query steps are in the guide</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</pre></div>
+      </details>
     </section>
 
     <section id="handwritten">
-      <div class="sec-head"><span class="no">03</span><h2>The handwritten zone</h2></div>
-      <p class="sec-sub">The generation philosophy: <strong>generate the ports, leave the behavior to people</strong> (and their agents) — but only in a physically separate module that regeneration can never touch.</p>
-      <div class="card-grid cols-2">
-        <div class="card"><span class="tag">Generated side</span><h3>Everything structural</h3><p>Aggregates, commands, events, guards (compiled from <code>@rule</code> invariants), proto schemas, ports, test scaffolding — 235 files in the bank project, all regenerable, all anchored.</p></div>
-        <div class="card"><span class="tag">Handwritten side</span><h3>Everything behavioral</h3><p>Effect execution against the mock TA, JDBC wiring, recovery loops, the read-side catch-up, HTTP pages — <strong>35 files, complete implementations</strong> <span class="badge verified" title="F-08">verified</span>, mounted into the build via <code>unmanagedSourceDirectories</code>. No <code>BEGIN MANUAL</code> markers anywhere — the boundary is the filesystem.</p></div>
+      <div class="sec-head"><span class="no">03</span><h2>Edit the layer that owns the change</h2></div>
+      <p class="sec-sub"><strong>Generate supported, declared behavior; handwrite the remaining computations and host integration.</strong> The tree is the only <em>knowledge</em> editing surface—not the only editable file in the project.</p>
+      <div class="card-grid cols-3">
+        <div class="card"><span class="tag">Truth + generated side</span><h3>Domain declarations</h3><p>Aggregates, commands and events, together with supported guard, binding and fold declarations, drive generation. Structure includes schemas, ports and test scaffolding. An invariant name alone does not implement a missing rule.</p></div>
+        <div class="card"><span class="tag">Explicit input</span><h3>Technical bindings</h3><p>Bindings connect the declared model to the chosen implementation profile and host contracts. Review them separately from business policy; generated products are not a second place to edit the same knowledge.</p></div>
+        <div class="card"><span class="tag">Handwritten zone</span><h3>Host integration</h3><p>Mock TA effect execution, JDBC wiring, recovery loops, read-side catch-up and HTTP pages remain explicit implementations. The bank’s 35 handwritten files were recorded as complete implementations <a href="/status/#F-08" data-fact="F-08">F-08 · 2026-11-11</a>.</p></div>
       </div>
-      <div class="callout"><b>DRIFT</b><p>When the tree changes, generated files are refreshed; the handwritten zone is never overwritten. The tests stay fixed as expectations — <strong>the generated code must satisfy the handwritten tests, not the other way around</strong>. 23/23 pass today <span class="badge verified" title="F-07">verified</span>.</p></div>
+      <p class="prose">The bank build includes its separate handwritten module through <code>unmanagedSourceDirectories</code>. The filesystem boundary keeps it outside normal regeneration; it is not a promise that arbitrary output paths or unrelated tools cannot overwrite files.</p>
+      <div class="callout"><b>TEST SCOPE</b><p>When the tree changes, generated files are refreshed; the handwritten zone is not overwritten. The <strong>23/23 result from 2026-11-11 is generated unit tests</strong> <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a>: handwritten production sources compile with that build, but this is not evidence of independent handwritten test expectations. In the newer technical candidate, actor <strong>64</strong> and readside <strong>47</strong> passed with fixed business expectations; those scopes <strong>share 23 generated tests</strong> and must not be summed as distinct cases <a class="badge verified" href="/status/#F-25" data-fact="F-25">F-25</a>.</p></div>
     </section>
 
     <section id="engines">
@@ -86,17 +91,15 @@
     </section>
 
     <section id="boundaries">
-      <div class="sec-head"><span class="no">05</span><h2>What this loop does not claim yet</h2></div>
-      <div class="callout red"><b>BOUNDARIES</b><p>
-        <strong>Full-service runtime gate — not passed</strong> (<a class="badge boundary" href="/status/#DEF-06">DEF-06</a>): generated code compiles and all 23 tests pass, but the service02 acceptance run missed one gate — a fresh read-side replay didn’t catch up within 90 seconds. Code, 24 recovery cases, and real-DB initial/restart/refund did pass. &nbsp;·&nbsp;
-        <strong>HTTP smoke of the running service — not yet executed</strong> (<a class="badge boundary" href="/status/#DEF-07">DEF-07</a>). &nbsp;·&nbsp;
-        <strong>BDD/Gherkin specs — designed as a derivative, not built</strong> (<a class="badge deferred" href="/status/#DEF-01">DEF-01</a>): guards + scenarios should generate Gherkin; that projection isn’t implemented.
-      </p></div>
+      <div class="sec-head"><span class="no">05</span><h2>Current technical result, separate acceptance boundaries</h2></div>
+      <div class="callout teal"><b>NEW CANDIDATE, NOT A REWRITTEN OLD RUN</b><p>On 2026-11-12, <code>bank030-relocated-20261112-02</code> passed and rechecked <strong>source / anchors / code / service</strong> <a class="badge verified" href="/status/#F-24" data-fact="F-24">F-24</a>, including real database/HTTP and automated browser observations <a class="badge verified" href="/status/#F-26" data-fact="F-26">F-26</a>. Its fresh SQL rebuild reached readiness in <strong>66.847 s within the unchanged 90 s gate</strong> <a class="badge verified" href="/status/#F-27" data-fact="F-27">F-27</a>. Native Darwin x64 / JDK11, one owner; inputs were unchanged and that owner’s resources and lease were released <a class="badge verified" href="/status/#F-28" data-fact="F-28">F-28</a>. See the <a href="/docs/bank-technical-20261112.md">sanitized scope and evidence summary</a>. The old P23/service02 failure remains historical (<a href="/status/#DEF-06">DEF-06</a>).</p></div>
+      <div class="callout red"><b>STILL SEPARATE</b><p><strong>Independent service experience</strong> remains open (<a href="/status/#DEF-07">DEF-07</a>): session03 readiness failed; slot cleanup was not a pass, and the later fix candidate is unexecuted. Technical HTTP/browser passes do not close <strong>public material delivery</strong> (<a href="/status/#DEF-15">DEF-15</a>) or <strong>human usability</strong> (<a href="/status/#DEF-16">DEF-16</a>). Family observations (<a href="/status/#DEF-17">DEF-17</a>), retry/backoff/deadline debt (<a href="/status/#DEF-18">DEF-18</a>), targeted negatives and extra Node CI/typecheck (<a href="/status/#DEF-19">DEF-19</a>), and legacy offline-bundle migration (<a href="/status/#DEF-20">DEF-20</a>) are not signed off by the bank run.</p><p><strong>BDD/Gherkin specs remain an unbuilt derivative</strong> (<a href="/status/#DEF-01">DEF-01</a>). Formal workshop verification also needs the <a href="/guide/#bank-prerequisites">explicit paired materials and scope-specific environment</a>; the convenience generation path is not a substitute.</p></div>
     </section>
 
     <section id="try">
-      <div class="sec-head"><span class="no">06</span><h2>Run it yourself</h2></div>
-      <p class="sec-sub">The Counter tutorial walks stages 1–6 on a one-aggregate project in about ten minutes, Node-only. The bank example takes it to full scale. Both are on the <a href="/guide/">hands-on guide</a>.</p>
+      <div class="sec-head"><span class="no">06</span><h2>Take the smallest useful loop first</h2></div>
+      <p class="sec-sub">Counter exercises creation, generation, querying, an author change, update and verification using Node. It does not claim to run the bank or validate a JVM service. The guide separates those later prerequisites.</p>
+      <p class="next-step"><strong>Next: make one change.</strong> <a href="/guide/">Start with the hands-on guide</a>.</p>
     </section>
   </main>
 

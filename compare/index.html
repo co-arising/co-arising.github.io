@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Landscape: peers, complements &amp; protocol projections — co-arising</title>
-  <meta name="description" content="How the truth-source approach relates to EventCatalog, ContextMapper, prooph, Qlerify, EventStorming and Palantir Ontology — and which open standards the truth tree can project onto." />
+  <meta name="description" content="Choose by job: discovery, catalogs, DDD modeling, runtime and traceability. Understand complementary tools, current interfaces, and standards projections that are still proposals." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/compare/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/compare/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/compare/" />
+  <link rel="canonical" href="https://co-arising.github.io/compare/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,96 +21,68 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">Landscape</p>
-      <h1>Peers, complements &amp; the <span class="accent">ontology next door</span></h1>
-      <p class="thesis">This space has good neighbors. The honest positioning: some tools we complement, some we extend, one we respectfully disagree with about what “model” means. None of this is a star-count contest — it is about which job each tool does.</p>
+      <p class="over">Fit, not a feature contest</p>
+      <h1>Where does this fit<br />in <span class="accent">your existing workflow?</span></h1>
+      <p class="thesis">Keep tools that help your team discover, describe and operate a domain. Consider a truth source when you also need a reviewable connection from declared behavior to generated implementation and back. That is a particular job, not a replacement for every modeling or data platform.</p>
+      <p class="page-outline"><a href="#peers">Choose by job</a> · <a href="#protocols">Check what is available</a> · <a href="#licenses">Review licenses</a></p>
     </header>
 
     <section id="peers">
-      <div class="sec-head"><span class="no">01</span><h2>The peers, job by job</h2></div>
+      <div class="sec-head"><span class="no">01</span><h2>Start with the job you need done</h2></div>
+      <p class="sec-sub">These are complementary starting points, not an exhaustive vendor capability audit. No absence of a feature or integration is inferred from a tool’s category.</p>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>Project</th><th>What it is</th><th>License / model</th><th>Where we overlap</th><th>Where we differ / complement</th></tr></thead>
+        <thead><tr><th>Your job</th><th>A place to start</th><th>How a truth source could fit</th><th>Boundary to check</th></tr></thead>
         <tbody>
-          <tr>
-            <td class="nm">EventCatalog<span class="sub">docs-as-code for event-driven systems</span></td>
-            <td>Domains, services, events and schemas rendered as a browsable catalog. v4 adds an agent/MCP layer.</td>
-            <td>MIT · open core</td>
-            <td>Event-driven knowledge as a first-class graph; MCP for agent access — same instincts.</td>
-            <td><strong>The cleanest one-liner in the space:</strong> EventCatalog generates <em>docs from your architecture</em>; we generate <em>the architecture itself, from knowledge</em> — and anchor it back. Their Code-to-Docs agent is code → docs; our loop is knowledge → code → provenance. Natural complement, not rival.</td>
-          </tr>
-          <tr>
-            <td class="nm">ContextMapper<span class="sub">DDD DSL (CML)</span></td>
-            <td>A textual DSL for bounded contexts, context maps, aggregates; generates PlantUML / MDSL.</td>
-            <td>Apache-2.0 · academic origin</td>
-            <td>File-based DDD modeling with generators — the closest ancestor in spirit.</td>
-            <td>CML captures strategic + tactical <em>shape</em>; it stops at diagrams and contracts. Our tree compiles to a knowledge graph with query verbs, generates a compiling CQRS codebase, and proves lineage with anchors. CML output could ride downstream of a truth tree as one projection among several.</td>
-          </tr>
-          <tr>
-            <td class="nm">prooph<span class="sub">PHP CQRS/ES components · Event Engine</span></td>
-            <td>Event-sourcing toolkit in PHP; Event Engine pioneered “type a model, generate ES code”.</td>
-            <td>MIT · community/mixed</td>
-            <td>The “model → generated ES code” ambition — they proved the demand is real.</td>
-            <td>Their audience is PHP runtime plumbing; ours is the knowledge layer above any runtime — with validation gates, graph queries, agent access and anchored round-tripping. Different layer, same belief.</td>
-          </tr>
-          <tr>
-            <td class="nm">Qlerify<span class="sub">AI-assisted collaborative modeling SaaS</span></td>
-            <td>Event-storming-style canvas, AI proposes commands/events/models, exports backlogs + OpenAPI.</td>
-            <td>Proprietary SaaS</td>
-            <td>AI-assisted discovery of commands/events/read models — overlapping front-end of the funnel.</td>
-            <td>Field-level analysis of a real Qlerify export: <strong>skeleton full, behavior empty</strong> — aggregates/events/roles/queries export cleanly (5/15 of our types fully), but invariants, guards, error codes, sagas and pipelines have no representation (their strategy/decision/GWT cards are narrative text, not formal). Qlerify discovers consensus; a truth tree turns it into industrial artifacts. Integration — including reverse export back to the canvas — is designed for, on the <a class="badge deferred" href="/status/#DEF-02">DEF-02</a> ledger.</td>
-          </tr>
-          <tr>
-            <td class="nm">EventStorming / Domain Storytelling<span class="sub">discovery methods</span></td>
-            <td>Workshop formats: orange events, blue commands, actors, policies — or actor/workpiece/activity narratives.</td>
-            <td>Methods, not tools</td>
-            <td>Our <code>inbox</code> note types ARE the sticky-note vocabulary — EventStorming is the canonical intake.</td>
-            <td>A method is not a source of truth: photos of walls rot. The inbox is where workshop output lands as machine-checkable drafts awaiting human promotion — the discovery layer we deliberately don’t compete with, we consume.</td>
-          </tr>
-          <tr>
-            <td class="nm">Palantir Ontology<span class="sub">enterprise semantic layer</span></td>
-            <td>Object/link/action types over enterprise data; actions write back; SDKs generated from types; MCP exposure.</td>
-            <td>Proprietary</td>
-            <td>Generated SDKs from a semantic model; “decisions, not just data”; agent access — deeply aligned instincts.</td>
-            <td>Closed world vs open files: their ontology is the product you rent; our tree is YAML you own, compiling to code you can leave with. Taxonomy-first vs relation-first — the philosophical fork this site is named after. We borrow their governance thinking (usage tracking, staged changes); we publish the stack.</td>
-          </tr>
+          <tr><td class="nm">Discover a shared business language</td><td>EventStorming / Domain Storytelling</td><td>Keep the discussion and examples. Capture decisions as reviewable drafts, then make accepted rules and relationships explicit.</td><td>A workshop method is not replaced by a file format; promotion from a draft remains a human decision.</td></tr>
+          <tr><td class="nm">Collaborate on a model</td><td>Qlerify and other modeling canvases</td><td>Use the canvas for conversation; review how each exported field maps to declarations before treating an import as authoritative.</td><td>Roundtrip canvas integration is not shipped here. <a href="/status/#DEF-02">DEF-02</a> tracks the deferred integration; no product-wide coverage score is claimed.</td></tr>
+          <tr><td class="nm">Publish an architecture catalog</td><td>EventCatalog</td><td>A catalog can help people browse domains, services and events. A truth-source workflow adds its own declared-behavior generation and source-anchor checks.</td><td>Complementary roles do not imply an automatic catalog exporter or synchronization contract.</td></tr>
+          <tr><td class="nm">Explore bounded contexts and context maps</td><td>ContextMapper</td><td>Use strategic modeling to discuss boundaries. This project connects its supported declarations to a graph and CQRS/ES implementation.</td><td>A CML projection is a direction, not a delivered adapter or a claim about ContextMapper’s limits.</td></tr>
+          <tr><td class="nm">Implement an event-sourced application</td><td>prooph / Event Engine</td><td>Choose runtime and language for the application. Here, the demonstrated generation target is Scala CQRS/ES; Saga and Monarch have separate coordination responsibilities.</td><td>The knowledge layer does not make runtime ports interchangeable. There is no PHP target demonstrated here.</td></tr>
+          <tr><td class="nm">Connect enterprise data and actions</td><td>Palantir Ontology and semantic platforms</td><td>Both semantic models and truth-source models can express relationships and behavior. This project emphasizes author files, generated source and inspectable provenance.</td><td>Evaluate platform integration and governance on their own requirements. This is not a compatibility, feature-parity or vendor-exit assessment.</td></tr>
         </tbody>
       </table></div>
-      <p class="small" style="margin-top:10px">Coverage numbers for Qlerify come from a field-level analysis of a real exported <code>workflow.json</code> against our 15-type registry — 5 full / 6 partial / 4 absent. Method and matrix available in the project’s research notes.</p>
     </section>
 
     <section id="protocols">
-      <div class="sec-head"><span class="no">02</span><h2>Protocol projections — the tree as master, standards as outputs</h2></div>
-      <p class="sec-sub">The deliberately small owned layer is the domain IR and its relation registry. Everything else is a <em>projection</em> onto standards the industry already runs on — chosen per job, never reinvented.</p>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Layer</th><th>Standard</th><th>Governance</th><th>License family</th><th>Projection from the tree</th></tr></thead>
-        <tbody>
-          <tr><td class="nm">Acceptance</td><td>Gherkin</td><td>Cucumber community</td><td>MIT</td><td>Guards + scenarios → Given/When/Then features. <strong>Designed, not yet built</strong> — <a class="badge deferred" href="/status/#DEF-01">DEF-01</a>.</td></tr>
-          <tr><td class="nm">Event contracts</td><td>AsyncAPI 3.x</td><td>Linux Foundation</td><td>Apache-2.0</td><td>Events + payload schemas → channels/operations/messages. Planned projection.</td></tr>
-          <tr><td class="nm">Event envelope</td><td>CloudEvents 1.0</td><td>CNCF (graduated)</td><td>Apache-2.0</td><td>Envelope metadata for emitted events. Planned projection.</td></tr>
-          <tr><td class="nm">REST contracts</td><td>OpenAPI 3.x</td><td>OpenAPI Initiative</td><td>Apache-2.0 / CC</td><td>Read models + commands → paths/schemas. Planned projection.</td></tr>
-          <tr><td class="nm">Architecture views</td><td>C4 / Structurizr DSL</td><td>Community / single-vendor</td><td>Apache-2.0</td><td>Contexts + aggregates → system/context/container diagrams. Planned projection.</td></tr>
-          <tr><td class="nm">Service topology</td><td>Backstage catalog</td><td>CNCF</td><td>Apache-2.0</td><td>Contexts, dependencies (R21), external systems → catalog entities. Planned projection.</td></tr>
-          <tr><td class="nm">DDD modeling</td><td>ContextMapper CML</td><td>Academic community</td><td>Apache-2.0</td><td>Bounded contexts + context map → CML files. Planned projection (see peers above).</td></tr>
-          <tr><td class="nm">Agent transport</td><td>MCP</td><td>AAIF (donated by Anthropic)</td><td>MIT</td><td><strong>Shipped</strong>: 26 read-oriented tools over stdio JSON-RPC <span class="badge verified" title="F-16">verified</span> — describe, expand, blast_radius, lineage, anchors, orphans, consistency_check + registry verbs.</td></tr>
-          <tr><td class="nm">Local graph</td><td>SQLite</td><td>Public domain</td><td>—</td><td><strong>Shipped</strong>: every compile builds a queryable graph store — this site’s <a href="/explorer/">explorer</a> runs it in your browser.</td></tr>
-        </tbody>
-      </table></div>
-      <div class="callout"><b>WHY PROJECTIONS</b><p>A projection is regenerable, so it can adopt the <em>best</em> standard for each consumer without the tree owning N dialects. The standard never becomes the master; the tree never forks into N files that drift apart. (Projection generators beyond MCP + SQLite are sequenced after the runtime gates on the ledger.)</p></div>
+      <div class="sec-head"><span class="no">02</span><h2>Existing standards, explicit implementation status</h2></div>
+      <p class="sec-sub">The standards already exist. A sensible mapping onto one is not the same as an implemented, tested exporter. The current interfaces below are distinct from proposed derivatives.</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">Available interface</span><h3>SQLite knowledge graph</h3><p>A local graph representation supports real queries. The <a href="/explorer/">Explorer</a> reads the shipped bank snapshot <a href="/status/#F-03" data-fact="F-03">F-03</a>; it is not a live view of your repository.</p></div>
+        <div class="card"><span class="tag">Available interface</span><h3>MCP access</h3><p>The toolchain provides read-oriented tools over stdio JSON-RPC <a href="/status/#F-16" data-fact="F-16">F-16</a>. This is a query interface, not an export to every standard listed below.</p></div>
+      </div>
+      <details open>
+        <summary>Proposed derivatives · not shipped integrations</summary>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Job</th><th>Standard or format</th><th>Proposed mapping</th><th>Status here</th></tr></thead>
+          <tbody>
+            <tr><td class="nm">Acceptance examples</td><td>Gherkin</td><td>Scenarios and declared behavior → Given / When / Then features</td><td>Designed, not built <a href="/status/#DEF-01">DEF-01</a>. Expected behavior still requires independent review.</td></tr>
+            <tr><td class="nm">Event contracts</td><td>AsyncAPI</td><td>Events and payload schemas → messages, channels and operations</td><td>Proposed projection; not a current export.</td></tr>
+            <tr><td class="nm">Event envelopes</td><td>CloudEvents</td><td>Event metadata → an interoperable envelope</td><td>Proposed mapping; no conformance claim.</td></tr>
+            <tr><td class="nm">HTTP contracts</td><td>OpenAPI</td><td>Commands and queries → operations and schemas</td><td>Proposed projection; no current exporter claimed here.</td></tr>
+            <tr><td class="nm">Architecture views</td><td>C4 / Structurizr DSL</td><td>Explicit architecture declarations → system and container views</td><td>Proposed projection; domain relations alone do not specify deployment topology.</td></tr>
+            <tr><td class="nm">Service catalog</td><td>Backstage catalog</td><td>Contexts and declared dependencies → catalog entities</td><td>Proposed projection; not a synchronization integration.</td></tr>
+            <tr><td class="nm">DDD modeling</td><td>ContextMapper CML</td><td>Bounded contexts and context maps → CML declarations</td><td>Proposed projection; not a roundtrip adapter.</td></tr>
+          </tbody>
+        </table></div>
+      </details>
+      <div class="callout"><b>ADOPT WITHOUT OVERCLAIMING</b><p>Start from an available interface. For a new projection, agree on identity, semantics, information loss and ownership before building an exporter. A derivative should not become a competing editable source by accident.</p></div>
     </section>
 
     <section id="licenses">
-      <div class="sec-head"><span class="no">03</span><h2>Licensing posture</h2></div>
+      <div class="sec-head"><span class="no">03</span><h2>Check the license at each boundary</h2></div>
       <div class="card-grid cols-3">
-        <div class="card"><span class="tag">MIT</span><h3>truthsrc toolchain</h3><p>The language, compiler, generators, MCP server — maximum reuse, minimum friction for adoption into any toolchain.</p></div>
-        <div class="card"><span class="tag">Apache-2.0</span><h3>Engines &amp; example</h3><p>saga-core, monarch-core, monarch-persistence, bank-wealth-demo — runtime libraries and demo assets, with patent grant, matching the JVM ecosystem’s convention.</p></div>
-        <div class="card"><span class="tag">CC BY 4.0 + MIT</span><h3>This site</h3><p>Content CC BY 4.0, code MIT — fork the site, quote the ideas, both fine with attribution.</p></div>
+        <div class="card"><span class="tag">MIT</span><h3>truthsrc toolchain</h3><p>The recorded toolchain license is MIT <a href="/status/#F-19" data-fact="F-19">F-19</a>. Review the license and notices for the version you adopt.</p></div>
+        <div class="card"><span class="tag">Apache-2.0</span><h3>Engines and bank example</h3><p>saga-core, monarch-core and monarch-persistence <a href="/status/#F-18" data-fact="F-18">F-18</a>, plus bank-wealth-demo <a href="/status/#F-20" data-fact="F-20">F-20</a>. Runtime dependencies retain their own obligations.</p></div>
+        <div class="card"><span class="tag">CC BY 4.0 + MIT</span><h3>This site</h3><p>Site content is CC BY 4.0; site code is MIT. Keep the applicable attribution and notices when reusing them.</p></div>
       </div>
-      <p class="small" style="margin-top:10px">Your generated code is yours: generation output carries the license you choose — the toolchain imposes nothing downstream. <span class="badge verified" title="F-18/F-19/F-20">verified per-repo</span></p>
+      <p class="evidence-note">For an application you distribute, review generated content, included scaffolding and runtime dependencies together; a permissive generator license is not a blanket waiver of their terms.</p>
+      <p class="next-step"><strong>Next: evaluate the workflow on a small model.</strong> <a href="/guide/#l1">Try the Counter loop</a>, or <a href="/bank-demo/">read the bank scenarios without installing anything</a>.</p>
     </section>
   </main>
 

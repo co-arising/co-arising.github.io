@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>状态与台账 — co-arising</title>
-  <meta name="description" content="每一条经验证的事实，附采集日期与复现命令；以及一份诚实的挂帐台账。" />
+  <meta name="description" content="银行当前技术验收、按日期保留的历史事实，以及尚未签收的材料交付与体验台账。技术通过不等于全面签收。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/status/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/status/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/status/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/status/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,63 +21,93 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">诚实层</p>
       <h1>状态、事实与<span class="accent">台账</span></h1>
-      <p class="thesis">这个项目家族把「什么真的能用」当作一等公民产物。本站任何地方用到的每个数字都登记在下面，附复现它的命令；一切还没成真的东西都在台账上，带稳定 ID。</p>
+      <p class="thesis">当前技术结果、历史采集与未完成事项分开记录。每条事实都有稳定 ID 和自己的证据日期；新的技术候选通过，不会抹去旧失败，也不替材料交付与真人体验签收。</p>
     </header>
 
-    <section id="facts">
-      <div class="sec-head"><span class="no">01</span><h2>已验证事实</h2></div>
-      <p class="sec-sub">采集于 <strong>2026-11-11</strong>，对象是 <code>bank-wealth-demo</code> @ <code>fix/pending-replay-20261111</code> 与 <code>metarch-truthsrc</code> @ <code>fix/pending-reconciliation-20261111</code>。事实来源：本仓库的 <a href="https://github.com/co-arising/co-arising.github.io/blob/main/SITE-FACTS.md">SITE-FACTS.md</a>（英文主文件）。</p>
+    <section id="bank-technical" aria-labelledby="bank-technical-heading">
+      <div class="sec-head"><span class="no">01</span><h2 id="bank-technical-heading">银行当前技术通过；历史失败仍保留</h2></div>
+      <p class="sec-sub">内容更新于 <time datetime="2026-11-13">2026-11-13</time>；技术证据采集于 <time datetime="2026-11-12">2026-11-12</time>。参见<a href="/docs/bank-technical-20261112.md#中文">技术验收脱敏摘要</a>。维护者已核对本地报告及其哈希；原始报告与完整配对材料尚未公开。</p>
+      <p><span class="badge verified" title="F-24">技术通过，已复核</span> owner <code>bank030-relocated-20261112-02</code> 在源码实际移址后，<strong>source、anchors、code、service</strong> 四层均通过。报告记录 <code>fullPipelinePassed=true</code>，diagnostics 为空（<a href="#F-24">F-24</a>）。</p>
+      <ul>
+        <li><strong>actor 64 项、readside 47 项通过。</strong>两组共享 23 项生成测试，不是 111 个互不重复用例（<a href="#F-25">F-25</a>）。</li>
+        <li><strong>24 个三 JVM 恢复窗口，共 72 次 JVM 执行</strong>；4 阶段真实数据库/HTTP、3 次自动浏览器观测、5 个 MySQL 负例通过（<a href="#F-26">F-26</a>）。</li>
+        <li><strong>新 SQL 重建 66.847 秒，处于未放宽的 90 秒门限内。</strong>仅描述本候选，不是一般性能承诺（<a href="#F-27">F-27</a>）。</li>
+      </ul>
+      <p>范围限于原生 <strong>Darwin x64 / JDK11、单 owner</strong>。源码输入未变，该 owner 的资源已退出、租约已归还；不能推广到其他会话，也不是生产、多 writer、全平台或真实基金公司接入认证（<a href="#F-28">F-28</a>）。<strong>CLI 工具是 0.5.0</strong>，<strong>引擎是 0.3.0</strong>，属于不同版本维度（<a href="#F-29">F-29</a>、<a href="#F-23">F-23</a>）。</p>
+      <div class="callout"><b>签收边界</b><p><span class="badge boundary">未签收</span> 公开配对材料（<a href="#DEF-15">DEF-15</a>）、独立真人可用性（<a href="#DEF-16">DEF-16</a>）、独立 start/status/页面操作/stop 体验（<a href="#DEF-07">DEF-07</a>）仍须分别签收。session03 未达 readiness，手工清理占位不是通过；后续 <time datetime="2026-11-13">2026-11-13</time> 会话修补候选记录为<strong>未执行</strong>。自动浏览器观测不能替真人体验签收。</p><p><span class="badge boundary">历史失败</span> P23/service02 在 <time datetime="2026-11-06">2026-11-06</time> 的回放失败仍是失败（<a href="#DEF-06">DEF-06</a>）；当前技术判断已采用新结果，不改写旧回执。Maven Central 发布本身不等于银行服务验收（<a href="#F-23">F-23</a>）。</p></div>
+    </section>
+
+    <section id="facts" aria-labelledby="facts-heading">
+      <div class="sec-head"><span class="no">02</span><h2 id="facts-heading">已验证事实——各有日期与范围</h2></div>
+      <p class="sec-sub">采集日期逐条记录，不代表所有内容已重新复验。2026-11-11 的采集保留 bank <code>fix/pending-replay-20261111</code> 与工具 <code>fix/pending-reconciliation-20261111</code> 范围；当前 owner-02 证据另有输入与范围。事实来源：<a href="https://github.com/co-arising/co-arising.github.io/blob/main/SITE-FACTS.md">SITE-FACTS.md</a>（英文主文件）。列出复现命令，不等于配对材料已有公开渠道。</p>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>ID</th><th>事实</th><th>值</th><th>复现</th></tr></thead>
+        <thead><tr><th scope="col">ID</th><th scope="col">事实</th><th scope="col">值</th><th scope="col">采集日期</th><th scope="col">证据 / 复现</th></tr></thead>
         <tbody>
-          <tr><td class="nm">F-01</td><td>银行真源树可编译</td><td><span class="badge verified">已验证</span> 0 硬发现</td><td><code>npm run validate</code>（bank 仓库）</td></tr>
-          <tr><td class="nm">F-02</td><td>往返逐字节一致</td><td><span class="badge verified">已验证</span> 157 原子</td><td>validate 闸门的一部分</td></tr>
-          <tr><td class="nm">F-03</td><td>知识图谱</td><td><span class="badge verified">已验证</span> 389 节点 / 413 边</td><td><code>truthsrc graph --tree truth/bank-wealth --out &lt;db&gt;</code></td></tr>
-          <tr><td class="nm">F-04</td><td>代码生成</td><td><span class="badge verified">已验证</span> 235 个文件</td><td><code>generate-project</code></td></tr>
-          <tr><td class="nm">F-05</td><td>锚点验证</td><td><span class="badge verified">已验证</span> 通过，792 个锚点</td><td><code>verify-project</code></td></tr>
-          <tr><td class="nm">F-06</td><td>生成的 Scala 可编译</td><td><span class="badge verified">已验证</span> 0 错误 / 534 源文件</td><td><code>sbt compile</code></td></tr>
-          <tr><td class="nm">F-07</td><td>测试套件</td><td><span class="badge verified">已验证</span> 23/23 通过</td><td><code>sbt test</code></td></tr>
-          <tr><td class="nm">F-08</td><td>手写区</td><td><span class="badge verified">已验证</span> 35 个文件，完整实现</td><td>文件系统计数</td></tr>
-          <tr><td class="nm">F-09</td><td>不变量</td><td><span class="badge verified">已验证</span> 3 个聚合共 149 条 <code>@rule</code></td><td>对真源树 grep</td></tr>
-          <tr><td class="nm">F-10</td><td>原子普查</td><td><span class="badge verified">已验证</span> 59 VO · 27 切片 · 36 formal-product · 8 结构 · 4 流水线 · 4 故事 · 6 读模型 · 3 聚合 · 2 saga · …</td><td>文件系统计数</td></tr>
-          <tr><td class="nm">F-13</td><td>工具链足迹</td><td><span class="badge verified">已验证</span> 0 npm 依赖 · Node ≥ 22.13</td><td>package.json</td></tr>
-          <tr><td class="nm">F-14</td><td>关系注册表</td><td><span class="badge verified">已验证</span> 22 条关系，带 propagates 标记</td><td><code>lib/shared.mjs</code></td></tr>
-          <tr><td class="nm">F-16</td><td>MCP 工具</td><td><span class="badge verified">已验证</span> 26 个工具，stdio JSON-RPC</td><td><code>truthsrc mcp</code></td></tr>
-          <tr><td class="nm">F-21</td><td>影响半径，<code>SipInstallmentFailed</code> d3</td><td><span class="badge verified">已验证</span> 55 个节点——站点 SQL 预设 ≡ CLI 动词</td><td>对 bank canonical 运行 MCP <code>blast_radius</code></td></tr>
-          <tr><td class="nm">F-22</td><td>孤儿</td><td><span class="badge verified">已验证</span> 11 个去重的无源事件（23 行 graphstore）</td><td>MCP <code>orphans</code></td></tr>
-          <tr><td class="nm">F-18/19/20</td><td>许可</td><td><span class="badge verified">已验证</span> truthsrc MIT · 引擎 + bank Apache-2.0</td><td>各仓库 LICENSE</td></tr>
-          <tr><td class="nm">F-23</td><td>引擎已上架 Maven Central</td><td><span class="badge verified">已验证</span> saga-core / monarch-core / monarch-persistence 0.3.0 已发布；jar sha256 550fbd5c… · 0c7a25ee… · f42f1b99…；银行全链已在这批字节上复验（0 硬发现 · 157 原子 · 235 文件 · 0 错误 · 23/23 · 792 锚点）</td><td>对 repo1.maven.org 的 jar 跑 <code>shasum -a 256</code>；bank 的 <code>npm run runtime:prepare</code></td></tr>
+          <tr id="F-01"><th scope="row" class="nm">F-01</th><td>银行真源树可编译</td><td><span class="badge verified" title="F-01">已验证</span> 0 硬发现</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>npm run validate</code>（bank 仓库）</td></tr>
+          <tr id="F-02"><th scope="row" class="nm">F-02</th><td>往返逐字节一致</td><td><span class="badge verified" title="F-02">已验证</span> 157 原子</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>validate 闸门的一部分</td></tr>
+          <tr id="F-03"><th scope="row" class="nm">F-03</th><td>知识图谱</td><td><span class="badge verified" title="F-03">已验证</span> 389 节点 / 413 边</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>truthsrc graph --tree truth/bank-wealth --out &lt;db&gt;</code></td></tr>
+          <tr id="F-04"><th scope="row" class="nm">F-04</th><td>代码生成</td><td><span class="badge verified" title="F-04">已验证</span> 235 个文件</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>generate-project</code></td></tr>
+          <tr id="F-05"><th scope="row" class="nm">F-05</th><td>锚点验证</td><td><span class="badge verified" title="F-05">已验证</span> 通过，792 个锚点</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>verify-project</code></td></tr>
+          <tr id="F-06"><th scope="row" class="nm">F-06</th><td>生成的 Scala 可编译</td><td><span class="badge verified" title="F-06">已验证</span> 0 错误 / 534 源文件</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>sbt compile</code></td></tr>
+          <tr id="F-07"><th scope="row" class="nm">F-07</th><td>生成的单元测试</td><td><span class="badge verified" title="F-07">已验证</span> 23/23 通过；不是独立银行业务测试套件，也不是手写测试预期</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>生成项目内 <code>sbt test</code>；手写生产源码参与编译</td></tr>
+          <tr id="F-08"><th scope="row" class="nm">F-08</th><td>手写区</td><td><span class="badge verified" title="F-08">已验证</span> 35 个文件，完整实现（非 stub）</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>文件系统计数</td></tr>
+          <tr id="F-09"><th scope="row" class="nm">F-09</th><td>不变量</td><td><span class="badge verified" title="F-09">已验证</span> 3 个聚合共 149 条 <code>@rule</code></td><td><time datetime="2026-11-11">2026-11-11</time></td><td>对真源树 grep</td></tr>
+          <tr id="F-10"><th scope="row" class="nm">F-10</th><td>原子普查</td><td><span class="badge verified" title="F-10">已验证</span> 157 个 YAML 原子：59 VO · 27 切片 · 36 formal-product · 8 结构 · 4 流水线 · 4 故事 · 6 读模型 · 3 聚合 · 2 saga · 1 use-cases · 1 context · 5 inbox notes</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>SITE-FACTS 记录的文件系统计数</td></tr>
+          <tr id="F-11"><th scope="row" class="nm">F-11</th><td>已声明的 Saga</td><td><span class="badge verified" title="F-11">已验证</span> 2 个：银行现金 Saga、独立于银行的退款 Saga</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>真源树文件系统</td></tr>
+          <tr id="F-12"><th scope="row" class="nm">F-12</th><td>Counter 教程</td><td><span class="badge verified" title="F-12">已验证</span> 仅需 Node；无须 JVM、数据库或网络</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>truthsrc init counter-lab --format human</code>；TUTORIAL.md</td></tr>
+          <tr id="F-13"><th scope="row" class="nm">F-13</th><td>工具链足迹</td><td><span class="badge verified" title="F-13">已验证</span> 0 npm 运行时依赖 · Node ≥ 22.13.0（内置 <code>node:sqlite</code>）</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>package.json</td></tr>
+          <tr id="F-14"><th scope="row" class="nm">F-14</th><td>关系注册表</td><td><span class="badge verified" title="F-14">已验证</span> 22 条关系（R1–R22），带 propagates 标记</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>lib/shared.mjs</code></td></tr>
+          <tr id="F-15"><th scope="row" class="nm">F-15</th><td>原子种类 / 笔记类型</td><td><span class="badge verified" title="F-15">已验证</span> 12 种原子、15 种笔记</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>lib/shared.mjs</code></td></tr>
+          <tr id="F-16"><th scope="row" class="nm">F-16</th><td>MCP 工具</td><td><span class="badge verified" title="F-16">已验证</span> 26 个工具，stdio JSON-RPC</td><td><time datetime="2026-11-11">2026-11-11</time></td><td><code>truthsrc mcp</code></td></tr>
+          <tr id="F-17"><th scope="row" class="nm">F-17</th><td>工作坊 HTML 快照，不同于 Explorer 图</td><td><span class="badge verified" title="F-17">快照范围已核对</span> 单文件、2.18 MB、离线、zh-CN；导出 120 节点 / 183 边，项目视图声明总量 861 / 737；省略 741 节点</td><td><time datetime="2026-11-06">2026-11-06</time>；范围核对于 <time datetime="2026-11-13">2026-11-13</time></td><td><a href="/downloads/bank-workshop.html">快照</a>内嵌的 <code>workshop-view</code> 属于 <code>truthsrc.project-view/v1</code>，不是 <a href="#F-03">F-03 graphstore</a>。核对导出数组、总量与截断字段；该历史快照不含新的服务验收报告。</td></tr>
+          <tr><th scope="row" class="nm"><span id="F-18">F-18</span> / <span id="F-19">F-19</span> / <span id="F-20">F-20</span></th><td>许可</td><td><span class="badge verified" title="F-18, F-19, F-20">已验证</span> 引擎：Apache-2.0，tag v0.3.0 · truthsrc：MIT · bank：Apache-2.0</td><td>F-18：<time datetime="2026-11-12">2026-11-12</time><br />F-19/20：<time datetime="2026-11-11">2026-11-11</time></td><td>各仓库 LICENSE；引擎 tag</td></tr>
+          <tr id="F-21"><th scope="row" class="nm">F-21</th><td>影响半径，<code>SipInstallmentFailed</code> d3</td><td><span class="badge verified" title="F-21">已验证</span> 55 个节点——站点 SQL 预设 ≡ CLI 动词</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>对 bank canonical 运行 MCP <code>blast_radius</code></td></tr>
+          <tr id="F-22"><th scope="row" class="nm">F-22</th><td>孤儿</td><td><span class="badge verified" title="F-22">已验证</span> canonical：11 个无源事件。原始查询：23 节点 / 13 个名称，其中 2 个限定请求别名有本地生产者</td><td><time datetime="2026-11-11">2026-11-11</time></td><td>MCP <code>orphans</code></td></tr>
+          <tr id="F-23"><th scope="row" class="nm">F-23</th><td>引擎已上架 Maven Central</td><td><span class="badge verified" title="F-23">发布已核验</span> <code>net.imadz</code> saga-core / monarch-core / monarch-persistence 0.3.0；JAR SHA-256 550fbd5c… / 0c7a25ee… / f42f1b99…。发布不等于银行服务验收。</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>公开 JAR/POM 响应与固定字节；取得指定版本制品并对比 SHA-256。<a href="/docs/bank-technical-20261112.md#中文">验收摘要</a></td></tr>
+          <tr id="F-24"><th scope="row" class="nm">F-24</th><td>银行移址技术验收</td><td><span class="badge verified" title="F-24">通过并复核</span> source / anchors / code / service；<code>fullPipelinePassed=true</code>；diagnostics 为空</td><td><time datetime="2026-11-12">2026-11-12</time></td><td><code>bank030-relocated-20261112-02</code>；bank <code>ce51d0e6</code> 加 16 项固定 source overlay，tool <code>cb860b5c</code>。<a href="/docs/bank-technical-20261112.md#中文">范围与前置条件</a>：仍需私有配对材料，不承诺公开一键复演。</td></tr>
+          <tr id="F-25"><th scope="row" class="nm">F-25</th><td>Actor 与 readside 测试范围</td><td><span class="badge verified" title="F-25">通过</span> actor 64 项；readside 47 项；共享 23 项生成测试，不是 111 个独立用例</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>同一移址候选；<code>verify --through service</code> 分别构建 actor/readside，保留已批准的固定业务预期。仍须满足 <a href="#F-24">F-24 前置条件</a>。</td></tr>
+          <tr id="F-26"><th scope="row" class="nm">F-26</th><td>移址恢复与服务观测</td><td><span class="badge verified" title="F-26">通过</span> 24 个三 JVM 恢复窗口（72 JVM）；4 阶段真实数据库/HTTP；3 次自动浏览器观测；5 个 MySQL 负例</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>同一封存候选：initial、restart、refund、新 SQL 重建。显式服务验证；自动检查不替独立或真人体验签收。</td></tr>
+          <tr id="F-27"><th scope="row" class="nm">F-27</th><td>新 SQL 重建就绪时间</td><td><span class="badge verified" title="F-27">门限内通过</span> 66.847 秒，未放宽的门限为 90 秒；initial / restart / refund：2.132 / 14.251 / 13.667 秒</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>owner-02 的 <code>readinessMs.replay=66847</code>；重跑须有完整隔离服务环境。不是前一候选成绩，也不是一般性能承诺。</td></tr>
+          <tr id="F-28"><th scope="row" class="nm">F-28</th><td>候选范围、源码稳定与资源退出</td><td><span class="badge verified" title="F-28">仅 owner-02 已核验</span> 原生 Darwin x64 / JDK11、单 owner；源码未变，自有资源已退出、租约已归还</td><td><time datetime="2026-11-12">2026-11-12</time></td><td>本地已核对的 driver 与输入前后证据；不描述其他会话。<a href="/docs/bank-technical-20261112.md#中文">脱敏证据摘要</a></td></tr>
+          <tr id="F-29"><th scope="row" class="nm">F-29</th><td>CLI 安装与 Counter 移址</td><td><span class="badge verified" title="F-29">功能检查通过</span> 工具包 0.5.0：包 pin 校验、离线安装、实际 prefix 移址、Counter 0→2 更新；40 项命令观察</td><td><time datetime="2026-11-12">2026-11-12</time></td><td><code>tool-install-counter-review</code>；须有配套包。工具版本不同于引擎 0.3.0。重复更新的生成源码零写入，不等于证据/图零写入；交付与新人可用性另行签收（<a href="#DEF-15">DEF-15</a>、<a href="#DEF-16">DEF-16</a>）。</td></tr>
         </tbody>
       </table></div>
     </section>
 
-    <section id="ledger">
-      <div class="sec-head"><span class="no">02</span><h2>台账——挂帐与未决</h2></div>
-      <p class="sec-sub">不是营销债：是工程诚实。事实来源：<a href="https://github.com/co-arising/co-arising.github.io/blob/main/LEDGER.md">LEDGER.md</a>（英文主文件）。全站引用的条目都链接到这里。</p>
+    <section id="ledger" aria-labelledby="ledger-heading">
+      <div class="sec-head"><span class="no">03</span><h2 id="ledger-heading">台账——未决、挂帐、已解决与历史结果</h2></div>
+      <p class="sec-sub">状态只对所指范围生效；新候选通过，不会改写旧失败回执。事实来源：<a href="https://github.com/co-arising/co-arising.github.io/blob/main/LEDGER.md">LEDGER.md</a>（英文主文件）。全站引用的条目都链接到这里。</p>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>ID</th><th>类别</th><th>条目</th><th>状态</th><th>备注</th></tr></thead>
+        <thead><tr><th scope="col">ID</th><th scope="col">类别</th><th scope="col">条目</th><th scope="col">状态</th><th scope="col">备注</th></tr></thead>
         <tbody>
-          <tr id="DEF-01"><td class="nm">DEF-01</td><td>behavior</td><td>BDD / Gherkin 行为规格</td><td><span class="badge deferred">挂帐</span></td><td>定位为树的衍生物（守卫 + 场景可生成 Gherkin）。</td></tr>
-          <tr id="DEF-02"><td class="nm">DEF-02</td><td>tooling</td><td>可视化真源树编辑（Qlerify / Miro 导入、逆向抽取）</td><td><span class="badge deferred">挂帐</span></td><td>语言层先行；编辑 UX 是另一个讨论。</td></tr>
-          <tr id="DEF-03"><td class="nm">DEF-03</td><td>publishing</td><td>truthsrc npm 发布</td><td><span class="badge boundary">阻塞</span></td><td>目前只有本地 tgz / 源码检出。</td></tr>
-          <tr id="DEF-04"><td class="nm">DEF-04</td><td>publishing</td><td>monarch-* / saga-* 发布到 Maven Central</td><td><span class="badge verified">已解决 2026-11-12</span></td><td>已交付：三个引擎都以 0.3.0 发布（tag v0.3.0 → sbt-ci-release → Central Portal）；本站 pin 已对照公开字节核验。离线发行包工具仍钉着已退役的 p23 集——在台账继续追踪。</td></tr>
-          <tr id="DEF-05"><td class="nm">DEF-05</td><td>demos</td><td>fab-simulator-demo、bank-batch-transactor-demo 开源</td><td><span class="badge deferred">挂帐</span></td><td>第二轮对齐。</td></tr>
-          <tr id="DEF-06"><td class="nm">DEF-06</td><td>bank-service</td><td>service02 全服务闸门</td><td><span class="badge boundary">未决</span></td><td>读侧回放没赶上 90 秒追平闸门（2026-11-06）；代码、24 个恢复用例、真实库的初始/重启/退款已通过。</td></tr>
-          <tr id="DEF-07"><td class="nm">DEF-07</td><td>bank-service</td><td><code>sbt run</code> + HTTP 冒烟</td><td><span class="badge boundary">未决</span></td><td>尚未在人工会话中执行。</td></tr>
-          <tr id="DEF-08"><td class="nm">DEF-08</td><td>hosting</td><td>免费托管上的演示</td><td><span class="badge deferred">挂帐</span></td><td>需要先过 DEF-06/07；免费档 JVM 内存存疑。</td></tr>
-          <tr id="DEF-09"><td class="nm">DEF-09</td><td>examples</td><td>Saga/Monarch 端到端业务叙事</td><td><span class="badge deferred">挂帐</span></td><td>银行示例两者都声明了；缺一篇专门的横切叙事。</td></tr>
-          <tr id="DEF-10"><td class="nm">DEF-10</td><td>i18n</td><td>中文版站点</td><td><span class="badge verified">已解决 2026-11-11</span></td><td>全站 /zh/ 中文镜像上线。备注更正：workshop HTML 本来就是中文（原条目把这一点记反了，不存在「补英文版」的需求）。</td></tr>
-          <tr id="DEF-11"><td class="nm">DEF-11</td><td>alignment</td><td>各仓库 README 与本站对齐</td><td><span class="badge deferred">挂帐</span></td><td>明确排在本站上线之后的下一阶段。</td></tr>
-          <tr id="DEF-12"><td class="nm">DEF-12</td><td>explorer</td><td>力导向画布；录屏</td><td><span class="badge deferred">挂帐</span></td><td>查询控制台 + 放射视图已覆盖 v1。</td></tr>
-          <tr id="DEF-13"><td class="nm">DEF-13</td><td>naming</td><td>npm scope → <code>@co-arising/truthsrc</code></td><td><span class="badge deferred">挂帐</span></td><td>首次发布（DEF-03）之前零成本。</td></tr>
-          <tr id="DEF-14"><td class="nm">DEF-14</td><td>org</td><td>其余仓库 → co-arising 组织</td><td><span class="badge deferred">挂帐</span></td><td>链接集中在 site.js；迁移只改一行。</td></tr>
+          <tr id="DEF-01"><th scope="row" class="nm">DEF-01</th><td>behavior</td><td>BDD / Gherkin 行为规格</td><td><span class="badge deferred">挂帐</span></td><td>定位为真源树的衍生物（守卫 + 场景可生成 Gherkin）；守卫/fold 的形式化优先。待行为投影交付。</td></tr>
+          <tr id="DEF-02"><th scope="row" class="nm">DEF-02</th><td>tooling</td><td>可视化真源树编辑（Qlerify / Miro 导入、逆向抽取成树）</td><td><span class="badge deferred">挂帐</span></td><td>语言层先行；编辑 UX 另议。待早期用户验证策略/范围层。</td></tr>
+          <tr id="DEF-03"><th scope="row" class="nm">DEF-03</th><td>publishing</td><td>truthsrc npm 发布</td><td><span class="badge boundary">阻塞</span></td><td>目前只有本地 tgz / 源码，尚未发布到 registry。需要 owner 作出可发布决定。</td></tr>
+          <tr id="DEF-04"><th scope="row" class="nm">DEF-04</th><td>publishing</td><td>monarch-* / saga-* 发布到 Maven Central</td><td><span class="badge verified">已解决 2026-11-12</span></td><td>三个 <code>net.imadz</code> 引擎均已发布 0.3.0，公开字节与 pin 相符（<a href="#F-23">F-23</a>）。不因此关闭材料交付或全部下游观察。</td></tr>
+          <tr id="DEF-05"><th scope="row" class="nm">DEF-05</th><td>demos</td><td>fab-simulator-demo、bank-batch-transactor-demo 开源</td><td><span class="badge deferred">挂帐</span></td><td>版本对齐在当前四仓之后：第二轮对齐。</td></tr>
+          <tr id="DEF-06"><th scope="row" class="nm">DEF-06</th><td>bank-service</td><td>历史 P23/service02 全服务闸门</td><td><span class="badge boundary">历史失败</span> 当前技术判断已采用新结果</td><td>2026-11-06 回放未赶上 90 秒门限，该回执仍失败。新 owner <code>bank030-relocated-20261112-02</code> 使用自身修补、移址后的输入通过四层技术验收，含 66.847 秒 SQL 重建（<a href="#F-24">F-24</a>–<a href="#F-28">F-28</a>）。不改写旧运行。</td></tr>
+          <tr id="DEF-07"><th scope="row" class="nm">DEF-07</th><td>bank-experience</td><td>独立 start/status/页面操作/stop 体验与原人工冒烟</td><td><span class="badge boundary">未决</span></td><td>owner-02 自动 HTTP/浏览器观测不能认证原人工 <code>sbt run</code> 或独立体验。session03 未达 readiness，后续手工清理占位不是通过；2026-11-13 会话修补候选记录为未执行。需要新的独立体验签收回执，包括停机与租约结果。</td></tr>
+          <tr id="DEF-08"><th scope="row" class="nm">DEF-08</th><td>hosting</td><td>免费 Web 服务上的银行托管演示</td><td><span class="badge deferred">挂帐</span></td><td>已有候选级技术验收；独立体验、分发与托管仍分开。不宣称已有托管服务。须有独立体验、交付渠道和明确托管决定。</td></tr>
+          <tr id="DEF-09"><th scope="row" class="nm">DEF-09</th><td>examples</td><td>贯穿原转账流程的 Saga/Monarch 端到端业务示例</td><td><span class="badge deferred">挂帐</span></td><td>银行示例声明了 saga + monarch；仍须在真源中编写专门的横切叙事。</td></tr>
+          <tr id="DEF-10"><th scope="row" class="nm">DEF-10</th><td>i18n</td><td>中文版站点</td><td><span class="badge verified">已解决 2026-11-11</span></td><td>全站 /zh/ 镜像已交付，含 site.js/explorer.js/dissolve.js 双语界面。更正：工作坊 HTML 本来就是 zh-CN，原条目记反；并无补英文工作坊的要求。</td></tr>
+          <tr id="DEF-11"><th scope="row" class="nm">DEF-11</th><td>alignment</td><td>各仓库 README 与本站对齐</td><td><span class="badge deferred">挂帐</span></td><td>明确排在本站交付后的下一阶段；须先获站点批准并稳定。</td></tr>
+          <tr id="DEF-12"><th scope="row" class="nm">DEF-12</th><td>explorer</td><td>力导向图画布；asciinema/录屏</td><td><span class="badge deferred">挂帐</span></td><td>查询控制台 + 放射视图已覆盖 v1；工作区无录屏工具链。上线后处理。</td></tr>
+          <tr id="DEF-13"><th scope="row" class="nm">DEF-13</th><td>naming</td><td>npm scope <code>@madpolaris/truthsrc</code> → <code>@co-arising/truthsrc</code></td><td><span class="badge deferred">挂帐</span></td><td>首次 npm 发布前零成本；须在 <a href="#DEF-03">DEF-03</a> 关闭前完成。</td></tr>
+          <tr id="DEF-14"><th scope="row" class="nm">DEF-14</th><td>org</td><td>其余仓库（bank-wealth-demo、monarch-*、saga-*）迁往 co-arising 组织</td><td><span class="badge deferred">挂帐</span></td><td>链接集中于 site.js，迁移只改一行。待 owner 决定。</td></tr>
+          <tr id="DEF-15"><th scope="row" class="nm">DEF-15</th><td>delivery</td><td>公开配套 CLI 包、clean1134 与配对源码材料</td><td><span class="badge boundary">阻塞</span></td><td>运行时制品已公开；配套工具 tgz、固定工具链/第三方归档、完整配对 bundle/overlay 尚无确认的公开交付渠道。须公开字节匹配的材料并说明获取路径。</td></tr>
+          <tr id="DEF-16"><th scope="row" class="nm">DEF-16</th><td>usability</td><td>独立真人新用户验收</td><td><span class="badge boundary">未决</span></td><td>尚无三位独立读者签收。自动浏览器检查与技术通过不等于真人可用性验收；须有文档路径对应的真人签收记录。</td></tr>
+          <tr id="DEF-17"><th scope="row" class="nm">DEF-17</th><td>families</td><td>四个 Saga、两个 Play 家族观察</td><td><span class="badge deferred">挂帐</span></td><td>计划 24 项观察：12 项生成 + 6 项编译 + 6 项行为。银行验收不能代签；Play 示例本身不消费这些引擎。须有各家族的独立记录。</td></tr>
+          <tr id="DEF-18"><th scope="row" class="nm">DEF-18</th><td>runtime</td><td>Retry/backoff/deadline 工程债</td><td><span class="badge boundary">未决</span></td><td>仍为 OPEN；finite-profile 验收不是豁免。须有单独批准的运行时工作与证据。</td></tr>
+          <tr id="DEF-19"><th scope="row" class="nm">DEF-19</th><td>assurance</td><td>定向 Inspector 竞态/故障注入负例与 Node CI/typecheck</td><td><span class="badge boundary">未决</span></td><td>身份校验修补已进入技术运行，但对应负控及额外 Node CI/typecheck 未在本轮执行。须有另定范围的负控与 CI 回执。</td></tr>
+          <tr id="DEF-20"><th scope="row" class="nm">DEF-20</th><td>distribution</td><td>旧离线发行包运行时 pin 迁移</td><td><span class="badge deferred">挂帐</span></td><td>历史离线分发工具仍面向已退役 P23；当前显式供给工作坊不改写、不重签旧归档。下次使用该分发路径时另行迁移。</td></tr>
         </tbody>
       </table></div>
       <div class="callout"><b>纪律</b><p>台账与状态页<strong>在同一个 commit 里更新</strong>。一个数字离开 SITE-FACTS，它就必须离开页面；一个承诺离开台账，它就必须出现在某个仓库里。</p></div>

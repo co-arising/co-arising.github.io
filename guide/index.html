@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hands-on guide — co-arising</title>
-  <meta name="description" content="From zero to the full loop: environment setup (with Docker fallback), the Counter tutorial, the bank example pipeline, and wiring the MCP server into Claude Code for blast-radius queries." />
+  <meta name="description" content="The Node-only Counter loop, an independently expected rule-change exercise, generated-source review, separate bank acceptance prerequisites, and optional MCP collaboration." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/guide/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/guide/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/guide/" />
+  <link rel="canonical" href="https://co-arising.github.io/guide/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,19 +21,20 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — plain content below. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">Hands-on · zero to full loop</p>
       <h1>The guide: <span class="accent">run the whole thing</span></h1>
-      <p class="thesis">Three levels, each with a green light at the end: L1 the Counter tutorial (Node only, ~10 min), L2 the bank example pipeline (add a JVM, ~30 min), L3 wiring the MCP server into Claude Code so an agent plans an incremental change by querying the graph. If any step fails, the last sub-section tells you where the red lines are.</p>
+      <p class="thesis">Three levels: L1 the Node-only Counter tutorial, L2 the bank generation path and its separate formal workshop prerequisites, and L3 graph queries through MCP. <strong>A local generation command is not a formal service acceptance run.</strong> The bank’s newer technical pass and the still-open independent experience are described separately below.</p>
     </header>
 
     <section id="env">
-      <div class="sec-head"><span class="no">00</span><h2>Environment — pick one path, both are first-class</h2></div>
-      <p class="sec-sub">The toolchain needs <strong>Node ≥ 22.13.0</strong> (built-in <code>node:sqlite</code> is why). Level 2 additionally needs a JVM (11+) and sbt. Every command below is copy-pasteable.</p>
+      <div class="sec-head"><span class="no">00</span><h2>Environment — choose the scope first</h2></div>
+      <p class="sec-sub">The Node-only tutorial and bank source scope need <strong>Node ≥ 22.13.0</strong> (<code>node:sqlite</code>) <a class="badge verified" href="/status/#F-13" data-fact="F-13">F-13</a>. Compiling generated Scala needs a JVM and sbt. <strong>Formal anchors/code/service verification additionally needs explicit matched materials</strong>; formal code/service is scoped to native Darwin x64 / JDK11 <a class="badge verified" href="/status/#F-28" data-fact="F-28">F-28</a>. Read <a href="#bank-prerequisites">the prerequisites</a> before treating any command as an acceptance path.</p>
 
       <h3>Path A · native Node</h3>
       <pre class="code"><code># macOS (Homebrew)
@@ -42,11 +44,11 @@ brew install node@22
 nvm install 22
 node --version   # must print v22.13.0 or newer</code></pre>
 
-      <h3>Path B · Docker (if you don’t want to touch your host Node)</h3>
-      <pre class="code"><code>docker run --rm -it -v "$PWD":/work -w /work node:22 bash
-# you are now on Node 22 inside the container; everything below works unchanged</code></pre>
+      <h3>Path B · Docker for Node-only work</h3>
+      <pre class="code"><code>docker run --rm -it -v "$PWD":/work -w /work node:22 bash</code></pre>
+      <p class="small">This container is an option for Node work, not a substitute for the accepted native bank code/service environment.</p>
 
-      <h3>Level 2 only · JVM + sbt</h3>
+      <h3>Convenience Scala compilation · JVM + sbt</h3>
       <pre class="code"><code># macOS
 brew install openjdk@11 sbt
 
@@ -56,59 +58,156 @@ docker run --rm -it -v "$PWD":/work -w /work sbtscala/scala-sbt:eclipse-temurin-
 
     <section id="install">
       <div class="sec-head"><span class="no">01</span><h2>Get the toolchain</h2></div>
-      <p class="sec-sub">npm publication is on the ledger (<a class="badge deferred" href="/status/#DEF-03">DEF-03</a>) — until then, a source checkout is the canonical install. Zero npm <em>runtime</em> dependencies means the checkout is the whole toolchain.</p>
-      <pre class="code"><code>git clone https://github.com/co-arising/metarch-truthsrc.git
-npm install --prefix metarch-truthsrc        # dev deps only; runtime is stdlib-only
-
-# smoke test — no SQLite touched, no side effects
-node metarch-truthsrc/bin/truthsrc.js --help</code></pre>
-      <p class="small">Tip: <code>alias truthsrc="node $PWD/metarch-truthsrc/bin/truthsrc.js"</code> makes the rest of this page read literally.</p>
+      <p class="sec-sub">npm publication is still pending (<a class="badge deferred" href="/status/#DEF-03">DEF-03</a>); a source checkout is the entry point shown here. Zero npm <em>runtime</em> dependencies does not include the bank workshop’s frozen compiler, third-party dependencies or runtime supply. A checkout alone is not the complete paired acceptance candidate (<a href="/status/#DEF-15">DEF-15</a>).</p>
+      <p class="small">Separately reviewed on 2026-11-12: the matched <strong>CLI package 0.5.0</strong> passed package-pin verification, functional offline installation, actual prefix relocation and the Counter <strong>0→2</strong> update, with <strong>40 command observations</strong> <a class="badge verified" href="/status/#F-29" data-fact="F-29">F-29</a>. This is distinct from engines <strong>0.3.0</strong> <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>, public package delivery and human newcomer acceptance. Repeated update’s zero writes means generated-source files only, not graph/evidence writes. See the <a href="/docs/bank-technical-20261112.md">evidence summary</a>.</p>
+      <pre class="code" data-example="install-source"><code>export TRUTHSRC_WORKSPACE="$PWD"
+git clone https://github.com/co-arising/metarch-truthsrc.git
+export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
+node "$TRUTHSRC_CLI" --help</code></pre>
+      <p class="small">Run from your own exercise parent directory; the checkout directory must not exist. Keep the same shell: the absolute CLI path survives directory changes. No npm runtime installation is needed.</p>
     </section>
 
     <section id="l1">
-      <div class="sec-head"><span class="no">02</span><h2>L1 · Counter tutorial — the whole loop in miniature</h2></div>
-      <p class="sec-sub">One aggregate, one slice, one rule. You will author, generate, query the anchor both directions, verify, change the tree, see staleness, and regenerate. Green lights are printed by the tool — trust them, not your eyes.</p>
-      <div class="steps">
-        <div class="step-item"><div><h4>Create the project</h4><p class="meta">refuses to touch an existing directory</p><p><code>node ../metarch-truthsrc/bin/truthsrc.js init counter-lab --format human</code> then <code>cd counter-lab</code>. Look inside: <code>truth/example/…</code> is the whole author tree — <code>aggregate.yaml</code> (state + <code>@rule</code>) and one slice.</p></div></div>
-        <div class="step-item"><div><h4>Plan before you write</h4><p class="meta">nothing is written yet</p><p><code>… generate-project --plan --format human</code> — the plan lists every file it <em>would</em> write. Read it. Generation should never be a surprise.</p></div></div>
-        <div class="step-item"><div><h4>Generate &amp; inspect freshness</h4><p class="meta">green light: inputs=current · evidence=verified · synchronized=true</p><p><code>… generate-project --format human</code> then <code>… status-project --out . --format human</code>. Open a generated file — every one carries its anchor header.</p></div></div>
-        <div class="step-item"><div><h4>Ask both directions</h4><p class="meta">the moment the loop closes</p><p><code>… query-project --knowledge SetCount</code> → the exact file and span. Then <code>… query-project --file &lt;that file&gt; --symbol &lt;symbol&gt;</code> → back to the rule. Knowledge and code, joined.</p></div></div>
-        <div class="step-item"><div><h4>Change the truth, not the code</h4><p class="meta">see staleness, then re-sync</p><p>Edit <code>truth/…/aggregate.yaml</code>: change the count default <code>0</code> → <code>2</code>. <code>status-project</code> now reports <strong>changed</strong>. <code>… generate-project --update --plan</code> shows the diff plan; <code>--update</code> applies it. Run generate again — <strong>written: 0</strong>. Idempotence is the gate.</p></div></div>
-        <div class="step-item"><div><h4>Verify &amp; take the picture</h4><p class="meta">green light: verify passed</p><p><code>… verify-project --out . </code> re-proves every anchor against file bytes. <code>… view-project --out . --html counter-map.html</code> exports a single-file map — open it offline.</p></div></div>
-      </div>
+      <div class="sec-head"><span class="no">02</span><h2>L1 · Counter: generate once, then change once</h2></div>
+      <p>After preparing the tool above, remain in the exercise parent directory. <code>counter-lab</code> must not exist. Every command names its project and a separate generated-output directory.</p>
+      <pre class="code" data-example="counter-first"><code>node "$TRUTHSRC_CLI" init counter-lab --format human
+cd counter-lab
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human</code></pre>
+      <p>The preview lists update actions, not a textual diff. After generation, expect <code>inputs=current</code>, <code>evidence=verified</code> and <code>synchronized=true</code>. These describe source and byte freshness, not Scala or bank behavior execution.</p>
+      <h3 id="counter-reverse-query">Reverse-query a real location, not a guessed file or line</h3>
+      <p>A span is a half-open UTF-8 byte range, not a line number. This script derives a line from currently verified source and queries it back; it stops rather than inventing a missing location.</p>
+      <pre class="code" data-example="counter-reverse"><code>node --input-type=module &lt;&lt;'NODE'
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+const cli = process.env.TRUTHSRC_CLI;
+if (!cli) throw new Error('TRUTHSRC_CLI is required');
+const base = ['--project', 'truthsrc.project.json', '--out', 'generated'];
+const forward = JSON.parse(execFileSync(process.execPath, [cli, 'query-project', ...base,
+  '--knowledge', 'SetCount', '--format', 'json'], { encoding: 'utf8' }));
+const loc = forward.result.flatMap(row =&gt; row.locations).find(item =&gt;
+  item.file.endsWith('CounterRules.scala') &amp;&amp; item.verification.spanVerified &amp;&amp;
+  item.freshness === 'current-bytes' &amp;&amp; item.span.text.startsWith('  def SetCount('));
+if (!loc) throw new Error('No verified current SetCount span; inspect status first');
+const bytes = readFileSync(join('generated', loc.file));
+const line = bytes.subarray(0, loc.span.start).toString('utf8').split('\n').length;
+process.stdout.write(execFileSync(process.execPath, [cli, 'query-project', ...base,
+  '--file', loc.file, '--line', String(line), '--format', 'human'], { encoding: 'utf8' }));
+NODE</code></pre>
+      <h3>Verify and export an offline snapshot</h3>
+      <pre class="code" data-example="counter-verify"><code>node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" view-project --project truthsrc.project.json --out generated --html counter-map.html --knowledge SetCount --format human</code></pre>
+      <p>Open the newly created <code>counter-map.html</code>. It is a fixed read-only snapshot, not a live view of disk changes.</p>
+      <h3>Change the initial value, see staleness, then synchronize</h3>
+      <p>In <code>truth/example/contexts/example/aggregates/counter/aggregate.yaml</code>, change only count’s <code>"default": "0"</code> to <code>"default": "2"</code>. Still inside <code>counter-lab</code>, run:</p>
+      <pre class="code" data-example="counter-update"><code>node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human</code></pre>
+      <p>Before update, inputs should be <code>changed</code> while existing files may remain <code>unchanged</code>: their bytes still match the last generation. After update, verification passes. The final repeat should report <code>written=0</code> for generated source files, not all evidence writes. Keep old snapshots; use a new filename for a later export.</p>
+      <p class="small">On an existing directory or output conflict, preserve it and inspect ownership and inputs. Do not delete directories or hand-edit ledgers to force success. See the tool’s <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/TUTORIAL.md">TUTORIAL.md</a> for the full CLI contract.</p>
+    </section>
+
+    <section id="change-rule">
+      <div class="sec-head"><span class="no">02b</span><h2>Optional · change a business rule, not just a default</h2></div>
+      <p>Continue inside your own <code>counter-lab</code> after the <strong>0→2 loop</strong>. No bank edits, original scaffold edits, JVM, database or MCP are needed. The approved toy requirement is: <strong>SetCount accepts 0 through 100 inclusive</strong>, with a nonempty id. Changing the initial default does not impose this command limit.</p>
+      <h3>Agree on the boundary before changing the rule</h3>
+      <p>Write these independent cases first; do not generate expected answers from the new predicate. Use id <code>toy-counter</code> and old count <code>2</code> for all four. A human approves the business expectation and scope; a test cannot grant that approval.</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Requested count</th><th>Expected decision</th><th>Expected event / state</th></tr></thead>
+        <tbody>
+          <tr><td>-1</td><td>reject · NEGATIVE_COUNT</td><td>No event; old state unchanged.</td></tr>
+          <tr><td>0</td><td>continue</td><td>CountSet(count=0); next count 0.</td></tr>
+          <tr><td>100</td><td>continue</td><td>CountSet(count=100); next count 100.</td></tr>
+          <tr><td>101</td><td>reject · NEGATIVE_COUNT</td><td>No event; old state unchanged.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Save the <a href="/tools/verify-counter-change.mjs">Node-only Counter check</a> outside the author tree. Set <code>COUNTER_CHECK</code> to that file’s absolute path; keep <code>TRUTHSRC_CLI</code> from setup. It needs the complete package’s documented <code>lib/domain-products</code> oracles. Run it <em>before</em> the edit: the original rule should fail the new <code>101</code> expectation.</p>
+      <pre class="code" data-example="counter-range-check" data-example-kind="shell" data-grammar="bash"><code>: "${COUNTER_CHECK:?Set COUNTER_CHECK to the saved verify-counter-change.mjs absolute path}"
+: "${TRUTHSRC_CLI:?Complete the CLI setup first}"
+node "$COUNTER_CHECK" --project "$PWD/truthsrc.project.json"</code></pre>
+      <h3>Edit the existing guard, preserving its identity</h3>
+      <p>In <code>truth/example/contexts/example/aggregates/counter/slices/set-count.slice.yaml</code>, find <code>payload.guards</code>’ existing <code>ref: nonnegative-count</code> row. Change <strong>only</strong> its <code>cond</code> from <code>param.count &gt;= 0</code> to the condition below. Keep the preceding <code>nonempty-id</code> guard, order, <code>ref</code>, <code>errCode</code> and <code>onFail</code>. Do not append a competing second range rule or patch generated Scala.</p>
+      <p>This is the replacement JSON member fragment, not a complete slice/YAML file.</p>
+      <pre class="code" data-example="counter-range-guard" data-example-kind="author"><code>{
+  "kind": "invariantRef",
+  "ref": "nonnegative-count",
+  "errCode": "NEGATIVE_COUNT",
+  "cond": "param.count &gt;= 0 &amp;&amp; param.count &lt;= 100",
+  "onFail": "reject"
+}</code></pre>
+      <p class="small">Reusing this guard deliberately reuses <code>NEGATIVE_COUNT</code> for <em>both</em> -1 and 101, despite its historical name. That is this toy exercise’s error policy, not a recommendation for production API wording. Changing identity/error policy needs its own explicit decision. Zero remains valid.</p>
+      <h3>Check the author inputs, preview, update, then fully verify</h3>
+      <p>All commands below run in <code>counter-lab</code>. Only the toy author edit is manual; generation writes <code>generated/</code> and the project’s derived knowledge/evidence. The update plan lists actions, not a text diff.</p>
+      <pre class="code" data-example="counter-range-update" data-example-kind="shell" data-grammar="bash"><code>node "$TRUTHSRC_CLI" validate --tree truth/example
+node "$TRUTHSRC_CLI" roundtrip --tree truth/example
+node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --update --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$COUNTER_CHECK" --project "$PWD/truthsrc.project.json"</code></pre>
+      <p>Now all four cases should pass. The script calls the <strong>public <code>compile-project</code> CLI</strong> to freshly admit the actual modified rule (that command takes <code>--project</code>, not <code>--out</code>). It evaluates those products using the <em>same installed package’s</em> decision, binding and fold oracles, with fixed expected answers. It is not a separately rewritten JavaScript range test. Replay deliberately gets state/event only, not command inputs.</p>
+      <div class="callout"><b>WHAT THIS CHECK DOES NOT PROVE</b><p>Supported here: Counter decision @4 and dependencies/folds @6 at tool <code>cb860b5c</code>, package 0.5.0. Missing package modules, rejected syntax or different profiles must stop the exercise; no fallback arithmetic or fake success. The result is <strong>admitted-product behavior only</strong>, not execution of generated Scala, an HTTP service or bank acceptance. Generated verification cases are not automatically independent business tests.</p></div>
+      <h3>Close the loop in both directions, and read the real code</h3>
+      <p>Follow the forward <code>SetCount</code> query above to current verified locations. Open the actual generated rule and event handler: review the inclusive comparisons, retained reject code, payload binding and event-only assignment. Repeat <a href="#counter-reverse-query">the earlier byte-span-to-line reverse query</a> against the <em>new</em> verified bytes, back to the author declaration. Never reuse an old guessed line number. <code>verify-project</code> checks source/anchor consistency, not execution; target-runtime claims still require separately run generated-code behavioral tests with independently approved expectations.</p>
+      <p>After review, repeat update if desired: zero <em>generated-source</em> writes indicates idempotent synchronization, not zero evidence writes. If ownership, MANUAL boundaries, inputs or output bytes conflict, stop and preserve them. Inspect status and the real diff; use a new explicitly owned exercise directory if needed, never delete output/SQLite/ledgers to force green.</p>
     </section>
 
     <section id="l2">
-      <div class="sec-head"><span class="no">03</span><h2>L2 · The bank example at full scale</h2></div>
-      <p class="sec-sub">157 atoms, 3 aggregates, 2 sagas, 4 pipelines — the same six gates, industrial size. From here the green lights are the project’s own acceptance layers.</p>
-      <pre class="code"><code>git clone https://github.com/MadPolaris/bank-wealth-demo.git
+      <div class="sec-head"><span class="no">03</span><h2>L2 · Bank generation and formal workshop scopes</h2></div>
+      <div class="callout red" id="bank-prerequisites"><b>PREREQUISITES — NOT AN INSTALLATION SHORTCUT</b><p><strong>Node-only source checks, convenience generation and formal workshop acceptance are different entry points.</strong> The convenient <code>npm run project</code> may obtain engines, but formal anchors/code/service requires <strong>both</strong> an explicit clean1134 archive and an already prepared runtime-supply directory. The matched CLI, complete paired source materials and archive have no confirmed public delivery channel (<a href="/status/#DEF-15">DEF-15</a>). Do not treat this page as a one-command public reproduction.</p></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Formal scope</th><th>Required inputs and environment</th></tr></thead>
+        <tbody>
+          <tr><td class="nm">source</td><td>Your bank checkout, the complete adjacent matched tool checkout and Node. No JVM, database or browser. <strong>Rejects unused <code>--archive</code> and <code>--runtime-supply</code> flags.</strong></td></tr>
+          <tr><td class="nm">anchors</td><td>Source inputs plus <strong><code>--archive</code>: an absolute path to the existing clean1134 archive</strong> (frozen compiler/toolchain and third-party dependencies), and <strong><code>--runtime-supply</code>: an absolute path to the existing prepared 0.3.0 <code>receipt.json</code> + <code>maven/</code> directory</strong>, matching the project <a class="badge verified" href="/status/#F-23" data-fact="F-23">F-23</a>. Neither is optional.</td></tr>
+          <tr><td class="nm">code</td><td>Both supplies above, plus native Darwin x64, an installed x64 JDK11 selected by <code>--java-home</code>, and the sandbox/Python prerequisites <a class="badge verified" href="/status/#F-28" data-fact="F-28">F-28</a>.</td></tr>
+          <tr><td class="nm">service</td><td>All code prerequisites, plus a new exclusive resource lease, available Docker/socket and pinned database images, and explicit Playwright module and <code>chrome-headless-shell</code> paths. Service scope cannot omit the browser.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">Formal verification does <strong>not implicitly download, prepare or fall back to P23</strong>. The composed supply excludes the archive’s old engines and selects the separately locked runtime supply; the archive is not re-signed. The legacy offline-bundle migration remains separate (<a href="/status/#DEF-20">DEF-20</a>). See the <a href="/docs/bank-technical-20261112.md">accepted scope and material contract</a>.</p>
+
+      <h3 id="workshop-preflight">Preflight only — set your own real paths first</h3>
+      <p>Run from your own bank checkout root with its matched adjacent tool checkout. Set <code>BANK</code> to that checkout’s absolute path. For code scope, also set <code>ARCHIVE</code>, <code>RUNTIME_SUPPLY</code> and <code>JAVA_HOME_BANK</code> to <strong>existing, absolute local paths</strong> described above. These are required variables, not download locations or supplied files.</p>
+      <p class="small">Source preflight has no archive/runtime flags.</p>
+      <pre class="code"><code>: "${BANK:?Set BANK to your own bank checkout absolute path}"
+node "$BANK/tools/bank-workshop.mjs" doctor --through source --format human</code></pre>
+      <p class="small">Code preflight explicitly selects both supplies and the installed JDK.</p>
+      <pre class="code"><code>: "${BANK:?Set BANK to your own bank checkout absolute path}"
+: "${ARCHIVE:?Set ARCHIVE to the existing clean1134 archive absolute path}"
+: "${RUNTIME_SUPPLY:?Set RUNTIME_SUPPLY to the prepared 0.3.0 supply directory absolute path}"
+: "${JAVA_HOME_BANK:?Set JAVA_HOME_BANK to the installed x64 JDK11 absolute path}"
+node "$BANK/tools/bank-workshop.mjs" doctor --through code \
+  --archive "$ARCHIVE" --runtime-supply "$RUNTIME_SUPPLY" \
+  --java-home "$JAVA_HOME_BANK" --format human</code></pre>
+      <p><strong>Doctor is preflight, not acceptance.</strong> A subsequent <code>verify</code> must create a fresh run in a never-used direct child of the bank’s <code>target/</code>, with an existing parent and a canonical absolute path. Do not reuse an old run. Doctor without <code>--run</code> does not check that parent. Report/view and independent session start/status/stop use the run’s <strong>sealed supply</strong>; session commands reject archive/runtime-supply overrides. A later fix needs new execution evidence, not a relabelled report.</p>
+
+      <h3 id="bank-convenience">Convenience generation — not the workshop recipe</h3>
+      <p>The existing local path validates, generates into <code>generated/current/</code>, compiles handwritten production sources with the generated project, and verifies anchors. Its first generation may fetch SHA-256-pinned engines from Maven Central. It does not establish that the formal supplies above are present, and it does not start or accept the service.</p>
+      <pre class="code" data-example="bank-convenience"><code>: "${TRUTHSRC_WORKSPACE:?Complete the source setup first}"
+cd "$TRUTHSRC_WORKSPACE"
+git clone https://github.com/MadPolaris/bank-wealth-demo.git
 cd bank-wealth-demo
-
-# gate 1+2 — validate &amp; roundtrip (one command; roundtrip is part of the gate)
-npm run validate            # ✅ 0 hard · roundtrip: 157 atoms byte-identical
-
-# gate 3 — compile &amp; build the graph store (389 nodes / 413 edges)
+npm run validate
 npm run compile
-node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out bank.graph.sqlite
-
-# gate 4 — generate the CQRS project (235 files); the first run also
-#          fetches the pinned 0.3.0 engine jars from Maven Central (sha256-verified)
-npm run project             # writes generated/current/
-
-# gate 5 — the handwritten zone is already complete in the repo (35 files);
-#          it compiles as part of the generated build:
-cd generated/current &amp;&amp; sbt compile   # ✅ 0 errors, 534 sources
-sbt test                             # ✅ 23/23
-
-# gate 6 — prove every anchor (792)
-cd ../.. &amp;&amp; node ../metarch-truthsrc/bin/truthsrc.js verify-project \
+node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out bank.graph.sqlite
+npm run project
+cd generated/current &amp;&amp; sbt compile
+sbt test
+cd ../.. &amp;&amp; node "$TRUTHSRC_CLI" verify-project \
   --project truthsrc.project.json --out generated/current</code></pre>
-      <div class="callout"><b>WHAT YOU JUST PROVED</b><p>That a 157-atom description of a bank wealth domain compiles, becomes a queryable graph, generates a compiling, tested Scala codebase whose 792 anchors verify against file bytes — <strong>and that you can re-run every step</strong>. The boundary you did NOT cross: running the HTTP service end-to-end (ledger <a class="badge boundary" href="/status/#DEF-06">DEF-06</a> <a class="badge boundary" href="/status/#DEF-07">DEF-07</a>).</p></div>
+      <p class="small"><strong>Historical capture, 2026-11-11:</strong> 0 hard findings and 157 byte-identical roundtrip atoms <a class="badge verified" href="/status/#F-01" data-fact="F-01">F-01</a> <a class="badge verified" href="/status/#F-02" data-fact="F-02">F-02</a>; 235 generated files <a class="badge verified" href="/status/#F-04" data-fact="F-04">F-04</a>; 0 compile errors across 534 sources <a class="badge verified" href="/status/#F-06" data-fact="F-06">F-06</a>; <strong>23/23 generated unit tests, not independent handwritten tests</strong> <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a>; 792 verified anchors <a class="badge verified" href="/status/#F-05" data-fact="F-05">F-05</a>. These counts are not asserted for the newer service candidate.</p>
+      <div class="callout teal"><b>CURRENT TECHNICAL EVIDENCE, NOT YOUR RUN’S RESULT</b><p><code>bank030-relocated-20261112-02</code> passed and rechecked source / anchors / code / service on 2026-11-12 <a class="badge verified" href="/status/#F-24" data-fact="F-24">F-24</a>, including real database/HTTP and automated browser observations <a class="badge verified" href="/status/#F-26" data-fact="F-26">F-26</a>. The old P23/service02 failure stays historical (<a href="/status/#DEF-06">DEF-06</a>). Independent experience remains open: session03 did not reach readiness, cleanup was not a pass, and the later fix candidate is unexecuted (<a href="/status/#DEF-07">DEF-07</a>). Public materials (<a href="/status/#DEF-15">DEF-15</a>) and human acceptance (<a href="/status/#DEF-16">DEF-16</a>) are not signed off by that technical result. See <a href="/bank-demo/#technical-acceptance">the bank’s scoped results and remaining boundaries</a>.</p></div>
     </section>
 
     <section id="l3">
-      <div class="sec-head"><span class="no">04</span><h2>L3 · Wire the graph into Claude Code (MCP)</h2></div>
-      <p class="sec-sub">This is the agentic payoff: an agent that plans changes by <em>querying the knowledge graph</em> instead of grepping the repo. The MCP server ships 26 read-oriented tools <span class="badge verified" title="F-16">verified</span>.</p>
+      <div class="sec-head"><span class="no">04</span><h2>L3 · Optional graph collaboration through MCP</h2></div>
+      <p class="sec-sub">MCP is optional, not a prerequisite for the Counter CLI loop or rule-change exercise. It lets an agent use the declared graph alongside source inspection when planning a change. The server ships 26 read-oriented tools <span class="badge verified" title="F-16">verified</span>.</p>
 
       <h3>Register the server</h3>
       <pre class="code"><code># from any directory (path to your metarch-truthsrc checkout)
@@ -122,15 +221,15 @@ cp -r /absolute/path/to/metarch-truthsrc/skills/truthsrc .claude/skills/</code><
       <h3>The exercise: plan an incremental change by blast radius</h3>
       <div class="steps">
         <div class="step-item"><div><h4>Give the agent a requirement</h4><p class="meta">in Claude Code, inside bank-wealth-demo</p><p>Try: <em>“We need to change what happens when an SIP installment fails. Before proposing anything, query the truth graph for the blast radius of <code>SipInstallmentFailed</code> and report which slices, read models and pipelines are affected.”</em></p></div></div>
-        <div class="step-item"><div><h4>Watch the discipline work</h4><p class="meta">describe → expand → blast_radius, following next_actions</p><p>The agent should walk propagating edges from the event, enumerate affected guards/read-models/pipelines (dozens of nodes within 3 hops), and only then draft a change proposal <strong>against the tree</strong> — not against code.</p></div></div>
-        <div class="step-item"><div><h4>Apply the editing contract</h4><p class="meta">agents draft; gates judge</p><p>Any tree edit must end with <code>validate</code> (0 hard) <strong>and</strong> <code>roundtrip</code> (byte-identical) green, then <code>generate-project --update --plan</code> to see the regeneration diff before applying. That’s stewardship, mechanically enforced.</p></div></div>
+        <div class="step-item"><div><h4>Watch the discipline work</h4><p class="meta">describe → expand → blast_radius, following next_actions</p><p>The agent should report nodes actually reached, traversal limits and missing modeled connections. The website’s 55-node snapshot result contains aggregates, commands, events and slices—not read models or pipelines <a href="/status/#F-21" data-fact="F-21">F-21</a>. Review those dependencies separately before drafting a proposal against the appropriate author inputs.</p></div></div>
+        <div class="step-item"><div><h4>Apply the editing contract</h4><p class="meta">agents draft; humans approve; gates check</p><p>A human approves the business expectation and editing scope. Validate and roundtrip check their specified contracts; neither approves business meaning. Preview update actions with <code>generate-project --project truthsrc.project.json --out generated/current --update --plan</code>, then run the relevant behavioral checks and anchor verification. The plan is not a textual diff.</p></div></div>
       </div>
       <p class="small">Also shipped: skills for extracting a tree from an existing codebase, from reachable data, or bootstrapping workshop drafts from a one-line description — <code>skills/</code> in the toolchain repo.</p>
     </section>
 
     <section id="redlines">
       <div class="sec-head"><span class="no">05</span><h2>Red lines &amp; recovery</h2></div>
-      <div class="callout red"><b>NEVER</b><p><strong>Never hand-edit derived artifacts</strong> — the compiled canonical, <code>.truthsrc/</code>, ledgers, anchors, or generated files. They are regenerated; your edits are void (and detected). If generated code looks wrong, the fix belongs in the tree — that is the entire point. &nbsp;·&nbsp; <strong>Never force past a red gate.</strong> <code>validate</code> findings and roundtrip divergence are information, not obstacles. &nbsp;·&nbsp; <strong>Graph store? Delete freely</strong> — it is a pure cache, rebuild with one <code>graph</code> command.</p></div>
+      <div class="callout red"><b>NEVER</b><p><strong>Do not patch derived artifacts or force past failed gates.</strong> Business meaning belongs in the author tree; technical choices in bindings; parsing/generation defects in the shared toolchain; external effects in supported handwritten implementations. Preserve conflicts and failed evidence. A graphstore cache and the project knowledge/anchor database are different assets: one graph command cannot recover every kind of evidence. Do not delete SQLite files indiscriminately.</p></div>
       <p class="small">Stuck? The toolchain README has a diagnostics section; the <a href="/status/#facts">facts page</a> tells you exactly which claims are verified on which date — if your numbers differ from ours, trust your terminal.</p>
     </section>
   </main>

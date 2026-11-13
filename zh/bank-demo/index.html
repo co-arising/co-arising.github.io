@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>银行财富完整示例 — co-arising</title>
-  <meta name="description" content="一笔 100 元的基金申购，跟穿付款、TA 确认、独立退款与有界定投——3 个聚合、157 个真源原子、149 条不变量、2 个 saga、4 条流水线、235 个生成文件、792 个经验证的锚点。" />
+  <meta name="description" content="付款成功就是投资成功吗？沿银行声明阅读现金付款、TA 拒绝与独立退款、有界定投和未知结果。这是静态导览，不是在线银行。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/bank-demo/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/bank-demo/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/bank-demo/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/bank-demo/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,67 +21,94 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">完整示例 · 本地教学演示</p>
-      <h1>一笔申购，<span class="accent">每一步的出处</span></h1>
-      <p class="thesis">客户提交一笔 100 元的基金申购。钱扣了——投资就成功了吗？基金公司拒绝这笔申购时，为什么会有一个独立的退款？定投计划的每一期如何复用同一批规则？这个示例从真源树回答这些问题，而不是从散文。</p>
-      <div class="stat-strip">
-        <div class="stat"><div class="num">3</div><div class="lbl">个聚合：CreditBalance · FundOrder · SipPlan</div></div>
-        <div class="stat"><div class="num">157</div><div class="lbl">个真源原子 · 149 条 <code>@rule</code> 不变量 <span class="badge verified" title="F-02/F-09">已验证</span></div></div>
-        <div class="stat"><div class="num">2+4</div><div class="lbl">个 saga + 流水线，全部用真源声明</div></div>
-        <div class="stat"><div class="num">23/23</div><div class="lbl">生成 + 手写测试通过 <span class="badge verified" title="F-07">已验证</span></div></div>
-      </div>
+      <p class="over">银行财富 · 声明导览</p>
+      <h1>付款成功了。<br /><span class="accent">投资也成功了吗？</span></h1>
+      <p class="thesis">还不能这样判断。付款、基金公司确认、可能发生的退款，是不同的业务事实。沿声明看它们为什么需要不同的一致性边界，以及定投的每一期如何复用这些规则。</p>
+      <p class="evidence-note"><strong>本页是静态声明导览，不是运行中的银行后端，也不是浏览器模拟器。</strong>节点链接指向随站点提供的声明快照。另行测试的本地 demo 使用模拟过户代理（TA），并未接入真实基金公司。</p>
+      <p class="page-outline"><a href="#business">选一个业务问题</a> · <a href="#views">查看来源视图</a> · <a href="#technical-acceptance">读技术验收</a></p>
     </header>
 
     <section id="business">
-      <div class="sec-head"><span class="no">01</span><h2>四条业务线，一棵树</h2></div>
-      <p class="sec-sub">每条线都是一种不同的协调<em>形状</em>——这正是它们各自需要不同真源原子的原因。</p>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>业务线</th><th>它回答的问题</th><th>协调形状</th><th>在真源中声明为</th></tr></thead>
-        <tbody>
-          <tr><td class="nm">现金申购付款</td><td>扣款成功了——投资就成功了吗？（不：付款 ≠ 认购成功。）</td><td>带补偿的跨聚合事务</td><td><code>bank-cash-payment-v1</code> saga——投资人出金、归集入金，然后订单确认；同一 <code>Money</code>，钉死的 ID</td></tr>
-          <tr><td class="nm">Mock TA 确认</td><td>过户代理受理了订单——份额就是我的了吗？（不：受理 ≠ 确认。）</td><td>带显式未知状态的外部系统观察</td><td>FundOrder 切片 + 形式产物：TA 效果端口、结果映射（<code>confirmed → Observed</code>，超时 → <code>Unknown</code>）</td></tr>
-          <tr><td class="nm">独立退款</td><td>为什么是一个独立的退款 saga，而不是「把付款撤销」？</td><td>第二个 TCC saga——退款是自己的业务事实，不是伪装的补偿</td><td><code>bank-independent-refund-v1</code> saga + 流水线</td></tr>
-          <tr><td class="nm">有界的定投计划</td><td>定投的每一期如何复用同一批规则——并且保持有界？</td><td>流水线驱动派发，带显式跳过/终止语义</td><td><code>bank-sip-dispatch-v1</code> 流水线，覆盖 SipPlan/FundOrder 切片</td></tr>
-        </tbody>
-      </table></div>
-      <div class="callout"><b>语义不变量</b><p>这棵树把人们容易说错的那几句话钉死了：<strong>付款成功 ≠ 投资成功</strong> · <strong>TA 受理 ≠ 份额确认</strong> · <strong>独立退款 ≠ 对已提交付款的补偿</strong> · <strong>saga ≠ 流水线</strong>。每句都有规则和测试兜底。</p></div>
+      <div class="sec-head"><span class="no">01</span><h2>带着四个问题读真源</h2></div>
+      <p class="sec-sub">下方箭头是<strong>声明的阅读顺序</strong>，不是执行轨迹，也不证明图中的一个节点会直接触发下一个动作。链接选择的是 2026-11-11 SQLite 快照中实际存在的节点 <a href="/zh/status/#F-03" data-fact="F-03">F-03</a>。</p>
+      <div class="card-grid cols-2 scenario-grid">
+        <article class="card scenario-card" id="scenario-payment">
+          <span class="tag">付款</span><h3>扣款究竟确认了什么？</h3>
+          <p>现金入口调用付款 saga，协调投资人资金、归集账户与订单。付款成功不等于 TA 确认，也不表示已经拥有基金份额。</p>
+          <p class="foot"><a href="/zh/explorer/?node=pipeline%3Abank-cash-payment-v1#nodes">读现金入口</a> → <a href="/zh/explorer/?node=saga%3Abank-cash-payment-v1#nodes">检查付款 saga</a></p>
+        </article>
+        <article class="card scenario-card" id="scenario-refund">
+          <span class="tag">TA 拒绝与退款</span><h3>为什么退款是另一笔事务？</h3>
+          <p>退款请求会核对选定的成功付款及 TA 已拒绝状态，再进入独立退款业务流程。它不是对已提交付款的补偿；退款 saga 有自己的结果。</p>
+          <p class="foot"><a href="/zh/explorer/?node=slice%3ARecordFundTARejected#nodes">TA 拒绝</a> → <a href="/zh/explorer/?node=slice%3ARequestFundPurchaseRefund#nodes">退款请求守卫</a> → <a href="/zh/explorer/?node=saga%3Abank-independent-refund-v1#nodes">独立退款 saga</a></p>
+        </article>
+        <article class="card scenario-card" id="scenario-sip">
+          <span class="tag">有界定投 · SIP</span><h3>每一期如何复用付款规则？</h3>
+          <p>封存的有限计划与保留的 occurrence，明确哪一期可以派发到现金流程。派发成功不是投资成功；关联的业务终态才更新该期结果。</p>
+          <p class="foot"><a href="/zh/explorer/?node=slice%3ASealSipSchedule#nodes">封存计划</a> → <a href="/zh/explorer/?node=slice%3ATriggerSipInstallment#nodes">准入一期</a> → <a href="/zh/explorer/?node=pipeline%3Abank-sip-dispatch-v1#nodes">派发到现金流程</a></p>
+          <details><summary>暂停会改变什么？</summary><p><a href="/zh/explorer/?node=slice%3ASkipPausedSipDueSlot#nodes">读暂停期间的时隙跳过守卫</a>。这是显式的时隙分类，不是「连续失败三次后自动暂停」政策。</p></details>
+        </article>
+        <article class="card scenario-card" id="scenario-unknown">
+          <span class="tag">未知结果</span><h3>还不知道结果时，该如何表达？</h3>
+          <p>不能把「未知」改写成「失败」或「成功」。TA 观察与定投进展都有显式的未知声明。现金与定投计划要求先核对未知效果再恢复；没有收到答案，不代表可以再次扣款。</p>
+          <p class="foot"><a href="/zh/explorer/?node=slice%3ARecordFundTAUnknown#nodes">检查 TA 未知观察</a> · <a href="/zh/explorer/?node=slice%3ARecordSipInstallmentOutcomeUnknown#nodes">检查定投未知进展</a></p>
+        </article>
+      </div>
+      <div class="callout"><b>保持这些区别</b><p><strong>付款成功 ≠ 投资成功</strong> · <strong>TA 受理 ≠ 份额确认</strong> · <strong>独立退款 ≠ 对已提交付款的补偿</strong> · <strong>saga 的事务边界 ≠ 流水线的流程顺序</strong>。在这里读声明；执行证据请看下方范围独立的验收。</p></div>
     </section>
 
     <section id="views">
       <div class="sec-head"><span class="no">02</span><h2>看这张图</h2></div>
-      <p class="sec-sub">工作坊查看器的三张经验证快照（2026-11-06 由 <code>view-project --html</code> 生成）——桌面地图、搜索、移动端。完整的 2.18 MB 单文件快照可在下方下载；双击即可离线运行。</p>
+      <p class="sec-sub">这是较早的工作坊查看器快照，2026-11-06 由 <code>view-project --html</code> 生成。中文单文件快照保留章节、证据面板与搜索，可离线打开；它不是新的技术验收 run。</p>
       <figure style="margin:14px 0">
         <img src="/assets/img/workshop-desktop.png" alt="银行财富知识图谱工作坊视图：聚合、切片、事件与规则的节点铺成一张可交互地图" loading="lazy" />
-        <figcaption class="small" style="margin-top:6px">工作坊 HTML 快照——389 节点 / 413 边 <span class="badge verified" title="F-03">已验证</span>，带章节、证据面板与搜索。<a href="/downloads/bank-workshop.html">下载完整快照（2.18 MB，可离线打开）</a>——界面即中文。</figcaption>
+        <figcaption class="small" style="margin-top:6px">工作坊导出子集包含 <strong>120 节点 / 183 边</strong>，来自 <strong>861 节点 / 737 边</strong>的图谱 <a class="badge verified" href="/zh/status/#F-17" data-fact="F-17">F-17</a>。<a href="/downloads/bank-workshop.html">下载历史中文快照（2.18 MB，可离线打开）</a>——不是完整图谱导出，也不是当前技术验收报告。</figcaption>
       </figure>
-      <p class="small">比起浏览更喜欢查询？<a href="/zh/explorer/">Explorer</a> 把同一张图谱作为 SQLite 装进你的浏览器——影响半径、血缘、孤儿、自由 SQL。</p>
+      <p class="small">比起浏览更喜欢查询？<a href="/zh/explorer/">Explorer</a> 加载的是<strong>另一份 2026-11-11 采集</strong>：389 节点 / 413 边 <a class="badge verified" href="/zh/status/#F-03" data-fact="F-03">F-03</a>，以 SQLite 供浏览器查询——影响半径、血缘、孤儿、自由 SQL。</p>
     </section>
 
     <section id="projections">
-      <div class="sec-head"><span class="no">03</span><h2>设计投影</h2></div>
-      <p class="sec-sub">这棵树还渲染七种面向人的设计视图（旅程、屏幕流、上下文地图、事件流、资金体验/生命周期、故事地图）。它们是<strong>派生的设计提案</strong>——从真源生成，明确标注为提案，从不手工维护。渲染图将在下一轮内容更新时放到这里。</p>
-      <div class="callout teal"><b>为什么这很重要</b><p>大多数工具逼你二选一：要么一块和代码漂移的设计画布，要么一份没有任何设计视图的代码。来自真源树的投影两者都不是——它<em>可再生</em>也<em>可读</em>，而且它的漂移可以通过重新渲染被发现。</p></div>
+      <div class="sec-head"><span class="no">03</span><h2>把视图当作投影，不当作批准</h2></div>
+      <p class="sec-sub">旅程、上下文地图或事件流视图，为讨论模型提供不同角度。它们仍是派生设计视图，不是另一份业务真源，也不证明服务已经运行。</p>
+      <div class="callout teal"><b>随时回到来源</b><p>利用历史工作坊的章节、搜索与证据面板，在解释之间切换；利用 Explorer 检查它自己声明的快照。不要因为两个导出中有同名节点，就推断它们有配对的代码位置。</p></div>
     </section>
 
     <section id="run">
-      <div class="sec-head"><span class="no">04</span><h2>在本地跑起来</h2></div>
-      <div class="steps">
-        <div class="step-item"><div><h4>验证树</h4><p class="meta">node ≥ 22.13 · 这一步不需要 JVM</p><p><code>git clone https://github.com/MadPolaris/bank-wealth-demo && cd bank-wealth-demo && npm run validate</code>——0 硬发现，往返逐字节一致 <span class="badge verified" title="F-01/F-02">已验证</span>。</p></div></div>
-        <div class="step-item"><div><h4>生成 &amp; 编译</h4><p class="meta">从这里开始需要 JVM + sbt</p><p><code>npm run project</code>——首次运行还会从 Maven Central 取回钉定的 0.3.0 引擎 jar 并校验 sha256——写出 <code>generated/current/</code>（235 个文件）；在其中 <code>sbt compile</code>：534 个源文件 0 错误 <span class="badge verified" title="F-04/F-06">已验证</span>；<code>sbt test</code>：23/23 <span class="badge verified" title="F-07">已验证</span>。</p></div></div>
-        <div class="step-item"><div><h4>验证锚点</h4><p class="meta">收据在此</p><p><code>truthsrc verify-project</code> 重新证明全部 792 个锚点 <span class="badge verified" title="F-05">已验证</span>——文件字节对照树，双向。</p></div></div>
+      <div class="sec-head"><span class="no">04</span><h2>从读源码到本地生成</h2></div>
+      <p class="sec-sub">先看<a href="https://github.com/MadPolaris/bank-wealth-demo">银行源码仓库</a>。命令与前置以<a href="/zh/guide/#bank-prerequisites">指南的银行路径</a>为准，不把本页当作运行手册。仓库内容会演进；这里的数字保留 <strong>2026-11-11</strong> 的采集日期。</p>
+      <div class="stat-strip">
+        <div class="stat"><div class="num">3</div><div class="lbl">个聚合：CreditBalance · FundOrder · SipPlan</div></div>
+        <div class="stat"><div class="num">157</div><div class="lbl">个真源原子 · 149 条 <code>@rule</code> 不变量 <a href="/zh/status/#F-02" data-fact="F-02">F-02</a> / <a href="/zh/status/#F-09" data-fact="F-09">F-09</a></div></div>
+        <div class="stat"><div class="num">2+4</div><div class="lbl">个 saga + 流水线，全部用真源声明</div></div>
+        <div class="stat"><div class="num">23/23</div><div class="lbl">生成单元测试 · 2026-11-11 <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a></div></div>
       </div>
-      <p class="small">分步教程（含 JVM 侧的 Docker 变体）在<a href="/zh/guide/">实战指南</a>。</p>
+      <details>
+        <summary>生成证据及其材料边界</summary>
+        <p>真源验证记录为 0 硬发现且往返逐字节一致 <a href="/zh/status/#F-01" data-fact="F-01">F-01</a> / <a href="/zh/status/#F-02" data-fact="F-02">F-02</a>。构建记录为 235 个生成文件 <a href="/zh/status/#F-04" data-fact="F-04">F-04</a>、534 个源文件 0 错误 <a href="/zh/status/#F-06" data-fact="F-06">F-06</a>、792 个已验证锚点 <a href="/zh/status/#F-05" data-fact="F-05">F-05</a>。23/23 是生成单元测试，不是独立手写业务测试 <a href="/zh/status/#F-07" data-fact="F-07">F-07</a>。</p>
+        <p><code>npm run project</code> 写出 <code>generated/current/</code>；便捷路径可从 Maven Central 取得钉定的 0.3.0 引擎并核 SHA-256 <a href="/zh/status/#F-23" data-fact="F-23">F-23</a>。这不提供正式工作坊归档与封存运行时材料，也不构成正式服务验收。</p>
+      </details>
+      <p class="evidence-note">正式 source / anchors / code / service 范围的输入和环境各不相同。这不是一条命令即可公开复演服务的承诺。</p>
     </section>
 
     <section id="boundaries">
-      <div class="sec-head"><span class="no">05</span><h2>诚实的边界</h2></div>
-      <div class="callout red"><b>评估前必读</b><p>这是一个<strong>本地教学演示</strong>。它不移动任何真实资金，不是生产级银行系统，也不是与 Palantir 兼容的实现。全服务运行时闸门<strong>未通过</strong>（<a class="badge boundary" href="/zh/status/#DEF-06">DEF-06</a>：读侧回放没赶上 90 秒追平期限）；<code>sbt run</code> + HTTP 冒烟<strong>尚未执行</strong>（<a class="badge boundary" href="/zh/status/#DEF-07">DEF-07</a>）；冻结的运行时制品还没有公开下载渠道。<em>已经</em>被证明的：树的闸门、图谱、生成、编译、测试、锚点——全部于 2026-11-11 验证，且可从仓库复现。</p></div>
+      <div class="sec-head"><span class="no">05</span><h2>技术验收与诚实边界</h2></div>
+      <div class="callout teal" id="technical-acceptance"><b>已通过的候选 · 2026-11-12</b><p><code>bank030-relocated-20261112-02</code> 在配对源码实际移址后，<strong>source / anchors / code / service</strong> 均通过并复核；<code>fullPipelinePassed=true</code>，diagnostics 为空 <a class="badge verified" href="/zh/status/#F-24" data-fact="F-24">F-24</a>。<a href="/docs/bank-technical-20261112.md#中文">脱敏技术摘要</a>记录范围与报告身份；它不是原始报告，也不是公开复现包。</p></div>
+      <ul>
+        <li>actor：<strong>64 项通过</strong>；readside：<strong>47 项通过</strong>。两组<strong>共享 23 项生成测试</strong>，不是 111 个互不重复用例 <a class="badge verified" href="/zh/status/#F-25" data-fact="F-25">F-25</a>。</li>
+        <li><strong>24 个三 JVM 恢复窗口（72 次 JVM 执行）</strong>，保留固定 barrier 与独立金融预期；<strong>4 阶段真实数据库/HTTP、3 次自动浏览器观测及 5 个 MySQL 负例</strong>通过 <a class="badge verified" href="/zh/status/#F-26" data-fact="F-26">F-26</a>。</li>
+        <li>新 SQL 重建 readiness：<strong>66.847 秒，处于未放宽的 90 秒门限内</strong>。这是移址候选的本轮观测，不是一般性能承诺 <a class="badge verified" href="/zh/status/#F-27" data-fact="F-27">F-27</a>。</li>
+        <li><strong>原生 Darwin x64 / JDK11、单 owner</strong>；输入未变，所属资源退出、租约已归还。仅描述 owner-02 <a class="badge verified" href="/zh/status/#F-28" data-fact="F-28">F-28</a>。</li>
+      </ul>
+      <div class="callout red"><b>不等于更广范围的签收</b><p>这仍是<strong>本地教学演示</strong>：不移动真实资金，不是生产认证或真实基金公司接入，也不声称与 Palantir 兼容。历史 P23/service02 回放失败仍保留为失败（<a href="/zh/status/#DEF-06">DEF-06</a>），不能用它概括新技术候选。</p><p><strong>独立 start/status/页面操作/stop 体验仍未签收</strong>（<a href="/zh/status/#DEF-07">DEF-07</a>）：session03 未达到 readiness，之后清理占位不是通过，后续修补候选记录为未执行。自动 HTTP/浏览器观测不代签独立体验或原始手工 <code>sbt run</code> 冒烟。</p><p>引擎已在 Maven Central 公开 <a class="badge verified" href="/zh/status/#F-23" data-fact="F-23">F-23</a>，但<strong>配对材料交付</strong>（<a href="/zh/status/#DEF-15">DEF-15</a>）、<strong>真人验收</strong>（<a href="/zh/status/#DEF-16">DEF-16</a>）、家族观察（<a href="/zh/status/#DEF-17">DEF-17</a>）、retry/backoff/deadline 债务（<a href="/zh/status/#DEF-18">DEF-18</a>）、特定 Inspector 负控与额外 Node CI/typecheck（<a href="/zh/status/#DEF-19">DEF-19</a>）、旧离线包迁移（<a href="/zh/status/#DEF-20">DEF-20</a>）仍是独立且未关闭的事项。</p></div>
     </section>
+
+    <p class="next-step"><strong>下一步：检查证据。</strong><a href="/zh/status/#F-24">阅读该候选的技术事实与待签收门</a>。</p>
   </main>
 
   <footer id="site-footer"></footer>

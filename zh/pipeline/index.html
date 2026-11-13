@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>从真源树到代码，再回来 — co-arising</title>
-  <meta name="description" content="完整生命周期：编译真源树、构建本地知识图谱、生成可编译的 CQRS 代码库、验证锚点、填充手写区、再验证。每个阶段都有它的命令和经验证的数字。" />
+  <meta name="description" content="哪些由生成器实现，哪些仍由你负责，验证又证明了什么？沿真源生命周期理解编辑、测试与来源锚点的边界。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/pipeline/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/pipeline/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/pipeline/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/pipeline/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,59 +21,63 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">生命周期</p>
-      <h1>真源树 → 代码，<span class="accent">再回来</span></h1>
-      <p class="thesis">六个阶段，每段一条精确命令、一道绿/红闸门。这个闭环闭合了两次：一次向前（树 → 图谱 → 代码），一次向后（代码 → 锚点 → 树）。以下数字来自银行完整示例，2026-11-11 重新采集。</p>
+      <p class="over">工程闭环</p>
+      <h1>哪些由生成器实现，<br /><span class="accent">哪些仍由你负责？</span></h1>
+      <p class="thesis">让领域知识、技术绑定与手写集成各归其位。编译声明，检查将生成的变化，测试行为，再从实现追溯回来源。</p>
+      <p class="page-outline"><a href="#flow">沿生命周期阅读</a> · <a href="#anchors">理解锚点精度</a> · <a href="#boundaries">核对证据边界</a></p>
     </header>
 
     <section id="flow">
-      <div class="sec-head"><span class="no">01</span><h2>六个阶段</h2></div>
+      <div class="sec-head"><span class="no">01</span><h2>每个阶段都有明确职责</h2></div>
       <div class="flow" aria-label="六阶段流水线">
-        <div class="step"><span class="snum">01 · 编写</span><b>编辑树</b><p>只写 YAML 原子。智能体起草，人类批准——每个原子记录 <code>approvedBy</code>。</p></div>
-        <div class="step"><span class="snum">02 · 闸门</span><b>验证 + 往返</b><p><code>validate</code> 0 硬发现；<code>roundtrip</code> 逐字节一致。<span class="badge verified" title="F-01/F-02">157 原子 ✓</span></p></div>
-        <div class="step"><span class="snum">03 · 图谱</span><b>编译 &amp; 推送</b><p>canonical 投影 → SQLite 图谱：<span class="badge verified" title="F-03">389 节点 / 413 边</span>。</p></div>
-        <div class="step"><span class="snum">04 · 生成</span><b>CQRS 代码库</b><p><code>generate-project</code>：<span class="badge verified" title="F-04">235 个文件</span>，<span class="badge verified" title="F-06">0 编译错误</span>。</p></div>
-        <div class="step"><span class="snum">05 · 手写</span><b>填手写区</b><p>端口是生成的；行为进物理隔离的手写模块——<span class="badge verified" title="F-08">35 个文件</span>，完整实现。</p></div>
-        <div class="step"><span class="snum">06 · 验证</span><b>证明血缘</b><p><code>verify-project</code>：<span class="badge verified" title="F-05">792 个锚点</span>；测试 <span class="badge verified" title="F-07">23/23</span>。</p></div>
+        <div class="step"><span class="snum">01 · 编写</span><b>先约定行为</b><p>知识改在真源树中。审阅业务预期，通过项目实际的审阅流程记录人工批准。</p></div>
+        <div class="step"><span class="snum">02 · 闸门</span><b>验证真源</b><p>验证检查结构与受支持语义，往返检查内容保留。二者都不能代替业务测试。</p></div>
+        <div class="step"><span class="snum">03 · 编译</span><b>派生产物与图谱</b><p>将声明编译为产物并构建可查询图谱。不手改这些派生的知识表示。</p></div>
+        <div class="step"><span class="snum">04 · 生成</span><b>先预览，再写入</b><p>使用项目的显式技术绑定，先检查生成计划，再写入受支持行为与结构代码。</p></div>
+        <div class="step"><span class="snum">05 · 集成</span><b>实现宿主职责</b><p>外部效果与剩余计算留在独立的手写实现区，依据已约定结果测试。</p></div>
+        <div class="step"><span class="snum">06 · 验证</span><b>核对代码与出处</b><p>编译并执行相应测试，验证来源锚点与输出新鲜度。发现漂移，先调查再更新。</p></div>
       </div>
-      <p class="small">然后它循环：改树，<code>status-project</code> 精确显示哪些生成文件过期了，<code>generate-project --update</code> 只刷新那些，对未改动的树重跑则写入 <strong>0 个文件</strong>（幂等是闸门，不是愿望）。</p>
+      <p class="small">输入过期与输出字节变化是两回事：<code>status-project</code> 分别报告输入和已有生成文件的状态；<code>generate-project --update --plan</code> 给出将要执行的更新动作，不是文本 diff。反查行号要从匹配源码的 UTF-8 span 换算，不猜固定文件/行号。</p>
+      <details>
+        <summary>银行生成证据记录 · 2026-11-11</summary>
+        <p class="evidence-note">验证 0 硬发现 <a href="/zh/status/#F-01" data-fact="F-01">F-01</a>；157 个原子且往返逐字节一致 <a href="/zh/status/#F-02" data-fact="F-02">F-02</a>；图谱 389 节点 / 413 边 <a href="/zh/status/#F-03" data-fact="F-03">F-03</a>；235 个生成文件 <a href="/zh/status/#F-04" data-fact="F-04">F-04</a>；0 编译错误 <a href="/zh/status/#F-06" data-fact="F-06">F-06</a>；792 个已验证锚点 <a href="/zh/status/#F-05" data-fact="F-05">F-05</a>。这些数字保留原采集日期；<a href="#boundaries">更新的服务验收</a>单独陈述。</p>
+      </details>
     </section>
 
     <section id="anchors">
-      <div class="sec-head"><span class="no">02</span><h2>锚点：别人都没交付的那部分</h2></div>
-      <p class="sec-sub">代码生成很常见。<strong>出身证明</strong>不常见。每个生成文件都携带锚点元数据，把它绑定到产生它的知识节点——而且这个绑定靠重读字节来验证，不是靠信任一份清单。</p>
-      <div class="term">
-        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">两个方向，各一条命令</span></div>
-        <pre><span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
-<span class="o">  knowledge  rule:SetCount (aggregate example/Counter)</span>
-<span class="o">  generated  app/domain/example/Counter.scala  L31–L54   ← 是区间，不是猜的</span>
-
-<span class="p">$</span> <span class="c">truthsrc query-project --file app/domain/example/Counter.scala --symbol setCount</span>
-<span class="o">  source     slice example/set-count  →  guards  →  rule:SetCount</span>
-
-<span class="p">$</span> <span class="c">truthsrc verify-project --project truthsrc.project.json --out app/</span>
-<span class="ok">✓ 通过</span> <span class="o">— 每个锚点都对照文件字节重新验证（银行项目 792 个）</span></pre>
-      </div>
+      <div class="sec-head"><span class="no">02</span><h2>问清一段实现从哪里来</h2></div>
+      <p class="sec-sub">来源锚点连接知识声明与生成位置。有用的答案包含<strong>身份、精度与新鲜度</strong>，而不只是一个看起来合理的文件名。</p>
       <div class="card-grid cols-3">
-        <div class="card"><span class="tag">为什么重要</span><h3>「这一行从哪来的？」</h3><p>是合规问题、是调试问题，也是新人上手问题——用查询回答，不用考古。</p></div>
-        <div class="card"><span class="tag">为什么诚实</span><h3>字节级精度，不是感觉</h3><p>锚点记录区间；验证重读文件。如果有人改了生成代码，验证会报告漂移，而不是默默继续信任。</p></div>
-        <div class="card"><span class="tag">为什么智能体需要它</span><h3>不用 grep 的上下文包</h3><p>同一张锚点图能为手写智能体打包出精确的上游类型、调用方契约与验收场景——为 AI 协作者闭环。</p></div>
+        <div class="card"><span class="tag">出处</span><h3>证明联系，不证明正确</h3><p>锚点支持「此位置来自此声明」的判断。它不证明声明已获批准，也不证明程序的每行代码都正确。</p></div>
+        <div class="card"><span class="tag">精度</span><h3>区间与文件不是同一个答案</h3><p><code>span</code> 指明字节区间；<code>file</code> 只定位文件。<code>ambiguous</code> 或 <code>unavailable</code> 表示边界，不是允许猜行号。</p></div>
+        <div class="card"><span class="tag">新鲜度</span><h3>先核对匹配字节</h3><p>从 UTF-8 字节区间换算行号前，先核源码指纹与验证结果。没有配对代码位置的图谱快照，不能提供精确的代码跳转。</p></div>
       </div>
+      <p class="prose"><a href="/zh/guide/#l1">Counter 指南</a>使用实际验证过的位置走通正反查询，并解释输入过期、输出漂移与更新。canonical 图、项目知识图和工作坊导出是不同表示，不能凭同名拼接身份。</p>
+      <details>
+        <summary>Counter 命令速查 · 先完成指南中的准备</summary>
+      <div class="term"><div class="term-bar"><span class="title">在自己的 Counter 项目中；具体反查步骤见指南</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</pre></div>
+      </details>
     </section>
 
     <section id="handwritten">
-      <div class="sec-head"><span class="no">03</span><h2>手写区</h2></div>
-      <p class="sec-sub">生成哲学：<strong>生成端口，把行为留给人</strong>（和他们的智能体）——但只留在再生成永远碰不到的物理隔离模块里。</p>
-      <div class="card-grid cols-2">
-        <div class="card"><span class="tag">生成侧</span><h3>一切结构性的东西</h3><p>聚合、命令、事件、守卫（从 <code>@rule</code> 不变量编译而来）、proto schema、端口、测试脚手架——银行项目 235 个文件，全部可再生成，全部有锚点。</p></div>
-        <div class="card"><span class="tag">手写侧</span><h3>一切行为性的东西</h3><p>对 mock TA 的效果执行、JDBC 装配、恢复循环、读侧追赶、HTTP 页面——<strong>35 个文件，完整实现</strong> <span class="badge verified" title="F-08">已验证</span>，经 <code>unmanagedSourceDirectories</code> 挂进构建。没有任何 <code>BEGIN MANUAL</code> 标记——边界就是文件系统本身。</p></div>
+      <div class="sec-head"><span class="no">03</span><h2>在拥有这项职责的层修改</h2></div>
+      <p class="sec-sub"><strong>生成受支持的已声明行为，手写剩余计算与宿主集成。</strong>真源树是唯一的<em>知识</em>编辑面，并不是项目里唯一可以编辑的文件。</p>
+      <div class="card-grid cols-3">
+        <div class="card"><span class="tag">真源与生成侧</span><h3>领域声明</h3><p>聚合、命令、事件以及受支持的守卫、绑定、状态折叠声明共同驱动生成。结构还包括 schema、端口与测试脚手架。只命名不变量，不会自动实现缺失规则。</p></div>
+        <div class="card"><span class="tag">显式输入</span><h3>技术绑定</h3><p>绑定把已声明模型接到选定的实现 profile 与宿主契约。它应与业务政策分别审阅；生成产物不是编辑同一份知识的第二入口。</p></div>
+        <div class="card"><span class="tag">手写实现区</span><h3>宿主集成</h3><p>mock TA 效果执行、JDBC 装配、恢复循环、读侧追赶与 HTTP 页面仍是显式实现。银行的 35 个手写文件记录为完整实现 <a href="/zh/status/#F-08" data-fact="F-08">F-08 · 2026-11-11</a>。</p></div>
       </div>
-      <div class="callout"><b>漂移</b><p>树变了，生成文件被刷新；手写区永不被覆盖。测试保持为固定的期望——<strong>生成代码必须满足手写测试，而不是反过来</strong>。今天 23/23 通过 <span class="badge verified" title="F-07">已验证</span>。</p></div>
+      <p class="prose">银行构建通过 <code>unmanagedSourceDirectories</code> 引入独立手写模块。文件系统边界使它不受正常再生成覆盖；这不保证任意输出路径或其他工具都无法覆盖文件。</p>
+      <div class="callout"><b>测试范围</b><p>树变了，生成文件被刷新；手写区不被覆盖。<strong>2026-11-11 的 23/23 是生成单元测试</strong> <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a>：手写生产源码随构建编译，不代表独立手写测试预期已验证。新技术候选的 actor <strong>64 项</strong>、readside <strong>47 项</strong>通过，保留固定业务预期；两组<strong>共享 23 项生成测试</strong>，不能相加当作互不重复用例 <a class="badge verified" href="/zh/status/#F-25" data-fact="F-25">F-25</a>。</p></div>
     </section>
 
     <section id="engines">
@@ -86,17 +91,15 @@
     </section>
 
     <section id="boundaries">
-      <div class="sec-head"><span class="no">05</span><h2>这个闭环暂不声称什么</h2></div>
-      <div class="callout red"><b>边界</b><p>
-        <strong>全服务运行时闸门——未通过</strong>（<a class="badge boundary" href="/zh/status/#DEF-06">DEF-06</a>）：生成的代码可编译、23 个测试全过，但 service02 验收跑有一道闸没过——一次全新的读侧回放没在 90 秒内追平。代码、24 个恢复用例、真实库的初始/重启/退款确实通过了。 &nbsp;·&nbsp;
-        <strong>运行中服务的 HTTP 冒烟——尚未执行</strong>（<a class="badge boundary" href="/zh/status/#DEF-07">DEF-07</a>）。 &nbsp;·&nbsp;
-        <strong>BDD/Gherkin 规格——按衍生物设计，未构建</strong>（<a class="badge deferred" href="/zh/status/#DEF-01">DEF-01</a>）：守卫 + 场景应当能生成 Gherkin；该投影尚未实现。
-      </p></div>
+      <div class="sec-head"><span class="no">05</span><h2>当前技术结果与独立验收边界</h2></div>
+      <div class="callout teal"><b>新候选，不改写旧报告</b><p>2026-11-12，<code>bank030-relocated-20261112-02</code> 的 <strong>source / anchors / code / service</strong> 均通过并复核 <a class="badge verified" href="/zh/status/#F-24" data-fact="F-24">F-24</a>，包括真实数据库/HTTP 与自动浏览器观测 <a class="badge verified" href="/zh/status/#F-26" data-fact="F-26">F-26</a>。本轮新 SQL 重建 <strong>66.847 秒达到 readiness，未放宽 90 秒门限</strong> <a class="badge verified" href="/zh/status/#F-27" data-fact="F-27">F-27</a>。范围是原生 Darwin x64 / JDK11、单 owner；输入未变，该 owner 的资源与租约已释放 <a class="badge verified" href="/zh/status/#F-28" data-fact="F-28">F-28</a>。详见<a href="/docs/bank-technical-20261112.md#中文">脱敏范围与证据摘要</a>。旧 P23/service02 失败保留为历史事实（<a href="/zh/status/#DEF-06">DEF-06</a>）。</p></div>
+      <div class="callout red"><b>仍须分别签收</b><p><strong>独立服务体验</strong>仍未签收（<a href="/zh/status/#DEF-07">DEF-07</a>）：session03 readiness 失败；清理占位不是通过，后续修补候选未执行。技术 HTTP/浏览器通过不关闭<strong>公开材料交付</strong>（<a href="/zh/status/#DEF-15">DEF-15</a>）或<strong>真人可用性</strong>（<a href="/zh/status/#DEF-16">DEF-16</a>）。家族观察（<a href="/zh/status/#DEF-17">DEF-17</a>）、retry/backoff/deadline 债务（<a href="/zh/status/#DEF-18">DEF-18</a>）、特定负控与额外 Node CI/typecheck（<a href="/zh/status/#DEF-19">DEF-19</a>）、旧离线包迁移（<a href="/zh/status/#DEF-20">DEF-20</a>）也不由银行 run 代签。</p><p><strong>BDD/Gherkin 规格仍是未构建的衍生物</strong>（<a href="/zh/status/#DEF-01">DEF-01</a>）。正式工作坊验收还需要<a href="/zh/guide/#bank-prerequisites">显式配对材料与分层环境前置</a>；便捷生成路径不能代替。</p></div>
     </section>
 
     <section id="try">
-      <div class="sec-head"><span class="no">06</span><h2>自己跑一遍</h2></div>
-      <p class="sec-sub">Counter 教程在一个单聚合项目上用大约十分钟走完 1–6 阶段，只需 Node。银行示例把它带到完整规模。两者都在<a href="/zh/guide/">实战指南</a>里。</p>
+      <div class="sec-head"><span class="no">06</span><h2>先走最小实用闭环</h2></div>
+      <p class="sec-sub">Counter 用 Node 练习创建、生成、查询、修改作者文件、更新与验证。不把它当作银行运行或 JVM 服务验收；指南会分别说明后续各层前置。</p>
+      <p class="next-step"><strong>下一步：亲手改一次。</strong><a href="/zh/guide/">从动手指南开始</a>。</p>
     </section>
   </main>
 

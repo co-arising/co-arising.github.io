@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>真源树语言 — co-arising</title>
-  <meta name="description" content="truthsrc 语言的战略层与范围层：12 种原子、15 种工作坊笔记类型、22 种带类型的关系、治理闸门，以及银行示例的真实切片。" />
+  <meta name="description" content="从 Counter 学习 truthsrc：守卫、事件绑定、同时计算的状态折叠、当前表达式支持边界，以及完整保留五个守卫的银行切片。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/dsl/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/dsl/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/dsl/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/dsl/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,18 +21,165 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——下方为纯内容。<a href="/zh/">首页</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">语言 · 战略层与范围层</p>
-      <h1>一门给<span class="accent">真源树</span>的描述语言</h1>
-      <p class="thesis">一棵 YAML 树是唯一的编辑界面：工作坊笔记经 inbox 流入，形式化原子持有编译后的契约，一张 22 种带类型关系的注册表就是元模型。本页发布语言的战略层（上下文、子域、地图）与范围层（种类、关系、闸门）。可视化编辑工具在<a href="/zh/status/#DEF-02">台账</a>上。</p>
+      <p class="over">真源语言 · 从一条规则到状态</p>
+      <h1>说清规则，追溯<span class="accent">变化</span></h1>
+      <p class="thesis">从 Counter 开始：守卫决定命令能否继续，绑定提供事件载荷，状态折叠把事件变成新状态。业务声明只有一棵作者树；技术绑定与手写实现各负其责。图谱与绿灯都不能代替人对业务规则达成共识。</p>
+      <p><a href="#counter-example">最小 Counter</a> · <a href="#fold">折叠如何工作</a> · <a href="#slice">真实银行切片</a> · <a href="#expression-reference">表达式参考</a> · <a href="#relations">关系注册表</a></p>
     </header>
 
+    <section id="counter-example">
+      <div class="sec-head"><span class="no">01</span><h2>Counter：一条因果链，三种视角</h2></div>
+      <h3>1 · 业务解释</h3>
+      <p>从 <code>count = 0</code> 开始，请求 <code>SetCount(id="counter-1", count=2)</code>。id 非空、count 非负，两条守卫都通过。绑定将参数放入 <code>CountSet</code>；应用这个事件后，id 为 <code>counter-1</code>，count 为 <code>2</code>。负数请求被拒绝，不产生事件。这是赋值，不是累加。</p>
+      <h3>2 · 当前作者输入</h3>
+      <p>下列 JSON 数组片段来自 <a href="https://github.com/co-arising/metarch-truthsrc/blob/cb860b5c1f8f038eb073c95cd83b724424c89cc6/scaffold/unified-project/truth/example/contexts/example/aggregates/counter/slices/set-count.slice.yaml">cb860b5c 随包提供的 Counter 切片</a>，仅重排了格式，<strong>不是完整 YAML 文件或项目</strong>。放回原位置并保留周围类型声明；<a href="/zh/guide/#l1">指南中的公共 <code>init</code></a> 会创建完整项目。</p>
+      <p><code>payload.guards</code>——按顺序读取命令参数与当前状态。</p>
+      <pre class="code" data-example="counter-guards" data-example-kind="author"><code>[
+  {"kind":"invariantRef","ref":"nonempty-id","errCode":"EMPTY_ID","cond":"param.id.nonEmpty","onFail":"reject"},
+  {"kind":"invariantRef","ref":"nonnegative-count","errCode":"NEGATIVE_COUNT","cond":"param.count &gt;= 0","onFail":"reject"}
+]</code></pre>
+      <p><code>events.CountSet.bindings</code>——填充事件，而不是修改状态。</p>
+      <pre class="code" data-example="counter-bindings" data-example-kind="author"><code>[
+  {"slot":"id","expr":"param.id"},
+  {"slot":"count","expr":"param.count"}
+]</code></pre>
+      <p><code>events.CountSet.foldAssignments</code>——重放读已记录的事件，不读原命令。</p>
+      <pre class="code" data-example="counter-folds" data-example-kind="author"><code>[
+  {"slot":"id","expr":"event.id"},
+  {"slot":"count","expr":"event.count"}
+]</code></pre>
+      <h3>3 · 展开语义——IR，不是作者输入</h3>
+      <p>下方是已接纳 <code>domain-folds@6</code> 中 count 赋值的 <code>update</code> 子树。完整产品还含目标、类型、来源与依赖。不要把这段 IR 粘进 <code>expr</code>。</p>
+      <pre class="code" data-example="counter-fold-ir" data-example-kind="compiled-fragment" data-grammar="json"><code>{
+  "op": "set",
+  "value": {
+    "op": "ref",
+    "ref": {"context":"example","kind":"event-slot","owner":["Counter","CountSet"],"id":"count"}
+  }
+}</code></pre>
+    </section>
+
+    <section id="fold">
+      <div class="sec-head"><span class="no">02</span><h2>守卫、绑定、状态折叠：各负其责</h2></div>
+      <div class="card-grid cols-3">
+        <div class="card"><span class="tag">守卫</span><h3>命令可以继续吗？</h3><p>条件为真，继续下一条守卫。条件为<strong>假</strong>时，<code>onFail: reject</code> 携错误码终止；<code>succeed-empty</code> 成功终止且不产生事件。两者都不再执行后续守卫。失败策略不是条件本身的返回值。</p></div>
+        <div class="card"><span class="tag">绑定</span><h3>记录什么事实？</h3><p>发射绑定从已声明的命令/状态值，或显式接纳且固定版本的宿主输出，填充事件槽位。事件字段与状态字段不能混为一谈。</p></div>
+        <div class="card"><span class="tag">状态折叠</span><h3>事实如何改变状态？</h3><p>聚合状态只在事件应用中演进。重放只消费<strong>state + event</strong>；不能调用宿主、读取时钟/网络，或依赖原命令参数。</p></div>
+      </div>
+      <h3>同时计算，不是按行执行的脚本</h3>
+      <p>所有右值与更新基值都读取<strong>同一份不可变的事件前快照</strong>。先算出全部结果，再构成新状态。一条赋值删除 map 项，不会遮住另一条赋值读取的旧值。一个事件对每个目标只能赋值一次：不能靠书写顺序、最后写入获胜或中间状态读取表达逻辑。</p>
+      <p>例如 <code>state.pending[event.key]</code> 在类型化产品中得到的是<em>可选值</em>，接收类型必须容纳 optional；它不是无检查的取值。即便旧树预检接纳某个拼写，严格类型接纳仍可能拒绝。</p>
+      <div class="callout"><b>精确数值</b><p>Long/Int/Integer 在产品与 oracle 边界使用规范的有符号 64 位十进制字符串，不用 JS Number。精确金额需要声明名义类型、精度、小数位和单位；没有隐式币种、舍入或换算。单位、精度不符或溢出都失败；<code>money-apply</code> 是操作名，不是内建银行政策。宿主时钟与任意 Scala 不是重放表达式；严格产品中的 <code>literal:SYSTEM_NOW</code> 不是读时钟。</p></div>
+    </section>
+
+    <section id="slice">
+      <div class="sec-head"><span class="no">03</span><h2>一个真实切片，原样未剪</h2></div>
+      <p class="sec-sub">来自 <code>truth/bank-wealth/…/credit-balance/slices/initialize-account.slice.yaml</code>：一条命令、五个守卫、一个事件、折叠与溯源。此原文不是独立项目，也不是一次新的银行验收。</p>
+      <h3>业务视角：身份、冲突，再到幂等</h3>
+      <ol>
+        <li><code>ACCOUNT_ID</code>：请求资源必须等于本聚合 id。</li>
+        <li><code>ACCOUNT_CURRENCY</code>：币种必须为 CNY，金额也必须携带同一币种。</li>
+        <li><code>ACCOUNT_INIT_CONFLICT</code>：尚未初始化则继续；初始化后，金额须与已记录值相同。不同金额在幂等守卫<strong>之前拒绝</strong>。</li>
+        <li><code>ACCOUNT_INIT_ONCE</code>：<code>!state.initialized</code> 为假表示 <strong>succeed-empty</strong>。匹配的重试不发第二个事件，后续守卫也不执行。</li>
+        <li><code>ACCOUNT_SEED_NONNEGATIVE</code>：首次种子金额须 <code>&gt;= 0.00</code>，允许零；不是更严格的 money-positive 谓词。</li>
+      </ol>
+      <h3>当前作者视角：原文件字节</h3>
+      <pre class="code" data-example="initialize-account-file" data-source-file="truth/bank-wealth/contexts/bankwealth/aggregates/credit-balance/slices/initialize-account.slice.yaml" data-source-sha256="fdb6f4e2690dd68c55f595ad6aa66c43cc55b77ed2b03d0124bc615060eb0ebf"><code># ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: CreditBalance
+command: InitializeAccount
+payload:
+  {
+    "name": "InitializeAccount",
+    "parameters": [
+      "resource: AccountId @BUSINESS_INPUT",
+      "currency: String @BUSINESS_INPUT",
+      "amount: Money @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject ACCOUNT_ID/ACCOUNT_ID: \"param.resource == state.id\")",
+      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" &amp;&amp; param.amount.currency == param.currency\")",
+      "@guard[invariantRef](reject ACCOUNT_INIT_CONFLICT/ACCOUNT_INIT_CONFLICT: \"!state.initialized || state.accountBalance.get(param.currency).contains(param.amount)\")",
+      "@guard[invariantRef](succeed-empty ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
+      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount &gt;= 0.00\")"
+    ],
+    "produces": [
+      "AccountInitialized"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "approvedBy": "user-approved-p24-p25-bank-joint",
+      "sourceVersion": "bank-v1-p23-design-2"
+    }
+  }
+events:
+  {
+    "AccountInitialized": {
+      "name": "AccountInitialized",
+      "payloads": [
+        "resource: AccountId @PROPAGATED",
+        "currency: String @PROPAGATED",
+        "amount: Money @PROPAGATED"
+      ],
+      "bindings": [
+        "resource &lt;- param.resource",
+        "currency &lt;- param.currency",
+        "amount &lt;- param.amount"
+      ],
+      "foldAssignments": [
+        "initialized := \"literal:true\"",
+        "accountBalance := @fold[put](key=event.currency, value=event.amount)"
+      ]
+    }
+  }
+</code></pre>
+      <h3>展开语义视角——解释，不是作者输入</h3>
+      <p>五条守卫全通过后，三个绑定把 resource、currency、amount 记入 <code>AccountInitialized</code>。折叠设置 <code>initialized=true</code>，并以事件 currency 为键将事件 amount 放入 <code>accountBalance</code>；两者均读取同一事件前快照。对身份匹配的新账户，<code>0.00 CNY</code> 有效；已初始化且匹配的重试不产生事件/折叠；不同金额则拒绝。这是对声明的解释，不是独立执行银行行为。</p>
+      <div class="card-grid cols-3" style="margin-top:16px">
+        <div class="card"><span class="tag">守卫</span><h3>有牙齿的规则</h3><p>守卫保留声明顺序与条件为假时的结果：<code>reject</code> 表示拒绝，<code>succeed-empty</code> 表示幂等重试成功且不再发出事件。「余额非负」不再是一条注释——它编译进生成的命令处理器。</p></div>
+        <div class="card"><span class="tag">绑定</span><h3>载荷从哪里来</h3><p>每个事件字段要么从参数传播而来，要么是计算出来的——字段级的溯源，这正是读模型血缘（R10/R11）建立其上的东西。</p></div>
+        <div class="card"><span class="tag">折叠</span><h3>历史变成状态</h3><p><code>foldAssignments</code> 定义事件如何更新聚合状态——生成的 event applier 实现的就是这套代数。</p></div>
+      </div>
+    </section>
+
+    <section id="expression-reference">
+      <div class="sec-head"><span class="no">04</span><h2>当前表达式参考</h2></div>
+      <p>核对版本为工具链 <code>cb860b5c</code>、工具包 <code>0.5.0</code>。作者格式、微语法与产品 profile 各有版本。Counter 选择 decision <code>@4</code>、dependencies/folds <code>@6</code>；不能用旧例子悄悄替换这些 profile。</p>
+      <h3>七种折叠操作</h3>
+      <p>每行都是事件 <code>foldAssignments</code> 中的<strong>作者对象片段</strong>，不是独立 YAML。示意字段名必须有匹配声明。外层对象配字符串操作数是当前可用的过渡形态，不是未来语言设计的终点。</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>操作 / 作者形态</th><th>参数与含义</th><th>类型、profile 与限制</th></tr></thead>
+        <tbody>
+          <tr><td><code>set</code><br><code>{"slot":"count","expr":"event.count"}</code></td><td><code>slot, expr</code>；可加 <code>op:"set"</code>。替换一个值。</td><td>必须与目标类型完全相同。fold 产品 @1 起支持。用直接赋值，不用有缺陷的 micro set 形态。</td></tr>
+          <tr><td><code>put</code><br><code>{"slot":"items","op":"put","key":"event.key","value":"event.value"}</code></td><td><code>slot, op, key, value</code>。插入或替换一个键。</td><td>目标为 Map，键和值类型匹配；不是列表追加。fold 产品 @1 起支持。</td></tr>
+          <tr><td><code>remove</code><br><code>{"slot":"items","op":"remove","key":"event.key"}</code></td><td><code>slot, op, key</code>。删除一个键；不存在则 map 不变。</td><td>目标为 Map，键类型匹配；没有 <code>value</code> 参数。fold 产品 @1 起支持。</td></tr>
+          <tr><td><code>put-all</code><br><code>{"slot":"items","op":"put-all","key":"event.keys","value":"event.value"}</code></td><td><code>key</code> 是序列，在每个键上写入<strong>同一个标量值</strong>。</td><td>目标为 Map，序列元素与键类型匹配；不是 map 合并或键值 zip。fold 产品 @1 起支持。</td></tr>
+          <tr><td><code>remove-all</code><br><code>{"slot":"items","op":"remove-all","key":"event.keys"}</code></td><td>删除序列中的各个键。</td><td>目标为 Map，此处不能给标量键；没有 value 或回调。fold 产品 @1 起支持。</td></tr>
+          <tr><td><code>money-apply</code><br><code>{"slot":"balance","op":"money-apply","delta":"event.amount","sign":-1}</code></td><td><code>slot, op, delta, sign</code>。事件前余额加上带符号的 delta。</td><td>目标与 delta 为已接纳的同一精确名义类型、同单位；sign 只能是 <code>1</code> 或 <code>-1</code>，不用浮点。fold 产品 @1 起配合 exact types 支持。</td></tr>
+          <tr><td><code>integer-apply</code><br><code>{"slot":"count","op":"integer-apply","delta":"event.count","sign":1}</code></td><td>事件前 signed-64 count 加上带符号的 delta，溢出拒绝。</td><td>目标与 delta 为整数。作者聚合须显式选 <code>valueExpressionProfile:"truthsrc.domain-values/v2"</code>；该标记本身不选择产品或生成器。类型化 fold 产品 @1 起支持。</td></tr>
+        </tbody>
+      </table></div>
+      <h3>不要混用四层语法</h3>
+      <ul>
+        <li><strong>守卫条件：</strong>有限的 <code>param</code>/<code>state</code> 谓词、布尔运算、比较，以及接纳的集合/成员操作。signed-64 字面量与有限 <code>+</code>/<code>-</code> 需要 decision @3/@4；旧 profile 不同。不接受任意调用或 Scala 闭包。</li>
+        <li><strong>作者值表达式：</strong>例如 <code>event.count</code>、<code>literal:true</code>、<code>literal:1</code> 字符串。成员路径需要作者 v2 显式选择；普通中缀算术不是 fold 值字符串。value-product v2 识别的嵌套 literal/add/subtract 对象，当前作者预检仍拒绝。</li>
+        <li><strong>微语法载体：</strong>系统显式选择 <code>authoring.micro:"truthsrc.micro/v1"</code> 后，<code>"count := event.count"</code> 或 <code>"items := @fold[put](key=event.key, value=event.value)"</code> 这类 JSON 字符串降低到上述外层对象。参数以逗号加空格分隔；带标点/空白的文本要用内层 JSON 字符串，并在外层 JSON 转义。微语法不扩大语义接纳范围。</li>
+        <li><strong>类型化产品 IR：</strong>封闭的 <code>op/ref/valueType</code> 对象、限定身份与来源。这是编译输出，不是绕过作者验证的捷径。参见<a href="/docs/fold-language-rfc.md">尚未实现的精炼 RFC 与三项当前缺陷</a>；不推荐 <code>@fold[set](value=...)</code>。</li>
+      </ul>
+      <p class="small">固定版本参考：<a href="https://github.com/co-arising/metarch-truthsrc/blob/cb860b5c1f8f038eb073c95cd83b724424c89cc6/AUTHORING.md#scoped-micro-syntax">AUTHORING · 微语法</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/cb860b5c1f8f038eb073c95cd83b724424c89cc6/SCHEMA.md#domain-value-source-residence-explicit-v2-opt-in-2026-10-30">SCHEMA · 作者值表达式</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/cb860b5c1f8f038eb073c95cd83b724424c89cc6/PRODUCTS.md#complete-dependency-and-pre-event-fold-profiles">PRODUCTS · 类型化折叠/oracle</a>。历史章节描述更宽的兼容载体，不代表这些严格 profile 允许任意执行。</p>
+      <p><a href="/zh/guide/#change-rule">下一步：批准并检查一次 Counter 规则变更</a>。</p>
+    </section>
+
     <section id="shape">
-      <div class="sec-head"><span class="no">01</span><h2>一棵树的形状</h2></div>
+      <div class="sec-head"><span class="no">05</span><h2>一棵树的形状</h2></div>
       <p class="sec-sub">来自银行示例——真实路径，真实计数 <span class="badge verified" title="F-10">已验证</span>。</p>
       <pre class="code"><code>truth/bank-wealth/
 ├── system.yaml                    # 系统根：id、名称、职责
@@ -53,11 +201,11 @@
     ├── pipelines/                 # 4 条 Monarch 风格的有序步骤队列（R14–R16）
     ├── sagas/                     # 2 个 TCC 跨聚合事务
     └── formal-products/           # 36 份契约：端口、宿主、制品契约…</code></pre>
-      <div class="callout"><b>第零规则</b><p><strong>作者树是唯一的编辑界面。</strong>下游的一切——编译后的 canonical、知识图谱、生成的代码、台账、锚点——都是派生物，都会被重新生成。手工编辑派生物，按契约作废。这一条规则，是其他一切保证成为可能的原因。</p></div>
+      <div class="callout"><b>第零规则</b><p><strong>业务声明只在作者树中编辑。</strong>编译 canonical、语义产品、图谱和代码锚点是派生物，不是竞争的业务模型。技术绑定与受支持的手写实现区各有明确契约；不要通过修改生成产物来改变业务规则。</p></div>
     </section>
 
     <section id="kinds">
-      <div class="sec-head"><span class="no">02</span><h2>范围层：你能说什么</h2></div>
+      <div class="sec-head"><span class="no">06</span><h2>范围层：你能说什么</h2></div>
       <p class="sec-sub">两套词汇表，一张注册表。工作坊<strong>笔记类型</strong>是发现面（一墙便签的去处）；<strong>原子种类</strong>是编译后的契约。<span class="badge verified" title="F-15">已对照 lib/shared.mjs 验证</span></p>
 
       <h3>15 种笔记类型——工作坊入口</h3>
@@ -92,7 +240,7 @@
     </section>
 
     <section id="relations">
-      <div class="sec-head"><span class="no">03</span><h2>关系注册表——元模型的脊柱</h2></div>
+      <div class="sec-head"><span class="no">07</span><h2>关系注册表——元模型的脊柱</h2></div>
       <p class="sec-sub">22 种带类型的关系。<code>propagates</code> 标记是每条关系一次的人工裁定：这条边是否传导影响？<code>blast_radius</code> 恰好沿 <code>propagates</code> 边行走——宁可多报，不可漏报。<span class="badge verified" title="F-14">已验证</span></p>
       <div class="tbl-wrap"><table>
         <thead><tr><th>ID</th><th>从</th><th>关系</th><th>到</th><th>传导</th><th>含义</th></tr></thead>
@@ -124,51 +272,10 @@
       <p class="small" style="margin-top:10px">战略层一眼看尽：R21 是上下文映射；R22 把聚合安放进核心/支撑/通用子域；R12/R13 承载谁能做什么、谁能看见什么。其余全是行为——而行为边传导影响。</p>
     </section>
 
-    <section id="slice">
-      <div class="sec-head"><span class="no">04</span><h2>一个真实切片，原样未剪</h2></div>
-      <p class="sec-sub">来自 <code>truth/bank-wealth/…/credit-balance/slices/initialize-account.slice.yaml</code>。这是这门语言最密的样子：一条命令、五个守卫、一个事件、折叠、溯源。</p>
-      <pre class="code"><code>kind: slice
-aggregate: CreditBalance
-command: InitializeAccount
-payload:
-  {
-    "name": "InitializeAccount",
-    "parameters": [
-      "resource: AccountId @BUSINESS_INPUT",
-      "currency: String @BUSINESS_INPUT",
-      "amount: Money @BUSINESS_INPUT"
-    ],
-    "guards": [
-      "@guard[invariantRef](reject ACCOUNT_ID/ACCOUNT_ID: \"param.resource == state.id\")",
-      "@guard[invariantRef](reject ACCOUNT_CURRENCY/ACCOUNT_CURRENCY: \"param.currency == \\\"CNY\\\" …\")",
-      "@guard[invariantRef](reject ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE: \"!state.initialized\")",
-      "@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE: \"param.amount.amount >= 0.00\")"
-    ],
-    "produces": [ "AccountInitialized" ],
-    "provenance": { "author": "agent-assisted-bank-v1", "approvedBy": "user-approved-p24-p25-bank-joint", … }
-  }
-events:
-  {
-    "AccountInitialized": {
-      "payloads":  [ "resource: AccountId @PROPAGATED", "amount: Money @PROPAGAGED", … ],
-      "bindings":  [ "resource <- param.resource", "amount <- param.amount", … ],
-      "foldAssignments": [
-        "initialized := \"literal:true\"",
-        "accountBalance := @fold[put](key=event.currency, value=event.amount)"
-      ]
-    }
-  }</code></pre>
-      <div class="card-grid cols-3" style="margin-top:16px">
-        <div class="card"><span class="tag">守卫</span><h3>有牙齿的规则</h3><p>每条守卫引用一条具名不变量（<code>ACCOUNT_SEED_NONNEGATIVE</code>）和一个用于拒绝的错误码。「余额非负」不再是一条注释——它编译进生成的命令处理器。</p></div>
-        <div class="card"><span class="tag">绑定</span><h3>载荷从哪里来</h3><p>每个事件字段要么从参数传播而来，要么是计算出来的——字段级的溯源，这正是读模型血缘（R10/R11）建立其上的东西。</p></div>
-        <div class="card"><span class="tag">折叠</span><h3>历史变成状态</h3><p><code>foldAssignments</code> 定义事件如何更新聚合状态——生成的 event applier 实现的就是这套代数。</p></div>
-      </div>
-    </section>
-
     <section id="gates">
-      <div class="sec-head"><span class="no">05</span><h2>治理：三道闸门，不是风格指南</h2></div>
+      <div class="sec-head"><span class="no">08</span><h2>治理：三道闸门，不是风格指南</h2></div>
       <div class="steps">
-        <div class="step-item"><div><h4><code>validate</code>——0 个硬发现</h4><p class="meta">对作者树做结构 + 语义验证</p><p>未知种类、悬空引用、事件在两处定义、切片没有所属聚合——全是硬发现。零是唯一可接受的计数。银行树截至 2026-11-11：<strong>0 硬发现</strong> <span class="badge verified" title="F-01">已验证</span>。</p></div></div>
+        <div class="step-item"><div><h4><code>validate</code>——0 个硬发现</h4><p class="meta">作者结构与已声明引用检查，不等于完整类型接纳</p><p>未知种类、悬空引用、事件在两处定义、切片没有所属聚合——全是硬发现。零是唯一可接受的计数。银行树截至 2026-11-11：<strong>0 硬发现</strong> <span class="badge verified" title="F-01">已验证</span>。</p></div></div>
         <div class="step-item"><div><h4><code>roundtrip</code>——逐字节一致</h4><p class="meta">树 → canonical → 树，必须精确复现作者文件</p><p>这是反格式漂移闸门。如果编译「顺手规范化」了任何东西，往返就会发散、闸门就会失败。银行树：<strong>157 个原子，逐字节一致</strong> <span class="badge verified" title="F-02">已验证</span>。</p></div></div>
         <div class="step-item"><div><h4><code>compile-products</code>——严格契约</h4><p class="meta">形式产物必须先满足自己的 schema 才能被使用</p><p>端口、saga IR、执行 IR：从树编译而来的带类型、带版本的产物，各有各的验证。生成代码只消费冻结后的产物。</p></div></div>
       </div>
@@ -176,7 +283,7 @@ events:
     </section>
 
     <section id="authoring">
-      <div class="sec-head"><span class="no">06</span><h2>今天与明天的编辑体验</h2></div>
+      <div class="sec-head"><span class="no">09</span><h2>今天与明天的编辑体验</h2></div>
       <p class="sec-sub">今天的编辑界面是 YAML 文件加三个抽取技能（从代码库、从可达数据、从一句话描述）。可视化编辑——从 Qlerify 或 Miro 导入工作坊画板、从既有仓库逆向抽取一棵树——已为它留好设计但尚未构建：<a class="badge deferred" href="/zh/status/#DEF-02">DEF-02</a>。</p>
       <p class="small">Schema 参考：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/SCHEMA.md">SCHEMA.md</a> · 编写指南：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/AUTHORING.md">AUTHORING.md</a> · 完整教程：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/TUTORIAL.md">TUTORIAL.md</a></p>
     </section>

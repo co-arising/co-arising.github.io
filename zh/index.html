@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>co-arising —— 会编译的领域知识</title>
-  <meta name="description" content="面向 DDD 的开放真源语言与工具链：把你的领域写成真源树，编译成本地知识图谱，生成可编译的 CQRS 代码，并把每一行生成代码都锚回产生它的知识。" />
+  <title>co-arising —— 业务知识可共识，实现可验证，变更可追溯</title>
+  <meta name="description" content="让业务知识可共识、实现可验证、变更可追溯。读真实银行声明，或动手走通 Counter 的真源到代码闭环。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,90 +21,90 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="站点导航"></nav>
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript 已关闭——你看到的是纯内容。导航：<a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源树语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">Explorer</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">实战指南</a> · <a href="/zh/status/">状态</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="home-hero">
-      <p class="kicker">真源 · 托管投影 · 智能体访问</p>
-      <h1>领域知识，<br />因<span class="accent">缘起</span>共生——且可编译。</h1>
-      <p class="lede">
-        把你的领域写成一棵<strong>真源树</strong>：一份基于文件的唯一事实来源，涵盖聚合、命令、事件、守卫、不变量、saga 与流水线。
-        把它编译成本地<strong>知识图谱</strong>。生成一个<strong>可编译的 CQRS 代码库</strong>。
-        然后把每一行生成代码<strong>锚回产生它的知识</strong>——其余的交给你的 AI 智能体，并附上出处证明。
-      </p>
-      <div class="cta-row">
-        <a class="btn" href="/zh/guide/">10 分钟上手</a>
-        <a class="btn ghost" href="/zh/why-co-arising/">为何是「co-arising（缘起）」？</a>
-        <a class="btn ghost" href="/zh/explorer/">查询真实图谱</a>
-      </div>
-
-      <div class="term" role="img" aria-label="终端会话：初始化项目、生成代码、追问一条规则从哪来">
-        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">truthsrc —— 完整闭环，零 npm 依赖</span></div>
-        <pre><span class="p">$</span> <span class="c">truthsrc init counter-lab --format human</span>
-<span class="p">$</span> <span class="c">truthsrc generate-project --project truthsrc.project.json --out app/</span>
-<span class="ok">✓</span> <span class="o">已生成——然后验证每个文件都能回溯到树：</span>
-<span class="p">$</span> <span class="c">truthsrc query-project --knowledge SetCount</span>
-<span class="o">  rule      SetCount.count >= 0</span>
-<span class="o">  generated app/domain/Counter.scala#L31-L54   ← 精确的字节区间</span>
-<span class="p">$</span> <span class="c">truthsrc verify-project --project … --out app/</span>
-<span class="ok">✓ 通过——792 个锚点全部验证（银行示例）</span></pre>
-      </div>
-
-      <div class="stat-strip" aria-label="经验证的数字，2026-11-11 审计">
-        <div class="stat"><div class="num">157</div><div class="lbl">银行完整示例中的真源原子 <span class="badge verified" title="F-02">已验证</span></div></div>
-        <div class="stat"><div class="num">149</div><div class="lbl">声明为可执行规则的不变量 <span class="badge verified" title="F-09">已验证</span></div></div>
-        <div class="stat"><div class="num">235</div><div class="lbl">生成的 Scala 文件，0 编译错误 <span class="badge verified" title="F-04, F-06">已验证</span></div></div>
-        <div class="stat"><div class="num">792</div><div class="lbl">锚点证明文件 ↔ 知识的血缘 <span class="badge verified" title="F-05">已验证</span></div></div>
+      <div class="home-intro">
+        <div>
+          <p class="kicker">co-arising · 共享知识，明确变更责任</p>
+          <h1>让业务知识可共识、<br />实现可验证、<br /><span class="accent">变更可追溯。</span></h1>
+          <p class="lede">业务决策如何始终与实现它的代码相连？把概念、规则与行为写进可读的<strong>真源</strong>，生成工具支持的实现，明确保留集成职责，再从代码追溯到相应声明。</p>
+          <div class="cta-row">
+            <a class="btn" href="/zh/bank-demo/">看银行示例</a>
+            <a class="btn ghost" href="/zh/guide/#l1">动手试 Counter</a>
+          </div>
+        </div>
+        <aside class="causal-preview card" aria-labelledby="counter-preview">
+          <span class="tag">真实声明 · 不是运行中的控制台</span>
+          <h2 id="counter-preview">一次计数变更，凭什么成立？</h2>
+          <ol>
+            <li><strong>命令。</strong><code>Counter.SetCount</code> 接收 <code>id</code> 与 <code>count</code>。</li>
+            <li><strong>守卫。</strong>要求 <code>param.id.nonEmpty</code> 且 <code>param.count &gt;= 0</code>；不满足时以 <code>EMPTY_ID</code> 或 <code>NEGATIVE_COUNT</code> 拒绝。</li>
+            <li><strong>事件与绑定。</strong>接受命令后，<code>CountSet</code> 的 <code>id</code>、<code>count</code> 取自命令参数。</li>
+            <li><strong>状态折叠。</strong>事件把状态的 <code>id</code> 设为 <code>event.id</code>，把 <code>count</code> 设为 <code>event.count</code>。</li>
+          </ol>
+          <p class="evidence-note">这是对<a href="https://github.com/co-arising/metarch-truthsrc/blob/cb860b5c1f8f038eb073c95cd83b724424c89cc6/scaffold/unified-project/truth/example/contexts/example/aggregates/counter/slices/set-count.slice.yaml">固定版本 Counter 源码</a>的讲解，不是模拟执行结果。<a href="/zh/dsl/#fold">继续读声明与状态折叠</a>。</p>
+        </aside>
       </div>
     </header>
 
     <section id="what">
-      <div class="sec-head"><span class="no">01</span><h2>这是什么</h2></div>
-      <p class="sec-sub">围绕同一个理念的一小组 MIT / Apache-2.0 项目：<strong>领域描述才是事实来源，代码是它的投影。</strong>而不是相反。</p>
+      <div class="sec-head"><span class="no">01</span><h2>让业务决策与实现保持联系</h2></div>
+      <p class="sec-sub">最小实用闭环是<strong>真源树 → 编译产物 → 生成代码 → 来源锚点</strong>。每一环回答不同的问题；任何一道绿灯，都不能单独证明业务决策正确。</p>
       <div class="feature-grid">
-        <article class="feature"><span class="n">F-01</span><h3>truthsrc——语言与编译器</h3><p>面向 DDD 的 YAML 真源树语言：12 种原子、15 种工作坊笔记类型、22 种带类型的关系。带硬闸门编译，往返转换逐字节一致，零 npm 运行时依赖。</p></article>
-        <article class="feature"><span class="n">F-02</span><h3>一张可以盘问的图谱</h3><p>每次编译产出本地 SQLite 知识图谱。影响半径、血缘、孤儿、一致性——从 CLI 问、从 MCP 问，或者<a href="/zh/explorer/">在浏览器里问</a>。</p></article>
-        <article class="feature"><span class="n">F-03</span><h3>带收据的代码生成</h3><p>生成可编译的 CQRS/ES Scala 代码库。每个生成文件都携带锚点：它来自哪个知识节点、哪个字节区间，一清二楚。<code>verify-project</code> 会重新证明这一点。</p></article>
-        <article class="feature"><span class="n">F-04</span><h3>刻意保留的手写区</h3><p>端口是生成的；行为填在物理隔离的手写模块里。银行示例中的 35 个手写文件是完整实现，不是占位桩。</p></article>
-        <article class="feature"><span class="n">F-05</span><h3>智能体可用，但有守护纪律</h3><p>一个 MCP 服务器暴露 26 个只读工具，让编码智能体查询图谱，而不是到处 grep。智能体起草，人类定夺。真源树始终是唯一的编辑界面。</p></article>
-        <article class="feature"><span class="n">F-06</span><h3>构造性地诚实</h3><p>没做完的东西在<a href="/zh/status/">台账</a>上，不在营销话术里。全服务运行时闸门、托管、BDD 衍生物——全部带 ID 追踪。</p></article>
+        <article class="feature"><span class="n">描述</span><h3>哪些条件必须始终成立？</h3><p>在文件真源树中明确聚合、命令、事件与不变量。讨论实现细节之前，先让人能一起审阅业务规则。</p></article>
+        <article class="feature"><span class="n">探索</span><h3>什么依赖这项知识？</h3><p>在本地 SQLite 知识图谱中查询已声明的关系。可以先<a href="/zh/explorer/">探索银行快照</a>；图谱只能显示已建模的依赖。</p></article>
+        <article class="feature"><span class="n">生成</span><h3>哪些行为已经声明清楚？</h3><p>受支持的守卫、事件绑定与状态折叠，连同 CQRS/ES 结构一起生成。缺失的业务政策不会由生成器代为决定。</p></article>
+        <article class="feature"><span class="n">集成</span><h3>哪些仍需要手写？</h3><p>技术绑定与独立的手写实现区，把生成项目接到外部效果和宿主服务。各自的职责与测试不被生成过程掩盖。</p></article>
+        <article class="feature"><span class="n">追溯</span><h3>这段实现来自哪项知识？</h3><p>来源锚点按实际提供的精度连接知识与生成代码。验证检查新鲜度和字节，不等于证明每行代码都正确。</p></article>
+        <article class="feature"><span class="n">审阅</span><h3>谁来批准变更？</h3><p>人与智能体都可以查询、提议和测试；预期业务行为由人批准。技术通过、独立体验与交付在<a href="/zh/status/">状态台账</a>中分别记录。</p></article>
       </div>
     </section>
 
     <section id="quickstart">
-      <div class="sec-head"><span class="no">02</span><h2>快速开始</h2></div>
-      <p class="sec-sub">Node ≥ 22.13 是唯一要求。不需要 JVM、不需要数据库、不联网。包含银行示例与 MCP 集成的完整教程在<a href="/zh/guide/">实战指南</a>。</p>
-      <pre class="code"><code># 1 · 拿到工具链（源码检出；npm 发布在台账上）
+      <div class="sec-head"><span class="no">02</span><h2>在自己的项目中改一次</h2></div>
+      <p class="sec-sub">在新的练习目录中使用 Node ≥ 22.13。取得工具源码需要网络；Counter 生成闭环不需要 JVM 或数据库服务。包含银行示例与 MCP 集成的完整教程在<a href="/zh/guide/">实战指南</a>。</p>
+      <details>
+        <summary>展开首次生成命令</summary>
+      <pre class="code" data-example="home-quickstart"><code>export TRUTHSRC_WORKSPACE="$PWD"
 git clone https://github.com/co-arising/metarch-truthsrc.git
-npm install --prefix metarch-truthsrc
-
-# 2 · 创建第一个项目，在写入任何东西之前先看计划
-node metarch-truthsrc/bin/truthsrc.js init counter-lab --format human
+export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
+node "$TRUTHSRC_CLI" init counter-lab --format human
 cd counter-lab
-node ../metarch-truthsrc/bin/truthsrc.js generate-project --plan --format human
-
-# 3 · 生成，然后追问一条规则住在生成代码的哪里
-node ../metarch-truthsrc/bin/truthsrc.js generate-project --format human
-node ../metarch-truthsrc/bin/truthsrc.js query-project --knowledge SetCount</code></pre>
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
+node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --format human
+node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human
+node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out generated --format human</code></pre>
+      </details>
     </section>
 
     <section id="map">
-      <div class="sec-head"><span class="no">03</span><h2>接下来去哪</h2></div>
-      <div class="card-grid cols-2">
-        <a class="card" href="/zh/why-co-arising/"><span class="tag">理解</span><h3>为何是 co-arising，而非本体论</h3><p>聚合不是你画在图上的类——它是当命令、事件、状态与守卫在不变量约束下共同成立时所「缘起」的结构。附基于真实银行数据的交互式消解演示。</p></a>
-        <a class="card" href="/zh/dsl/"><span class="tag">理解</span><h3>真源树语言</h3><p>战略层与范围层：限界上下文、子域、22 条关系的注册表、治理闸门，以及银行树的真实切片。</p></a>
-        <a class="card" href="/zh/pipeline/"><span class="tag">看它工作</span><h3>真源树 → 代码 → 回得来</h3><p>六个阶段，每段都有精确命令和经核实的闸门数字：编译、图谱、生成、锚点验证、手写区、再验证。</p></a>
-        <a class="card" href="/zh/bank-demo/"><span class="tag">看它工作</span><h3>银行财富示例</h3><p>一笔 100 元的基金申购，跟穿付款、TA 确认、独立退款与有界的定投计划——saga 与流水线全部用真源声明。</p></a>
-        <a class="card" href="/zh/explorer/"><span class="tag">看它工作</span><h3>查询真实图谱</h3><p>银行知识图谱（389 节点 / 413 边），经 sql.js 在你的浏览器中加载。影响半径、血缘、孤儿——预设查询加自由 SQL 控制台。</p></a>
-        <a class="card" href="/zh/compare/"><span class="tag">采用</span><h3>全景与协议</h3><p>它与 EventCatalog、ContextMapper、prooph、Qlerify 及 Palantir 本体是什么关系——以及真源树能投影到哪些开放标准上。</p></a>
+      <div class="sec-head"><span class="no">03</span><h2>带着你的问题继续读</h2></div>
+      <div class="card-grid cols-2 reader-paths">
+        <a class="card" href="/zh/why-co-arising/"><span class="tag">理解</span><h3>为什么概念之外还要建模关系？</h3><p>从 DDD 一致性边界出发，用真实银行子图做一次关系练习。</p></a>
+        <a class="card" href="/zh/dsl/"><span class="tag">阅读</span><h3>一份声明长什么样？</h3><p>跟随命令走过守卫、事件绑定与状态折叠，再了解语言的其他层次。</p></a>
+        <a class="card" href="/zh/pipeline/"><span class="tag">构建</span><h3>生成在哪里停下？</h3><p>把知识、技术绑定、生成代码、手写集成与测试放进同一条生命周期。</p></a>
+        <a class="card" href="/zh/bank-demo/"><span class="tag">评估</span><h3>付款成功就是投资成功吗？</h3><p>沿声明看付款、TA 拒绝、独立退款与有界定投的不同职责。</p></a>
+        <a class="card" href="/zh/explorer/"><span class="tag">调查</span><h3>能直接检查那些关系吗？</h3><p>浏览真实节点与边，从场景进入声明，或查询随站点提供的 SQLite 快照。</p></a>
+        <a class="card" href="/zh/compare/"><span class="tag">采用</span><h3>如何与已有工具配合？</h3><p>按工作任务比较，区分当前接口与尚在提案中的标准投影。</p></a>
       </div>
     </section>
 
     <section id="honesty">
-      <div class="sec-head"><span class="no">04</span><h2>哪些能用，哪些还不能——暂时</h2></div>
-      <p class="sec-sub">上文的每个数字都在 <strong>2026-11-11</strong> 重新采集，登记在 <a href="/zh/status/#facts">SITE-FACTS</a>。还不能用的东西在<a href="/zh/status/#ledger">台账</a>上：全服务运行时闸门（一次读侧回放没赶上 90 秒期限）、生成服务的 HTTP 冒烟、npm/Maven 发布、托管，以及作为衍生物的 BDD 规格。</p>
-      <div class="callout teal"><b>哲学</b><p><strong>本站自身就是证明。</strong>零构建步骤、零 npm 依赖、每个事实都能用命令复现——这些页面实践着工具链所倡导的。<a href="/zh/why-co-arising/">读读为什么</a>。</p></div>
+      <div class="sec-head"><span class="no">04</span><h2>看证据，也看证据的边界</h2></div>
+      <p class="sec-sub">下方的真源、代码与锚点数字保留 <strong>2026-11-11</strong> 的采集日期，登记在 <a href="/zh/status/#facts">SITE-FACTS</a>；它们不是新服务验收的计数。引擎现已发布到 Maven Central <a class="badge verified" href="/zh/status/#F-23" data-fact="F-23">F-23</a>。npm 发布、托管与 BDD 衍生物仍在<a href="/zh/status/#ledger">台账</a>上。</p>
+      <div class="stat-strip" aria-label="经验证的数字，2026-11-11 审计">
+        <div class="stat"><div class="num">157</div><div class="lbl">银行完整示例中的真源原子 <a class="badge verified" href="/zh/status/#F-02" data-fact="F-02">F-02</a></div></div>
+        <div class="stat"><div class="num">149</div><div class="lbl">银行真源中的具名不变量声明 <a class="badge verified" href="/zh/status/#F-09" data-fact="F-09">F-09</a></div></div>
+        <div class="stat"><div class="num">235</div><div class="lbl">生成文件；构建 0 编译错误 <a class="badge verified" href="/zh/status/#F-04" data-fact="F-04">F-04</a> <a class="badge verified" href="/zh/status/#F-06" data-fact="F-06">F-06</a></div></div>
+        <div class="stat"><div class="num">792</div><div class="lbl">已验证的来源锚点 <a class="badge verified" href="/zh/status/#F-05" data-fact="F-05">F-05</a></div></div>
+      </div>
+      <div class="callout teal" id="bank-technical"><b>银行技术结果</b><p>2026-11-12，<code>bank030-relocated-20261112-02</code> 的 <strong>source / anchors / code / service</strong> 均通过并复核 <a class="badge verified" href="/zh/status/#F-24" data-fact="F-24">F-24</a>，包括真实数据库/HTTP 与自动浏览器观测 <a class="badge verified" href="/zh/status/#F-26" data-fact="F-26">F-26</a>。这仅是该候选的技术验收，不是独立体验（<a href="/zh/status/#DEF-07">DEF-07</a>）、公开配对材料交付（<a href="/zh/status/#DEF-15">DEF-15</a>）或真人可用性签收（<a href="/zh/status/#DEF-16">DEF-16</a>）。旧 service02 失败保留为历史事实（<a href="/zh/status/#DEF-06">DEF-06</a>）。详见<a href="/docs/bank-technical-20261112.md#中文">验收范围与前置条件</a>。</p></div>
+      <div class="callout teal"><b>哲学</b><p><strong>把证据边界写清楚。</strong>这些页面不需要构建步骤或 npm 依赖；声明链接到带日期的证据与待办。维护者核对私有报告的摘要，不等于公开复现包。<a href="/zh/why-co-arising/">读读为什么</a>。</p></div>
+      <p class="next-step"><strong>下一步：沿着业务问题继续读。</strong><a href="/zh/bank-demo/">看付款与投资成功为什么是不同的事实</a>。</p>
     </section>
   </main>
 

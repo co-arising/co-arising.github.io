@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Why co-arising, not ontology — co-arising</title>
-  <meta name="description" content="Domain concepts are not static classifications. An aggregate is what arises when commands, events, state and guards hold together under invariants. The philosophical core of the truth-source approach." />
+  <title>Why co-arising — concepts, behavior and consistency</title>
+  <meta name="description" content="How do domain concepts stay connected to behavior? Start from DDD consistency boundaries, inspect declared relationships, and keep business approval a human responsibility." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -13,6 +13,7 @@
   <link rel="alternate" hreflang="en" href="https://co-arising.github.io/why-co-arising/" />
   <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/why-co-arising/" />
   <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/why-co-arising/" />
+  <link rel="canonical" href="https://co-arising.github.io/why-co-arising/" />
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/base.css" />
@@ -20,111 +21,92 @@
   <link rel="stylesheet" href="/assets/css/pages.css" />
 </head>
 <body>
-  <nav id="site-nav" aria-label="Site navigation"></nav>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a></div></div></nav>
   <noscript><div class="wrap" style="padding-top:16px"><p class="small">JavaScript is off — the interactive demo below shows its static fallback. <a href="/">Home</a></p></div></noscript>
 
-  <main class="wrap">
+  <main id="main-content" class="wrap">
     <header class="page-hero">
-      <p class="over">Philosophy</p>
-      <h1>Why <span class="accent">co-arising</span>, not ontology</h1>
-      <p class="thesis">In dependent origination, nothing has independent existence: things arise together, conditioned by their relations. That is exactly how domain knowledge behaves — and exactly why a static classification of “object types” keeps failing to capture it.</p>
+      <p class="over">The idea</p>
+      <h1>What gives a domain concept <span class="accent">its meaning?</span></h1>
+      <p class="thesis">An account is more than a name and a balance field. Its meaning also depends on what may happen, under which conditions, and which facts change its state. “Co-arising” names this attention to concepts and their relationships together.</p>
+      <p class="page-outline"><a href="#ddd">Start with DDD</a> · <a href="#demo">Try the relationship exercise</a> · <a href="#stewardship">Keep the decision human</a></p>
     </header>
 
-    <section id="problem">
-      <div class="sec-head"><span class="no">01</span><h2>The problem we kept hitting</h2></div>
-      <p class="sec-sub">Two decades of the same wall, from opposite directions:</p>
+    <section id="problem" class="prose">
+      <div class="sec-head"><span class="no">01</span><h2>Keep the rule close to its consequences</h2></div>
+      <p class="sec-sub">A useful model helps people agree on behavior and helps engineers find where that behavior is implemented.</p>
       <div class="card-grid cols-2">
-        <div class="card"><span class="tag">1999–2004 · research</span><h3>“Business generates code” produced toys</h3><p>Model-to-code research kept generating things that ran but couldn’t survive contact with a real domain: no enforceable rules, no traceability, no evolution path. The models were <strong>descriptions without consequences</strong>.</p></div>
-        <div class="card"><span class="tag">2019–2023 · industry</span><h3>Compliance had to reverse-engineer lineage</h3><p>Enterprises with hundreds of microservices had no data lineage. When legal asked “where did this number come from”, the only method was to <strong>grep the estate backwards</strong>. Knowledge existed only inside code — unreachable, unprovable.</p></div>
+        <div class="card"><span class="tag">Before implementation</span><h3>What have we actually agreed?</h3><p>A diagram can name an account without settling whether a repeated initialization is accepted, rejected or ignored. Conditions and outcomes need their own explicit declarations.</p></div>
+        <div class="card"><span class="tag">During change</span><h3>What else must we revisit?</h3><p>A rule change may affect a command, event, state fold or caller. Recorded relationships give reviewers a starting point for impact analysis, alongside code inspection and tests.</p></div>
       </div>
-      <p style="margin-top:18px;max-width:52em">Both walls have the same root: domain knowledge was treated as a <em>documentation artifact</em> of the code, instead of the other way around. The fix isn’t a better diagram tool. It’s making the domain description the thing that is <strong>compiled, verified and traced</strong> — so that every line of code provably comes from a named piece of knowledge.</p>
+      <p>The aim is not to replace discussion with a compiler. It is to give decisions a reviewable home, derive supported implementations from them, and record where those implementations came from.</p>
     </section>
 
-    <section id="ddd">
-      <div class="sec-head"><span class="no">02</span><h2>DDD already knew: concepts co-arise</h2></div>
-      <p class="sec-sub">The name is not decoration — it is a reading of what DDD has said all along.</p>
-
-      <h3>Tactical: an aggregate is a standing wave, not a class</h3>
-      <p style="max-width:52em">Evans defined an aggregate as a <strong>consistency boundary</strong>. In a truth tree that becomes literal: an aggregate <em>is</em> what arises when its slices hold — each slice is one command, its guards, and the events it produces; the guards enforce the aggregate’s invariants; the events fold back into state. Remove any leg and the aggregate stops being an aggregate:</p>
-      <ul style="max-width:52em">
-        <li><strong>Commands</strong> without <strong>guards</strong> — mutation without rules; the invariant has no enforcement point.</li>
-        <li><strong>Events</strong> without <strong>fold assignments</strong> — history that never becomes state.</li>
-        <li><strong>Invariants</strong> nothing references — dead law; consistency exists on paper only.</li>
+    <section id="ddd" class="prose">
+      <div class="sec-head"><span class="no">02</span><h2>Build on DDD’s consistency boundaries</h2></div>
+      <p class="sec-sub">This is a way to put DDD relationships to work, not a claim to replace DDD or to define its only correct interpretation.</p>
+      <h3>Tactical: connect the command, the rule and the state</h3>
+      <p>An aggregate is a consistency boundary. In the supported event-sourced model, commands are checked by declared guards, accepted commands produce events through bindings, and events evolve state through folds. A slice brings that behavior together for review.</p>
+      <ul>
+        <li><strong>A guard</strong> gives a declared rule an enforcement point; an unreferenced rule deserves investigation.</li>
+        <li><strong>A binding</strong> explains where an event payload comes from.</li>
+        <li><strong>A state fold</strong> explains how that event changes state. Some events may intentionally leave state unchanged.</li>
       </ul>
-      <p style="max-width:52em">The bank tree makes this concrete: <code>CreditBalance</code> exists because 27 slices carry guards like <code>@guard[invariantRef](reject ACCOUNT_SEED_NONNEGATIVE …)</code>, backed by named <code>@rule</code> invariants — <strong>149 of them</strong> across three aggregates <span class="badge verified" title="F-09">verified</span>.</p>
-
-      <h3>Strategic: structure follows the business terrain</h3>
-      <p style="max-width:52em">The strategic patterns are equally relational. <strong>Core / supporting / generic subdomains</strong> are decided by where the business has advantage or distinctive knowledge — not by any property of the code. A <strong>bounded context</strong> and its <strong>context map</strong> (customer–supplier, anticorruption layer, open host service…) co-arise from the org chart and the commercial landscape of upstream and downstream parties. In the truth-tree language these are first-class notes — <code>context</code>, <code>subdomain</code>, <code>relation</code> — joined by the same relation registry as everything else (R21 contexts-depending-on, R22 aggregate-belongs-to-subdomain).</p>
-
-      <div class="callout teal"><b>THESIS</b><p><strong>DDD’s core insight is co-arising.</strong> Aggregates, contexts and subdomains are not categories you file things into — they are structures that arise from relations (commands→events, invariants→guards, business terrain→context maps), persist while the relations hold, and dissolve when they don’t. Our language just makes that machine-checkable.</p></div>
+      <p>In the bank source, <code>CreditBalance</code> owns account behavior such as <code>InitializeAccount</code> and <code>ReserveFunds</code>. Order and installment behavior belong to <code>FundOrder</code> and <code>SipPlan</code>, not to CreditBalance. The recorded <strong>149 rules are across the bank aggregates</strong>, not one account aggregate <a class="badge verified" href="/status/#F-09" data-fact="F-09">F-09 · 2026-11-11</a>.</p>
+      <h3>Strategic: make context and ownership explicit</h3>
+      <p>Bounded contexts, subdomains and context maps help express where a meaning applies and how teams or systems depend on one another. The language records <code>context</code>, <code>subdomain</code> and <code>relation</code> notes, including context dependencies and aggregate-to-subdomain relationships.</p>
+      <div class="callout teal"><b>THE DISTINCTION</b><p>Names and types identify concepts. <strong>Behavior, conditions and consistency relationships explain how those concepts work together.</strong> The compiler checks the supported declarations; people still decide whether the model fits the business.</p></div>
     </section>
 
     <section id="demo">
       <div class="sec-head"><span class="no">03</span><h2>Feel it: the aggregate dissolve / arise demo</h2></div>
-      <p class="sec-sub">Real subgraph from the bank example’s <code>CreditBalance</code> aggregate (exported from the compiled knowledge graph). <strong>Dissolve</strong>: pull the relations out one by one and watch the aggregate lose its footing. <strong>Arise</strong>: build it back from scattered workshop notes. No physics engine, no metaphor — just the actual relations from the registry.</p>
+      <p class="sec-sub">A relationship exercise over the exported <code>CreditBalance</code> subgraph. Remove or restore edges using the diagram or the keyboard-accessible checklist. It measures declared guard coverage, not execution of the bank rules. All edits stay in this exercise; they do not change the source tree or the Explorer database.</p>
       <div class="dissolve-stage" id="dissolve-stage">
         <noscript>
           <p style="padding:20px;font-size:14px;color:var(--ink-2)">
-            <strong>Static fallback:</strong> fully assembled, CreditBalance = 1 aggregate + N slices, each slice = command + guards + events, all legs attached, invariants enforced.
-            Fully dissolved: the same nodes sit as disconnected workshop notes — commands, events and rules that no longer <em>mean</em> anything together.
-            Enable JavaScript for the interactive version.
+            <strong>Static fallback:</strong> the exercise connects CreditBalance to its slices, commands, events and declared guard edges. Removing an edge changes the displayed relationship coverage—not the bank implementation or its business correctness.
+            Enable JavaScript to remove and restore edges with the diagram or checklist.
           </p>
         </noscript>
       </div>
-      <p class="small">The edge labels are real relation names from the <a href="/dsl/#relations">R1–R22 registry</a>. When a guard edge is gone, the invariant it enforced is <em>unchecked</em> — which is precisely what the graph verb <code>orphans</code> reports mechanically. <a href="/explorer/#orphans">Run orphans on the full graph ↗</a></p>
+      <p class="small">Guard edges here are expanded from slice declarations. Losing one means incomplete coverage in this exercise. The separate <a href="/explorer/#orphans">raw event-producer query</a> checks for missing <code>produces</code> edges, not missing guards; it does not receive these local edits.</p>
     </section>
 
-    <section id="vs-ontology">
-      <div class="sec-head"><span class="no">04</span><h2>Ontology next door</h2></div>
-      <p class="sec-sub">The closest thing to this approach in industry is Palantir’s Ontology — and the differences are instructive, not hostile.</p>
-      <div class="versus">
-        <div class="side">
-          <span class="tag" style="font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;color:var(--red);text-transform:uppercase">Ontology (proprietary)</span>
-          <h3 style="margin-top:6px">A classification with an execution layer</h3>
-          <ul style="font-size:14px;color:var(--ink-2);padding-left:18px">
-            <li><strong>Object types, link types, action types</strong> — a taxonomy of the enterprise, defined top-down in an Ontology Manager.</li>
-            <li>“Represents decisions, not just data” — a genuinely good line: actions write back through the ontology into datasets.</li>
-            <li>Closed: the execution layer, the semantics and the format are the product. No open interchange, no exit.</li>
-            <li>Meaning is <em>declared once</em> in the type system — objects keep sitting in their taxon even when every relationship that mattered has rotted.</li>
-          </ul>
-        </div>
-        <div class="mid">vs</div>
-        <div class="side">
-          <span class="tag" style="font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;color:var(--teal);text-transform:uppercase">Co-arising (this project)</span>
-          <h3 style="margin-top:6px">A relation graph that compiles</h3>
-          <ul style="font-size:14px;color:var(--ink-2);padding-left:18px">
-            <li><strong>22 typed relations</strong> with explicit impact flags (<code>propagates</code>) — meaning lives in the edges, and the edges are executable inputs.</li>
-            <li>Decisions-and-data too — but the action layer is <strong>generated open code</strong> (CQRS/ES Scala you can read, compile and leave with).</li>
-            <li>Open: MIT/Apache-2.0, file-based trees, SQLite graph, MCP access for any agent.</li>
-            <li>Meaning is <em>continuously re-derived</em>: the compiler re-proves the relations on every build; orphaned knowledge is detected, not archived.</li>
-          </ul>
-        </div>
+    <section id="vs-ontology" class="prose">
+      <div class="sec-head"><span class="no">04</span><h2>Relations are not exclusive to this approach</h2></div>
+      <p class="sec-sub">Ontologies and semantic platforms can model relationships, constraints and actions too. The distinction here is the engineering workflow, not “types versus meaning.”</p>
+      <div class="card-grid cols-2">
+        <div class="card"><span class="tag">Complementary concerns</span><h3>Connect enterprise data and decisions</h3><p>Semantic platforms, including Palantir Ontology, bring concepts, links and actions together around enterprise data. Their suitability depends on the platform, integration and governance needs of a team—not on a claim that ontologies lack relations.</p></div>
+        <div class="card"><span class="tag">This project’s focus</span><h3>Review files, derive code, trace changes</h3><p>The truth-source workflow starts from versioned author files. It compiles declared relations and supported behavior, produces CQRS/ES code, and connects generated locations back to knowledge through source anchors.</p></div>
       </div>
-      <div class="callout"><b>ONE SENTENCE</b><p>In an ontology, an object is defined by its place in a taxonomy. In co-arising, a concept is defined by its relations — <strong>remove them and it stops meaning anything</strong>, and the tooling tells you exactly when that happened.</p></div>
+      <div class="callout"><b>CHOOSE BY JOB</b><p>A file-first source, explicit generation boundaries and inspectable provenance may fit your engineering workflow. They do not establish feature parity or compatibility with another platform. See the <a href="/compare/#protocols">current interfaces and proposed projections</a>.</p></div>
     </section>
 
     <section id="stewardship">
-      <div class="sec-head"><span class="no">05</span><h2>Two more commitments</h2></div>
+      <div class="sec-head"><span class="no">05</span><h2>Checks inform a decision; they do not approve it</h2></div>
       <div class="card-grid cols-2">
-        <div class="card"><span class="tag">Stewardship</span><h3>Agents draft, humans decide</h3><p>AI agents are extremely good at <em>proposing</em> domain structure and extremely bad at being accountable for it. So the contract is: agents may query, draft and fill; the truth tree is the only editing surface; every batch of edits must end with the validation gates green; approval is a human act recorded in provenance (<code>approvedBy</code> on every atom).</p></div>
-        <div class="card"><span class="tag">Human-verifiable production</span><h3>People can still produce and check</h3><p>The tree is YAML a person can read and edit. Validation is deterministic. Roundtrip is byte-identical. Machines do the volume — counting, compiling, anchoring, querying — and people stay responsible for correctness. That division of labor is a feature, not nostalgia.</p></div>
+        <div class="card"><span class="tag">Stewardship</span><h3>Agents draft, humans decide</h3><p>People and agents can investigate relationships and propose changes. A human confirms the business expectation and reviews the evidence. Record that decision through the project’s actual review and provenance process; a green gate is not approval.</p></div>
+        <div class="card"><span class="tag">Editing boundaries</span><h3>Change the right source</h3><p>The truth tree is the knowledge-editing surface. Explicit technical bindings and the handwritten zone are separate inputs with separate responsibilities. Validate the changed layer, then test the behavior against independently agreed expectations.</p></div>
       </div>
     </section>
 
-    <section id="naming">
-      <div class="sec-head"><span class="no">06</span><h2>What it is not, and why the odd name</h2></div>
+    <section id="naming" class="prose">
+      <div class="sec-head"><span class="no">06</span><h2>A name for the way we work</h2></div>
+      <p>“Co-arising” is an invitation to consider a concept together with its conditions and relationships. In engineering terms: keep the business statement, its declared behavior and its implementation connected as they evolve.</p>
       <div class="card-grid cols-3">
-        <div class="card"><span class="tag">Not</span><h3>A low-code platform</h3><p>No canvas of drag-and-drop blocks. The output is real, compiling, testable source code with a handwritten zone — because the hard half of every real system is exactly the part low-code can’t hold.</p></div>
-        <div class="card"><span class="tag">Not</span><h3>A model-to-code toy</h3><p>The acceptance bar is not “a demo runs”. It is: diff-able tree, byte-identical roundtrip, compiling generated project, anchors proven both directions — verified with commands, not vibes. <a href="/pipeline/">See the gates ↗</a></p></div>
-        <div class="card"><span class="tag">Not</span><h3>Another standard</h3><p>Gherkin, AsyncAPI, OpenAPI, C4 are fine standards — the tree can project onto them. The owned layer is deliberately small: the domain IR and its relation registry. <a href="/compare/#protocols">Projection table ↗</a></p></div>
+        <div class="card"><span class="tag">Readable source</span><h3>Keep discussion visible</h3><p>Files can be reviewed and diffed. That does not remove the need for discovery, examples or judgment.</p></div>
+        <div class="card"><span class="tag">Bounded automation</span><h3>Know what was checked</h3><p>Validation, compilation, tests and anchors check different properties. <a href="/pipeline/">Follow their responsibilities</a>.</p></div>
+        <div class="card"><span class="tag">Open collaboration</span><h3>Keep useful standards</h3><p>Adopt standards for their jobs. A proposed export is not a shipped integration. <a href="/compare/#protocols">Read the projection status</a>.</p></div>
       </div>
-      <p style="margin-top:20px;max-width:52em" class="small">On the name: Palantir coined “Forward Deployed Engineer” in 2011, was widely told the name was absurd, kept it — and today FDE is a job category hundreds of companies hire for. Coining a word and holding it patiently is how a word becomes a category. We are holding <em>co-arising</em>.</p>
+      <p class="next-step"><strong>Next: read one declaration.</strong> <a href="/dsl/#fold">Follow Counter from guard to state fold</a>.</p>
     </section>
   </main>
 
   <footer id="site-footer"></footer>
   <script src="/assets/js/site.js"></script>
   <script src="/assets/data/dissolve-subgraph.js"></script>
+  <script src="/assets/js/dissolve-model.js"></script>
   <script src="/assets/js/dissolve.js"></script>
 </body>
 </html>
