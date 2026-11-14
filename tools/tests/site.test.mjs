@@ -73,6 +73,36 @@ function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound 
   };
 }
 
+test('brand and community links keep localized homes separate from the permanent invite', () => {
+  for (const [lang, path, label] of [
+    ['en', '/', 'Join the Discord community'],
+    ['zh-CN', '/zh/', '加入 Discord 社区'],
+  ]) {
+    const p = page({ lang, path });
+    assert.ok(p.nav.innerHTML.includes(`<a class="brand" href="${path}" aria-current="page">`));
+    assert.ok(p.nav.innerHTML.includes('<img class="brand-icon" src="/assets/img/co-arising-icon.png" width="32" height="32" alt="" />co-arising</a>'));
+    assert.equal(p.nav.innerHTML.includes('discord.gg'), false);
+    const footer = p.nodes.get('site-footer').innerHTML;
+    assert.ok(footer.includes(`<a href="https://discord.gg/PwYrRpJu75">${label}`));
+    const staticHome = readFileSync(new URL(`../..${path}index.html`, import.meta.url), 'utf8');
+    const community = staticHome.match(/<section id="community"[\s\S]*?<\/section>/)?.[0];
+    assert.ok(community, 'the invitation must be available without JavaScript');
+    assert.ok(community.includes(`href="https://discord.gg/PwYrRpJu75">${label}`));
+    assert.ok(community.includes('src="/assets/img/co-arising-tree.webp" width="960" height="960"'));
+    assert.equal(community.includes('target="_blank"'), false);
+  }
+});
+
+test('all content pages and the shared 404 declare the same local favicon', () => {
+  const routes = ['', 'why-co-arising/', 'dsl/', 'pipeline/', 'bank-demo/', 'explorer/', 'compare/', 'guide/', 'status/'];
+  const paths = ['', 'zh/'].flatMap((prefix) => routes.map((route) => `${prefix}${route}index.html`));
+  for (const path of [...paths, '404.html']) {
+    const html = readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
+    assert.ok(html.includes('<link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />'), path);
+    assert.equal(html.includes('href="/assets/img/favicon.svg"'), false, path);
+  }
+});
+
 test('scroll guidance tracks actual overflow and updates the navigation offset', () => {
   const p = page({ layout: { clientWidth: 320, scrollWidth: 426 } });
   const primary = p.nodes.get('nav-primary');

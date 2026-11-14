@@ -29,6 +29,18 @@
 /* terminal on the band */
 .home-hero .term { box-shadow: 0 14px 40px rgba(0, 0, 0, .45), 0 0 0 1px rgba(140, 208, 186, .25); }
 
+/* ---------- community artwork and invitation ---------- */
+.community-grid { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); align-items: center; gap: clamp(28px, 5vw, 72px); }
+.community-art { margin: 0; width: 100%; max-width: 400px; }
+.community-art img { display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); }
+.community-art figcaption { margin-top: 10px; font-size: 12px; color: var(--ink-3); text-align: center; }
+.community-copy h2 { margin-bottom: 18px; }
+.community-copy p:not(.kicker) { max-width: 52ch; color: var(--ink-2); }
+@media (max-width: 900px) {
+  .community-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .community-art { justify-self: center; }
+}
+
 /* ---------- section rhythm: alternating bands + strong rules ---------- */
 main.wrap > section { padding: 64px 0 10px; }
 main.wrap > section + section::before {
