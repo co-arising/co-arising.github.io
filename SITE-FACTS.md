@@ -3,7 +3,7 @@
 Every quantitative claim on co-arising.github.io must carry a fact-ID listed here.
 Update this file first, then the pages. If a number is not here, it must not appear on the site.
 
-Content updated: 2026-11-13. Evidence dates are per row; this is not a claim that every older fact was re-run.
+Content updated: 2026-11-14. Evidence dates are per row; this is not a claim that every older fact was re-run.
 
 Current bank technical evidence: [sanitized 0.3.0 acceptance summary](docs/bank-technical-20261112.md).
 The underlying reports were reviewed locally and their hashes checked; the reports and complete delivery materials are not publicly available. Historical captures below retain their own scope and date.
@@ -14,14 +14,14 @@ The underlying reports were reviewed locally and their hashes checked; the repor
 |----|------|-------|----------|--------|-----------|
 | F-01 | Bank truth tree compiles with zero hard errors | 0 hard findings | 2026-11-11 | bank-wealth-demo working tree @ `fix/pending-replay-20261111` | `cd bank-wealth-demo && npm run validate` |
 | F-02 | Bank truth tree roundtrips byte-identical | 157 atoms | 2026-11-11 | same | `npm run validate` (roundtrip is part of the gate) |
-| F-03 | Bank knowledge graph size | 389 nodes / 413 edges | 2026-11-11 | truthsrc `graph` over the bank canonical | `node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out <db>` |
+| F-03 | Bank canonical graphstore size | 389 nodes / 413 edges | 2026-11-11; count scope checked 2026-11-14 | truthsrc `graph` over the bank canonical; shipped SQLite `nodes` and `meta.canonical` | Original capture: `node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out <db>`; read-only F-03/F-10 reconciliation below |
 | F-04 | Code generation output | 235 files | 2026-11-11 | `generate-project` into a fresh target | `npm run project -- --out <fresh-dir>` |
 | F-05 | Anchor verification | verify-project passed, 792 anchors | 2026-11-11 | generated project ledger | `verify-project --project truthsrc.project.json --out <dir>` |
 | F-06 | Generated Scala compiles | 0 errors, 534 sources | 2026-11-11 | `sbt compile` in generated project | `cd <generated> && sbt compile` |
 | F-07 | Generated unit tests (not the independent bank business suites) | 23/23 passed | 2026-11-11 | generated unit runner; handwritten production sources are compiled, not independent handwritten test expectations | `cd <generated> && sbt test` |
 | F-08 | Handwritten zone | 35 files, complete implementations (not stubs) | 2026-11-11 | `find handwritten -type f \| wc -l` | filesystem |
-| F-09 | Invariants declared in truth tree | 149 `@rule(...)` across 3 aggregate.yaml | 2026-11-11 | `grep -c '@rule(' truth/bank-wealth/contexts/bankwealth/aggregates/*/aggregate.yaml` | filesystem |
-| F-10 | Truth atoms by kind | 157 YAML atoms: 59 VO, 27 slice, 36 formal-product, 8 structure, 4 pipeline, 4 story, 6 read-model, 3 aggregate, 2 saga, 1 use-cases, 1 context, 5 inbox notes | 2026-11-11 | filesystem count | `find truth -name '*.yaml' \| wc -l` |
+| F-09 | Rule declarations in truth tree (not independently proved invariants or test cases) | 149 `@rule(...)` across 3 aggregate.yaml | 2026-11-11 | `grep -c '@rule(' truth/bank-wealth/contexts/bankwealth/aggregates/*/aggregate.yaml` | filesystem |
+| F-10 | Physical author files by kind | 157 YAML atoms: 59 VO, 27 slice, 36 formal-product, 8 structure, 4 pipeline, 4 story, 6 read-model, 3 aggregate, 2 saga, 1 use-cases, 1 context, 5 inbox notes, 1 system root (system.yaml) | 2026-11-11; count scope checked 2026-11-14 | Filesystem census, including the system root; categories count physical author files, not expanded graph nodes | `find truth/bank-wealth -name '*.yaml' \| wc -l`; read-only F-03/F-10 reconciliation below |
 | F-11 | Sagas declared | 2 (bank cash saga, bank-independent refund saga) | 2026-11-11 | `truth/.../sagas/` | filesystem |
 | F-12 | Counter tutorial is Node-only | no JVM / DB / network required | 2026-11-11 | TUTORIAL.md walkthrough | `truthsrc init counter-lab --format human` |
 | F-13 | truthsrc runtime footprint | 0 npm runtime dependencies; Node ≥ 22.13.0 (built-in `node:sqlite`) | 2026-11-11 | metarch-truthsrc package.json | — |
@@ -41,6 +41,20 @@ The underlying reports were reviewed locally and their hashes checked; the repor
 | F-27 | Fresh SQL rebuild readiness | 66.847 s within the unchanged 90 s gate; initial / restart / refund 2.132 / 14.251 / 13.667 s | 2026-11-12 | same candidate; `readinessMs.replay=66847`; not the previous candidate's result or a general performance promise | Review the candidate-specific readiness record; re-execution requires the full isolated service setup |
 | F-28 | Candidate scope, source stability and resource exit | native Darwin x64 / JDK11, one owner; source unchanged, owned resources exited and lease released | 2026-11-12 | owner-02 driver SHA-256 `a51f1210…`; does not describe other sessions | Driver and input-before/after evidence in the locally reviewed acceptance set |
 | F-29 | CLI installation and Counter relocation | tool package 0.5.0; package-pin verification and functional offline install / actual prefix relocation / Counter 0→2 update passed, 40 command observations | 2026-11-12 | `tool-install-counter-review`; this tool version is distinct from engines 0.3.0 | Requires the matched package; zero repeated generated-source writes does not mean zero evidence/graph writes; material delivery and newcomer usability are separate |
+
+## F-03 / F-10 — file census versus expanded VO nodes
+
+Count scope checked 2026-11-14; the original 2026-11-11 captures are retained, not re-signed as new technical runs. F-10 counts 157 physical YAML author files, including `system.yaml`. Its 59 independent VO atom files are not the full graph VO count: structure declarations contribute another 59 VOs (payment 29, refund 20, effect 10), giving 59 + 59 = 118 VO nodes in F-03. These are structure expansions, not simple copies of same-name nodes.
+
+For a read-only reconciliation, open the shipped `assets/data/bank-wealth.graph.sqlite` with SQLite read-only mode and inspect both representations:
+
+```sql
+SELECT COUNT(*) FROM nodes WHERE kind = 'value-object';
+SELECT json_array_length(value, '$.valueObjects')
+FROM meta WHERE key = 'canonical';
+```
+
+Both counts are 118. Compare the canonical `valueObjects` identities and declarations with the independent `value-objects/*.vo.yaml` files and the payment/refund/effect structure declarations in the matching bank source. Count all physical YAML files under `truth/bank-wealth`, including the root, separately. Do not run an expander, regenerate the graph, or merge identities merely because names match. This census check does not re-run F-24–F-29 technical acceptance.
 
 ## Conventions
 

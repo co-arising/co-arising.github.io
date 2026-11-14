@@ -61,6 +61,7 @@
         </article>
       </div>
       <div class="callout"><b>保持这些区别</b><p><strong>付款成功 ≠ 投资成功</strong> · <strong>TA 受理 ≠ 份额确认</strong> · <strong>独立退款 ≠ 对已提交付款的补偿</strong> · <strong>saga 的事务边界 ≠ 流水线的流程顺序</strong>。在这里读声明；执行证据请看下方范围独立的验收。</p></div>
+      <p class="small">外部契约引用与观测到业务命令的翻译声明，仍待联合设计版本解析机制（<a href="/zh/status/#DEF-22">DEF-22</a>）；已有契约与版本检查不等于声明层的一致性闭环已经完整。</p>
     </section>
 
     <section id="views">
@@ -71,6 +72,7 @@
         <figcaption class="small" style="margin-top:6px">工作坊导出子集包含 <strong>120 节点 / 183 边</strong>，来自 <strong>861 节点 / 737 边</strong>的图谱 <a class="badge verified" href="/zh/status/#F-17" data-fact="F-17">F-17</a>。<a href="/downloads/bank-workshop.html">下载历史中文快照（2.18 MB，可离线打开）</a>——不是完整图谱导出，也不是当前技术验收报告。</figcaption>
       </figure>
       <p class="small">比起浏览更喜欢查询？<a href="/zh/explorer/">Explorer</a> 加载的是<strong>另一份 2026-11-11 采集</strong>：389 节点 / 413 边 <a class="badge verified" href="/zh/status/#F-03" data-fact="F-03">F-03</a>，以 SQLite 供浏览器查询——影响半径、血缘、孤儿、自由 SQL。</p>
+      <p class="small">工作坊子集与 Explorer 的日期、表示及计数范围不同（见<a href="/zh/explorer/#graph-scopes">三种图表示</a>），不能用这些总量直接判断同口径的增长或减少。</p>
     </section>
 
     <section id="projections">
@@ -81,13 +83,14 @@
 
     <section id="run">
       <div class="sec-head"><span class="no">04</span><h2>从读源码到本地生成</h2></div>
-      <p class="sec-sub">先看<a href="https://github.com/MadPolaris/bank-wealth-demo">银行源码仓库</a>。命令与前置以<a href="/zh/guide/#bank-prerequisites">指南的银行路径</a>为准，不把本页当作运行手册。仓库内容会演进；这里的数字保留 <strong>2026-11-11</strong> 的采集日期。</p>
+      <p class="sec-sub">先看<a href="https://github.com/co-arising/bank-wealth-demo">银行源码仓库</a>。命令与前置以<a href="/zh/guide/#bank-prerequisites">指南的银行路径</a>为准，不把本页当作运行手册。仓库内容会演进；这里的数字保留 <strong>2026-11-11</strong> 的采集日期。</p>
       <div class="stat-strip">
         <div class="stat"><div class="num">3</div><div class="lbl">个聚合：CreditBalance · FundOrder · SipPlan</div></div>
         <div class="stat"><div class="num">157</div><div class="lbl">个真源原子 · 149 条 <code>@rule</code> 不变量 <a href="/zh/status/#F-02" data-fact="F-02">F-02</a> / <a href="/zh/status/#F-09" data-fact="F-09">F-09</a></div></div>
         <div class="stat"><div class="num">2+4</div><div class="lbl">个 saga + 流水线，全部用真源声明</div></div>
         <div class="stat"><div class="num">23/23</div><div class="lbl">生成单元测试 · 2026-11-11 <a class="badge verified" href="/zh/status/#F-07" data-fact="F-07">F-07</a></div></div>
       </div>
+      <p class="small">149 条 <code>@rule</code> 统计三个聚合中的声明，不是独立证明的不变量或互不重复的测试数量。</p>
       <details>
         <summary>生成证据及其材料边界</summary>
         <p>真源验证记录为 0 硬发现且往返逐字节一致 <a href="/zh/status/#F-01" data-fact="F-01">F-01</a> / <a href="/zh/status/#F-02" data-fact="F-02">F-02</a>。构建记录为 235 个生成文件 <a href="/zh/status/#F-04" data-fact="F-04">F-04</a>、534 个源文件 0 错误 <a href="/zh/status/#F-06" data-fact="F-06">F-06</a>、792 个已验证锚点 <a href="/zh/status/#F-05" data-fact="F-05">F-05</a>。23/23 是生成单元测试，不是独立手写业务测试 <a href="/zh/status/#F-07" data-fact="F-07">F-07</a>。</p>

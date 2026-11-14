@@ -153,6 +153,7 @@ events:
     <section id="expression-reference">
       <div class="sec-head"><span class="no">04</span><h2>当前表达式参考</h2></div>
       <p>核对版本为工具链 <code>cb860b5c</code>、工具包 <code>0.5.0</code>。作者格式、微语法与产品 profile 各有版本。Counter 选择 decision <code>@4</code>、dependencies/folds <code>@6</code>；不能用旧例子悄悄替换这些 profile。</p>
+      <p>当前有限 fold 操作仍受支持；可复用纯函数定义/引用及函数级 BDD 挂帐于 <a href="/zh/status/#DEF-21">DEF-21</a>，语法与定义位置未定，不能放宽回放、类型或版本准入。</p>
       <h3>七种折叠操作</h3>
       <p>每行都是事件 <code>foldAssignments</code> 中的<strong>作者对象片段</strong>，不是独立 YAML。示意字段名必须有匹配声明。外层对象配字符串操作数是当前可用的过渡形态，不是未来语言设计的终点。</p>
       <div class="tbl-wrap"><table>
@@ -180,7 +181,7 @@ events:
 
     <section id="shape">
       <div class="sec-head"><span class="no">05</span><h2>一棵树的形状</h2></div>
-      <p class="sec-sub">来自银行示例——真实路径，真实计数 <span class="badge verified" title="F-10">已验证</span>。</p>
+      <p class="sec-sub">来自银行示例——统计物理作者文件 <span class="badge verified" title="F-10">已验证</span>。59 个独立 VO 原子文件（<a href="/zh/status/#F-10">F-10</a>），加上 structure 展开的 59 项，构成 canonical graphstore 中的 118 个 VO 节点（<a href="/zh/status/#F-03">F-03</a>）；文件与展开节点是不同计数单位。</p>
       <pre class="code"><code>truth/bank-wealth/
 ├── system.yaml                    # 系统根：id、名称、职责
 ├── inbox/                         # 工作坊入口——笔记是草稿，不是法律
@@ -193,7 +194,7 @@ events:
     │   │   └── slices/initialize-account.slice.yaml
     │   ├── fund-order/  …         # 3 个聚合共 27 个切片
     │   └── sip-plan/
-    ├── value-objects/             # 59 个值对象：Money、AccountId、AmountDecimal…
+    ├── value-objects/             # 59 个独立 VO 原子文件：Money、AccountId、AmountDecimal…
     ├── read-models/               # 6 个读模型，带字段血缘（R10/R11）
     ├── policies/                  # 事件 → 命令的反应规则（R7/R9）
     ├── stories/                   # 4 个用户故事

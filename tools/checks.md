@@ -15,7 +15,7 @@ Select the intended interpreter when PATH points to an older Node/Python.
 python3 -B tools/check-site.py --strict
 node tools/check-examples.mjs
 node --test tools/tests/*.test.mjs
-python3 -B tools/check-resources.py --baseline 6627b63
+python3 -B tools/check-resources.py --baseline 28ba7c2
 ```
 
 - Static checks cover 18 content pages plus 404: canonical/hreflang, stable section
@@ -29,6 +29,11 @@ python3 -B tools/check-resources.py --baseline 6627b63
   span is not a table definition. Privacy checks examine public prose, not intentional
   negative fixtures in test files. These checks do not certify arbitrary prose
   semantics or resolve every external documentation URL.
+- F-10's registry value is a complete ordered numeric census: its categories must
+  sum to its total, and both status value cells must match those quantities. Extra
+  VO-expansion numbers belong outside that value cell. Current bank source links
+  and the `bank-convenience` clone target must match `SITE.urls.bank`; historical
+  snapshot origins are not rewritten by this check.
 - HTML/CSS and finite first-party JS fetch, Worker, import/importScripts and literal
   asset references must be local and exist. Computed URLs and vendor internals are
   not proven safe by a text scan; browser request observation supplies another layer.
@@ -77,7 +82,8 @@ system temporary directory whose path is printed. It never installs a browser.
 Missing Playwright or browser executables produce **BLOCKED, exit 2**; test failures
 produce **FAIL, exit 1**. All created contexts collect page errors, console errors
 and external HTTP attempts; external requests are blocked and fail the run. Console
-errors are retained separately because injected resource failures generate them.
+errors are retained separately because injected resource failures and navigation
+cancellations can generate them; a pass does not mean an empty browser console.
 
 The default suite preserves B's all-route, 404/language, native Chromium clipboard,
 denied storage/clipboard, guard/Arise keyboard, seven real SQL presets, sandbox
@@ -99,13 +105,43 @@ share `?node=<encoded-id>#nodes`. Filtering preserves identity; the explicitly
 labelled reset clears filters/selection. Reconcile delivered selectors before
 interpreting a timeout as a UI defect.
 
-| Integrated result to be updated by the integrator | Result |
+`--extended` also checks 360/390 CSS-pixel EN/ZH navigation: overflow-dependent
+scroll guidance, actual 44px project touch targets, explicit horizontal input before
+primary-link taps, Reference links/keyboard Escape, theme/language taps and anchor
+clearance. Mobile callout stacking and persistent Counter-guide links are checked.
+Mobile Explorer visits wait for the actual 40-node first page before proceeding,
+not only a changed URL; no fixed sleep or page-error suppression is used.
+No physical-device or WCAG certification is implied.
+
+| Integrated result · 2026-11-14, local review working tree based on `28ba7c2` | Result |
 |---|---|
-| Chromium B regressions after C/D integration | **NOT RUN** |
-| Chromium extended directory/layout/failure matrix | **NOT RUN** |
-| WebKit B + extended matrix | **NOT RUN** |
-| Native browser-menu 200% zoom, screen reader, contrast/focus review | **NOT RUN** |
+| Strict static registry/link checks and paired examples | **PASS**: 29 facts, 22 ledger entries, graph 389/413 |
+| Node maintenance suite | **PASS**: 53 passed, 1 optional CLI integration skipped; no toolchain execution |
+| Resource inventory versus `28ba7c2` | **PASS**: no strict budget warnings or missing resources |
+| Chromium B regressions after integration | **PASS** |
+| Chromium extended directory/layout/failure and narrow-navigation matrix | **PASS**: no page errors or external requests; expected injected resource failures retained as console errors |
+| WebKit B + extended matrix | **PASS**: WebKit 26.5 / Playwright build 2336; no page errors or external requests; console messages retained and reviewed |
+| Native browser-menu 200% zoom, screen reader, contrast/focus review | **NOT RUN**; targeted keyboard focus and screenshots reviewed, not a complete accessibility audit |
 | Cached-offline availability | **NOT RUN / not guaranteed** |
+
+Both browser runs retained screenshots, `layout.json`, `mobile-layout.json` and
+`report.json` in separate local temporary evidence directories; these files are not
+public release materials. Each run measured 16 mobile and 48 desktop cases: no
+page-level horizontal overflow, with mobile navigation targets at least 44px wide
+and high. Baseline mobile measurements found EN overflow but no ZH primary nav
+overflow. Reviewed screenshots confirm the conditional hint, larger controls and
+single-column mobile callouts. These passes do not close independent human checks.
+
+WebKit was initially blocked by a missing executable; its matching browser was then
+installed with explicit authorization, without upgrading project dependencies.
+The first full run failed on Worker page errors while the mobile test immediately
+left Explorer after a URL change. A routed/unrouted diagnostic localized these to
+navigation during Worker startup. The mobile test now waits for the rendered first
+directory page at both entry points; unchanged page-error assertions then passed
+in both engines. Remaining WebKit console messages were traced to navigation-cancelled
+imports and deliberate 404/offline cases, not silently discarded. Local server
+broken-pipe messages during cancelled requests were retained separately. No Explorer
+runtime or graph assets were changed, and this is not a general unload-race guarantee.
 
 A historical B Chromium pass at `6627b63` is not a pass for the new integrated
 matrix. WebKit gets no unsupported Chromium clipboard permissions: its copy check
@@ -167,7 +203,7 @@ contract is not inferred from the website's Explorer tests.
 
 - [ ] Graph SHA-256 matches metadata; derived data is regenerated, not hand-edited.
 - [ ] Reading pages do not load the database/WASM or workshop snapshot.
-- [ ] Baseline `6627b63` entry byte/gzip deltas are recorded; growth over 20% is
+- [ ] Baseline `28ba7c2` entry byte/gzip deltas are recorded; growth over 20% is
       explained. Sizes are not presented as measured performance timings.
 - [ ] Runtime assets are local; external GitHub/documentation links are not runtime
       requests. Neither cold nor cached-offline site availability is guaranteed.

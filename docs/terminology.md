@@ -15,6 +15,9 @@ Identifiers, examples and profile versions remain exactly as recorded in source.
 | span | 字节区间 | A half-open UTF-8 byte range. Convert to lines only against matching, verified source bytes. |
 | handwritten zone | 手写实现区 | Explicit remaining computations, adapters and integrations; declared guards/bindings/folds can already be generated behavior. |
 | knowledge graph | 知识图谱 | A specific derived representation with a schema and snapshot. Canonical graphstore, project graph and workshop export are not interchangeable. |
+| canonical graphstore | canonical 声明图 | A derived declaration graph; the site's captured SQLite does not supply code locations. |
+| project knowledge/anchor graph | 项目知识/回锚图 | Knowledge and generated-location mappings for matching project inputs and outputs; precision and freshness must be checked. |
+| workshop project-view export | 工作坊视图导出 | A browsing export with its own scope and possible truncation, not a complete database or an execution trace. |
 | blast radius | 影响范围 | Reachability over admitted modeled relationships. Missing modeled connections limit coverage. |
 | technical acceptance | 技术验收 | A result for named inputs, artifacts, platform and checks—not public delivery, independent experience or production certification. |
 | independent experience | 独立体验 | A separately admitted session and interaction flow. Automated technical observations do not sign it off implicitly. |

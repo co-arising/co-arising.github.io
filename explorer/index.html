@@ -35,6 +35,14 @@
     <section id="nodes" class="xp-directory" aria-labelledby="xp-nodes-heading">
       <div class="sec-head"><span class="no">01</span><h2 id="xp-nodes-heading">Browse the nodes</h2></div>
       <p class="sec-sub">Search every node by its exact ID or name, then inspect its stored record and relationships. This is the <b>canonical graphstore capture of 2026-11-11</b>, not the project knowledge/anchor database. Qualified aliases remain separate nodes; matching names do not establish shared identity.</p>
+      <details id="graph-scopes">
+        <summary>Three graph representations, different scopes</summary>
+        <dl>
+          <dt>Canonical graphstore</dt><dd>The shipped declaration graph: 389 nodes / 413 edges, captured 2026-11-11 (<a href="/status/#F-03">F-03</a>). It does not provide code anchors.</dd>
+          <dt>Project knowledge/anchor graph</dt><dd>Knowledge and generated-location mappings from a matching project and output. Code queries require that project's identities, precision and freshness.</dd>
+          <dt>Workshop project-view export</dt><dd>A browsing export that may be truncated: the 2026-11-06 snapshot contains 120 nodes / 183 edges from declared totals of 861 / 737 (<a href="/status/#F-17">F-17</a>), not a complete copy of either database.</dd>
+        </dl>
+      </details>
       <div class="xp-filters">
         <label for="xp-node-search">ID or name <input id="xp-node-search" type="search" maxlength="256" autocomplete="off" aria-controls="xp-node-list" aria-describedby="xp-node-help" /></label>
         <label for="xp-node-kind">Node kind <select id="xp-node-kind" aria-controls="xp-node-list" disabled><option value="">All kinds — loading from the graph</option></select></label>
@@ -58,6 +66,7 @@
           <p class="small">Code anchors: <b>unavailable — not provided by this snapshot</b>. No author-file paths, line numbers or GitHub source links are inferred. Stored provenance is a declaration, not a verified code location.</p>
         </div>
       </div>
+      <p class="small" id="xp-anchor-guide">Need a code-location query? Follow <a href="/guide/#counter-reverse-query">the Counter reverse-query tutorial</a> with a matching local project. This is not a code jump for the selected bank node.</p>
       <p class="small">At most 80 edges per direction, 8192 UTF-8 bytes per displayed atom/provenance field, 512 KiB per response. Totals and truncation are explicit. Stored atoms are plain text, not executed or treated as verified generated output.</p>
       <noscript><p class="callout">The directory and inspector require JavaScript and the local SQLite engine. No live node results are available without them; use the rebuild instructions below to inspect the snapshot yourself.</p></noscript>
     </section>

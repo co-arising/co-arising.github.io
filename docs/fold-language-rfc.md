@@ -4,6 +4,10 @@
 change bank policy, or authorize compiler/migrator work. The website teaches the
 current supported forms; toolchain implementation needs separate approval.
 
+A separate capability gap, [DEF-21](/status/#DEF-21), tracks reusable pure fold function definitions/references and function-level BDD; it is not one of the three implementation/admission issues below and resolves none of them. Current finite folds remain supported; function location and syntax are undecided, with replay, type and version admission still required.
+
+另见 [DEF-21 中文台账](/zh/status/#DEF-21)：可复用纯函数定义/引用及函数级 BDD 是独立能力缺口，不属于下文三项实现/准入问题，也不表示它们已解决。当前有限 fold 仍受支持；函数位置与语法未定，仍须满足回放、类型与版本准入。
+
 ## Baseline and the three existing issues
 
 Reviewed 2026-11-13 against **`cb860b5c1f8f038eb073c95cd83b724424c89cc6`**, package
