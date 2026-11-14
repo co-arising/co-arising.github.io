@@ -30,7 +30,7 @@
   font-weight: 700; font-size: 15px; white-space: nowrap; padding: 10px 14px 10px 0;
   color: var(--ink); border: 0; display: inline-flex; align-items: center; gap: 8px;
 }
-.site-nav .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red); display: inline-block; }
+.site-nav .brand .brand-icon { width: 32px; height: 32px; border-radius: 8px; flex: none; }
 .site-nav .group { display: flex; align-items: center; gap: 0; }
 .site-nav .group-label {
   font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .09em; text-transform: uppercase;

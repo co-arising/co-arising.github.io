@@ -83,9 +83,45 @@ def verify(browser, base, evidence, engine='chromium', extended=False):
                 response = page.goto(base + prefix + route)
                 require(response.status == 200, f'page failed: {prefix + route}')
                 page.wait_for_selector('#language-switch')
+                brand = page.locator('#site-nav .brand')
+                require(brand.get_attribute('href') == prefix and brand.inner_text() == 'co-arising', 'brand lost its localized home or name')
+                page.locator('.brand-icon').evaluate('image => image.decode()')
+                require(page.locator('.brand-icon').get_attribute('alt') == '', 'brand image duplicates the visible name')
+                invite = page.locator('#site-footer a[href="https://discord.gg/PwYrRpJu75"]')
+                require(invite.count() == 1 and invite.is_visible(), 'permanent community invite missing from footer')
                 if route == 'explorer/':
                     page.wait_for_function("document.querySelector('#xp-run').disabled === false")
-        note('pages', '18 bilingual content routes returned 200 and initialized shared navigation')
+        note('pages', '18 bilingual content routes returned 200, loaded the brand icon and kept localized home links plus the permanent footer invite')
+
+        for width in (375, 1280):
+            page.set_viewport_size({'width': width, 'height': 900})
+            for prefix in ('/', '/zh/'):
+                for theme in ('light', 'dark'):
+                    page.goto(base + prefix)
+                    for _ in range(3):
+                        if page.locator('html').get_attribute('data-theme') == theme:
+                            break
+                        page.locator('#theme-toggle').click()
+                    require(page.locator('html').get_attribute('data-theme') == theme, 'community theme did not apply')
+                    community = page.locator('#community')
+                    community.scroll_into_view_if_needed()
+                    artwork = community.locator('img')
+                    artwork.evaluate('image => image.decode()')
+                    require(artwork.evaluate('image => image.naturalWidth === 960 && image.naturalHeight === 960'), 'community artwork missing or incorrectly sized')
+                    require(artwork.get_attribute('alt'), 'community artwork needs a description')
+                    invite = community.locator('a.btn')
+                    require(invite.is_visible() and invite.get_attribute('href') == 'https://discord.gg/PwYrRpJu75', 'homepage permanent invite missing')
+                    require(invite.get_attribute('target') is None, 'community link changed the same-tab convention')
+                    invite.focus()
+                    # macOS WebKit uses Option+Tab to include links in keyboard navigation.
+                    page.keyboard.press('Alt+Shift+Tab' if engine == 'webkit' else 'Shift+Tab')
+                    page.keyboard.press('Alt+Tab' if engine == 'webkit' else 'Tab')
+                    require(invite.evaluate('e => e === document.activeElement && e.matches(":focus-visible") && getComputedStyle(e).outlineStyle !== "none"'), 'community invitation lost visible keyboard focus')
+                    require(invite.bounding_box()['height'] >= 44, 'community invitation below 44px touch target')
+                    require(page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'community layout overflow')
+                    page.screenshot(path=str(evidence / f'community-{width}-{prefix.strip("/") or "en"}-{theme}.png'))
+        page.set_viewport_size({'width': 1280, 'height': 900})
+        note('branding and community', '375/1280px × EN/ZH × light/dark: artwork loaded, exact invite, visible keyboard focus, 44px CTA and no horizontal overflow; Discord was not contacted')
 
         page.goto(base + '/status/#ledger')
         page.locator('#site-footer a[href="/status/#facts"]').click()
@@ -543,6 +579,13 @@ def verify_extended(new_context, base, evidence, note, require):
                     fallback.goto(base + prefix + route)
                     require(fallback.locator('#site-nav a').count() == 9, f'{mode}: static navigation missing')
                     require(fallback.locator('main').is_visible(), f'{mode}: main not visible')
+                    if route == '':
+                        invite = fallback.locator('#community a.btn')
+                        require(invite.is_visible() and invite.get_attribute('href') == 'https://discord.gg/PwYrRpJu75', f'{mode}: static community invitation missing')
+                        artwork = fallback.locator('#community img')
+                        artwork.scroll_into_view_if_needed()
+                        artwork.evaluate('image => image.decode()')
+                        require(artwork.get_attribute('src') == '/assets/img/co-arising-tree.webp', f'{mode}: static artwork missing')
                     if route == 'explorer/':
                         require(fallback.locator('#xp-anchor-guide a').get_attribute('href') == prefix + 'guide/#counter-reverse-query', f'{mode}: Counter guide missing')
                     skip = fallback.locator('a.skip-link')

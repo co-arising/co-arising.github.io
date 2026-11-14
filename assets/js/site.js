@@ -13,6 +13,7 @@ const SITE = {
     monarchPersistence: "https://github.com/MadPolaris/monarch-persistence",
     saga: "https://github.com/MadPolaris/saga-core",
     site: "https://github.com/co-arising/co-arising.github.io",
+    discord: "https://discord.gg/PwYrRpJu75",
   },
   nav: [
     {
@@ -54,6 +55,7 @@ const STR = {
     footerTagline:
       "Shared domain knowledge, verifiable implementations and traceable changes. Open tooling for people and agents working with DDD and event-sourced systems.",
     siteOnGitHub: "This site on GitHub",
+    joinDiscord: "Join the Discord community",
     colRepos: "Repositories",
     colEngines: "Engines",
     colHonesty: "Honesty",
@@ -74,6 +76,7 @@ const STR = {
     footerTagline:
       "让业务知识可共识、实现可验证、变更可追溯。面向人和智能体的开放工具链，以 DDD 与事件溯源约束协作开发。",
     siteOnGitHub: "本站在 GitHub 上",
+    joinDiscord: "加入 Discord 社区",
     colRepos: "仓库",
     colEngines: "引擎",
     colHonesty: "诚实层",
@@ -119,7 +122,7 @@ const STR = {
     const inReference = secondary.items.some((item) => item.href === here);
     const langA = LANG === "zh" ? "en" : "zh-CN";
     nav.innerHTML = `<div class="topline"></div><div class="site-nav"><div class="row nav-enhanced">
-      <a class="brand" href="${LANG === "zh" ? "/zh/" : "/"}"${isRoot ? ' aria-current="page"' : ""}><span class="dot"></span>co-arising</a>
+      <a class="brand" href="${LANG === "zh" ? "/zh/" : "/"}"${isRoot ? ' aria-current="page"' : ""}><img class="brand-icon" src="/assets/img/co-arising-icon.png" width="32" height="32" alt="" />co-arising</a>
       <div class="nav-primary" id="nav-primary">${links(SITE.nav[0])}</div>
       <div class="nav-actions">
         <details class="nav-reference${inReference ? " current" : ""}" id="nav-reference">
@@ -147,6 +150,7 @@ const STR = {
         <h4>co-arising</h4>
         <p>${T.footerTagline}</p>
         <p><a href="${SITE.urls.site}">${T.siteOnGitHub}</a></p>
+        <p><a href="${SITE.urls.discord}">${T.joinDiscord} <span aria-hidden="true">↗</span></a></p>
       </div>
       <div>
         <h4>${T.colRepos}</h4>
