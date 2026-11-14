@@ -286,19 +286,107 @@ def verify(browser, base, evidence, engine='chromium', extended=False):
                 pass
 
 
+def verify_mobile_navigation(new_context, base, evidence, note, require):
+    context = new_context(viewport={'width': 360, 'height': 800}, has_touch=True)
+    page = context.new_page()
+    measurements = []
+    try:
+        for width in (360, 390):
+            page.set_viewport_size({'width': width, 'height': 800})
+            for prefix in ('/', '/zh/'):
+                for route in ('', 'pipeline/', 'bank-demo/', 'explorer/'):
+                    page.goto(base + prefix + route)
+                    page.wait_for_selector('#nav-primary')
+                    page.evaluate('document.fonts.ready')
+                    if route == 'explorer/':
+                        page.wait_for_function("document.querySelectorAll('#xp-node-list button[data-node]').length === 40 && document.querySelector('#xp-node-list').getAttribute('aria-busy') === 'false'")
+                    page.wait_for_function("() => {const n=document.querySelector('#nav-primary');return document.querySelector('#nav-scroll-hint').hidden === (n.scrollWidth <= n.clientWidth)}")
+                    box = page.evaluate("""() => {
+                      const n=document.querySelector('#nav-primary');
+                      return {viewport:innerWidth, client:n.clientWidth, scroll:n.scrollWidth,
+                        hint:!document.querySelector('#nav-scroll-hint').hidden,
+                        overflow:document.documentElement.scrollWidth-innerWidth,
+                        targets:[...document.querySelectorAll('#nav-primary a, #nav-reference summary, #language-switch, #theme-toggle')].map(e=>{
+                          const r=e.getBoundingClientRect();return {label:e.textContent,width:r.width,height:r.height};})};
+                    }""")
+                    require(box['viewport'] == width, 'requested mobile viewport was not applied')
+                    require(box['overflow'] <= 1, f'mobile page overflow at {width}/{prefix + route}: {box}')
+                    require(all(t['height'] >= 44 and t['width'] >= 44 for t in box['targets']), f'mobile navigation target below project 44px goal: {box}')
+                    measurements.append({'route': prefix + route, **box})
+                    if not route:
+                        page.screenshot(path=str(evidence / f'mobile-nav-{width}-{prefix.strip("/") or "en"}.png'))
+                    if route == 'pipeline/':
+                        callout = page.locator('#boundaries .callout').first
+                        callout.scroll_into_view_if_needed()
+                        require(callout.evaluate("e => e.querySelector('p').getBoundingClientRect().top >= e.querySelector('b').getBoundingClientRect().bottom"), 'mobile callout paragraph did not stack below label')
+                        page.screenshot(path=str(evidence / f'mobile-pipeline-{width}-{prefix.strip("/") or "en"}.png'))
+                for index, route in enumerate(('why-co-arising/', 'dsl/', 'bank-demo/', 'explorer/', 'guide/')):
+                    page.goto(base + prefix)
+                    page.wait_for_selector('#nav-primary')
+                    page.evaluate('document.fonts.ready')
+                    strip = page.locator('#nav-primary')
+                    link = strip.locator('a').nth(index)
+                    if link.evaluate('e => e.getBoundingClientRect().right > e.parentElement.getBoundingClientRect().right'):
+                        bounds = strip.bounding_box()
+                        page.mouse.move(bounds['x'] + bounds['width'] / 2, bounds['y'] + bounds['height'] / 2)
+                        page.mouse.wheel(1000, 0)
+                        page.wait_for_function("() => {const n=document.querySelector('#nav-primary');return n.scrollLeft + n.clientWidth >= n.scrollWidth - 1}")
+                    require(link.evaluate('e => {const r=e.getBoundingClientRect(),p=e.parentElement.getBoundingClientRect();return r.left>=p.left-1 && r.right<=p.right+1}'), 'link remains clipped after explicit horizontal navigation')
+                    bounds = link.bounding_box()
+                    page.touchscreen.tap(bounds['x'] + bounds['width'] / 2, bounds['y'] + bounds['height'] / 2)
+                    page.wait_for_url(base + prefix + route)
+                    if route == 'explorer/':
+                        page.wait_for_function("document.querySelectorAll('#xp-node-list button[data-node]').length === 40 && document.querySelector('#xp-node-list').getAttribute('aria-busy') === 'false'")
+                for route in ('pipeline/', 'compare/', 'status/'):
+                    page.goto(base + prefix)
+                    page.locator('#nav-reference summary').tap()
+                    link = page.locator(f'#nav-reference a[href="{prefix + route}"]')
+                    bounds = link.bounding_box()
+                    require(bounds and bounds['x'] >= 0 and bounds['x'] + bounds['width'] <= width, 'Reference item outside viewport')
+                    link.tap()
+                    page.wait_for_url(base + prefix + route)
+                summary = page.locator('#nav-reference summary')
+                summary.focus()
+                page.keyboard.press('Enter')
+                require(page.locator('#nav-reference').evaluate('e => e.open'), 'keyboard did not open Reference')
+                page.keyboard.press('Escape')
+                require(not page.locator('#nav-reference').evaluate('e => e.open') and summary.evaluate('e => e === document.activeElement'), 'Escape failed to close Reference and restore focus')
+                before = page.locator('html').get_attribute('data-theme')
+                page.locator('#theme-toggle').tap()
+                require(page.locator('html').get_attribute('data-theme') != before, 'mobile theme tap failed')
+                page.goto(base + prefix + 'status/#DEF-21')
+                page.wait_for_function("document.querySelector('#DEF-21').getBoundingClientRect().top >= document.querySelector('#site-nav').getBoundingClientRect().bottom")
+                target = '/zh/status/#DEF-21' if prefix == '/' else '/status/#DEF-21'
+                page.locator('#language-switch').tap()
+                page.wait_for_url(base + target)
+        note('mobile navigation', '360/390 CSS px × EN/ZH: conditional scroll guidance, measured 44px targets, five primary links after explicit horizontal input, three Reference links, keyboard Escape/focus, theme/language taps and fragment clearance')
+    finally:
+        (evidence / 'mobile-layout.json').write_text(json.dumps(measurements, ensure_ascii=False, indent=2))
+        context.close()
+
+
 def verify_extended(new_context, base, evidence, note, require):
     """D protocol assertions. Synchronize on rendered results/status, never timed sleeps."""
+    verify_mobile_navigation(new_context, base, evidence, note, require)
     context = new_context(viewport={'width': 1280, 'height': 900})
     page = context.new_page()
     try:
+        def anchor_guide():
+            link = page.locator('#xp-anchor-guide a')
+            prefix = '/zh/' if urlsplit(page.url).path.startswith('/zh/') else '/'
+            require(link.count() == 1 and link.get_attribute('href') == prefix + 'guide/#counter-reverse-query', 'persistent Counter query guide missing or wrong language')
+            require(link.evaluate("e => !e.closest('#xp-node-detail')"), 'Counter guide would be erased by inspector rendering')
+
         def ready():
             page.wait_for_function("document.querySelector('#xp-run')?.disabled === false")
+            anchor_guide()
 
         def listed(count):
             page.wait_for_function("n => document.querySelectorAll('#xp-node-list button[data-node]').length === n && document.querySelector('#xp-node-list').getAttribute('aria-busy') !== 'true'", arg=count)
 
         def detail(node):
             page.wait_for_function("id => document.querySelector('#xp-node-detail')?.getAttribute('aria-busy') === 'false' && document.querySelector('#xp-node-detail .xp-node-id code')?.textContent === id", arg=node)
+            anchor_guide()
 
         def chosen():
             return parse_qs(urlsplit(page.url).query).get('node', [None])[0]
@@ -336,6 +424,7 @@ def verify_extended(new_context, base, evidence, note, require):
             require(page.locator('#xp-node-search').input_value() == '', 'reset left search text')
             require(page.locator('#xp-node-kind').input_value() == '', 'reset left the kind filter')
             require(chosen() is None, 'explicit reset did not clear selected identity')
+            anchor_guide()
             page.locator('#xp-node-search').fill(selected)
             listed(1)
             page.locator('#xp-node-list button[data-node]').click()
@@ -370,6 +459,27 @@ def verify_extended(new_context, base, evidence, note, require):
             ready()
             page.wait_for_function("document.querySelector('#xp-node-detail').getAttribute('aria-busy') === 'false' && /No node with this exact full ID|unknown|not found|unavailable|不存在|未找到|未知|不可用|没有这个完整 ID/i.test(document.querySelector('#xp-node-detail').textContent)")
             require(chosen() == unknown and page.locator('#xp-node-detail .xp-node-id').count() == 0, 'unknown identity silently replaced with a real node')
+            anchor_guide()
+            page.locator('#xp-anchor-guide a').click()
+            page.wait_for_url(base + prefix + 'guide/#counter-reverse-query')
+            for source, selector, destination in (
+                ('dsl/', '#expression-reference a[href$="#DEF-21"]', 'status/#DEF-21'),
+                ('bank-demo/', '#business a[href$="#DEF-22"]', 'status/#DEF-22'),
+                ('bank-demo/', '#views a[href$="#graph-scopes"]', 'explorer/#graph-scopes'),
+                ('pipeline/', '#engines a[href$="#relations"]', 'dsl/#relations'),
+                ('pipeline/', '#anchors a[href$="#counter-reverse-query"]', 'guide/#counter-reverse-query'),
+            ):
+                page.goto(base + prefix + source)
+                page.locator(selector).click()
+                page.wait_for_url(base + prefix + destination)
+                fragment = urlsplit(page.url).fragment
+                target = page.locator('#' + fragment)
+                if target.evaluate('e => e.tagName === "DETAILS"'):
+                    target.locator('summary').click()
+                    require(target.evaluate('e => e.open'), 'graph scope glossary did not open')
+                else:
+                    require(target.is_visible(), 'cross-reference target is not visible')
+        note('review reading paths', 'EN/ZH DEF-21/22, graph glossary, R16 relation and Counter reverse-query links reach their intended local-language targets')
         note('node directory', 'EN/ZH: 389 total / 40 per page; next/prev, 3 aggregates, search/empty/reset, stable selection, real adjacency, share/reload/history/language and unknown IDs')
         page.screenshot(path=str(evidence / 'extended-node-unknown.png'))
 
@@ -433,6 +543,8 @@ def verify_extended(new_context, base, evidence, note, require):
                     fallback.goto(base + prefix + route)
                     require(fallback.locator('#site-nav a').count() == 9, f'{mode}: static navigation missing')
                     require(fallback.locator('main').is_visible(), f'{mode}: main not visible')
+                    if route == 'explorer/':
+                        require(fallback.locator('#xp-anchor-guide a').get_attribute('href') == prefix + 'guide/#counter-reverse-query', f'{mode}: Counter guide missing')
                     skip = fallback.locator('a.skip-link')
                     require(skip.count() == 1 and skip.get_attribute('href') == '#' + fallback.locator('main').get_attribute('id'), f'{mode}: skip link broken')
             fallback.screenshot(path=str(evidence / f'extended-{mode}.png'))
@@ -445,6 +557,7 @@ def verify_extended(new_context, base, evidence, note, require):
         failedpage.wait_for_function("/unavailable/i.test(document.querySelector('#xp-status').textContent)")
         require(failedpage.locator('#xp-run').is_disabled() and failedpage.locator('#xp-result table').count() == 0, 'cold asset failure presented an executed query')
         require('No query was executed' in failedpage.locator('#xp-status').inner_text(), 'asset failure did not disclose unexecuted status')
+        require(failedpage.locator('#xp-anchor-guide a').get_attribute('href') == '/guide/#counter-reverse-query', 'graph failure removed the Counter guide')
         cold = new_context(offline=True)
         try:
             cold.new_page().goto(base + '/explorer/')

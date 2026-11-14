@@ -8,8 +8,7 @@ const SITE = {
     // Flagship toolchain. Transferred to the co-arising org on 2026-11-11;
     // the old zhongdj/metarch-truthsrc address redirects automatically.
     truthsrc: "https://github.com/co-arising/metarch-truthsrc",
-    // Ecosystem repos — currently on the MadPolaris org, migration deferred (DEF-11).
-    bank: "https://github.com/MadPolaris/bank-wealth-demo",
+    bank: "https://github.com/co-arising/bank-wealth-demo",
     monarchCore: "https://github.com/MadPolaris/monarch-core",
     monarchPersistence: "https://github.com/MadPolaris/monarch-persistence",
     saga: "https://github.com/MadPolaris/saga-core",
@@ -38,7 +37,7 @@ const SITE = {
     },
   ],
   audited: "2026-11-11",
-  contentUpdated: "2026-11-13",
+  contentUpdated: "2026-11-14",
 };
 
 const STR = {
@@ -121,7 +120,7 @@ const STR = {
     const langA = LANG === "zh" ? "en" : "zh-CN";
     nav.innerHTML = `<div class="topline"></div><div class="site-nav"><div class="row nav-enhanced">
       <a class="brand" href="${LANG === "zh" ? "/zh/" : "/"}"${isRoot ? ' aria-current="page"' : ""}><span class="dot"></span>co-arising</a>
-      <div class="nav-primary">${links(SITE.nav[0])}</div>
+      <div class="nav-primary" id="nav-primary">${links(SITE.nav[0])}</div>
       <div class="nav-actions">
         <details class="nav-reference${inReference ? " current" : ""}" id="nav-reference">
           <summary>${LANG === "zh" ? "参考" : "Reference"}</summary>
@@ -130,6 +129,7 @@ const STR = {
         <a class="nav-link" id="language-switch" lang="${langA}" hreflang="${langA}" rel="alternate" href="${LANG === "zh" ? "/" : "/zh/"}" title="${T.langSwitchTitle}">${T.langSwitch}</a>
         <button class="theme-btn" id="theme-toggle" type="button" title="${T.themeTitle}">◐ ${T.themeLabel.auto}</button>
       </div>
+      <p class="nav-scroll-hint" id="nav-scroll-hint" hidden>${LANG === "zh" ? "左右滑动查看更多导航链接" : "Scroll sideways for more navigation links"}</p>
     </div></div>`;
     const menu = document.getElementById("nav-reference");
     if (menu) menu.addEventListener("keydown", (event) => {
@@ -180,7 +180,14 @@ const STR = {
 
   /* Wrapped navigation changes height on narrow screens and after font loading. */
   if (nav && typeof nav.getBoundingClientRect === "function") {
-    const updateNavOffset = () => document.documentElement.style.setProperty("--nav-offset", Math.ceil(nav.getBoundingClientRect().height + 12) + "px");
+    const primary = document.getElementById("nav-primary");
+    const hint = document.getElementById("nav-scroll-hint");
+    const updateNavOffset = () => {
+      hint.hidden = primary.scrollWidth <= primary.clientWidth;
+      if (hint.hidden) primary.removeAttribute("aria-describedby");
+      else primary.setAttribute("aria-describedby", hint.id);
+      document.documentElement.style.setProperty("--nav-offset", Math.ceil(nav.getBoundingClientRect().height + 12) + "px");
+    };
     updateNavOffset();
     window.addEventListener("resize", updateNavOffset);
     if (typeof ResizeObserver === "function") new ResizeObserver(updateNavOffset).observe(nav);

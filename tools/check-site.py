@@ -127,6 +127,7 @@ class Page(HTMLParser):
         self.fact_markers, self.examples = Counter(), Counter()
         self.sections, self.nav_links, self.map_links, self.skip_links = [], [], [], []
         self.table_ids = {'facts': set(), 'ledger': set()}
+        self.census_cells, self.section_links, self.example_code = [], {}, {}
         self.lang, self.page_id, self.canonical = None, None, None
         self.alternates, self.stack, self.elements = {}, [], []
         self.problems = []
@@ -151,6 +152,16 @@ class Page(HTMLParser):
                         if name in ancestors:
                             self.table_ids[name].add(value)
         self.elements.append((tag, attrs))
+        if tag == 'td' and 'F-10' in ancestors:
+            cell = []
+            self.census_cells.append(cell)
+            attrs['_census'] = cell
+        if tag == 'code':
+            example = next((a.get('data-example') for t, a in reversed(self.stack) if t == 'pre'), None)
+            if example:
+                code = []
+                self.example_code.setdefault(example, []).append(code)
+                attrs['_example_code'] = code
         if tag == 'section':
             self.sections.append(attrs.get('id'))
             if not attrs.get('id'):
@@ -163,6 +174,7 @@ class Page(HTMLParser):
             href = attrs.get('href', '')
             if href:
                 self.links.append(href)
+                self.section_links.setdefault(section, []).append(href)
             record = {'href': href, 'text': '', 'label': attrs.get('aria-label', '')}
             attrs['_anchor'] = record
             if 'site-nav' in ancestors:
@@ -221,9 +233,14 @@ class Page(HTMLParser):
         if any(t == 'style' for t, _ in self.stack):
             return
         self.references.update(ID_RE.findall(data))
+        badge = any('badge' in attrs.get('class', '').split() for _, attrs in self.stack)
         for _, attrs in self.stack:
             if '_anchor' in attrs:
                 attrs['_anchor']['text'] += data
+            if '_census' in attrs and not badge:
+                attrs['_census'].append(data)
+            if '_example_code' in attrs:
+                attrs['_example_code'].append(data)
 
 
 def registry_ids(text, prefix):
@@ -231,6 +248,39 @@ def registry_ids(text, prefix):
     if not rows or len(rows) != len(set(rows)):
         raise ValueError(f'{prefix} registry is empty or has duplicate rows')
     return set(rows)
+
+
+def atom_census(value):
+    header = re.fullmatch(r'\s*(\d+)\s+(?:YAML atoms|个 YAML 原子)\s*[:：]\s*(.+?)\s*', value)
+    if not header:
+        raise ValueError('F-10 census header or enumeration is malformed')
+    parts = re.split(r'\s*[,·]\s*', header[2])
+    counts = []
+    labels = set()
+    for part in parts:
+        match = re.fullmatch(r'(\d+)\s+([^\d,:：;；·]+)', part)
+        if not match or not match[2].strip() or match[2].strip() in labels:
+            raise ValueError('F-10 census item is malformed or duplicated')
+        counts.append(int(match[1]))
+        labels.add(match[2].strip())
+    total = int(header[1])
+    if sum(counts) != total:
+        raise ValueError(f'F-10 census sum {sum(counts)} differs from total {total}')
+    return total, counts
+
+
+def bank_entry_findings(page, bank_url):
+    route = page.path.parent.name
+    if route == 'bank-demo':
+        links = [href for href in page.section_links.get('run', []) if urlsplit(href).netloc]
+        if links != [bank_url]:
+            return ['bank source link differs from SITE.urls.bank or is missing/duplicated']
+    if route == 'guide':
+        blocks = page.example_code.get('bank-convenience', [])
+        clones = re.findall(r'^\s*git clone\s+(\S+)\s*$', ''.join(blocks[0]), re.M) if len(blocks) == 1 else []
+        if [url.removesuffix('.git') for url in clones] != [bank_url]:
+            return ['bank clone target differs from SITE.urls.bank or is missing/duplicated']
+    return []
 
 
 def site_file(url, source, root=ROOT):
@@ -325,10 +375,22 @@ def public_path_findings(text):
 def check_site(root=ROOT):
     root = Path(root).resolve()
     errors, warnings, pages = [], [], {}
-    facts = registry_ids((root / 'SITE-FACTS.md').read_text(), 'F')
+    facts_text = (root / 'SITE-FACTS.md').read_text()
+    facts = registry_ids(facts_text, 'F')
     deferred = registry_ids((root / 'LEDGER.md').read_text(), 'DEF')
+    census, bank_url = None, None
     try:
-        site_configuration((root / 'assets/js/site.js').read_text())
+        row = next(line for line in facts_text.splitlines() if re.match(r'^\s*\|\s*F-10\s*\|', line))
+        cells = re.split(r'(?<!\\)\|', row)
+        census = atom_census(cells[3])
+    except (StopIteration, IndexError, ValueError) as error:
+        errors.append(f'SITE-FACTS.md: F-10 census: {error}')
+    try:
+        config = site_configuration((root / 'assets/js/site.js').read_text())
+        bank_url = config.get('urls', {}).get('bank')
+        if not isinstance(bank_url, str) or not bank_url.startswith('https://'):
+            bank_url = None
+            raise ValueError('SITE.urls.bank must be an HTTPS repository URL')
     except ValueError as error:
         errors.append(f'assets/js/site.js: {error}')
     for route in ROUTES:
@@ -416,7 +478,17 @@ def check_site(root=ROOT):
         for script in page.inline_scripts:
             for url in js_runtime_references(script):
                 resource(url, path)
+        if bank_url:
+            errors.extend(f'{label}: {problem}' for problem in bank_entry_findings(page, bank_url))
         if page.path.parent.name == 'status':
+            try:
+                if len(page.census_cells) != 4:
+                    raise ValueError('F-10 census requires four data cells')
+                displayed = atom_census(''.join(page.census_cells[1]))
+                if census is not None and displayed != census:
+                    raise ValueError('F-10 census quantities differ from SITE-FACTS')
+            except ValueError as error:
+                errors.append(f'{label}: {error}')
             for section, registered, prefix in (('facts', facts, 'F-'), ('ledger', deferred, 'DEF-')):
                 actual = {v for v in page.table_ids[section] if v.startswith(prefix)}
                 if actual != registered:

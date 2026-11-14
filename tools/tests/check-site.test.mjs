@@ -19,6 +19,7 @@ try:
     if action == 'config': result = m.site_configuration(q['text'])
     elif action == 'runtime': result = m.js_runtime_references(q['text'])
     elif action == 'registry': result = sorted(m.registry_ids(q['text'], q['prefix']))
+    elif action == 'census': result = m.atom_census(q['text'])
     elif action == 'privacy': result = m.public_path_findings(q['text'])
     elif action == 'scan': result = m.check_site(q['root'])
     elif action == 'resources':
@@ -146,6 +147,42 @@ test('private-path fixtures are not public prose and external documentation is n
     amend(dir, 'index.html', text => text.replace('</main>', '<a href="https://example.org/docs">External documentation</a></main>'));
   }).result;
   assert.ok(!result.errors.some(e => e.includes('private-fixture') || e.includes('example.org')));
+});
+
+test('atom census parses the entire ordered list and rejects missing or malformed items', () => {
+  assert.deepEqual(call({ action: 'census', text: '3 YAML atoms: 2 VO, 1 system root (system.yaml)' }).result, [3, [2, 1]]);
+  assert.deepEqual(call({ action: 'census', text: '3 个 YAML 原子：2 值对象 · 1 系统根 (system.yaml)' }).result, [3, [2, 1]]);
+  for (const text of ['3 YAML atoms: 2 VO', '4 YAML atoms: 2 VO, 1 root', '3 YAML atoms: 2 VO, one root', '3 YAML atoms: 2 VO, 1 root; ignored', '3 YAML atoms: 2 VO, 1 VO', '3 YAML atoms: 2 VO, 1 root,']) {
+    assert.equal(call({ action: 'census', text }).ok, false, text);
+  }
+});
+
+test('registered census and bank entries pass for the current complete site', () => {
+  const result = call({ action: 'scan', root });
+  assert.equal(result.ok, true, result.error);
+  assert.deepEqual(result.result.errors, []);
+});
+
+test('census omissions and translated quantity drift fail even with a balanced total', () => {
+  const missing = fixture(dir => amend(dir, 'SITE-FACTS.md', text => text.replace(', 1 system root (system.yaml)', ''))).result;
+  assert.ok(missing.errors.some(e => e.includes('F-10 census sum')));
+  const malformed = fixture(dir => amend(dir, 'SITE-FACTS.md', text => text.replace('59 VO, 27 slice', '59 VO, twenty-seven slice'))).result;
+  assert.ok(malformed.errors.some(e => e.includes('F-10 census item')));
+  const drift = fixture(dir => amend(dir, 'zh/status/index.html', text => text.replace('59 VO · 27 切片', '58 VO · 28 切片'))).result;
+  assert.ok(drift.errors.some(e => e.includes('zh/status') && e.includes('quantities differ')));
+});
+
+test('current bank source and clone entries follow SITE even when both languages share a stale URL', () => {
+  for (const files of [['bank-demo/index.html'], ['guide/index.html'], ['bank-demo/index.html', 'zh/bank-demo/index.html', 'guide/index.html', 'zh/guide/index.html']]) {
+    const result = fixture(dir => {
+      for (const file of files) amend(dir, file, text => text.replaceAll('https://github.com/co-arising/bank-wealth-demo', 'https://github.com/MadPolaris/bank-wealth-demo'));
+    }).result;
+    for (const file of files) assert.ok(result.errors.some(e => e.startsWith(file + ': bank ')), file);
+  }
+  const missing = fixture(dir => amend(dir, 'guide/index.html', text => text.replace('git clone https://github.com/co-arising/bank-wealth-demo.git', ''))).result;
+  assert.ok(missing.errors.some(e => e.includes('bank clone target')));
+  const duplicate = fixture(dir => amend(dir, 'guide/index.html', text => text.replace('git clone https://github.com/co-arising/bank-wealth-demo.git', 'git clone https://github.com/co-arising/bank-wealth-demo.git\ngit clone https://github.com/co-arising/bank-wealth-demo.git'))).result;
+  assert.ok(duplicate.errors.some(e => e.includes('bank clone target')));
 });
 
 test('read-only static scan leaves database bytes untouched', () => {

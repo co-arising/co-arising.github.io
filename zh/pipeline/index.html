@@ -58,7 +58,7 @@
         <div class="card"><span class="tag">精度</span><h3>区间与文件不是同一个答案</h3><p><code>span</code> 指明字节区间；<code>file</code> 只定位文件。<code>ambiguous</code> 或 <code>unavailable</code> 表示边界，不是允许猜行号。</p></div>
         <div class="card"><span class="tag">新鲜度</span><h3>先核对匹配字节</h3><p>从 UTF-8 字节区间换算行号前，先核源码指纹与验证结果。没有配对代码位置的图谱快照，不能提供精确的代码跳转。</p></div>
       </div>
-      <p class="prose"><a href="/zh/guide/#l1">Counter 指南</a>使用实际验证过的位置走通正反查询，并解释输入过期、输出漂移与更新。canonical 图、项目知识图和工作坊导出是不同表示，不能凭同名拼接身份。</p>
+      <p class="prose"><a href="/zh/guide/#counter-reverse-query">Counter 反查指南</a>使用实际验证过的位置走通正反查询，并解释输入过期、输出漂移与更新。canonical 图、项目知识图和工作坊导出是<a href="/zh/explorer/#graph-scopes">不同表示</a>，不能凭同名拼接身份。</p>
       <details>
         <summary>Counter 命令速查 · 先完成指南中的准备</summary>
       <div class="term"><div class="term-bar"><span class="title">在自己的 Counter 项目中；具体反查步骤见指南</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human
@@ -71,6 +71,7 @@ node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out genera
     <section id="handwritten">
       <div class="sec-head"><span class="no">03</span><h2>在拥有这项职责的层修改</h2></div>
       <p class="sec-sub"><strong>生成受支持的已声明行为，手写剩余计算与宿主集成。</strong>真源树是唯一的<em>知识</em>编辑面，并不是项目里唯一可以编辑的文件。</p>
+      <p>受支持的有限 fold 尚不提供可复用纯函数定义/引用或函数级 BDD；<a href="/zh/status/#DEF-21">DEF-21</a> 单独登记此项设计，不放宽确定性回放、类型或版本准入。</p>
       <div class="card-grid cols-3">
         <div class="card"><span class="tag">真源与生成侧</span><h3>领域声明</h3><p>聚合、命令、事件以及受支持的守卫、绑定、状态折叠声明共同驱动生成。结构还包括 schema、端口与测试脚手架。只命名不变量，不会自动实现缺失规则。</p></div>
         <div class="card"><span class="tag">显式输入</span><h3>技术绑定</h3><p>绑定把已声明模型接到选定的实现 profile 与宿主契约。它应与业务政策分别审阅；生成产物不是编辑同一份知识的第二入口。</p></div>
@@ -85,7 +86,7 @@ node "$TRUTHSRC_CLI" verify-project --project truthsrc.project.json --out genera
       <p class="sec-sub">两个引擎，两种职责——用真源声明，绝不混淆：</p>
       <div class="card-grid cols-2">
         <div class="card"><span class="tag">saga-core · TCC 事务</span><h3>跨聚合一致性</h3><p>一个 <code>saga</code> 原子声明参与者（聚合）、阶段（Try / Confirm / Cancel）和补偿。它编译成 saga IR 交给 <a href="https://github.com/MadPolaris/saga-core">saga-core</a>——一个 Akka Typed、事件溯源的 TCC 协调器。银行树声明了 <strong>2 个 saga</strong>：现金付款（投资人出金 → 归集入金 → 订单确认）和独立退款。</p></div>
-        <div class="card"><span class="tag">monarch-core · 阶段队列</span><h3>流程编排</h3><p>一个 <code>pipeline</code> 原子是有序的业务步骤队列；步骤执行切片（R16）。它编译成计划交给 <a href="https://github.com/MadPolaris/monarch-core">monarch-core</a>——一个可恢复的阶段队列引擎，支持基于游标的续跑，由 <a href="https://github.com/MadPolaris/monarch-persistence">monarch-persistence</a> 做日志持久化。银行树声明了 <strong>4 条流水线</strong>（现金付款、TA 提交、定投派发、独立退款）。</p></div>
+        <div class="card"><span class="tag">monarch-core · 阶段队列</span><h3>流程编排</h3><p>一个 <code>pipeline</code> 原子是有序的业务步骤队列；步骤执行切片（<a href="/zh/dsl/#relations">R16</a>）。它编译成计划交给 <a href="https://github.com/MadPolaris/monarch-core">monarch-core</a>——一个可恢复的阶段队列引擎，支持基于游标的续跑，由 <a href="https://github.com/MadPolaris/monarch-persistence">monarch-persistence</a> 做日志持久化。银行树声明了 <strong>4 条流水线</strong>（现金付款、TA 提交、定投派发、独立退款）。</p></div>
       </div>
       <p class="small" style="margin-top:12px">把它们分清的规则：<strong>saga 拥有事务边界；流水线拥有流程顺序。</strong>二者不可互换，真源树拒绝含混。</p>
     </section>

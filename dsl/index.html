@@ -153,6 +153,7 @@ events:
     <section id="expression-reference">
       <div class="sec-head"><span class="no">04</span><h2>Current expression reference</h2></div>
       <p>Checked against toolchain <code>cb860b5c</code>, package <code>0.5.0</code>. Author format, micro syntax and product profiles are separate versions. Counter selects decision <code>@4</code>, dependencies/folds <code>@6</code>; do not silently replace those profiles with an older example.</p>
+      <p>Current finite fold operations remain supported; reusable pure function definitions/references and function-level BDD are deferred in <a href="/status/#DEF-21">DEF-21</a>, with syntax and definition location undecided and no relaxation of replay, type or version admission.</p>
       <h3>Seven fold operations</h3>
       <p>Each row below is an <strong>author object fragment</strong> inside an event’s <code>foldAssignments</code>, not standalone YAML. Example field names require matching declarations. Outer objects with string operands are the supported interim form; they are not the proposed final language design.</p>
       <div class="tbl-wrap"><table>
@@ -180,7 +181,7 @@ events:
 
     <section id="shape">
       <div class="sec-head"><span class="no">05</span><h2>The shape of a tree</h2></div>
-      <p class="sec-sub">From the bank example — real paths, real counts <span class="badge verified" title="F-10">verified</span>.</p>
+      <p class="sec-sub">From the bank example — physical author-file counts <span class="badge verified" title="F-10">verified</span>. The 59 independent VO atom files (<a href="/status/#F-10">F-10</a>) plus 59 VOs expanded from structures give 118 VO nodes in the canonical graphstore (<a href="/status/#F-03">F-03</a>); files and expanded nodes are different counting units.</p>
       <pre class="code"><code>truth/bank-wealth/
 ├── system.yaml                    # the system root: id, name, responsibility
 ├── inbox/                         # workshop intake — notes are DRAFTS, not law
@@ -193,7 +194,7 @@ events:
     │   │   └── slices/initialize-account.slice.yaml
     │   ├── fund-order/  …         # 27 slices across 3 aggregates
     │   └── sip-plan/
-    ├── value-objects/             # 59 VOs: Money, AccountId, AmountDecimal…
+    ├── value-objects/             # 59 independent VO atom files: Money, AccountId, AmountDecimal…
     ├── read-models/               # 6 read models with field lineage (R10/R11)
     ├── policies/                  # event → command reaction rules (R7/R9)
     ├── stories/                   # 4 user stories

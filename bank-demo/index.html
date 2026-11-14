@@ -61,6 +61,7 @@
         </article>
       </div>
       <div class="callout"><b>KEEP THESE DISTINCTIONS</b><p><strong>Payment success ≠ investment success</strong> · <strong>TA acceptance ≠ share confirmation</strong> · <strong>independent refund ≠ compensation of a committed payment</strong> · <strong>saga transaction boundary ≠ pipeline flow order</strong>. Read the declarations here; use the separately scoped acceptance below for execution evidence.</p></div>
+      <p class="small">External-contract references and observation-to-business-command translation declarations still need a joint version-resolution design (<a href="/status/#DEF-22">DEF-22</a>); existing contracts and version checks are not a complete declaration-level consistency loop.</p>
     </section>
 
     <section id="views">
@@ -71,6 +72,7 @@
         <figcaption class="small" style="margin-top:6px">The exported workshop subset contains <strong>120 nodes / 183 edges</strong> from a graph of <strong>861 nodes / 737 edges</strong> <a class="badge verified" href="/status/#F-17" data-fact="F-17">F-17</a>. <a href="/downloads/bank-workshop.html">Download the historical Chinese snapshot (2.18 MB, opens offline)</a> — not a complete graph export or a report of the current technical acceptance.</figcaption>
       </figure>
       <p class="small">Prefer querying to browsing? The <a href="/explorer/">Explorer</a> loads a <strong>different, 2026-11-11 capture</strong>: 389 nodes / 413 edges <a class="badge verified" href="/status/#F-03" data-fact="F-03">F-03</a> as SQLite in your browser — blast radius, lineage, orphans, free SQL.</p>
+      <p class="small">The workshop subset and Explorer use different dates, representations and counting scopes (<a href="/explorer/#graph-scopes">three graph representations</a>); their totals are not a like-for-like growth or decline measurement.</p>
     </section>
 
     <section id="projections">
@@ -81,13 +83,14 @@
 
     <section id="run">
       <div class="sec-head"><span class="no">04</span><h2>From source browsing to local generation</h2></div>
-      <p class="sec-sub">Start with the <a href="https://github.com/MadPolaris/bank-wealth-demo">bank source repository</a>. For commands and prerequisites, use the <a href="/guide/#bank-prerequisites">guide’s bank path</a>, not this page as a runbook. Repository contents can evolve; the figures here retain the <strong>2026-11-11</strong> capture.</p>
+      <p class="sec-sub">Start with the <a href="https://github.com/co-arising/bank-wealth-demo">bank source repository</a>. For commands and prerequisites, use the <a href="/guide/#bank-prerequisites">guide’s bank path</a>, not this page as a runbook. Repository contents can evolve; the figures here retain the <strong>2026-11-11</strong> capture.</p>
       <div class="stat-strip">
         <div class="stat"><div class="num">3</div><div class="lbl">aggregates: CreditBalance · FundOrder · SipPlan</div></div>
         <div class="stat"><div class="num">157</div><div class="lbl">truth atoms · 149 <code>@rule</code> invariants <a href="/status/#F-02" data-fact="F-02">F-02</a> / <a href="/status/#F-09" data-fact="F-09">F-09</a></div></div>
         <div class="stat"><div class="num">2+4</div><div class="lbl">sagas + pipelines declared in truth</div></div>
         <div class="stat"><div class="num">23/23</div><div class="lbl">generated unit tests · 2026-11-11 <a class="badge verified" href="/status/#F-07" data-fact="F-07">F-07</a></div></div>
       </div>
+      <p class="small">The 149 <code>@rule</code> entries count declarations across the three aggregates, not independently proved invariants or distinct tests.</p>
       <details>
         <summary>Generation evidence and its material boundary</summary>
         <p>Source validation recorded 0 hard findings and byte-identical roundtrip <a href="/status/#F-01" data-fact="F-01">F-01</a> / <a href="/status/#F-02" data-fact="F-02">F-02</a>. The build recorded 235 generated files <a href="/status/#F-04" data-fact="F-04">F-04</a>, 0 errors across 534 sources <a href="/status/#F-06" data-fact="F-06">F-06</a> and 792 verified anchors <a href="/status/#F-05" data-fact="F-05">F-05</a>. The 23/23 result is generated unit tests, not independent handwritten business tests <a href="/status/#F-07" data-fact="F-07">F-07</a>.</p>

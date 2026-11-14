@@ -45,8 +45,8 @@ python3 -B tools/check-site.py --strict
 node tools/check-examples.mjs
 node --test tools/tests/*.test.mjs
 
-# Read-only raw/gzip entry budgets against the B baseline; no checkout/build
-python3 -B tools/check-resources.py --baseline 6627b63
+# Read-only raw/gzip entry budgets against the review baseline; no checkout/build
+python3 -B tools/check-resources.py --baseline 28ba7c2
 
 # Preview on localhost only; file:// blocks Explorer's asset fetches
 python3 -m http.server 8000 --bind 127.0.0.1
@@ -65,8 +65,9 @@ ephemeral localhost server and writes screenshots, measurements and `report.json
 only to a new temporary evidence directory. Missing tooling/browser executables
 produce a structured **BLOCKED** result (exit 2), not a pass; no browser is installed
 by the script. A test failure exits 1. It does not execute bank services or publish
-the site. The new integrated browser matrix is **NOT RUN** until the integrator
-records actual results; a historical B pass does not accept later edits. See
+the site. The 2026-11-14 integrated Chromium and WebKit matrices passed after an
+explicitly authorized WebKit installation. This is local automated cross-browser
+validation, not physical-device or human acceptance. See
 [tools/checks.md](tools/checks.md) for exact scope and remaining manual checks.
 
 Navigation is readable static HTML before enhancement; `SITE.nav` owns the shared

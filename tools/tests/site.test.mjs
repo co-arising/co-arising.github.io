@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const source = readFileSync(new URL('../../assets/js/site.js', import.meta.url), 'utf8');
 
-function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound = false, saved = null, blockedRead = false, blockedWrite = false, clipboardFails = false, fallbackWorks = false } = {}) {
+function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound = false, saved = null, blockedRead = false, blockedWrite = false, clipboardFails = false, fallbackWorks = false, layout = null } = {}) {
   const nodes = new Map();
   const timers = new Map();
   const windowEvents = new Map();
@@ -26,11 +26,17 @@ function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound 
     set innerHTML(value) {
       this._html = value;
       if (this === nav) {
-        for (const id of ['language-switch', 'theme-toggle']) nodes.set(id, new Element(id === 'theme-toggle' ? 'button' : 'a'));
+        for (const id of ['language-switch', 'theme-toggle', 'nav-primary', 'nav-scroll-hint']) {
+          const element = new Element(id === 'theme-toggle' ? 'button' : 'a');
+          element.id = id;
+          nodes.set(id, element);
+        }
+        if (layout) Object.assign(nodes.get('nav-primary'), layout);
       }
     }
     setAttribute(key, value) { this.attributes[key] = value; }
     getAttribute(key) { return this.attributes[key]; }
+    removeAttribute(key) { delete this.attributes[key]; }
     appendChild(child) { this.children.push(child); child.parent = this; }
     remove() { if (this.parent) this.parent.children = this.parent.children.filter((child) => child !== this); }
     addEventListener(name, fn) { if (!this.events.has(name)) this.events.set(name, []); this.events.get(name).push(fn); }
@@ -46,6 +52,8 @@ function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound 
   const code = new Element('code'); code.textContent = 'node "$TRUTHSRC_CLI" --help\n'; pre.appendChild(code);
   const body = new Element('body'); body.dataset.page = notFound ? 'not-found' : '';
   const html = new Element('html'); html.setAttribute('lang', lang);
+  html.style.setProperty = (key, value) => { html.style[key] = value; };
+  if (layout) nav.getBoundingClientRect = () => ({ height: nodes.get('nav-scroll-hint').hidden ? 110 : 135 });
   const document = { documentElement: html, body, activeElement: null,
     getElementById: (id) => nodes.get(id) || null,
     createElement: (tag) => new Element(tag),
@@ -64,6 +72,24 @@ function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound 
     fireWindow(name) { for (const fn of windowEvents.get(name) || []) fn(); },
   };
 }
+
+test('scroll guidance tracks actual overflow and updates the navigation offset', () => {
+  const p = page({ layout: { clientWidth: 320, scrollWidth: 426 } });
+  const primary = p.nodes.get('nav-primary');
+  const hint = p.nodes.get('nav-scroll-hint');
+  assert.equal(hint.hidden, false);
+  assert.equal(primary.getAttribute('aria-describedby'), 'nav-scroll-hint');
+  assert.equal(p.html.style['--nav-offset'], '147px');
+  primary.clientWidth = 500;
+  p.fireWindow('resize');
+  assert.equal(hint.hidden, true);
+  assert.equal(primary.getAttribute('aria-describedby'), undefined);
+  assert.equal(p.html.style['--nav-offset'], '122px');
+  primary.scrollWidth = 600;
+  p.fireWindow('load');
+  assert.equal(hint.hidden, false);
+  assert.equal(p.html.style['--nav-offset'], '147px');
+});
 
 test('known routes preserve current language, query and fragment', () => {
   const p = page({ path: '/guide/index.html', search: '?example=counter', hash: '#l1' });

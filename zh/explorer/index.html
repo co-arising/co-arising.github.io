@@ -35,6 +35,14 @@
     <section id="nodes" class="xp-directory" aria-labelledby="xp-nodes-heading">
       <div class="sec-head"><span class="no">01</span><h2 id="xp-nodes-heading">浏览真实节点</h2></div>
       <p class="sec-sub">按完整 ID 或名称搜索全部节点，查看存储记录及双向关系。这是 <b>2026-11-11 捕获的 canonical graphstore</b>，不是项目知识/回锚数据库。限定别名保持独立节点，同名不等于同一身份。</p>
+      <details id="graph-scopes">
+        <summary>三种图表示，各有范围</summary>
+        <dl>
+          <dt>Canonical graphstore</dt><dd>随站点提供的声明图：2026-11-11 捕获，389 节点 / 413 边（<a href="/zh/status/#F-03">F-03</a>），不提供代码锚点。</dd>
+          <dt>项目知识/回锚图</dt><dd>来自配套项目与生成输出的知识及代码位置映射；查询代码需要匹配的项目身份、精度和新鲜度。</dd>
+          <dt>Workshop project-view 导出</dt><dd>供浏览的视图，可以截断：2026-11-06 快照从声明总量 861 节点 / 737 边中导出 120 节点 / 183 边（<a href="/zh/status/#F-17">F-17</a>），不是上述任一数据库的完整副本。</dd>
+        </dl>
+      </details>
       <div class="xp-filters">
         <label for="xp-node-search">ID 或名称 <input id="xp-node-search" type="search" maxlength="256" autocomplete="off" aria-controls="xp-node-list" aria-describedby="xp-node-help" /></label>
         <label for="xp-node-kind">节点类型 <select id="xp-node-kind" aria-controls="xp-node-list" disabled><option value="">全部类型 — 正在从图谱加载</option></select></label>
@@ -58,6 +66,7 @@
           <p class="small">代码回锚：<b>unavailable — 此快照未提供</b>。不推断作者文件路径、行号或 GitHub 源码链接。存储的 provenance 是声明，不是已验证的代码位置。</p>
         </div>
       </div>
+      <p class="small" id="xp-anchor-guide">需要查询代码位置？用配套本地项目完成 <a href="/zh/guide/#counter-reverse-query">Counter 来源反查教程</a>；这不是当前选中银行节点的代码跳转。</p>
       <p class="small">每个方向最多显示 80 条边，每个 atom/provenance 字段最多 8192 UTF-8 字节，每次响应最多 512 KiB；明确显示总数与截断。存储的 atom 仅作为文本，不执行，也不视为已验证的生成产物。</p>
       <noscript><p class="callout">目录和详情需要 JavaScript 与本地 SQLite 引擎；未加载时没有真实节点查询结果。可用下方重建说明自行检查快照。</p></noscript>
     </section>
