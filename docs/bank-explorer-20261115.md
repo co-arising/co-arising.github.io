@@ -7,7 +7,18 @@ The installed Graph / Code view was observed in Chromium and WebKit using the
 actual exported bank bytes, without fixture substitution.
 
 这是经过完整来源/回锚验证的配对快照，不是新的银行运行验收。真实银行导出已在
-Chromium、WebKit 中完成知识 → 代码 → 知识的浏览器闭环；未运行 Scala 编译或银行服务。
+Chromium、WebKit 中完成知识 → 代码 → 知识的浏览器闭环；快照捕获时没有运行 Scala
+编译或银行服务。后续本机重建与编译结果在下方单独说明，不改写这份快照的证据。
+
+**Experimental sample:** the sample business logic and code generator are still
+being upgraded, and current generated code quality is poor. This code illustrates
+bidirectional knowledge/code traceability; it is not production-ready or a
+best-practice reference. Source/anchor checks and successful compilation do not
+certify design quality or business correctness.
+
+**实验样例：**样例业务逻辑与代码生成器仍在升级，当前生成代码质量较低。代码仅用于
+展示知识与代码的双向追溯，不用于生产，也不作为最佳实践参考。来源/回锚验证和编译
+通过不等于设计质量或业务正确性得到认证。
 
 - Public snapshot: `cfc3fb229a0390922eaaea3ffc6604503b340add7fdcd0b1cf3d2b781ca3149d`.
 - Bank input commit: `f8ac7ca`; tool commit: `86c525e`.
@@ -75,6 +86,39 @@ The public payload gate also checked the installed assets. The older Workshop
 HTML remains its 2026-11-06 truncated snapshot; only its two local verification
 paths were removed from the public copy. Its code, mapping and historical result
 were not re-signed.
+
+## Which generated directory?
+
+**网站展示的是独立验证候选的打包快照，不是实时挂载银行工作区目录。**
+
+| Location | Meaning |
+|---|---|
+| Former bank `generated/` root and nested `current/` | Archived together outside the workspace on 2026-11-15; no longer active outputs |
+| Bank `generated/current/` after rebuild | The sole active output, freshly generated from current author inputs; current-input and complete anchor verification passed at rebuild |
+| Website export candidate `bank-explorer-20261115-uevvblfc/generated/` | Independently generated and verified under the tool fingerprint recorded above; the source of this website snapshot |
+| Site `assets/data/explorer/snapshots/cfc3fb229a0390922eaaea3ffc6604503b340add7fdcd0b1cf3d2b781ca3149d/` | The actual public files fetched by the browser; independent of either bank output directory |
+
+The relative path shown in Code is the captured generated/author path. “File
+details” gives the exact site asset path and hash. It is not an instruction to
+find that relative file in an arbitrary local generated directory.
+
+After the 2026-11-15 archive and rebuild, every public generated file in the website
+snapshot matched the newly generated `generated/current` source bytes. Its withheld
+`build.sbt` contained different machine-local paths. Current source and complete
+anchor checks passed; a separate JDK 11 / sbt offline compilation also passed using
+current local artifact caches, without extracting the historical distribution tar.
+Actual compiler staging sources were checked against the new output. Business
+tests and services were not run.
+
+The website's immutable snapshot and original receipt were not replaced or re-signed.
+This byte agreement does not mean the website is live-linked to `current`, certified
+against every later tool version, or approved as a model implementation.
+
+Deleting local bank output cannot erase the website snapshot, but the website is
+**not a recovery archive**: it omits build configuration, handwritten implementation,
+JAR supply and full project receipts. Retained output is Git-ignored; cleanup must
+preserve any required historical evidence and account for scripts still targeting
+`generated/current`. Do not infer “safe to delete” from the directory name.
 
 ## Licensing and boundaries
 

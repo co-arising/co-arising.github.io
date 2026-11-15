@@ -140,6 +140,21 @@ test('both languages provide the native directory/inspector contract and truthfu
   }
 });
 
+test('sample quality notice is outside collapsible evidence and present in both languages', () => {
+  for (const [path, expected] of [
+    ['explorer/index.html', /Business logic and generator are still evolving; generated code quality is poor/],
+    ['zh/explorer/index.html', /业务逻辑与代码生成器仍在升级，当前生成代码质量较低/],
+  ]) {
+    const html = readFileSync(new URL(path, root), 'utf8');
+    const fileHeader = html.match(/<div class="xp-file-header">([\s\S]*?)<\/div>/)?.[1];
+    assert.ok(fileHeader, 'file header missing');
+    assert.match(fileHeader, /id="xp-code-quality-notice"[^>]*role="note"/);
+    assert.match(fileHeader, expected);
+    assert.doesNotMatch(fileHeader, /<details|\bhidden\b/);
+    assert.match(fileHeader, /not for production|不用于生产/);
+  }
+});
+
 test('initial node URL waits for verified graph, loads once, and ignores URL SQL', async () => {
   const p = page({ url: '/explorer/?node=aggregate%3ACreditBalance&sql=DELETE+FROM+nodes#nodes' });
   assert.equal(p.workers.length, 0);

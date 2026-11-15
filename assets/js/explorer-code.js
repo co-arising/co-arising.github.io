@@ -32,6 +32,9 @@
   const filesPanel = el("xp-files-panel"), knowledgePanel = el("xp-knowledge-panel");
   const fileToggle = el("xp-toggle-files"), knowledgeToggle = el("xp-toggle-knowledge"), focusButton = el("xp-focus");
   const filePath = el("xp-code-path"), fileEvidence = el("xp-file-evidence");
+  const filesResizer = el("xp-files-resizer"), codeLayout = panel.querySelector(".xp-code-layout");
+  const MIN_FILES_WIDTH = 220, DEFAULT_FILES_WIDTH = 270, MAX_FILES_WIDTH = 600, MIN_CODE_WIDTH = 480;
+  let preferredFilesWidth = DEFAULT_FILES_WIDTH, resizeDrag = null;
   const widthBand = () => innerWidth >= 1440 ? "wide" : innerWidth >= 900 ? "medium" : "small";
   let band = widthBand(), panels = { files: band !== "small", knowledge: band === "wide" }, focusSaved = null;
   let currentView, graphScroll = 0, treeSelection, treeWasFiltered = false;
@@ -44,6 +47,53 @@
     else if (rect.top < bounds.top) container.scrollTop += rect.top - bounds.top;
     else if (rect.bottom > bounds.bottom) container.scrollTop += rect.bottom - bounds.bottom;
   }
+  function filesWidthLimit() {
+    const reserved = band === "wide" && panels.knowledge ? 344 : 12;
+    return Math.max(MIN_FILES_WIDTH, Math.min(MAX_FILES_WIDTH, codeLayout.clientWidth - reserved - MIN_CODE_WIDTH - 2));
+  }
+  function applyFilesWidth() {
+    const available = currentView === "code" && band !== "small" && panels.files;
+    const maximum = filesWidthLimit();
+    const width = Math.max(MIN_FILES_WIDTH, Math.min(preferredFilesWidth, maximum));
+    codeLayout.style.setProperty("--xp-files-width", width + "px");
+    filesResizer.hidden = !available;
+    filesResizer.setAttribute("aria-valuemax", String(maximum));
+    filesResizer.setAttribute("aria-valuenow", String(width));
+    filesResizer.setAttribute("aria-valuetext", width + (zh ? " 像素" : " pixels"));
+    if (!available && document.activeElement === filesResizer) fileToggle.focus();
+    if (!available) stopResize();
+  }
+  function changeFilesWidth(width) {
+    preferredFilesWidth = Math.max(MIN_FILES_WIDTH, Math.min(Math.round(width), filesWidthLimit()));
+    applyFilesWidth();
+  }
+  function stopResize() {
+    const drag = resizeDrag;
+    resizeDrag = null;
+    delete document.body.dataset.resizingFiles;
+    if (drag && filesResizer.hasPointerCapture(drag.id)) filesResizer.releasePointerCapture(drag.id);
+  }
+  filesResizer.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || filesResizer.hidden) return;
+    event.preventDefault();
+    filesResizer.focus();
+    resizeDrag = { id: event.pointerId, x: event.clientX, width: filesPanel.getBoundingClientRect().width };
+    filesResizer.setPointerCapture(event.pointerId);
+    document.body.dataset.resizingFiles = "true";
+  });
+  filesResizer.addEventListener("pointermove", (event) => {
+    if (resizeDrag?.id === event.pointerId) changeFilesWidth(resizeDrag.width + event.clientX - resizeDrag.x);
+  });
+  for (const event of ["pointerup", "pointercancel", "lostpointercapture"]) filesResizer.addEventListener(event, stopResize);
+  filesResizer.addEventListener("dblclick", () => changeFilesWidth(DEFAULT_FILES_WIDTH));
+  filesResizer.addEventListener("keydown", (event) => {
+    const step = event.shiftKey ? 40 : 10;
+    const width = Number(filesResizer.getAttribute("aria-valuenow"));
+    const choices = { ArrowLeft: width - step, ArrowRight: width + step, Home: MIN_FILES_WIDTH, End: filesWidthLimit(), Enter: DEFAULT_FILES_WIDTH };
+    if (event.key === "Escape" && resizeDrag) { const initial = resizeDrag.width; stopResize(); changeFilesWidth(initial); event.preventDefault(); }
+    else if (Object.hasOwn(choices, event.key)) { event.preventDefault(); changeFilesWidth(choices[event.key]); }
+  });
+  window.addEventListener("blur", stopResize);
   function updatePanels() {
     filesPanel.hidden = !panels.files;
     knowledgePanel.hidden = !panels.knowledge;
@@ -53,6 +103,7 @@
     knowledgeToggle.setAttribute("aria-expanded", String(panels.knowledge));
     focusButton.setAttribute("aria-pressed", String(!!focusSaved));
     focusButton.textContent = focusSaved ? zh ? "退出专注" : "Exit focus" : zh ? "专注阅读" : "Focus reading";
+    applyFilesWidth();
   }
   function togglePanel(name, value = !panels[name], restoreFocus = false) {
     focusSaved = null;
@@ -75,7 +126,8 @@
   });
   window.addEventListener("resize", () => {
     const next = widthBand();
-    if (next === band) return;
+    if (next === band) { applyFilesWidth(); return; }
+    stopResize();
     band = next; focusSaved = null; panels = { files: band !== "small", knowledge: band === "wide" };
     const active = document.activeElement;
     updatePanels();
@@ -106,7 +158,7 @@
   }
   let snapshot, loadedFile, sequence = 0, lastSelection = "", settled = false;
   const lifetime = new AbortController();
-  const leavePage = () => { sequence++; lifetime.abort(); };
+  const leavePage = () => { stopResize(); sequence++; lifetime.abort(); };
   window.addEventListener("pagehide", leavePage);
   window.addEventListener("beforeunload", leavePage);
   window.addEventListener("pageshow", (event) => { if (event.persisted && lifetime.signal.aborted) location.reload(); });
@@ -248,7 +300,13 @@
     header.title = file?.path || "";
     filePath.textContent = file?.path || "";
     filePath.title = file?.path || "";
-    const rows = file ? [[zh ? "完整路径" : "Full path", file.path], ["SHA-256", file.sha256], ["Snapshot", snapshot.manifest.id], [zh ? "验证范围" : "Verification scope", t.verified]] : [];
+    const rows = file ? [
+      [zh ? "快照内路径（不是本机路径）" : "Path within snapshot (not a local path)", file.path],
+      [zh ? "文件类别" : "Source set", file.role === "generated" ? t.generated : t.author],
+      [zh ? "实际读取位置" : "Read from", file.resource ? "/assets/data/explorer/snapshots/" + snapshot.manifest.id + "/" + file.resource.path : t.withheld],
+      ["SHA-256", file.sha256], ["Snapshot", snapshot.manifest.id],
+      [zh ? "验证范围" : "Verification scope", t.verified],
+    ] : [];
     fileEvidence.innerHTML = rows.map(([key, value]) => "<dt>" + esc(key) + "</dt><dd>" + esc(value) + "</dd>").join("");
   }
   function showLines(state) {

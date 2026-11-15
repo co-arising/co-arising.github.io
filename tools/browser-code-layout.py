@@ -48,6 +48,14 @@ def main():
                     page.wait_for_selector(f'#xp-line-{line}.selected')
                     assert page.locator('#xp-code-heading').inner_text() == Path(file['path']).name
                     assert page.locator('#xp-code-path').text_content() == file['path']
+                    notice = page.locator('#xp-code-quality-notice')
+                    assert notice.is_visible() and notice.get_attribute('role') == 'note'
+                    assert ('仍在升级' if prefix == '/zh/' else 'still evolving') in notice.inner_text()
+                    assert notice.evaluate('e => !e.closest("details")'), 'quality notice must not be hidden in evidence details'
+                    page.locator('#xp-file-details summary').click()
+                    assert file['path'] in page.locator('#xp-file-evidence').inner_text()
+                    assert '/assets/data/explorer/snapshots/' + current['snapshot'] in page.locator('#xp-file-evidence').inner_text()
+                    page.locator('#xp-file-details summary').click()
                     measure = page.locator('#xp-code-viewer').evaluate("e => {const r=e.getBoundingClientRect(),s=getComputedStyle(e.querySelector('code')); return {width:r.width,height:r.height,font:s.fontSize,lineHeight:s.lineHeight,bodyWidth:document.documentElement.scrollWidth,bodyHeight:document.documentElement.scrollHeight,scrollY};}")
                     assert measure['font'] == '14px' and measure['lineHeight'] == '24px', measure
                     assert measure['bodyWidth'] <= width + 1 and measure['bodyHeight'] <= height + 1, measure
@@ -59,9 +67,37 @@ def main():
                         assert measure['height'] >= 600, measure
                     if width >= 900:
                         assert page.locator('#xp-files-panel').is_visible()
+                        resizer = page.locator('#xp-files-resizer')
+                        assert resizer.is_visible() and resizer.get_attribute('role') == 'separator'
+                        before_resize = page.url
+                        requests_before_resize = len(source_requests)
+                        bounds = resizer.bounding_box()
+                        page.mouse.move(bounds['x'] + 6, bounds['y'] + 80)
+                        page.mouse.down()
+                        page.mouse.move(bounds['x'] + 126, bounds['y'] + 80, steps=8)
+                        page.mouse.up()
+                        assert resizer.get_attribute('aria-valuenow') == '390'
+                        assert abs(page.locator('#xp-files-panel').bounding_box()['width'] - 390) <= 1
+                        page.locator('#xp-focus').click()
+                        assert resizer.is_hidden()
+                        page.locator('#xp-focus').click()
+                        assert resizer.get_attribute('aria-valuenow') == '390'
+                        resizer.focus()
+                        page.keyboard.press('ArrowLeft')
+                        assert resizer.get_attribute('aria-valuenow') == '380'
+                        page.keyboard.press('End')
+                        assert page.locator('#xp-code-viewer').bounding_box()['width'] >= 480
+                        page.keyboard.press('Home')
+                        assert resizer.get_attribute('aria-valuenow') == '220'
+                        page.keyboard.press('Enter')
+                        assert resizer.get_attribute('aria-valuenow') == '270'
+                        assert page.url == before_resize and len(source_requests) == requests_before_resize
+                        assert page.locator(f'#xp-line-{line}.selected').is_visible()
                     else:
                         assert page.locator('#xp-files-panel').is_hidden()
+                        assert page.locator('#xp-files-resizer').is_hidden()
                         page.locator('#xp-toggle-files').click()
+                        assert page.locator('#xp-files-resizer').is_hidden()
                     selected = page.locator('#xp-code-files a[aria-current="true"]')
                     assert selected.count() == 1 and selected.get_attribute('data-file-id') == file['id']
                     assert selected.is_visible()
@@ -79,6 +115,7 @@ def main():
                     requests_before = len(source_requests)
                     scroll_before = page.locator('#xp-code-viewer').evaluate('e => e.scrollTop')
                     page.locator('#xp-focus').click()
+                    assert notice.is_visible(), 'focus reading must retain the sample quality warning'
                     assert page.locator('#xp-files-panel').is_hidden() and page.locator('#xp-knowledge-panel').is_hidden()
                     assert page.locator('#xp-code-viewer').bounding_box()['width'] > width - 70
                     assert page.url == before and len(source_requests) == requests_before
@@ -95,6 +132,7 @@ def main():
                         assert page.locator('#xp-knowledge-panel').is_hidden(), 'drawer covered escaped keyboard focus'
                     page.screenshot(path=str(args.evidence / f'{engine}-{width}-{height}-light.png'))
                     page.locator('html').evaluate("e => e.setAttribute('data-theme','dark')")
+                    assert notice.is_visible()
                     page.screenshot(path=str(args.evidence / f'{engine}-{width}-{height}-dark.png'))
                     page.locator('[data-explorer-view="graph"]').click()
                     assert page.locator('#nodes').is_visible()

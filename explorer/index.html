@@ -48,6 +48,7 @@
         <summary>Snapshot & evidence</summary>
         <p class="small" id="xp-snapshot-status" role="status">Checking the matching bank snapshot and downloaded bytes…</p>
         <p class="small" id="xp-code-scope">Original file bytes; file candidates and exact spans are different precision levels.</p>
+        <p id="xp-source-origin" class="small">This browser reads a packaged, fixed snapshot—not your local bank <code>generated/</code> or <code>generated/current/</code>. Displayed paths are relative to that snapshot. <a href="/docs/bank-explorer-20261115.md#which-generated-directory">Which generated directory supplied it?</a></p>
         <p><a href="/docs/bank-explorer-20261115.md">Snapshot scope</a> · <a href="/downloads/bank-source-LICENSE.txt">Source license</a></p>
       </details>
     </div>
@@ -60,8 +61,12 @@
           <div class="xp-tree-status"><span class="small" id="xp-code-count" role="status"></span><button class="btn ghost" id="xp-reveal-file" type="button" hidden>Show current file</button></div>
           <nav class="xp-file-tree" id="xp-code-files" aria-label="Snapshot file tree"></nav>
         </aside>
+        <div id="xp-files-resizer" class="xp-files-resizer" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Resize file tree" aria-controls="xp-files-panel" aria-valuemin="220" aria-valuemax="600" aria-valuenow="270" title="Drag to resize. Arrow keys adjust; Enter or double-click resets."></div>
         <div class="xp-code-main">
-          <div class="xp-file-header"><h2 id="xp-code-heading">Choose a file</h2><p id="xp-code-path" class="small"></p></div>
+          <div class="xp-file-header">
+            <h2 id="xp-code-heading">Choose a file</h2><p id="xp-code-path" class="small"></p>
+            <p id="xp-code-quality-notice" class="xp-code-quality-notice" role="note"><strong>Experimental sample.</strong> Business logic and generator are still evolving; generated code quality is poor. Traceability demo only—not for production or best-practice reference.</p>
+          </div>
           <div class="xp-file-tools">
             <label for="xp-code-find" class="xp-find-label">Find in file<input id="xp-code-find" type="search" maxlength="256" autocomplete="off"></label>
             <button class="btn ghost" id="xp-code-copy" type="button">Copy link</button><a id="xp-code-share" href="?view=code#code">Fixed link</a>

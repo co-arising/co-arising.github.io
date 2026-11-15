@@ -48,6 +48,7 @@
         <summary>快照与证据</summary>
         <p class="small" id="xp-snapshot-status" role="status">正在核对银行配对快照与下载字节…</p>
         <p class="small" id="xp-code-scope">保留原始文件字节；文件候选与精确区间是不同精度。</p>
+        <p id="xp-source-origin" class="small">浏览器读取打包后的固定快照，不读取你本机银行仓库的 <code>generated/</code> 或 <code>generated/current/</code>。页面路径均相对这份快照。<a href="/docs/bank-explorer-20261115.md#which-generated-directory">这份代码是从哪个生成目录来的？</a></p>
         <p><a href="/docs/bank-explorer-20261115.md">快照范围</a> · <a href="/downloads/bank-source-LICENSE.txt">源码许可</a></p>
       </details>
     </div>
@@ -60,8 +61,12 @@
           <div class="xp-tree-status"><span class="small" id="xp-code-count" role="status"></span><button class="btn ghost" id="xp-reveal-file" type="button" hidden>显示当前文件</button></div>
           <nav class="xp-file-tree" id="xp-code-files" aria-label="快照文件树"></nav>
         </aside>
+        <div id="xp-files-resizer" class="xp-files-resizer" role="separator" tabindex="0" aria-orientation="vertical" aria-label="调整文件树宽度" aria-controls="xp-files-panel" aria-valuemin="220" aria-valuemax="600" aria-valuenow="270" title="拖动调整宽度；方向键微调，回车或双击恢复默认。"></div>
         <div class="xp-code-main">
-          <div class="xp-file-header"><h2 id="xp-code-heading">选择一个文件</h2><p id="xp-code-path" class="small"></p></div>
+          <div class="xp-file-header">
+            <h2 id="xp-code-heading">选择一个文件</h2><p id="xp-code-path" class="small"></p>
+            <p id="xp-code-quality-notice" class="xp-code-quality-notice" role="note"><strong>实验样例。</strong>业务逻辑与代码生成器仍在升级，当前生成代码质量较低；仅演示双向追溯，不用于生产或作为最佳实践参考。</p>
+          </div>
           <div class="xp-file-tools">
             <label for="xp-code-find" class="xp-find-label">文件内查找<input id="xp-code-find" type="search" maxlength="256" autocomplete="off"></label>
             <button class="btn ghost" id="xp-code-copy" type="button">复制链接</button><a id="xp-code-share" href="?view=code#code">固定链接</a>
