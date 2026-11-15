@@ -239,7 +239,7 @@ def verify(browser, base, evidence, engine='chromium', extended=False):
         note('clear while running', 'Clear terminated the job, cleared input and displayed cancellation')
 
         slow = new_context()
-        slow.route('**/assets/data/bank-wealth.graph.sqlite', lambda route: (time.sleep(1.2), route.continue_()))
+        slow.route('**/assets/data/**/graph.sqlite', lambda route: (time.sleep(1.2), route.continue_()))
         slowpage = slow.new_page()
         slowpage.goto(base + '/explorer/#blast', wait_until='domcontentloaded')
         slowpage.locator('[data-preset="census"]').click()
@@ -249,10 +249,10 @@ def verify(browser, base, evidence, engine='chromium', extended=False):
         slow.close()
 
         broken = new_context()
-        broken.route('**/assets/data/bank-wealth.graph.sqlite', lambda route: route.fulfill(status=200, body='wrong bytes'))
+        broken.route('**/assets/data/**/graph.sqlite', lambda route: route.fulfill(status=200, body='wrong bytes'))
         brokenpage = broken.new_page()
         brokenpage.goto(base + '/zh/explorer/#blast')
-        brokenpage.wait_for_function("document.querySelector('#xp-status').textContent.includes('SHA-256 mismatch')")
+        brokenpage.wait_for_function("/SHA-256 mismatch|byte\\/hash mismatch/.test(document.querySelector('#xp-status').textContent)")
         require(brokenpage.locator('#xp-result table').count() == 0, 'mismatch rendered query results')
         require(brokenpage.locator('#xp-run').is_disabled(), 'mismatch allowed execution')
         note('fingerprint failure', 'modified database bytes failed SHA checking; execution disabled and expected answer labelled unexecuted')
@@ -289,14 +289,15 @@ def verify(browser, base, evidence, engine='chromium', extended=False):
         def dismiss_draft(dialog):
             prompts.append(dialog.message)
             dialog.dismiss()
+        before_language = page.url
         page.once('dialog', dismiss_draft)
         page.locator('#language-switch').click()
-        require(page.url.endswith('/zh/explorer/?probe=b#blast'), 'dismissed draft prompt still navigated')
+        require(page.url == before_language, 'dismissed draft prompt still navigated')
         require(prompts and '草稿' in prompts[-1], 'missing draft warning')
         page.once('dialog', lambda dialog: dialog.accept())
         page.locator('#language-switch').focus()
         page.keyboard.press('Enter')
-        page.wait_for_url(base + '/explorer/?probe=b#blast')
+        page.wait_for_url(lambda url: urlsplit(url).path == '/explorer/' and urlsplit(url).query == urlsplit(before_language).query and urlsplit(url).fragment == 'blast')
         page.wait_for_function("document.querySelector('#xp-result').querySelector('table') !== null")
         idle()
         require(page.locator('html').get_attribute('lang') == 'en', 'accepted language switch did not navigate')
@@ -448,7 +449,7 @@ def verify_extended(new_context, base, evidence, note, require):
             selected = 'aggregate:CreditBalance'
             detail(selected)
             require(chosen() == selected and urlsplit(page.url).fragment == 'nodes', 'selected full identity not shared in ?node=#nodes')
-            require(set(parse_qs(urlsplit(page.url).query)) == {'node'}, 'filter or SQL state leaked into share URL')
+            require(set(parse_qs(urlsplit(page.url).query)) == {'node', 'snapshot'}, 'filter or SQL state leaked into share URL')
             page.locator('#xp-node-search').fill('no-such-node-e-validation')
             listed(0)
             page.wait_for_function("/0/.test(document.querySelector('#xp-node-count').textContent)")
@@ -485,7 +486,7 @@ def verify_extended(new_context, base, evidence, note, require):
             require(page.url == shared, 'reload rewrote the share contract')
             other_prefix = '/zh/' if prefix == '/' else '/'
             page.locator('#language-switch').click()
-            page.wait_for_url(base + other_prefix + 'explorer/?node=' + quote(target, safe='') + '#nodes')
+            page.wait_for_url(lambda url: urlsplit(url).path == other_prefix + 'explorer/' and parse_qs(urlsplit(url).query).get('node') == [target] and parse_qs(urlsplit(url).query).get('snapshot') == parse_qs(urlsplit(shared).query).get('snapshot') and urlsplit(url).fragment == 'nodes')
             ready()
             detail(target)
             require(chosen() == target, 'language switch lost node identity')

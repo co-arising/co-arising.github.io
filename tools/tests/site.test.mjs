@@ -110,11 +110,13 @@ test('scroll guidance tracks actual overflow and updates the navigation offset',
   assert.equal(hint.hidden, false);
   assert.equal(primary.getAttribute('aria-describedby'), 'nav-scroll-hint');
   assert.equal(p.html.style['--nav-offset'], '147px');
+  assert.equal(p.html.style['--nav-height'], '135px');
   primary.clientWidth = 500;
   p.fireWindow('resize');
   assert.equal(hint.hidden, true);
   assert.equal(primary.getAttribute('aria-describedby'), undefined);
   assert.equal(p.html.style['--nav-offset'], '122px');
+  assert.equal(p.html.style['--nav-height'], '110px');
   primary.scrollWidth = 600;
   p.fireWindow('load');
   assert.equal(hint.hidden, false);

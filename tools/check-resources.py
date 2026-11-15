@@ -59,6 +59,16 @@ def inventory(read, entry):
             urls.extend(raw[1:-1] for raw in re.findall(r'''@import\s+(["'][^"']+["'])''', text))
         elif name.endswith(('.js', '.mjs')) and not name.startswith('assets/vendor/'):
             urls.extend(site.js_runtime_references(data.decode('utf-8')))
+            if name == 'assets/js/explorer-snapshot.js':
+                urls.append('/assets/data/explorer/current.json')
+        elif name.endswith('.json') and name.startswith('assets/data/explorer/'):
+            value = json.loads(data)
+            if value.get('schemaVersion') == 'co-arising.explorer-current/v1' and value.get('state') == 'available':
+                urls.append(value['manifest']['path'])
+            elif value.get('schemaVersion') == 'co-arising.explorer-snapshot/v1':
+                urls.extend(value[key]['path'] for key in ('graph', 'index'))
+            elif value.get('schemaVersion') == 'co-arising.explorer-index/v1':
+                urls.extend(file['resource']['path'] for file in value['files'] if file['state'] == 'published')
         for url in urls:
             target = local_path(url, name)
             if target:

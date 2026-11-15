@@ -1,0 +1,72 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RequestFundPurchaseSettlement
+payload:
+  {
+    "name": "RequestFundPurchaseSettlement",
+    "parameters": [
+      "operationId: OperationId @BUSINESS_INPUT",
+      "fundOrderId: FundOrderId @BUSINESS_INPUT",
+      "investorAccountId: AccountId @BUSINESS_INPUT",
+      "fundCollectionAccountId: AccountId @BUSINESS_INPUT",
+      "fundCode: String @BUSINESS_INPUT",
+      "amount: Money @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject CASH_ADMITTED_PAYMENT_MATCH/CASH_ADMITTED_PAYMENT_MATCH: \"state.cashRequestSource.isEmpty || (state.cashRequestOriginals.contains(\\\"original\\\") && param.operationId == state.cashRequestOriginals(\\\"original\\\").payment.operationId && param.fundOrderId == state.cashRequestOriginals(\\\"original\\\").payment.fundOrderId && param.investorAccountId == state.cashRequestOriginals(\\\"original\\\").payment.investorAccountId && param.fundCollectionAccountId == state.cashRequestOriginals(\\\"original\\\").payment.fundCollectionAccountId && param.fundCode == state.cashRequestOriginals(\\\"original\\\").payment.fundCode && param.amount == state.cashRequestOriginals(\\\"original\\\").payment.amount)\")",
+      "@guard[invariantRef](reject ORDER_RESOURCE/ORDER_RESOURCE: \"param.fundOrderId == state.id\")",
+      "@guard[invariantRef](reject ORDER_REPLAY_CONFLICT/ORDER_REPLAY_CONFLICT: \"state.status == \\\"new\\\" || (param.operationId == state.operationId && param.investorAccountId == state.investorAccountId && param.fundCollectionAccountId == state.fundCollectionAccountId && param.fundCode == state.fundCode && param.amount == state.amount)\")",
+      "@guard[invariantRef](succeed-empty ORDER_REQUEST_ONCE/ORDER_REQUEST_ONCE: \"state.status == \\\"new\\\"\")",
+      "@guard[invariantRef](reject ORDER_ACCOUNTS/ORDER_ACCOUNTS: \"param.investorAccountId != param.fundCollectionAccountId\")",
+      "@guard[invariantRef](reject ORDER_AMOUNT/ORDER_AMOUNT: \"param.amount.currency == \\\"CNY\\\" && param.amount.amount > 0.00\")",
+      "@guard[invariantRef](reject ORDER_OPERATION/ORDER_OPERATION: \"param.operationId.value.nonEmpty && param.fundCode.nonEmpty\")"
+    ],
+    "produces": [
+      "FundPurchaseSettlementRequested"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "payment/ta/refund",
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
+    }
+  }
+events:
+  {
+    "FundPurchaseSettlementRequested": {
+      "name": "FundPurchaseSettlementRequested",
+      "payloads": [
+        "operationId: OperationId @PROPAGATED",
+        "fundOrderId: FundOrderId @PROPAGATED",
+        "investorAccountId: AccountId @PROPAGATED",
+        "fundCollectionAccountId: AccountId @PROPAGATED",
+        "fundCode: String @PROPAGATED",
+        "amount: Money @PROPAGATED"
+      ],
+      "bindings": [
+        "operationId <- param.operationId",
+        "fundOrderId <- param.fundOrderId",
+        "investorAccountId <- param.investorAccountId",
+        "fundCollectionAccountId <- param.fundCollectionAccountId",
+        "fundCode <- param.fundCode",
+        "amount <- param.amount"
+      ],
+      "foldAssignments": [
+        "operationId := event.operationId",
+        "investorAccountId := event.investorAccountId",
+        "fundCollectionAccountId := event.fundCollectionAccountId",
+        "fundCode := event.fundCode",
+        "amount := event.amount",
+        "status := \"literal:payment-requested\""
+      ]
+    }
+  }

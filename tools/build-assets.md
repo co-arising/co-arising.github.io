@@ -13,17 +13,60 @@ mad-polaris/
 
 ## 1 · Graph store + fingerprint
 
+The shipped legacy graph is the dated 2026-11-11 capture. `compile-project`
+compiles in memory; it **does not refresh** `generated/current/.truthsrc/canonical.json`.
+Do not use that command followed by an old disk canonical as a freshness check.
+For a standalone graph, follow the guide's explicit `graph --tree ... --out NEW_FILE`
+recipe. Replacing the published graph requires count/byte review and publication
+approval; a standalone graph is not a project code snapshot.
+
+### Matched Graph / Code public snapshot
+
+The website adapter uses `inspectProject` once and builds Graph, author mappings
+and code locations from that same verified capture. It does not edit the toolchain,
+project graph, generated code, ledger or anchors. Requires Node ≥22.13 and an
+explicit matching complete tool checkout, project, and owned generated output.
+
 ```bash
-cd ../bank-wealth-demo
-node ../metarch-truthsrc/bin/truthsrc.js compile-project --project truthsrc.project.json
-node ../metarch-truthsrc/bin/truthsrc.js graph \
-  --canonical generated/current/.truthsrc/canonical.json \
-  --out ../co-arising.github.io/assets/data/bank-wealth.graph.sqlite
+node tools/export-explorer-snapshot.mjs \
+  --tool /absolute/matching/metarch-truthsrc \
+  --project /absolute/bank/truthsrc.project.json \
+  --out /absolute/bank/generated/current \
+  --authors /absolute/public-author-allowlist.json \
+  --requirements /absolute/site/tools/bank-explorer-requirements.json \
+  --dest /absolute/new-public-candidate
 ```
 
-Expected: `389 nodes · 413 edges · workshop bank-wealth-v1`.
-Then update `sha256` / counts in `assets/data/bank-wealth.graph.meta.json`
-and re-capture any changed number in SITE-FACTS.md.
+The author allowlist is a JSON array of exact project-relative real author paths,
+not globs and not expanded virtual slice paths. The bank requirements bind the
+CreditBalance, ReserveFunds and LEDGER_SUFFICIENT identities. Required sources
+and code must remain publicly available after the withholding pass; a private
+location cannot satisfy the public demonstration gate. Destination must be absent and
+outside tool/project/author/generated roots. Export never activates `current.json`.
+
+A failed full verifier is a blocking result: do not rewrite receipts, relabel old
+anchors, or regenerate the shared bank output as a website maintenance shortcut.
+On 2026-11-15 the shared output failed `PROJECT_VERIFICATION_CURRENTINPUTS`.
+A separate candidate then copied current bank inputs unchanged, used an independent
+knowledge database and output, validated the three pinned 0.3.0 JARs, and passed
+validate/roundtrip/generate/verify/export. The installed pointer now selects the
+real bank snapshot documented in `docs/bank-explorer-20261115.md` (F-30).
+Synthetic browser fixtures are not public bank assets and must not be copied into
+`assets/data/`. No shared generated files or receipts were repaired.
+
+After a successful export, inspect every candidate payload, including SQLite JSON,
+source files, manifests and indexes. Keep source bytes intact: sensitive files are
+withheld whole, not edited while retaining old spans. Check published/withheld
+counts, identity bridges, hashes, and browser round-trips. Only after separate
+publication approval install the immutable snapshot directory and replace the
+small current pointer with the export's manifest hash/size. Preserve older snapshot
+URLs. Graph counts and new dated verification facts must be updated together.
+
+The historical Workshop HTML is a different, truncated snapshot. Its public copy
+was sanitized on 2026-11-15 with `tools/sanitize-historical-workshop.mjs`: only
+`verification.project` and `verification.output` were replaced, and a notice added.
+Original code excerpts, mappings, fingerprints, script/CSP and verification state
+were checked unchanged. Do not join that historical view into current Graph/Code.
 
 ## 2 · Dissolve subgraph (why-co-arising page)
 
@@ -42,8 +85,9 @@ node --no-warnings -e '<the export script from git history>' \
 Not regenerable headlessly (browser capture). Source of truth:
 `bank-wealth-demo/target/onboarding-graph-preview-MSkaJ6/` —
 `desktop.png / mobile.png / search.png / bank-workshop.html` (generated
-2026-11-06 by `bank-workshop.mjs view --html`). Copy the four files into
-`assets/img/` (renamed `workshop-*.png`) and `downloads/`.
+2026-11-06 by `bank-workshop.mjs view --html`). Images retain that historical
+capture. For the HTML, run the pinned sanitizer before installing the public copy;
+never restore the original local verification paths into `downloads/`.
 
 ## 4 · Relation registry
 

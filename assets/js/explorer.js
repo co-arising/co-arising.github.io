@@ -1,8 +1,15 @@
 /* Fixed presets and a disposable SQL sandbox share bytes, never mutable state. */
 (function () {
   "use strict";
+  const protocol = "co-arising.explorer-query/v1";
   const status = document.getElementById("xp-status");
   if (!status) return;
+  const lifetime = typeof AbortController === "undefined" ? null : new AbortController();
+  let departed = false;
+  const leavePage = () => { departed = true; lifetime?.abort(); stop(); stopNodeJob(directoryJob); stopNodeJob(inspectJob); };
+  window.addEventListener("pagehide", leavePage);
+  window.addEventListener("beforeunload", leavePage);
+  window.addEventListener("pageshow", (event) => { if (event.persisted && departed) location.reload(); });
   const result = document.getElementById("xp-result");
   const input = document.getElementById("xp-sql");
   const run = document.getElementById("xp-run");
@@ -100,6 +107,7 @@
   let bytes;
   let wasm;
   let meta;
+  let publicSnapshot = false;
   let pending = null;
   let worker = null;
   let timer;
@@ -125,7 +133,7 @@
     const info = request.mode === "preset" ? text[request.key] : [text.query, "", ""];
     let html = "<h3>" + esc(info[0]) + "</h3><p class='small'>" + esc(request.mode === "preset" ? text.preset : text.sandbox) + "</p>";
     if (info[1]) html += "<p class='answer'>" + esc(info[1]) + "</p>";
-    if (info[2]) html += "<p class='small'>" + esc(text.expected + " " + info[2]) + "</p>";
+    if (info[2]) html += "<p class='small'>" + esc((publicSnapshot ? zh ? "2026-11-11 历史基线（不作为当前快照断言）：" : "Historical baseline, 2026-11-11 (not asserted for this snapshot):" : text.expected) + " " + info[2]) + "</p>";
     if (!data.tables.length) html += "<p>" + esc(text.empty) + "</p>";
     for (const table of data.tables) {
       html += "<div class='xp-table-wrap' tabindex='0'><table><thead><tr>" + table.cols.map((col) => "<th scope='col'>" + esc(col) + "</th>").join("") + "</tr></thead><tbody>";
@@ -165,16 +173,17 @@
         if (event.data.id !== generation) return;
         const response = event.data;
         stop();
+        if (response.protocol !== protocol) { heading(text.error, "Explorer worker protocol mismatch"); return; }
         if (!response.ok) heading(text.error, response.error);
         else {
           show(response.result, request);
           timing.textContent = response.milliseconds.toFixed(1) + " ms";
         }
       };
-      worker.onerror = () => { if (id === generation) stop(text.error); };
+      worker.onerror = (event) => { event?.preventDefault(); if (id === generation) stop(text.error); };
       timer = setTimeout(() => { if (id === generation) stop(text.timeout); }, 5000);
       /* Structured clone leaves the verified originals intact for the next job. */
-      worker.postMessage({ id, bytes, wasm, request });
+      worker.postMessage({ id, protocol, bytes, wasm, request });
     } catch (error) { stop(); heading(text.error, error.message); }
   }
   function stopNodeJob(job) {
@@ -202,16 +211,18 @@
         if (id !== job.generation || event.data.id !== id) return;
         stopNodeJob(job);
         target.setAttribute("aria-busy", "false");
+        if (event.data.protocol !== protocol) { showError("Explorer worker protocol mismatch"); return; }
         if (event.data.ok) showResult(event.data.result);
         else showError(text.error + ": " + event.data.error);
       };
-      job.worker.onerror = () => { if (id === job.generation) fail(text.error); };
+      job.worker.onerror = (event) => { event?.preventDefault(); if (id === job.generation) fail(text.error); };
       job.timer = setTimeout(() => { if (id === job.generation) fail(text.timeout); }, 5000);
       /* No transfer list: each job gets a fresh clone of the verified originals. */
-      job.worker.postMessage({ id, bytes, wasm, request });
+      job.worker.postMessage({ id, protocol, bytes, wasm, request });
     } catch (error) { fail(text.error + ": " + error.message); }
   }
   function nodeURL(id) {
+    if (typeof ExplorerCode !== "undefined") return ExplorerCode.nodeURL(id);
     const params = new URLSearchParams(location.search);
     /* SQL drafts never enter shared URLs, including an untrusted incoming sql key. */
     for (const key of [...params.keys()]) if (key.toLowerCase() === "sql") params.delete(key);
@@ -270,8 +281,8 @@
     const fields = (rows) => "<dl class='xp-node-fields'>" + rows.map((row) => "<dt>" + esc(row.field) + "</dt><dd>" + esc(row.value) + "</dd>").join("") + "</dl>";
     let html = "<h3>" + esc(nodesText.detail) + "</h3><p class='xp-node-id'><code>" + esc(node.id) + "</code></p>";
     html += fields([{ field: nodesText.kind, value: node.kind }, { field: nodesText.name, value: node.name }]);
-    html += "<p class='small'>" + esc(nodesText.scope) + "</p><p><a class='xp-node-share' href='" + esc(nodeURL(selectedNodeId)) + "'>" + esc(nodesText.share) + "</a></p>";
-    html += "<div class='xp-node-anchors'><h4>" + esc(nodesText.anchor) + "</h4><p>" + esc(nodesText.unavailable) + "</p></div>";
+    html += "<p class='small'>" + esc(typeof ExplorerCode !== "undefined" && ExplorerCode.scope() || nodesText.scope) + "</p><p><a class='xp-node-share' href='" + esc(nodeURL(selectedNodeId)) + "'>" + esc(nodesText.share) + "</a></p>";
+    html += "<div class='xp-node-anchors' id='xp-node-anchors'><h4>" + esc(nodesText.anchor) + "</h4><p>" + esc(nodesText.unavailable) + "</p></div>";
     html += "<h4>" + esc(nodesText.provenance) + "</h4><p class='small'>" + esc(nodesText.provenanceNote) + "</p>" + (node.provenance.length ? fields(node.provenance) : "<p>" + esc(nodesText.noProvenance) + "</p>");
     if (node.extra.length) html += "<h4>" + esc(nodesText.extra) + "</h4>" + fields(node.extra);
     for (const [direction, title] of [["outgoing", nodesText.outgoing], ["incoming", nodesText.incoming]]) {
@@ -283,6 +294,7 @@
     html += "<details class='xp-node-atom'><summary>" + esc(nodesText.atom) + "</summary><p class='small'>" + esc(nodesText.atomNote) + "</p>" + (node.atomTruncated ? "<p class='callout'>" + esc(nodesText.clipped) + "</p>" : "") + "<pre><code>" + esc(node.atom) + "</code></pre></details>";
     if (data.notices.length) html += "<p class='callout'>" + esc(text.limit + " " + data.notices.join(", ")) + "</p>";
     nodeDetail.innerHTML = html;
+    if (typeof ExplorerCode !== "undefined") ExplorerCode.renderAnchors(node.id, document.getElementById("xp-node-anchors"));
   }
   function inspectNode() {
     detailMessage(state === "ready" ? text.running : text.loading);
@@ -295,6 +307,7 @@
     if (share) shareNode(id);
     markSelected();
     if (id === null) detailMessage(nodesText.choose);
+    else if (state === "loading") detailMessage(text.loading);
     else inspectNode();
   }
   function resetNodes() {
@@ -342,6 +355,7 @@
   buttons.forEach((button) => button.addEventListener("click", () => select(button.dataset.preset, true)));
   window.addEventListener("hashchange", restoreLocation);
   window.addEventListener("popstate", restoreLocation);
+  window.addEventListener("site:locationchange", restoreLocation);
   run.addEventListener("click", () => execute({ mode: "sandbox", sql: input.value }));
   cancel.addEventListener("click", () => { pending = null; stop(text.stopped); });
   document.getElementById("xp-clear").addEventListener("click", () => {
@@ -358,22 +372,31 @@
   restoreLocation();
 
   async function fetchBytes(url) {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: lifetime?.signal });
     if (!response.ok) throw new Error("HTTP " + response.status);
     return response.arrayBuffer();
   }
   (async () => {
     try {
-      const loaded = await Promise.all([
+      const published = typeof ExplorerCode !== "undefined" ? await ExplorerCode.ready : null;
+      if (departed || published?.state === "cancelled") return;
+      if (published?.state === "error") throw published.error;
+      publicSnapshot = published?.state === "ready";
+      const graphData = published?.state === "ready" ? published.graphBytes().then((data) => [data, {
+        sha256: published.manifest.graph.sha256, nodeCount: published.manifest.graph.nodeCount,
+        edgeCount: published.manifest.graph.edgeCount, generatedAt: published.manifest.verifiedAt,
+      }]) : Promise.all([
         fetchBytes("/assets/data/bank-wealth.graph.sqlite"),
-        fetchBytes("/assets/vendor/sqljs/sql-wasm.wasm"),
-        fetch("/assets/data/bank-wealth.graph.meta.json").then((response) => {
+        fetch("/assets/data/bank-wealth.graph.meta.json", { signal: lifetime?.signal }).then((response) => {
           if (!response.ok) throw new Error("HTTP " + response.status);
           return response.json();
         }),
       ]);
+      const [[graphBytes, graphMeta], engine] = await Promise.all([graphData, fetchBytes("/assets/vendor/sqljs/sql-wasm.wasm")]);
+      const loaded = [graphBytes, engine, graphMeta];
       const digest = [...new Uint8Array(await crypto.subtle.digest("SHA-256", loaded[0]))].map((byte) => byte.toString(16).padStart(2, "0")).join("");
       if (digest !== loaded[2].sha256) throw new Error("SHA-256 mismatch");
+      if (departed) return;
       [bytes, wasm, meta] = loaded;
       state = "ready";
       status.textContent = text.ready + "\n" + meta.nodeCount + " / " + meta.edgeCount + " · " + meta.generatedAt + "\nsha256 " + digest;
@@ -382,6 +405,7 @@
       if (selectedNodeId !== null) inspectNode();
       if (pending) execute(pending);
     } catch (error) {
+      if (departed) return;
       state = "error";
       stop();
       status.textContent = text.failed + " (" + String(error.message).slice(0, 300) + ")";

@@ -1,0 +1,27 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: host-computation
+id: "[\"bankwealth\",\"StableRefundOperationId\"]"
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "@ref(bankwealth:port#StableRefundOperationId)",
+    "version": "bank-v1-1",
+    "command": "@ref(bankwealth:command/FundOrder#RequestFundPurchaseRefund)",
+    "outputType": "@type(nominal:bankwealth:type#OperationId)",
+    "inputDependencies": [
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#fundOrderId)",
+      "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#paymentTxId)"
+    ],
+    "stableIdentityContract": {
+      "id": "StableRefundOperationId-identity",
+      "version": "1",
+      "keys": [
+        "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#fundOrderId)",
+        "@ref(bankwealth:parameter/FundOrder/RequestFundPurchaseRefund#paymentTxId)"
+      ]
+    }
+  }

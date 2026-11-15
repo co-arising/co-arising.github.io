@@ -61,6 +61,117 @@ main.wrap > section + section::before {
 }
 
 /* ---------- explorer page ---------- */
+.xp-workbench-bar { display: contents; }
+.xp-workbench-controls { display: none; }
+.xp-view-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 12px; }
+.xp-view-tabs [aria-pressed="true"] { background: var(--teal-soft); border-color: var(--teal); color: var(--ink); }
+#xp-snapshot-status { overflow-wrap: anywhere; }
+#xp-advanced > section { padding: 10px 0; }
+#code[hidden], #nodes[hidden], #xp-advanced[hidden] { display: none; }
+.xp-identity { border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 14px; }
+.xp-code-location { border: 1px solid var(--line); background: var(--bg-raised); color: var(--ink); text-align: left; padding: 8px; margin: 4px 0; width: 100%; font: inherit; overflow-wrap: anywhere; cursor: pointer; }
+.xp-locations ul { padding-left: 14px; }
+
+/* Code owns the viewport; Graph and reading pages keep their existing measure. */
+body[data-explorer-view="code"] { height: 100vh; height: 100dvh; overflow: hidden; }
+body[data-explorer-view="code"] main.wrap { max-width: none; width: 100%; margin: 0; padding: 0 20px 12px; height: calc(100vh - var(--nav-height, 78px)); height: calc(100dvh - var(--nav-height, 78px)); display: grid; grid-template-rows: auto minmax(0, 1fr); }
+body[data-explorer-view="code"] .page-hero,
+body[data-explorer-view="code"] #rebuild,
+body[data-explorer-view="code"] #site-footer { display: none; }
+body[data-explorer-view="code"] .xp-workbench-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; min-height: 58px; padding: 7px 0; }
+body[data-explorer-view="code"] .xp-view-tabs { margin: 0; gap: 4px; }
+body[data-explorer-view="code"] #xp-tour { display: none; }
+body[data-explorer-view="code"] .xp-workbench-controls { display: flex; gap: 4px; }
+body[data-explorer-view="code"] .btn { min-height: 36px; padding: 6px 10px; font-size: 13px; white-space: nowrap; }
+body[data-explorer-view="code"] .xp-workbench-controls [aria-expanded="true"],
+body[data-explorer-view="code"] #xp-focus[aria-pressed="true"] { background: var(--teal-soft); border-color: var(--teal); }
+body[data-explorer-view="code"] .xp-snapshot-details { margin: 0 0 0 auto; font-size: 12px; }
+body[data-explorer-view="code"] .xp-snapshot-details > summary { padding: 7px 10px; }
+body[data-explorer-view="code"] .xp-snapshot-details[open] { position: absolute; top: calc(var(--nav-height, 78px) + 8px); right: 20px; z-index: 25; width: min(460px, calc(100vw - 40px)); max-height: 60vh; overflow: auto; box-shadow: var(--shadow); }
+body[data-explorer-view="code"] #code { min-height: 0; padding: 0; margin: 0; position: relative; }
+body[data-explorer-view="code"] #code::before { display: none; }
+body[data-explorer-view="code"] .xp-code-layout { height: 100%; min-height: 0; display: grid; grid-template-columns: 270px minmax(0, 1fr) 320px; gap: 12px; align-items: stretch; }
+body[data-explorer-view="code"][data-files-open="false"] .xp-code-layout { grid-template-columns: minmax(0, 1fr) 320px; }
+body[data-explorer-view="code"][data-knowledge-open="false"] .xp-code-layout { grid-template-columns: 270px minmax(0, 1fr); }
+body[data-explorer-view="code"][data-files-open="false"][data-knowledge-open="false"] .xp-code-layout { grid-template-columns: minmax(0, 1fr); }
+body[data-explorer-view="code"] .xp-code-layout > * { min-width: 0; min-height: 0; }
+body[data-explorer-view="code"] .xp-panel { padding: 12px; border-radius: 6px; }
+body[data-explorer-view="code"] .xp-panel[hidden] { display: none; }
+body[data-explorer-view="code"] .xp-files-panel { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); }
+body[data-explorer-view="code"] .xp-knowledge-panel { display: flex; flex-direction: column; }
+body[data-explorer-view="code"] .xp-panel-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+body[data-explorer-view="code"] .xp-panel-title h2 { font-size: 15px; letter-spacing: 0; }
+body[data-explorer-view="code"] .xp-panel-title button { min-width: 36px; font-size: 20px; padding: 0; }
+body[data-explorer-view="code"] .xp-filters { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+body[data-explorer-view="code"] .xp-filters label { font-size: 12px; gap: 3px; }
+body[data-explorer-view="code"] .xp-filters input,
+body[data-explorer-view="code"] .xp-filters select { padding: 6px 8px; height: 34px; }
+body[data-explorer-view="code"] .xp-tree-status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; padding: 9px 0; gap: 6px; }
+body[data-explorer-view="code"] .xp-tree-status .btn { font-size: 11px; min-height: 28px; padding: 3px 6px; }
+body[data-explorer-view="code"] .xp-file-tree { min-height: 0; overflow: auto; font: 12px/1.6 var(--font-mono); overscroll-behavior: contain; }
+body[data-explorer-view="code"] .xp-file-tree ul { list-style: none; padding-left: 12px; margin: 0; }
+body[data-explorer-view="code"] .xp-file-tree > ul { padding: 0; }
+body[data-explorer-view="code"] .xp-file-tree details { border: 0; margin: 0; padding: 0; background: transparent; }
+body[data-explorer-view="code"] .xp-file-tree details > :not(summary) { margin: 0; }
+body[data-explorer-view="code"] .xp-file-tree summary { display: flex; align-items: center; gap: 5px; padding: 5px 3px; min-width: 0; font-weight: 500; }
+body[data-explorer-view="code"] .xp-file-tree summary::before { content: "▸"; flex: 0 0 10px; color: var(--ink-3); }
+body[data-explorer-view="code"] .xp-file-tree details[open] > summary::before { content: "▾"; }
+body[data-explorer-view="code"] .xp-file-tree summary::-webkit-details-marker { display: none; }
+body[data-explorer-view="code"] .xp-file-link { display: flex; align-items: center; gap: 5px; padding: 5px 6px; min-width: 0; min-height: 30px; border: 0; border-radius: 4px; color: var(--ink-2); }
+body[data-explorer-view="code"] .xp-file-link:hover { background: var(--bg-sink); }
+body[data-explorer-view="code"] .xp-file-link[aria-current="true"] { background: var(--teal-soft); color: var(--ink); box-shadow: inset 3px 0 var(--teal); }
+body[data-explorer-view="code"] .xp-tree-label { display: block; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+body[data-explorer-view="code"] .xp-tree-withheld { font-size: 10px; color: var(--ink-3); flex: none; }
+body[data-explorer-view="code"] .xp-code-main { display: grid; min-height: 0; grid-template-rows: auto auto auto minmax(0, 1fr) auto; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--bg-raised); }
+body[data-explorer-view="code"] .xp-file-header { min-width: 0; padding: 10px 14px 6px; }
+body[data-explorer-view="code"] #xp-code-heading { font: 600 15px/22px var(--font-mono); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body[data-explorer-view="code"] #xp-code-path { font: 11px/18px var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0 0; }
+body[data-explorer-view="code"] .xp-file-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 4px 14px 8px; font-size: 12px; position: relative; }
+body[data-explorer-view="code"] .xp-find-label { display: flex; align-items: center; gap: 8px; flex: 1 1 230px; min-width: 0; white-space: nowrap; color: var(--ink-3); }
+body[data-explorer-view="code"] #xp-code-find { width: 100%; min-width: 0; max-width: 360px; height: 32px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--bg); color: var(--ink); padding: 4px 8px; }
+body[data-explorer-view="code"] #xp-file-details { margin: 0; font-size: 12px; }
+body[data-explorer-view="code"] #xp-file-details > summary { padding: 5px 8px; }
+body[data-explorer-view="code"] #xp-file-details[open] { position: absolute; top: 4px; right: 12px; z-index: 10; width: min(500px, calc(100% - 24px)); max-height: 50vh; overflow: auto; box-shadow: var(--shadow); }
+body[data-explorer-view="code"] #xp-file-evidence { font: 12px/1.6 var(--font-mono); overflow-wrap: anywhere; }
+body[data-explorer-view="code"] #xp-file-evidence dt { color: var(--ink-3); margin-top: 8px; }
+body[data-explorer-view="code"] #xp-file-evidence dd { margin: 0; }
+body[data-explorer-view="code"] #xp-code-find-result { margin: 0; padding: 0 14px; max-height: 64px; overflow: auto; overflow-wrap: anywhere; font-size: 12px; }
+body[data-explorer-view="code"] #xp-code-viewer { min-height: 0; max-height: none; overflow: auto; background: var(--bg); border-top: 1px solid var(--line); overscroll-behavior: contain; position: relative; }
+body[data-explorer-view="code"] .xp-source-lines { min-width: 100%; width: max-content; padding: 8px 0; }
+body[data-explorer-view="code"] .xp-source-line { display: flex; min-height: 24px; font: 14px/24px var(--font-mono); }
+body[data-explorer-view="code"] .xp-source-line.selected { background: var(--teal-soft); box-shadow: inset 3px 0 var(--teal); }
+body[data-explorer-view="code"] .xp-source-line code { white-space: pre; font: inherit; background: transparent; padding: 0 16px 0 10px; }
+body[data-explorer-view="code"] .xp-line-number { display: block; flex: 0 0 52px; width: 52px; padding: 0 8px; text-align: right; position: sticky; left: 0; border: 0; border-right: 1px solid var(--line); background: var(--bg-raised); color: var(--ink-3); }
+body[data-explorer-view="code"] .xp-source-status { border-top: 1px solid var(--line); padding: 6px 12px; display: flex; flex-wrap: wrap; gap: 3px 10px; }
+body[data-explorer-view="code"] .xp-source-status p { margin: 0; font-size: 11px; overflow-wrap: anywhere; }
+body[data-explorer-view="code"] #xp-code-knowledge { overflow: auto; min-height: 0; overscroll-behavior: contain; font-size: 13px; overflow-wrap: anywhere; }
+body[data-explorer-view="code"] #xp-code-knowledge > h3 { display: none; }
+body[data-explorer-view="code"] #xp-code-knowledge h4 { font: 600 14px/1.4 var(--font-sans); text-transform: none; letter-spacing: 0; color: var(--ink); margin: 8px 0; }
+body[data-explorer-view="code"] #xp-code-knowledge h5 { margin: 12px 0 4px; }
+body[data-explorer-view="code"] #xp-code-knowledge details { margin: 8px 0; }
+body[data-explorer-view="code"] #xp-code-knowledge details > summary { padding: 8px; font-size: 12px; }
+body[data-explorer-view="code"] #xp-code-knowledge details > :not(summary) { margin-left: 8px; margin-right: 8px; }
+body[data-explorer-view="code"] #xp-code-knowledge ul { padding-left: 16px; }
+body[data-explorer-view="code"] .xp-short-path { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body[data-explorer-view="code"] .xp-pointer-hint { display: block; color: var(--ink-3); font: 11px/1.5 var(--font-mono); overflow-wrap: anywhere; }
+@media (max-width: 1439px) {
+  body[data-explorer-view="code"] .xp-code-layout,
+  body[data-explorer-view="code"][data-knowledge-open="false"] .xp-code-layout { grid-template-columns: 270px minmax(0, 1fr); }
+  body[data-explorer-view="code"][data-files-open="false"] .xp-code-layout { grid-template-columns: minmax(0, 1fr); }
+  body[data-explorer-view="code"] .xp-knowledge-panel { position: absolute; right: 0; top: 0; bottom: 0; width: min(360px, 100%); z-index: 20; box-shadow: var(--shadow); }
+}
+@media (max-width: 899px) {
+  body[data-explorer-view="code"] main.wrap { padding: 0 8px 8px; }
+  body[data-explorer-view="code"] .xp-code-layout,
+  body[data-explorer-view="code"][data-knowledge-open="false"] .xp-code-layout { grid-template-columns: minmax(0, 1fr); }
+  body[data-explorer-view="code"] .xp-files-panel { position: absolute; left: 0; top: 0; bottom: 0; width: min(320px, 100%); z-index: 20; box-shadow: var(--shadow); }
+  body[data-explorer-view="code"] .xp-workbench-bar { gap: 4px 8px; min-height: 52px; }
+  body[data-explorer-view="code"] .xp-workbench-bar .btn { font-size: 12px; padding: 5px 8px; min-height: 40px; }
+  body[data-explorer-view="code"] .xp-snapshot-details { margin-left: 0; }
+  body[data-explorer-view="code"] .xp-file-tools { gap: 4px 8px; }
+  body[data-explorer-view="code"] .xp-find-label { flex-basis: 100%; }
+  body[data-explorer-view="code"] .xp-file-link, body[data-explorer-view="code"] .xp-file-tree summary { min-height: 36px; }
+}
 .xp-layout { display: grid; grid-template-columns: 280px 1fr; gap: 18px; margin-top: 22px; }
 @media (max-width: 900px) { .xp-layout { grid-template-columns: 1fr; } }
 .xp-side { display: flex; flex-direction: column; gap: 12px; }
