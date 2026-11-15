@@ -90,7 +90,7 @@
       <div class="tbl-wrap"><table>
         <thead><tr><th scope="col">ID</th><th scope="col">类别</th><th scope="col">条目</th><th scope="col">状态</th><th scope="col">备注</th></tr></thead>
         <tbody>
-          <tr id="DEF-01"><th scope="row" class="nm">DEF-01</th><td>behavior</td><td>BDD / Gherkin 行为规格</td><td><span class="badge deferred">挂帐</span></td><td>定位为真源树的衍生物（守卫 + 场景可生成 Gherkin）；守卫/fold 的形式化优先。待行为投影交付。</td></tr>
+          <tr id="DEF-01"><th scope="row" class="nm">DEF-01</th><td>behavior</td><td>BDD / Gherkin 行为规格</td><td><span class="badge deferred">挂帐</span></td><td>定位为真源树的衍生物，守卫/fold 形式化优先。生成 Gherkin 不等于独立编写的测试预期；函数级用例、调用解析与真实实现测试归 <a href="#DEF-21">DEF-21</a>，行为投影仍待交付。</td></tr>
           <tr id="DEF-02"><th scope="row" class="nm">DEF-02</th><td>tooling</td><td>可视化真源树编辑（Qlerify / Miro 导入、逆向抽取成树）</td><td><span class="badge deferred">挂帐</span></td><td>语言层先行；编辑 UX 另议。待早期用户验证策略/范围层。</td></tr>
           <tr id="DEF-03"><th scope="row" class="nm">DEF-03</th><td>publishing</td><td>truthsrc npm 发布</td><td><span class="badge boundary">阻塞</span></td><td>目前只有本地 tgz / 源码，尚未发布到 registry。需要 owner 作出可发布决定。</td></tr>
           <tr id="DEF-04"><th scope="row" class="nm">DEF-04</th><td>publishing</td><td>monarch-* / saga-* 发布到 Maven Central</td><td><span class="badge verified">已解决 2026-11-12</span></td><td>三个 <code>net.imadz</code> 引擎均已发布 0.3.0，公开字节与 pin 相符（<a href="#F-23">F-23</a>）。不因此关闭材料交付或全部下游观察。</td></tr>
@@ -110,10 +110,22 @@
           <tr id="DEF-18"><th scope="row" class="nm">DEF-18</th><td>runtime</td><td>Retry/backoff/deadline 工程债</td><td><span class="badge boundary">未决</span></td><td>仍为 OPEN；finite-profile 验收不是豁免。须有单独批准的运行时工作与证据。</td></tr>
           <tr id="DEF-19"><th scope="row" class="nm">DEF-19</th><td>assurance</td><td>定向 Inspector 竞态/故障注入负例与 Node CI/typecheck</td><td><span class="badge boundary">未决</span></td><td>身份校验修补已进入技术运行，但对应负控及额外 Node CI/typecheck 未在本轮执行。须有另定范围的负控与 CI 回执。</td></tr>
           <tr id="DEF-20"><th scope="row" class="nm">DEF-20</th><td>distribution</td><td>旧离线发行包运行时 pin 迁移</td><td><span class="badge deferred">挂帐</span></td><td>历史离线分发工具仍面向已退役 P23；当前显式供给工作坊不改写、不重签旧归档。下次使用该分发路径时另行迁移。</td></tr>
-          <tr id="DEF-21"><th scope="row" class="nm">DEF-21</th><td>behavior</td><td>fold 可复用纯函数定义/引用及函数级 BDD 描述</td><td><span class="badge deferred">挂帐</span></td><td>当前有限 fold 操作仍受支持；函数定义位置与语法未定。关联 <a href="#DEF-01">DEF-01</a>，但不同于 <a href="/docs/fold-language-rfc.md">RFC 已登记的实现/准入缺陷</a>。未来函数仍须满足确定性回放、类型与版本准入，不允许任意宿主调用或副作用。设计与实施另行批准，此处不发布新语法。</td></tr>
-          <tr id="DEF-22"><th scope="row" class="nm">DEF-22</th><td>contracts</td><td>显式外部契约引用、观测到业务命令的翻译声明，以及按契约版本解析相关引用的编译门禁</td><td><span class="badge deferred">挂帐</span></td><td>须与 <code>binding-profile</code>、<code>versioning-policy</code> 联合设计。不是当前没有契约或版本校验；缺口是这些引用、翻译与版本解析的一致性闭环。联合设计与编译门禁须另行批准。</td></tr>
+          <tr id="DEF-21"><th scope="row" class="nm">DEF-21</th><td>behavior</td><td>版本化函数签名、独立 BDD 用例、表达式调用解析与实现绑定</td><td><span class="badge deferred">挂帐</span></td><td>BC 已有 <code>functions.yaml</code>、独立用例和专用生成；JS legacy 也有 <code>declaredFunction</code>/<code>fn:</code>。缺口是当前严格编译闭环，覆盖获准的 guard/binding/fold 与纯转换位置；须保留名义类型、确定性回放和实现版本锁定，不允许任意宿主调用或副作用。<a href="#DEF-01">DEF-01</a> 输出与 <a href="/docs/fold-language-rfc.md">fold RFC 的准入问题</a>另列。P0 设计已落档但未冻结，仍须真实实现测试、回放及来源追踪。</td></tr>
+          <tr id="DEF-22"><th scope="row" class="nm">DEF-22</th><td>contracts</td><td>外部契约引用、翻译/调用、版本解析与具体 ArtifactType 绑定</td><td><span class="badge deferred">挂帐</span></td><td>并非没有契约、端口或版本校验。须与 <code>binding-profile</code>、<code>versioning-policy</code> 联合设计引用、观测到命令的翻译及入站/出站 API 绑定，把选定契约连到实际端口、适配器和产物实例；类别标签不是实现。<a href="#DEF-23">DEF-23</a> 覆盖自有读模型消费。P0 已落档、未冻结，来源/版本/类型解析和实际绑定仍待验证。</td></tr>
+          <tr id="DEF-23"><th scope="row" class="nm">DEF-23</th><td>contracts</td><td>外部契约真源化，支持内部读模型构建</td><td><span class="badge deferred">挂帐</span></td><td>邮件安全大盘：外部数据集、消息总线消息（包括外部领域事件）、API 经显式接入、处理、投影和存储形成自有读模型。与 <a href="#DEF-22">DEF-22</a> 互补，不为接入读侧虚构本地命令或事件。OpenAPI、AsyncAPI、CloudEvents、JSON Schema 是分职责候选，并非已选版本或当前支持；须保留回放输入、去重与 checkpoint 语义。P0 已落档、未冻结，标准子集与独立核验的 mock 端到端样例仍待完成。</td></tr>
+          <tr id="DEF-24"><th scope="row" class="nm">DEF-24</th><td>workshop</td><td>银行财富 inbox 的 13 类产物，以及 01–05 的 EventStorming 信息覆盖</td><td><span class="badge deferred">挂帐</span></td><td>目标是 01–13 全部子目录及相应内容，不是只建空目录。须单独按 Alberto Brandolini EventStorming 工作坊的信息模式核查 01–05；Fab 和批量交易样例本身也不完整，不能照抄作为验收基准。13 类是项目组织约定，不是官方 13 个 EventStorming 步骤。保留重建与来源声明，不虚构工作坊历史。关闭此项须有经批准的内容补齐、明确的缺口/不适用记录及有依据的信息模式核查；目录数齐全不等于完成。<a href="#inbox-audit">本地核查与候选清单</a>。</td></tr>
+          <tr id="DEF-25"><th scope="row" class="nm">DEF-25</th><td>language</td><td>推荐作者/项目入口的多限界上下文与显式跨上下文关系</td><td><span class="badge deferred">挂帐</span></td><td>当前入口只接受一个上下文，relationships 数组须为空。不是历史上下文元数据全无，而是当前作者、限定引用和跨上下文组合能力的缺口。独立于 <a href="#DEF-21">DEF-21</a>–<a href="#DEF-23">DEF-23</a>，不扁平化同名元素、不隐式放宽 profile。须另行冻结身份/关系/组合合同，并通过跨上下文正反例。</td></tr>
         </tbody>
       </table></div>
+      <div class="callout" id="business-expression-design"><b>业务表达联合设计 · 2026-11-15</b><p>P0 评估与设计已落档，不等于合同冻结或能力实现。设计单源为 truthsrc 仓库的 <code>BUSINESS-EXPRESSION-DESIGN.md</code>，由其 <code>PROJECT-OPEN-ITEMS.md</code> 导航；BC 挂账为 S2-104。本地落档不宣称新文档已公开发布。</p><p>精确函数/call schema、耐久回放 bundle 绑定、外部标准版本/子集、具体 ArtifactType 实现和独立夹具仍待核定。<a href="#DEF-21">DEF-21</a>/<a href="#DEF-22">22</a>/<a href="#DEF-23">23</a> 须各过编译与行为门，<a href="#DEF-25">DEF-25</a> 另列；<a href="#DEF-09">DEF-09</a>/<a href="#DEF-24">24</a> 内容与 <a href="#DEF-18">DEF-18</a> 运行债不变。不宣称新语法、运行库发布或银行验收。</p></div>
+      <div class="callout" id="inbox-audit"><b>DEF-24 · INBOX 本地核查 · 2026-11-14</b>
+        <ul>
+          <li><code>bank-wealth-demo/truth/bank-wealth/inbox/</code>：<strong>3 / 13 个目录，5 张 YAML 便签</strong>——02 的三张角色便签、05 的一张上下文便签、06 的一张实施说明；缺 01、03、04、07–13。当前 README 把十三类作为覆盖视角，映射到切片、Saga、流水线、故事、用例及六个读模型；这不等于十三类有内容的 inbox 目录，缺便签也不等于缺业务实现，更不应复制出第二套可执行规则。</li>
+          <li><code>fab-simulator-demo/truth/inbox/</code>：<strong>12 / 13 个目录，119 张 YAML 便签</strong>，缺 04；<code>bank-batch-transactor-demo/truth/inbox/</code>：<strong>11 / 13 个目录，65 张 YAML 便签</strong>，缺 04、10。两者 README 均声明从真源反推重建、未举行真实工作坊，并明确跳过 04。Fab README 称 10 无独立便签，但目录中实际存在待裁决的 <code>OnEquipmentFaultReschedule</code> 提案，不应当作已接受策略。</li>
+          <li><strong>01–05 候选核查清单：</strong>事件时序与关键转折；命令、角色、外部系统；策略触发与读模型/决策输入；分支、异常与时间约束；热点、问题、假设、待定决定；聚合、子域与上下文边界及关系。核对关系与语义，不只数便签类型；区分已表达、引用其他载体、缺失和不适用，不为填空虚构子域划分或工作坊历史。</li>
+        </ul>
+        <p>本次仅为本地结构与内容的只读核查，不是对 Brandolini 一手资料的完整对标，方法原文核查仍待办；未修改 demo 真源、当前业务规则或运行时验收结论。</p>
+      </div>
       <div class="callout"><b>纪律</b><p>台账与状态页<strong>在同一个 commit 里更新</strong>。一个数字离开 SITE-FACTS，它就必须离开页面；一个承诺离开台账，它就必须出现在某个仓库里。</p></div>
     </section>
   </main>
