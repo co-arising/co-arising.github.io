@@ -3,7 +3,7 @@
 Every quantitative claim on co-arising.github.io must carry a fact-ID listed here.
 Update this file first, then the pages. If a number is not here, it must not appear on the site.
 
-Content updated: 2026-11-14. Evidence dates are per row; this is not a claim that every older fact was re-run.
+Content updated: 2026-11-15. Evidence dates are per row; this is not a claim that every older fact was re-run.
 
 Current bank technical evidence: [sanitized 0.3.0 acceptance summary](docs/bank-technical-20261112.md).
 The underlying reports were reviewed locally and their hashes checked; the reports and complete delivery materials are not publicly available. Historical captures below retain their own scope and date.
@@ -16,7 +16,7 @@ The underlying reports were reviewed locally and their hashes checked; the repor
 | F-02 | Bank truth tree roundtrips byte-identical | 157 atoms | 2026-11-11 | same | `npm run validate` (roundtrip is part of the gate) |
 | F-03 | Bank canonical graphstore size | 389 nodes / 413 edges | 2026-11-11; count scope checked 2026-11-14 | truthsrc `graph` over the bank canonical; shipped SQLite `nodes` and `meta.canonical` | Original capture: `node ../metarch-truthsrc/bin/truthsrc.js graph --tree truth/bank-wealth --out <db>`; read-only F-03/F-10 reconciliation below |
 | F-04 | Code generation output | 235 files | 2026-11-11 | `generate-project` into a fresh target | `npm run project -- --out <fresh-dir>` |
-| F-05 | Anchor verification | verify-project passed, 792 anchors | 2026-11-11 | generated project ledger | `verify-project --project truthsrc.project.json --out <dir>` |
+| F-05 | Anchor verification | verify-project passed, 792 anchor keys (not 792 exact spans) | 2026-11-11 | generated project ledger | `verify-project --project truthsrc.project.json --out <dir>` |
 | F-06 | Generated Scala compiles | 0 errors, 534 sources | 2026-11-11 | `sbt compile` in generated project | `cd <generated> && sbt compile` |
 | F-07 | Generated unit tests (not the independent bank business suites) | 23/23 passed | 2026-11-11 | generated unit runner; handwritten production sources are compiled, not independent handwritten test expectations | `cd <generated> && sbt test` |
 | F-08 | Handwritten zone | 35 files, complete implementations (not stubs) | 2026-11-11 | `find handwritten -type f \| wc -l` | filesystem |
@@ -28,7 +28,7 @@ The underlying reports were reviewed locally and their hashes checked; the repor
 | F-14 | Relation registry | 22 relations (R1–R22) with propagates flags | 2026-11-11 | metarch-truthsrc `lib/shared.mjs` RELATION_REGISTRY | — |
 | F-15 | Atom kinds / note types | 12 atom kinds, 15 note types | 2026-11-11 | metarch-truthsrc `lib/shared.mjs` | — |
 | F-16 | MCP tools | 26 tools over stdio JSON-RPC | 2026-11-11 | metarch-truthsrc `mcp/server.mjs` | `truthsrc mcp` |
-| F-17 | Workshop HTML snapshot (distinct from the Explorer graph) | single-file, 2.18 MB, offline, zh-CN; 120 exported nodes / 183 edges from a project view declaring totals 861 / 737, with 741 nodes omitted | 2026-11-06; scope checked 2026-11-13 | embedded `workshop-view` in `downloads/bank-workshop.html`; `truthsrc.project-view/v1`, not the F-03 graphstore | Parse embedded JSON and inspect exported arrays, totals and truncation; this historical snapshot does not contain the new service-acceptance report |
+| F-17 | Workshop HTML snapshot (distinct from the Explorer graph) | single-file, 2.18 MB, offline, zh-CN; 120 exported nodes / 183 edges from a project view declaring totals 861 / 737, with 741 nodes omitted | 2026-11-06; scope checked 2026-11-13 | embedded `workshop-view` in `downloads/bank-workshop.html`; `truthsrc.project-view/v1`, not the F-03 graphstore | Parse embedded JSON and inspect exported arrays, totals and truncation; public copy sanitized 2026-11-15 by removing only two local verification paths, without re-signing historical code/mappings/results; this snapshot does not contain the new service-acceptance report |
 | F-18 | Engine licenses | monarch-core / monarch-persistence / saga-core: Apache-2.0, tag v0.3.0 | 2026-11-12 | per-repo LICENSE + `git describe` | — |
 | F-19 | truthsrc license | MIT | 2026-11-11 | metarch-truthsrc/LICENSE | — |
 | F-20 | Bank repo license | Apache-2.0 (added 2026-11-11) | 2026-11-11 | bank-wealth-demo/LICENSE | — |
@@ -41,6 +41,8 @@ The underlying reports were reviewed locally and their hashes checked; the repor
 | F-27 | Fresh SQL rebuild readiness | 66.847 s within the unchanged 90 s gate; initial / restart / refund 2.132 / 14.251 / 13.667 s | 2026-11-12 | same candidate; `readinessMs.replay=66847`; not the previous candidate's result or a general performance promise | Review the candidate-specific readiness record; re-execution requires the full isolated service setup |
 | F-28 | Candidate scope, source stability and resource exit | native Darwin x64 / JDK11, one owner; source unchanged, owned resources exited and lease released | 2026-11-12 | owner-02 driver SHA-256 `a51f1210…`; does not describe other sessions | Driver and input-before/after evidence in the locally reviewed acceptance set |
 | F-29 | CLI installation and Counter relocation | tool package 0.5.0; package-pin verification and functional offline install / actual prefix relocation / Counter 0→2 update passed, 40 command observations | 2026-11-12 | `tool-install-counter-review`; this tool version is distinct from engines 0.3.0 | Requires the matched package; zero repeated generated-source writes does not mean zero evidence/graph writes; material delivery and newcomer usability are separate |
+
+| F-30 | Matched bank Graph / Code public snapshot | 389 graph nodes / 413 edges; 866 knowledge identities; 792 anchor keys / 2,898 locations / 669 spans; 385 browsable files (228 generated + 157 author), 1 withheld build.sbt; 374 graph nodes bridged | 2026-11-15 | snapshot `cfc3fb229a0390922eaaea3ffc6604503b340add7fdcd0b1cf3d2b781ca3149d`; isolated bank inputs @ `f8ac7ca`, tool @ `86c525e`; full source/anchor verification, no runtime execution | `tools/export-explorer-snapshot.mjs` with `tools/bank-explorer-requirements.json`; `python3 tools/browser-bank-explorer.py --evidence <new-dir>`; public manifest/index and [scope](docs/bank-explorer-20261115.md) |
 
 ## F-03 / F-10 — file census versus expanded VO nodes
 

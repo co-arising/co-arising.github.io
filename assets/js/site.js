@@ -190,7 +190,9 @@ const STR = {
       hint.hidden = primary.scrollWidth <= primary.clientWidth;
       if (hint.hidden) primary.removeAttribute("aria-describedby");
       else primary.setAttribute("aria-describedby", hint.id);
-      document.documentElement.style.setProperty("--nav-offset", Math.ceil(nav.getBoundingClientRect().height + 12) + "px");
+      const height = Math.ceil(nav.getBoundingClientRect().height);
+      document.documentElement.style.setProperty("--nav-height", height + "px");
+      document.documentElement.style.setProperty("--nav-offset", height + 12 + "px");
     };
     updateNavOffset();
     window.addEventListener("resize", updateNavOffset);

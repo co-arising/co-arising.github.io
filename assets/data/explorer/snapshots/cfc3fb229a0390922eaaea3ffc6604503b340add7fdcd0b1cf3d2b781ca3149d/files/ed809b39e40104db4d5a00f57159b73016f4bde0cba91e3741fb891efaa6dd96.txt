@@ -1,0 +1,29 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: host-computation
+id: "[\"bankwealth\",\"BalanceAfterReleaseReservedFunds\"]"
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "@ref(bankwealth:port#BalanceAfterReleaseReservedFunds)",
+    "version": "bank-v1-1",
+    "command": "@ref(bankwealth:command/CreditBalance#ReleaseReservedFunds)",
+    "outputType": "@type(nominal:bankwealth:type#Money)",
+    "inputDependencies": [
+      "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#txid)",
+      "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#resource)",
+      "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#amount)",
+      "@ref(bankwealth:state-field/CreditBalance#accountBalance)"
+    ],
+    "stableIdentityContract": {
+      "id": "BalanceAfterReleaseReservedFunds-identity",
+      "version": "1",
+      "keys": [
+        "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#txid)",
+        "@ref(bankwealth:parameter/CreditBalance/ReleaseReservedFunds#resource)"
+      ]
+    }
+  }

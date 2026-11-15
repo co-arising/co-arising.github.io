@@ -78,6 +78,7 @@ node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out genera
 node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human</code></pre>
       <p>The preview lists update actions, not a textual diff. After generation, expect <code>inputs=current</code>, <code>evidence=verified</code> and <code>synchronized=true</code>. These describe source and byte freshness, not Scala or bank behavior execution.</p>
       <h3 id="counter-reverse-query">Reverse-query a real location, not a guessed file or line</h3>
+      <p class="small">The <a href="/explorer/?view=code#code">Explorer Code view</a> is the no-install browsing surface for a published matching snapshot. Its bank source/anchor snapshot is fully verified (<a href="/status/#F-30">F-30</a>); the local procedure below remains the way to verify your own current files.</p>
       <p>A span is a half-open UTF-8 byte range, not a line number. This script derives a line from currently verified source and queries it back; it stops rather than inventing a missing location.</p>
       <pre class="code" data-example="counter-reverse"><code>node --input-type=module &lt;&lt;'NODE'
 import { execFileSync } from 'node:child_process';

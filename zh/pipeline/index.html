@@ -59,6 +59,7 @@
         <div class="card"><span class="tag">新鲜度</span><h3>先核对匹配字节</h3><p>从 UTF-8 字节区间换算行号前，先核源码指纹与验证结果。没有配对代码位置的图谱快照，不能提供精确的代码跳转。</p></div>
       </div>
       <p class="prose"><a href="/zh/guide/#counter-reverse-query">Counter 反查指南</a>使用实际验证过的位置走通正反查询，并解释输入过期、输出漂移与更新。canonical 图、项目知识图和工作坊导出是<a href="/zh/explorer/#graph-scopes">不同表示</a>，不能凭同名拼接身份。</p>
+      <p class="small"><a href="/zh/explorer/?view=code#code">Explorer 代码视图</a>消费固定且经核验的公开快照，不使用本机路径。银行数据集已通过配对项目来源/回锚验证（<a href="/zh/status/#F-30">F-30</a>），不继承本页的历史运行通过记录。</p>
       <details>
         <summary>Counter 命令速查 · 先完成指南中的准备</summary>
       <div class="term"><div class="term-bar"><span class="title">在自己的 Counter 项目中；具体反查步骤见指南</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human

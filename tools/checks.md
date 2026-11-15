@@ -66,6 +66,80 @@ python3 -B tools/check-resources.py --baseline 28ba7c2
   makes these warnings fail). Gzip totals are deterministic per-file sums, **not
   transfer measurements, cache behavior or invented performance timings**.
 
+## Graph / Code snapshot delivery gate
+
+The same Explorer now has Graph and Code views. The public pointer selects the
+fully verified isolated bank snapshot described by F-30 and
+`docs/bank-explorer-20261115.md`. This is source/anchor acceptance, not a new
+bank service run. Explicit missing snapshots still fail rather than borrowing
+locations from another version.
+
+`tools/export-explorer-snapshot.mjs` and its schema/fixtures define the public
+contract; `tools/build-assets.md` describes explicit inputs and absent destination.
+Run the release payload gate in addition to page checks:
+
+```sh
+python3 -B tools/check-public-payloads.py
+```
+
+It checks downloaded HTML, public JSON/text and SQLite payloads, not only visible
+prose. The historical Workshop's two private verification paths were removed from
+its public copy; original evidence and executable/CSP were checked unchanged.
+The installed bank bundle and historical copy pass this release payload gate.
+Source files keep their original bytes; private files are withheld whole.
+
+Browser observation uses `tools/browser-explorer-code.py --fixture RESOURCES_JSON
+--evidence NEW_DIRECTORY`. Its fixture is produced by
+`tools/tests/fixtures/explorer-fixture.mjs` into an owned temporary directory, never
+into public assets. The report and page title explicitly label it synthetic:
+**browser-contract evidence is not bank generation or runtime acceptance**.
+
+Observed locally on 2026-11-15 in Chromium and WebKit: unpublished-pointer fallback,
+Graph → complete source → clicked-line knowledge → actual author pointer,
+refresh/back/EN–ZH, file search, withheld file, 375px layout, unknown snapshot and
+modified-source rejection. New source bytes were displayed as text, not HTML.
+Source bytes were displayed as text, not HTML. Adversarial lifecycle observation
+also covered a slow code jump followed by changing Graph node, a Code deep-link
+whose source response remained pending while Graph became ready, stale file-tree
+context, withheld-file busy-state reset and retrying the same file after HTTP 503.
+All retained the current selection and recovered without stale code/knowledge.
+Rapid WebKit navigation also exposed post-navigation fetches; page loads now abort
+at beforeunload/pagehide and restore safely from page cache. Twenty rapid page
+changes and the final complete WebKit run produced no page errors or external
+requests. The final Chromium complete run also passed.
+The shared bank output initially failed `PROJECT_VERIFICATION_CURRENTINPUTS`.
+An independent candidate then passed full verification and public export without
+repairing shared files or receipts. `tools/browser-bank-explorer.py --evidence NEW_DIRECTORY`
+drives the installed real bank dataset: ReserveFunds → Behaviors line 26 → same
+command; LEDGER_SUFFICIENT → Rules line 33 → same guard; real structure-file source,
+refresh/EN–ZH, 375px and withheld build.sbt. Chromium and WebKit both passed.
+
+Real Counter observation additionally ran the public init/generate/export CLIs in
+an independent temporary project, then drove the actual Explorer in Chromium and
+WebKit: SetCount → CounterRules.scala line 7 → clicked-line reverse returned the
+same qualified command and author pointer. Export contained 20 public files,
+12 identities, 38 locations and 6 spans. No bank output or project database was
+used or changed. This proves the exporter/browser seam, not bank acceptance.
+
+Full existing site browser flows passed in Chromium and WebKit after preserving
+the old node URL shape and handling blocked Worker loads with an explicit query
+error. Automated maintenance checks are recorded separately from these runtime
+observations; they are not substitutes for them.
+
+The source-only implementation run before bank activation had 123 tests (122 passed,
+one optional legacy CLI integration skipped); the real temporary Counter exporter
+integration was enabled. After real bank activation and historical sanitization,
+128 tests completed: 127 passed and the same optional skip. Strict
+page/paired-example checks and the separate public-payload release gate pass.
+
+Resource growth is intentional and reviewed: the finite inventory now includes
+385 on-demand author/generated files, their index and the matched Graph snapshot,
+plus the retained legacy fallback. The inventory measures all reachable assets,
+not one page load. It reports approximately 8.53 MB raw / 1.47 MB per-file gzip,
++183% / +114% versus the pre-Code HEAD, so its 20% warning remains visible.
+Individual source files load only when opened; this is not a timing claim or a
+reason to preload the source tree. See F-30 for the verified file/count scope.
+
 ## Browser observation — integration gate
 
 **Do not run the final matrix while parallel content/Explorer edits are in flight.**

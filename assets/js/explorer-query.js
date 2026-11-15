@@ -185,5 +185,5 @@
       database.close();
     }
   }
-  root.ExplorerQuery = Object.freeze({ LIMITS, NODE_LIMITS, PRESETS, execute });
+  root.ExplorerQuery = Object.freeze({ PROTOCOL: "co-arising.explorer-query/v1", LIMITS, NODE_LIMITS, PRESETS, execute });
 })(globalThis);

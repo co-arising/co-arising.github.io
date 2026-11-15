@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "truthsrc.project-requirements/v1",
+  "required": [
+    {
+      "knowledge": "knowledge:bank-wealth/bankwealth/aggregate/CreditBalance",
+      "precision": "span",
+      "minLocations": 1
+    },
+    {
+      "knowledge": "knowledge:bank-wealth/bankwealth/command/CreditBalance/ReserveFunds",
+      "precision": "span",
+      "minLocations": 1
+    },
+    {
+      "knowledge": "knowledge:bank-wealth/bankwealth/guard/CreditBalance/ReserveFunds/LEDGER_SUFFICIENT",
+      "precision": "span",
+      "minLocations": 1
+    }
+  ]
+}

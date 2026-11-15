@@ -28,17 +28,69 @@
   <main id="main-content" class="wrap">
     <header class="page-hero">
       <p class="over">Explorer · runs entirely in your browser</p>
-      <h1>Query the <span class="accent">real graph</span></h1>
-      <p class="thesis">This is not mock data: the SQLite file below is the compiled knowledge graph of the bank wealth example — 389 nodes, 413 edges <span class="badge verified" title="F-03">verified 2026-11-11</span> — loaded into your browser with sql.js. Only static assets are downloaded from this site. Query text and results are not sent to a server.</p>
+      <h1>Explore the knowledge.<br><span class="accent">Trace the code.</span></h1>
+      <p class="thesis">Browse the real bank wealth knowledge and generated code in one matched snapshot. Follow a knowledge node to its author declaration and code, then click a code line to trace back. Everything runs in your browser; query text and results are not sent to a server.</p>
+      <p class="small"><a class="badge verified" href="/status/#F-30" data-fact="F-30">Source / anchors verified 2026-11-15 · F-30</a> · <a href="/docs/bank-explorer-20261115.md">Snapshot scope</a> · <a href="/downloads/bank-source-LICENSE.txt">Bank source license</a></p>
     </header>
+
+    <div class="xp-workbench-bar">
+      <div class="xp-view-tabs" role="group" aria-label="Explorer view">
+        <button class="btn ghost" type="button" data-explorer-view="graph" aria-pressed="true" aria-controls="nodes">Graph</button>
+        <button class="btn ghost" type="button" data-explorer-view="code" aria-pressed="false" aria-controls="code">Code</button>
+        <button class="btn ghost" id="xp-tour" type="button" disabled>Try ReserveFunds → Code → Knowledge</button>
+      </div>
+      <div class="xp-workbench-controls" role="group" aria-label="Reading layout">
+        <button class="btn ghost" id="xp-toggle-files" type="button" aria-expanded="true" aria-controls="xp-files-panel">Files</button>
+        <button class="btn ghost" id="xp-toggle-knowledge" type="button" aria-expanded="true" aria-controls="xp-knowledge-panel">Knowledge</button>
+        <button class="btn ghost" id="xp-focus" type="button" aria-pressed="false">Focus reading</button>
+      </div>
+      <details class="xp-snapshot-details">
+        <summary>Snapshot & evidence</summary>
+        <p class="small" id="xp-snapshot-status" role="status">Checking the matching bank snapshot and downloaded bytes…</p>
+        <p class="small" id="xp-code-scope">Original file bytes; file candidates and exact spans are different precision levels.</p>
+        <p id="xp-source-origin" class="small">This browser reads a packaged, fixed snapshot—not your local bank <code>generated/</code> or <code>generated/current/</code>. Displayed paths are relative to that snapshot. <a href="/docs/bank-explorer-20261115.md#which-generated-directory">Which generated directory supplied it?</a></p>
+        <p><a href="/docs/bank-explorer-20261115.md">Snapshot scope</a> · <a href="/downloads/bank-source-LICENSE.txt">Source license</a></p>
+      </details>
+    </div>
+
+    <section id="code" aria-label="Browse the code" hidden>
+      <div class="xp-code-layout">
+        <aside class="xp-panel xp-files-panel" id="xp-files-panel" aria-label="Snapshot files">
+          <div class="xp-panel-title"><h2>Files</h2><button class="btn ghost" type="button" id="xp-close-files" aria-label="Close files panel">×</button></div>
+          <div class="xp-filters"><label for="xp-code-search">File name or path<input id="xp-code-search" type="search" maxlength="256" autocomplete="off"></label><label for="xp-code-role">Source set<select id="xp-code-role"><option value="">All files</option><option value="generated">Generated</option><option value="author">Author</option></select></label></div>
+          <div class="xp-tree-status"><span class="small" id="xp-code-count" role="status"></span><button class="btn ghost" id="xp-reveal-file" type="button" hidden>Show current file</button></div>
+          <nav class="xp-file-tree" id="xp-code-files" aria-label="Snapshot file tree"></nav>
+        </aside>
+        <div id="xp-files-resizer" class="xp-files-resizer" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Resize file tree" aria-controls="xp-files-panel" aria-valuemin="220" aria-valuemax="600" aria-valuenow="270" title="Drag to resize. Arrow keys adjust; Enter or double-click resets."></div>
+        <div class="xp-code-main">
+          <div class="xp-file-header">
+            <h2 id="xp-code-heading">Choose a file</h2><p id="xp-code-path" class="small"></p>
+            <p id="xp-code-quality-notice" class="xp-code-quality-notice" role="note"><strong>Experimental sample.</strong> Business logic and generator are still evolving; generated code quality is poor. Traceability demo only—not for production or best-practice reference.</p>
+          </div>
+          <div class="xp-file-tools">
+            <label for="xp-code-find" class="xp-find-label">Find in file<input id="xp-code-find" type="search" maxlength="256" autocomplete="off"></label>
+            <button class="btn ghost" id="xp-code-copy" type="button">Copy link</button><a id="xp-code-share" href="?view=code#code">Fixed link</a>
+            <details id="xp-file-details"><summary>File details</summary><dl id="xp-file-evidence"></dl></details>
+          </div>
+          <p class="small" id="xp-code-find-result" role="status"></p>
+          <div id="xp-code-viewer" tabindex="0" aria-label="Source code" aria-busy="false"></div>
+          <div class="xp-source-status"><p class="small" id="xp-code-message" role="status">Choose a file. Locations are never guessed.</p><span class="small" id="xp-code-copy-status" role="status"></span></div>
+        </div>
+        <aside class="xp-panel xp-knowledge-panel" id="xp-knowledge-panel" aria-label="Knowledge linked to code">
+          <div class="xp-panel-title"><h2>Knowledge</h2><button class="btn ghost" type="button" id="xp-close-knowledge" aria-label="Close knowledge panel">×</button></div>
+          <div id="xp-code-knowledge"></div>
+        </aside>
+      </div>
+      <noscript><p>Code navigation needs JavaScript and the matching snapshot. Displayed source is never executed.</p></noscript>
+    </section>
 
     <section id="nodes" class="xp-directory" aria-labelledby="xp-nodes-heading">
       <div class="sec-head"><span class="no">01</span><h2 id="xp-nodes-heading">Browse the nodes</h2></div>
-      <p class="sec-sub">Search every node by its exact ID or name, then inspect its stored record and relationships. This is the <b>canonical graphstore capture of 2026-11-11</b>, not the project knowledge/anchor database. Qualified aliases remain separate nodes; matching names do not establish shared identity.</p>
+      <p class="sec-sub">Search nodes by full ID or name, inspect their relationships, then follow verified author and code locations. Qualified aliases keep separate node IDs; matching names alone never establish identity.</p>
       <details id="graph-scopes">
         <summary>Three graph representations, different scopes</summary>
         <dl>
-          <dt>Canonical graphstore</dt><dd>The shipped declaration graph: 389 nodes / 413 edges, captured 2026-11-11 (<a href="/status/#F-03">F-03</a>). It does not provide code anchors.</dd>
+          <dt>Canonical graphstore</dt><dd>The legacy declaration graph fallback: 389 nodes / 413 edges, captured 2026-11-11 (<a href="/status/#F-03">F-03</a>). This file alone does not provide code anchors. A published Graph / Code snapshot binds its own graph and project mappings under one manifest.</dd>
           <dt>Project knowledge/anchor graph</dt><dd>Knowledge and generated-location mappings from a matching project and output. Code queries require that project's identities, precision and freshness.</dd>
           <dt>Workshop project-view export</dt><dd>A browsing export that may be truncated: the 2026-11-06 snapshot contains 120 nodes / 183 edges from declared totals of 861 / 737 (<a href="/status/#F-17">F-17</a>), not a complete copy of either database.</dd>
         </dl>
@@ -63,14 +115,16 @@
         <div id="xp-node-detail" class="xp-node-detail xp-panel" tabindex="-1" aria-live="polite" aria-busy="false">
           <h3>Node inspector</h3>
           <p>Select a node to inspect its stored record and incoming/outgoing relationships.</p>
-          <p class="small">Code anchors: <b>unavailable — not provided by this snapshot</b>. No author-file paths, line numbers or GitHub source links are inferred. Stored provenance is a declaration, not a verified code location.</p>
+          <p class="small">Code locations load from the matching snapshot. An unavailable mapping is shown explicitly; no file paths or line numbers are guessed.</p>
         </div>
       </div>
-      <p class="small" id="xp-anchor-guide">Need a code-location query? Follow <a href="/guide/#counter-reverse-query">the Counter reverse-query tutorial</a> with a matching local project. This is not a code jump for the selected bank node.</p>
+      <p class="small" id="xp-anchor-guide">Code links inspect this fixed snapshot. To verify your own current files, follow <a href="/guide/#counter-reverse-query">the Counter reverse-query tutorial</a> with a matching local project.</p>
       <p class="small">At most 80 edges per direction, 8192 UTF-8 bytes per displayed atom/provenance field, 512 KiB per response. Totals and truncation are explicit. Stored atoms are plain text, not executed or treated as verified generated output.</p>
       <noscript><p class="callout">The directory and inspector require JavaScript and the local SQLite engine. No live node results are available without them; use the rebuild instructions below to inspect the snapshot yourself.</p></noscript>
     </section>
 
+    <details id="xp-advanced">
+      <summary>Advanced · Query the Graph with SQL</summary>
     <section id="console">
       <div class="sec-head"><span class="no">02</span><h2>The console</h2></div>
       <p class="sec-sub">Pick a preset (with the expected answer) or write your own SQL against <code>nodes(id, kind, name, atom, extra)</code> and <code>edges(seq, from_id, relation, to_id)</code>. Schema is exactly what <code>truthsrc graph --out</code> produces.</p>
@@ -125,6 +179,8 @@ ORDER BY n DESC;</textarea>
       </div>
     </section>
 
+    </details>
+
     <section id="rebuild">
       <div class="sec-head"><span class="no">03</span><h2>Don’t trust us — rebuild it</h2></div>
       <p class="sec-sub">This graphstore is a derived snapshot, not the project knowledge/anchor database. First complete <a href="/guide/#install">the guide’s tool setup</a> in the same shell, then point <code>BANK</code> at your existing matched bank checkout. The output below must be a new file. Current-source counts can differ from this dated snapshot; count equality alone does not establish byte identity.</p>
@@ -138,6 +194,8 @@ node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out my-copy.sqlite</code><
 
   <footer id="site-footer"></footer>
   <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/explorer-snapshot.js"></script>
+  <script src="/assets/js/explorer-code.js"></script>
   <script src="/assets/js/explorer.js"></script>
 </body>
 </html>

@@ -59,6 +59,7 @@
         <div class="card"><span class="tag">Freshness</span><h3>Check the matching bytes</h3><p>Use source fingerprints and verification before translating a UTF-8 byte span into a line number. A graph snapshot without matching code locations cannot supply a precise code jump.</p></div>
       </div>
       <p class="prose">The <a href="/guide/#counter-reverse-query">Counter reverse-query guide</a> walks both query directions using an actual verified location. It also explains stale inputs, output drift and updates. A canonical graph, a project knowledge graph and a workshop export are <a href="/explorer/#graph-scopes">different representations</a>; do not splice their identities together by name.</p>
+      <p class="small">The <a href="/explorer/?view=code#code">Explorer Code view</a> consumes a fixed, verified public snapshot rather than local paths. Its bank dataset passed matching-project source/anchor verification (<a href="/status/#F-30">F-30</a>); it does not inherit this page’s historical runtime results.</p>
       <details>
         <summary>Counter command reminder · after the guide’s setup</summary>
       <div class="term"><div class="term-bar"><span class="title">In your own Counter project; reverse-query steps are in the guide</span></div><pre>node "$TRUTHSRC_CLI" generate-project --project truthsrc.project.json --out generated --plan --format human

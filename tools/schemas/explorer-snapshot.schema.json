@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://co-arising.github.io/tools/schemas/explorer-snapshot.schema.json",
+  "title": "Explorer immutable snapshot manifest or index",
+  "description": "Structural schema. The exporter additionally validates referential integrity, reciprocal bridges, counts, original byte hashes, UTF-8 span boundaries, public safety and the noncircular snapshot digest. No current pointer is emitted.",
+  "oneOf": [{ "$ref": "#/$defs/manifest" }, { "$ref": "#/$defs/index" }],
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "maxLength": 8192 },
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "uint": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+    "path": { "type": "string", "minLength": 1, "maxLength": 8192, "pattern": "^(?!/)(?!.*[\\\\\\u0000-\\u001f?#:%])(?!(?:.*\/)?\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$" },
+    "pointer": { "type": "string", "pattern": "^(?:|/(?:[^~]|~[01])*)$" },
+    "refs": { "type": "array", "maxItems": 100000, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+    "resource": {
+      "type": "object", "required": ["path", "sha256", "bytes"],
+      "properties": { "path": { "$ref": "#/$defs/path" }, "sha256": { "$ref": "#/$defs/hash" }, "bytes": { "type": "integer", "minimum": 0, "maximum": 33554432 } }
+    },
+    "manifest": {
+      "type": "object", "required": ["schemaVersion", "id", "project", "verifiedAt", "evidence", "graph", "index", "counts"],
+      "properties": {
+        "schemaVersion": { "const": "co-arising.explorer-snapshot/v1" }, "id": { "$ref": "#/$defs/hash" },
+        "project": { "type": "object", "required": ["name"], "properties": { "name": { "$ref": "#/$defs/text" } } },
+        "verifiedAt": { "type": "string", "format": "date-time" },
+        "evidence": {
+          "type": "object", "required": ["state", "runtime", "sourceSnapshot", "knowledgeSnapshot", "generation", "codeDigest", "toolFingerprint", "exporterFingerprint"],
+          "properties": {
+            "state": { "const": "verified-at-export" }, "runtime": { "const": "not-run" },
+            "sourceSnapshot": { "$ref": "#/$defs/text" }, "knowledgeSnapshot": { "$ref": "#/$defs/text" }, "generation": { "$ref": "#/$defs/text" },
+            "codeDigest": { "$ref": "#/$defs/text" }, "toolFingerprint": { "$ref": "#/$defs/text" }, "exporterFingerprint": { "$ref": "#/$defs/text" }
+          }
+        },
+        "graph": { "allOf": [{ "$ref": "#/$defs/resource" }, {
+          "required": ["nodeCount", "edgeCount", "canonicalDigest"], "properties": {
+            "path": { "const": "graph.sqlite" }, "nodeCount": { "$ref": "#/$defs/uint" }, "edgeCount": { "$ref": "#/$defs/uint" }, "canonicalDigest": { "$ref": "#/$defs/text" }
+          }
+        }] },
+        "index": { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "path": { "const": "index.json" } } }] },
+        "counts": {
+          "type": "object", "required": ["files", "publishedFiles", "withheldFiles", "identities", "locations", "spanLocations", "mappedNodes"],
+          "properties": {
+            "files": { "$ref": "#/$defs/uint" }, "publishedFiles": { "$ref": "#/$defs/uint" }, "withheldFiles": { "$ref": "#/$defs/uint" },
+            "identities": { "$ref": "#/$defs/uint" }, "locations": { "$ref": "#/$defs/uint" }, "spanLocations": { "$ref": "#/$defs/uint" }, "mappedNodes": { "$ref": "#/$defs/uint" }
+          }
+        }
+      }
+    },
+    "file": {
+      "type": "object", "required": ["id", "path", "role", "sha256", "bytes", "state"],
+      "properties": {
+        "id": { "$ref": "#/$defs/text" }, "path": { "$ref": "#/$defs/path" }, "role": { "enum": ["generated", "author"] },
+        "sha256": { "$ref": "#/$defs/hash" }, "bytes": { "type": "integer", "minimum": 0, "maximum": 33554432 },
+        "state": { "enum": ["published", "withheld"] }, "reason": { "$ref": "#/$defs/text" },
+        "resource": { "allOf": [{ "$ref": "#/$defs/resource" }, { "properties": { "path": { "pattern": "^files/[a-f0-9]{64}\\.txt$" } } }] }
+      },
+      "allOf": [{ "if": { "properties": { "state": { "const": "published" } } }, "then": { "required": ["resource"] },
+        "else": { "required": ["reason"], "not": { "required": ["resource"] } } }]
+    },
+    "node": {
+      "type": "object", "required": ["id", "state", "identities", "pointers"],
+      "properties": {
+        "id": { "$ref": "#/$defs/text" }, "state": { "enum": ["mapped", "unmapped", "ambiguous"] },
+        "identities": { "$ref": "#/$defs/refs" }, "pointers": { "type": "array", "maxItems": 100000, "items": { "$ref": "#/$defs/pointer" } }
+      }
+    },
+    "identity": {
+      "type": "object", "required": ["id", "name", "kind", "graphNodeIds", "sources"],
+      "properties": {
+        "id": { "$ref": "#/$defs/text" }, "name": { "$ref": "#/$defs/text" }, "kind": { "$ref": "#/$defs/text" }, "graphNodeIds": { "$ref": "#/$defs/refs" },
+        "sources": { "type": "array", "maxItems": 100000, "items": {
+          "type": "object", "required": ["fileId", "pointer"], "properties": {
+            "fileId": { "$ref": "#/$defs/text" }, "pointer": { "$ref": "#/$defs/pointer" }, "pointerLocated": { "type": "boolean" },
+            "startLine": { "type": "integer", "minimum": 1 }, "endLine": { "type": "integer", "minimum": 1 }
+          }, "dependentRequired": { "startLine": ["endLine"], "endLine": ["startLine"] }
+        } },
+        "relations": { "type": "array", "maxItems": 100000, "items": {
+          "type": "object", "required": ["identity", "carrier"], "properties": { "identity": { "$ref": "#/$defs/text" }, "carrier": { "$ref": "#/$defs/text" } }
+        } }
+      }
+    },
+    "location": {
+      "type": "object", "required": ["id", "identity", "fileId", "precision", "knowledgeKey"],
+      "properties": {
+        "id": { "$ref": "#/$defs/text" }, "identity": { "$ref": "#/$defs/text" }, "fileId": { "$ref": "#/$defs/text" },
+        "precision": { "enum": ["file", "span"] }, "knowledgeKey": { "$ref": "#/$defs/text" },
+        "span": { "type": "object", "required": ["start", "end"], "properties": { "start": { "$ref": "#/$defs/uint" }, "end": { "$ref": "#/$defs/uint" } } }
+      },
+      "allOf": [{ "if": { "properties": { "precision": { "const": "span" } } }, "then": { "required": ["span"] }, "else": { "not": { "required": ["span"] } } }]
+    },
+    "index": {
+      "type": "object", "required": ["schemaVersion", "snapshot", "nodes", "identities", "files", "locations"],
+      "properties": {
+        "schemaVersion": { "const": "co-arising.explorer-index/v1" }, "snapshot": { "$ref": "#/$defs/hash" },
+        "nodes": { "type": "array", "maxItems": 100000, "items": { "$ref": "#/$defs/node" } },
+        "identities": { "type": "array", "maxItems": 100000, "items": { "$ref": "#/$defs/identity" } },
+        "files": { "type": "array", "maxItems": 100000, "items": { "$ref": "#/$defs/file" } },
+        "locations": { "type": "array", "maxItems": 1000000, "items": { "$ref": "#/$defs/location" } }
+      }
+    }
+  }
+}

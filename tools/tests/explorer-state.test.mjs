@@ -77,9 +77,9 @@ function page({ url = '/explorer/', lang = 'en', badHash = false, fetchFails = f
     postMessage(message, transfer) { assert.equal(transfer, undefined); this.message = structuredClone(message); }
     terminate() { this.terminated = true; }
     finish(result) {
-      this.onmessage({ data: { id: this.message.id, ok: true, result: result || execute(SQL, bytes, this.message.request), milliseconds: 1.25 } });
+      this.onmessage({ data: { id: this.message.id, protocol: this.message.protocol, ok: true, result: result || execute(SQL, bytes, this.message.request), milliseconds: 1.25 } });
     }
-    fail(error = 'Simulated query error') { this.onmessage({ data: { id: this.message.id, ok: false, error } }); }
+    fail(error = 'Simulated query error') { this.onmessage({ data: { id: this.message.id, protocol: this.message.protocol, ok: false, error } }); }
   }
   const context = vm.createContext({ document, location, history, Worker, URLSearchParams, TextEncoder, Event, Uint8Array,
     window: {
@@ -112,6 +112,21 @@ function page({ url = '/explorer/', lang = 'en', badHash = false, fetchFails = f
   };
 }
 
+test('departed page does not start graph workers after delayed boot', async () => {
+  const p = page({ url: '/explorer/?node=aggregate%3ACreditBalance#nodes' });
+  p.fireWindow('pagehide');
+  await p.boot();
+  assert.equal(p.workers.length, 0);
+});
+
+test('incompatible cached worker responses fail instead of rendering graph results', async () => {
+  const p = page(); await p.boot();
+  const worker = p.modeWorkers('directory')[0];
+  worker.onmessage({ data: { id: worker.message.id, protocol: 'old-protocol', ok: true, result: execute(SQL, bytes, worker.message.request) } });
+  assert.match(p.nodes.get('xp-node-count').textContent, /protocol mismatch/);
+  assert.equal(p.nodes.get('xp-node-list').innerHTML, '');
+});
+
 test('both languages provide the native directory/inspector contract and truthful fallback', () => {
   for (const path of ['explorer/index.html', 'zh/explorer/index.html']) {
     const html = readFileSync(new URL(path, root), 'utf8');
@@ -119,9 +134,24 @@ test('both languages provide the native directory/inspector contract and truthfu
     assert.match(html, /<input[^>]*id="xp-node-search"[^>]*type="search"/);
     assert.match(html, /<label for="xp-node-kind">/);
     assert.match(html, /<select[^>]*id="xp-node-kind"/);
-    assert.match(html, /canonical graphstore/);
+    assert.match(html, /canonical graphstore/i);
     assert.match(html, /2026-11-11/);
     assert.match(html, /unavailable/);
+  }
+});
+
+test('sample quality notice is outside collapsible evidence and present in both languages', () => {
+  for (const [path, expected] of [
+    ['explorer/index.html', /Business logic and generator are still evolving; generated code quality is poor/],
+    ['zh/explorer/index.html', /业务逻辑与代码生成器仍在升级，当前生成代码质量较低/],
+  ]) {
+    const html = readFileSync(new URL(path, root), 'utf8');
+    const fileHeader = html.match(/<div class="xp-file-header">([\s\S]*?)<\/div>/)?.[1];
+    assert.ok(fileHeader, 'file header missing');
+    assert.match(fileHeader, /id="xp-code-quality-notice"[^>]*role="note"/);
+    assert.match(fileHeader, expected);
+    assert.doesNotMatch(fileHeader, /<details|\bhidden\b/);
+    assert.match(fileHeader, /not for production|不用于生产/);
   }
 });
 
