@@ -12,24 +12,36 @@ assets retain their documented source identity and regeneration contracts.
 
 | Path | Role |
 |---|---|
-| `index.html`, `*/index.html`, `zh/**/index.html` | 9 paired EN/ZH pages + a shared 404; static navigation survives missing JavaScript |
+| `index.html`, core `*/index.html`, `zh/**/index.html`, `404.html` | 9 paired EN/ZH core pages + a shared 404; static navigation survives missing JavaScript |
+| `articles/index.html`, `zh/articles/index.html`, `zh/articles/*/index.html` | Paired editorial indices and Chinese-only article details; checked-in generated HTML |
+| `content/articles/*.md`, `content/articles/manifest.json` | Original editorial Markdown and publication metadata; source for the article generator |
 | `assets/css/*.css` | design tokens → base → components → pages (in that order) |
 | `assets/js/site.js` | Shared `SITE` repository/nav configuration, language routes, optional theme persistence and code-only copy controls |
 | `assets/js/explorer.js`, `explorer-worker.js`, `explorer-query.js` | real sql.js queries in cancellable, per-query disposable databases; fixed presets never share mutable state with free SQL |
 | `assets/js/dissolve.js`, `dissolve-model.js` | real CreditBalance relationship exercise with complete/partial/missing guard coverage and keyboard controls |
 | `assets/data/` | derived data — `tools/build-assets.md` documents every rebuild |
-| `SITE-FACTS.md` | the registry of every number the site claims (F-xx IDs) |
+| `SITE-FACTS.md` | Verified product claims and quantitative evidence, with captured scope and F-xx IDs; not a registry of editorial quotations |
 | `LEDGER.md` | the honest backlog (DEF-xx IDs) |
 | `tools/checks.md` | pre-deploy checklist |
 
-## Honest layering — the two files that make this site different
+## Honest layering — product evidence and editorial perspectives
 
-1. **A number may appear on a page only if it has an F-xx in SITE-FACTS.md**
-   (captured date + source + reproduce command). No exceptions.
-2. **A promise may be implied only if it is either shipped or on LEDGER.md**
-   with a stable DEF-xx ID that pages link to (`/status/#DEF-xx`).
+1. **Verified product claims and their numbers require an F-xx in SITE-FACTS.md**
+   (captured date + scope + source + reproduce command). Editorial text cannot be
+   used to bypass this product-evidence requirement.
+2. **Product promises must distinguish shipped capability from the backlog in
+   LEDGER.md**, with stable DEF-xx links (`/status/#DEF-xx`) for tracked gaps.
+3. **Insights are editorial articles, not product acceptance evidence.** Original
+   sources, quotations and third-party statistics are retained as attributed,
+   unverified editorial material; they are not automatically verified by the site.
+   Analysis, suggestions and proposed engineering directions do **not** prove
+   product shipping or become delivery commitments merely by being published.
+   Promoting any such statement into a product claim requires the usual F/DEF
+   evidence and scope review.
 
-Both files are updated in the same commit as any claim that depends on them.
+Update the relevant registry in the same commit as any product claim depending on
+it. Article source fidelity and generated freshness are separate checks; neither
+verifies external research nor certifies implemented product behavior.
 
 ## Working on the site
 
@@ -89,11 +101,17 @@ table anchors, and compares bilingual section/example/fact markers. It parses on
 the literal `SITE` configuration, never its executable body. Runtime URL checks cover
 finite first-party fetch/Worker/import patterns; ordinary external documentation
 links are not runtime loads. Browser observation is still needed for computed URLs.
-No second hand-maintained facts registry is introduced.
+No second hand-maintained facts registry is introduced. Paired article indices
+share the language/section contract; Chinese-only details retain their own
+canonical URL and use **EN index**, not a fake English translation. That index
+link deliberately drops article-specific query/fragment state. Unknown paths
+remain on the existing 404 recovery path.
 
 Resource reports inventory transitive literal dependencies (including on-demand
-Explorer data/WASM/Workers), with raw and deterministic per-file gzip sizes. Growth
-above 20% requires explanation; it is not a measured loading-time regression. No
+Explorer data/WASM/Workers), with raw and deterministic per-file gzip sizes. Both
+article indices and discovered Chinese detail pages are reading entries; a page
+absent from the baseline is reported as `newEntry`, not a broken historic inventory.
+Growth above 20% for existing entries requires explanation; it is not a measured loading-time regression. No
 service worker or reliable cold/cached-offline site-loading promise is implied.
 
 The SQL console executes real SQLite statements on a fresh Worker-owned copy per
@@ -102,6 +120,35 @@ query text is never transmitted or persisted in a share URL. Output limits and a
 five-second Worker deadline are browser-protection policies, not guarantees of
 bounded SQLite memory under hostile input. Graph counts and documentary provenance
 retain their captured scope rather than being inferred from UI success.
+
+## Authoring and rebuilding articles
+
+Articles are authored in `content/articles/*.md`; `content/articles/manifest.json`
+records each stable slug, original title, deck, category, publication date, relative
+source filename and related article. Keep imported originals byte-identical to the
+reviewed source. Publication metadata and site chrome are separate from that
+original prose. Review attribution and the editorial/verified-product distinction
+before publishing; adding a translated title does not create a translated article.
+
+The optional authoring tool requires Python **Markdown==3.4.1**, pinned in
+`tools/requirements-articles.txt`. It is not a deployment or browser dependency.
+
+```sh
+python3 -m pip install -r tools/requirements-articles.txt
+python3 -B tools/build-articles.py
+python3 -B tools/build-articles.py --check
+python3 -B -m unittest discover -s tools/tests -p test_articles.py
+# Browser evidence on an ephemeral local server; no browser installation
+python3 -B tools/article-browser-checks.py --browser chromium
+python3 -B tools/article-browser-checks.py --browser webkit
+```
+
+The generator produces the EN/ZH indices and Chinese detail HTML from the manifest
+and Markdown. Review and commit those outputs with their source/metadata changes;
+do not hand-edit generated article HTML. `--check` checks freshness without writing
+outputs. Run it after shared navigation or generator changes too. The live site
+serves the checked-in HTML without running Python. The English index links to the
+original Chinese articles; no English detail translation is currently provided.
 
 ## Rebuilding derived data
 

@@ -94,26 +94,31 @@ def measure(baseline=None):
             raise ValueError('Invalid baseline Git ref')
         baseline = git('rev-parse', '--verify', baseline + '^{commit}').decode().strip()
     entries, warnings, errors = {}, [], []
-    for prefix in ('', 'zh/'):
-        for route in site.ROUTES:
-            entry = prefix + (route + '/' if route else '') + 'index.html'
-            now = inventory(current, entry)
-            entries[entry] = {'current': now}
-            if now['missing']:
-                errors.append(f'{entry}: missing resources {now["missing"]}')
-            if route != 'explorer' and any(a['path'].endswith(('.sqlite', '.wasm', 'bank-workshop.html')) for a in now['assets']):
-                errors.append(f'{entry}: reading page depends on a heavy Explorer/workshop asset')
-            if baseline:
-                old = inventory(previous, entry)
-                entries[entry]['baseline'] = old
-                if old['missing']:
-                    errors.append(f'{entry}: baseline inventory incomplete {old["missing"]}')
-                delta = {key: now[key] - old[key] for key in ('bytes', 'gzipBytes')}
-                growth = {key: round(100 * delta[key] / old[key], 2) if old[key] else None for key in delta}
-                entries[entry].update(delta=delta, growthPercent=growth)
-                if any(value is not None and value > 20 for value in growth.values()):
-                    warnings.append(f'{entry}: growth exceeds 20%; review and explain the feature/content delta')
-    critical = ['assets/css', 'assets/js', 'assets/data', 'assets/vendor', 'index.html', 'zh/index.html', 'explorer/index.html', 'zh/explorer/index.html']
+    page_entries = [prefix + (route + '/' if route else '') + 'index.html'
+                    for prefix in ('', 'zh/') for route in site.NAV_ROUTES]
+    page_entries.extend(path.relative_to(ROOT).as_posix()
+                        for path in sorted((ROOT / 'zh/articles').glob('*/index.html')))
+    for entry in page_entries:
+        now = inventory(current, entry)
+        entries[entry] = {'current': now}
+        if now['missing']:
+            errors.append(f'{entry}: missing resources {now["missing"]}')
+        if entry not in ('explorer/index.html', 'zh/explorer/index.html') and any(a['path'].endswith(('.sqlite', '.wasm', 'bank-workshop.html')) for a in now['assets']):
+            errors.append(f'{entry}: reading page depends on a heavy Explorer/workshop asset')
+        if baseline:
+            if previous(entry) is None:
+                entries[entry].update(newEntry=True, baseline=None)
+                continue  # A newly published page has no historic entry to compare.
+            old = inventory(previous, entry)
+            entries[entry].update(newEntry=False, baseline=old)
+            if old['missing']:
+                errors.append(f'{entry}: baseline inventory incomplete {old["missing"]}')
+            delta = {key: now[key] - old[key] for key in ('bytes', 'gzipBytes')}
+            growth = {key: round(100 * delta[key] / old[key], 2) if old[key] else None for key in delta}
+            entries[entry].update(delta=delta, growthPercent=growth)
+            if any(value is not None and value > 20 for value in growth.values()):
+                warnings.append(f'{entry}: growth exceeds 20%; review and explain the feature/content delta')
+    critical = ['assets/css', 'assets/js', 'assets/data', 'assets/vendor', 'index.html', 'zh/index.html', 'explorer/index.html', 'zh/explorer/index.html', 'articles', 'zh/articles']
     diffstat = git('diff', '--stat', baseline, '--', *critical).decode() if baseline else None
     return {'baseline': baseline, 'python': sys.version.split()[0],
             'scope': 'Transitive finite literal resource inventory, including on-demand Workers. Raw bytes and deterministic per-file gzip sum; not network transfer, cold/cache availability or timing. Dynamic URLs require browser review.',

@@ -76,7 +76,7 @@ const config = readFileSync(join(root, 'assets/js/site.js'), 'utf8');
 test('SITE is a literal config; its body is never executed', () => {
   const found = call({ action: 'config', text: config + '\nthrow new Error("must never execute");' });
   assert.equal(found.ok, true, found.error);
-  assert.equal(found.result.nav.flatMap(g => g.items).length, 8);
+  assert.equal(found.result.nav.flatMap(g => g.items).length, 9);
   assert.equal(call({ action: 'config', text: 'const SITE = (() => { throw new Error("no eval"); })();' }).ok, false);
   assert.equal(call({ action: 'config', text: config.replace('href: "/dsl/"', 'href: "/unknown/"') }).ok, false);
   assert.equal(call({ action: 'config', text: config.replace('href: "/dsl/"', 'href: "/guide/"') }).ok, false);

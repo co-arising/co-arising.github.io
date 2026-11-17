@@ -1,0 +1,2 @@
+# Maintenance-only static publishing; no site/runtime dependency.
+Markdown==3.4.1

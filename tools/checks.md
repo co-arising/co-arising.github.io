@@ -3,27 +3,67 @@
 Run these commands from the site repository. Deployment requires no build step;
 maintenance tools are not browser runtime dependencies.
 
+## Article publication verification — 2026-11-17
+
+- Source/archive bytes and ordered external-link counts match the reviewed source;
+  13 article contract checks pass. Original quotations, lists, tables and diagrams
+  remain in the generated body; metadata and editorial framing are separate.
+- Strict static checks: 23 pages, zero errors/warnings. Node suite: 129 passed,
+  5 skipped, no failures. Resource comparison against `e39a7bb`: no warnings/errors;
+  the four article entries are new, with no Explorer database/WASM dependency.
+- Chromium and WebKit article observations: 1280/390px, light/dark, list-to-detail,
+  TOC/current section/progress, actual deep-link reload, byte-exact Markdown download,
+  related article and EN index navigation, horizontally scrollable tables/diagram,
+  and no-JavaScript reading. Reports/screenshots are written to temporary evidence
+  directories by `article-browser-checks.py`; these are browser-emulated viewports,
+  not physical-device acceptance.
+- Full existing-site Chromium extended matrix passes with ten navigation routes.
+  Expected deliberately blocked-script/data requests are recorded by the failure
+  probes, not treated as successful resource loads.
+- These observations do not independently fact-check the papers, quotations or
+  external statistics cited in the articles. Live deployment must still be checked
+  separately after authenticated publication.
+
 ## Automated checks
 
 Prerequisites: Python **≥3.9** (standard library), Node **≥22.13**, Bash for
 parse-only shell syntax, and Git for optional baseline resource comparison. Python
 Playwright plus an existing browser installation are optional, not app dependencies.
-No command below installs tools, runs the bank, generates an application or publishes.
-Select the intended interpreter when PATH points to an older Node/Python.
+Article authoring additionally requires the pinned Python **Markdown==3.4.1** from
+`tools/requirements-articles.txt`; serving the checked-in site does not require it.
+The check commands below do not install tools, run the bank, generate an application
+or publish. Select the intended interpreter when PATH points to an older Node/Python.
 
 ```sh
 python3 -B tools/check-site.py --strict
 node tools/check-examples.mjs
 node --test tools/tests/*.test.mjs
 python3 -B tools/check-resources.py --baseline 28ba7c2
+# After installing the optional pinned article-authoring dependency:
+python3 -B tools/build-articles.py --check
+python3 -B -m unittest discover -s tools/tests -p test_articles.py
+python3 -B tools/article-browser-checks.py --browser chromium
+python3 -B tools/article-browser-checks.py --browser webkit
 ```
 
-- Static checks cover 18 content pages plus 404: canonical/hreflang, stable section
-  IDs, section-scoped example/fact markers, F/DEF references, local links, actual
-  status-table definition anchors, main/skip links and nine-route static navigation.
+- Static checks retain the 18 core pages plus 404 and add the paired article
+  indices and discovered `zh/articles/*/index.html` details: canonical/hreflang,
+  stable section IDs, section-scoped example/fact markers, F/DEF references,
+  local links, actual status-table definition anchors and main/skip links.
+  The original nine core route pairs keep their ID/section contracts. Every page
+  has ten static navigation destinations (including Home and Insights).
   `SITE` is parsed as a literal object; no JS body or expression is evaluated.
-  Five primary and three secondary enhanced links do not remove the nine static
-  destinations (including Home). Map/navigation links need accessible labels.
+  Five primary and four secondary enhanced links retain those destinations.
+  Map/navigation links need accessible labels. Chinese-only details require their
+  own canonical, trusted `data-page="article"` identity and
+  `data-language-index="/articles/"`; they must not advertise an English translation.
+  Their **EN index** link has neither translation metadata nor article query/hash.
+  Paired indices retain query/fragment state when switching language.
+- Article prose and attributed third-party data are editorial material, not
+  verified product facts. Unmarked editorial F/DEF text is tracked separately;
+  explicit `data-fact` and linked F/DEF identities still pass the strict registry
+  checks. Core product validation is unchanged. Source fidelity/freshness checks
+  do not prove third-party statistics, product shipping or proposed delivery plans.
 - F/DEF definitions come directly from their Markdown table registries. New IDs
   must appear in both status tables; repeated display text, a link or an unrelated
   span is not a table definition. Privacy checks examine public prose, not intentional
@@ -61,9 +101,12 @@ python3 -B tools/check-resources.py --baseline 28ba7c2
 - Resource reports list every entry's finite transitive resource inventory and
   raw/gzip byte totals, baseline deltas and critical Git diffstat. Baselines are
   read with `git show`, never checked out. On-demand Explorer dependencies are
-  included; external prose links are not. Reading pages must not load SQLite/WASM
-  or the workshop. Over 20% raw or gzip growth needs an explanation (`--strict`
-  makes these warnings fail). Gzip totals are deterministic per-file sums, **not
+  included; external prose links are not. Article indices/details are included as
+  reading entries. Baseline-absent pages report `newEntry: true`, with no fabricated
+  delta or missing-baseline inventory error; existing entry budgets are unchanged.
+  Reading pages must not load SQLite/WASM or the workshop. Over 20% raw or gzip
+  growth in existing entries needs an explanation (`--strict` makes these warnings
+  fail). Gzip totals are deterministic per-file sums, **not
   transfer measurements, cache behavior or invented performance timings**.
 
 ## Graph / Code snapshot delivery gate
@@ -238,6 +281,12 @@ contract is not inferred from the website's Explorer tests.
 
 ## Content and evidence
 
+- [ ] Article Markdown and manifest metadata produce fresh checked-in outputs via
+      `tools/build-articles.py --check`; originals retain reviewed source bytes.
+- [ ] Editorial quotations, external statistics and proposed engineering directions
+      remain attributed and unverified, not recast as F-xx product-shipping proof.
+- [ ] Original Chinese article titles are not presented as translated EN titles;
+      EN detail translation is not advertised where only an index exists.
 - [ ] EN/ZH code payloads, fact IDs, source references and failure boundaries agree.
 - [ ] F-24–F-29 retain candidate/date/platform scope. SQL rebuild is 66.847 s;
       actor64/readside47 share 23 generated tests.
