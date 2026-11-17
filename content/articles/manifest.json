@@ -1,0 +1,22 @@
+{
+  "articles": [
+    {
+      "slug": "ai-coding-evolution-20261116",
+      "title": "AI Coding 发展全景：从 Vibe Coding 到 Agentic Engineering",
+      "deck": "从模型漂移、Vibe Coding 的争议到 Agentic 与 Harness Engineering：一份保留引文和参考链接的行业演进综述。",
+      "category": "行业综述",
+      "date": "2026-11-16",
+      "source": "ai-coding-evolution-20261116.md",
+      "related": "co-arising-implications-20261116"
+    },
+    {
+      "slug": "co-arising-implications-20261116",
+      "title": "对 co-arising 的启发：AI Coding 范式转移下的战略印证与工程路线",
+      "deck": "把行业演进放回 co-arising 的语境，讨论确定性编译、业务切片、代码锚定与拟议工程路线；不是已交付能力清单。",
+      "category": "战略思考",
+      "date": "2026-11-16",
+      "source": "co-arising-implications-20261116.md",
+      "related": "ai-coding-evolution-20261116"
+    }
+  ]
+}

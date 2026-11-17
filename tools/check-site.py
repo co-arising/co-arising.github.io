@@ -12,7 +12,9 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-ROUTES = ("", "why-co-arising", "dsl", "pipeline", "bank-demo", "explorer", "compare", "guide", "status")
+CORE_ROUTES = ("", "why-co-arising", "dsl", "pipeline", "bank-demo", "explorer", "compare", "guide", "status")
+ROUTES = CORE_ROUTES  # Original core contract remains available to existing consumers.
+NAV_ROUTES = (*CORE_ROUTES, "articles")
 PRESETS = {"census", "describe", "blast", "lineage", "orphans", "sagas", "invariants"}
 ID_RE = re.compile(r"(?<![\w-])(?:F-\d+|DEF-\d+)(?![\w-])")
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
@@ -111,7 +113,7 @@ def site_configuration(text):
             if not isinstance(item, dict) or any(not isinstance(item.get(k), str) or not item[k].strip() for k in ('href', 'label', 'labelZh')):
                 raise ValueError("navigation needs href and both labels")
             links.append(item['href'])
-    expected = {'/' + route + '/' for route in ROUTES if route}
+    expected = {'/' + route + '/' for route in NAV_ROUTES if route}
     if len(links) != len(expected) or set(links) != expected:
         raise ValueError("SITE.nav has duplicate, missing or unknown routes")
     return config
@@ -123,16 +125,24 @@ class Page(HTMLParser):
         self.path = path
         self.ids, self.duplicates = set(), set()
         self.links, self.resources, self.inline_scripts = [], [], []
-        self.references = set()
+        self.references, self.editorial_references = set(), set()
         self.fact_markers, self.examples = Counter(), Counter()
         self.sections, self.nav_links, self.map_links, self.skip_links = [], [], [], []
+        self.language_links = []
         self.table_ids = {'facts': set(), 'ledger': set()}
         self.census_cells, self.section_links, self.example_code = [], {}, {}
-        self.lang, self.page_id, self.canonical = None, None, None
+        self.lang, self.page_id, self.canonical, self.language_index = None, None, None, None
         self.alternates, self.stack, self.elements = {}, [], []
         self.problems = []
         self.feed(path.read_text(encoding='utf-8') if text is None else text)
         self.close()
+
+    def record_references(self, value, explicit=False):
+        # Original editorial prose is not a product-facts registry. Explicit claim
+        # markers and linked F/DEF identities still use the existing strict gate.
+        editorial = self.page_id == 'article' and any(t == 'main' for t, _ in self.stack)
+        target = self.editorial_references if editorial and not explicit else self.references
+        target.update(ID_RE.findall(value or ''))
 
     def handle_starttag(self, tag, attributes):
         attrs = dict(attributes)
@@ -145,7 +155,7 @@ class Page(HTMLParser):
             if not value or value in self.ids:
                 self.duplicates.add(value)
             self.ids.add(value)
-            self.references.update(ID_RE.findall(value or ''))
+            self.record_references(value)
             if tag == 'tr' or any(t == 'tr' for t, _ in self.stack):
                 if any(t == 'table' for t, _ in self.stack):
                     for name in self.table_ids:
@@ -170,6 +180,7 @@ class Page(HTMLParser):
             self.lang = attrs.get('lang')
         if tag == 'body':
             self.page_id = attrs.get('data-page')
+            self.language_index = attrs.get('data-language-index')
         if tag == 'a':
             href = attrs.get('href', '')
             if href:
@@ -178,7 +189,11 @@ class Page(HTMLParser):
             record = {'href': href, 'text': '', 'label': attrs.get('aria-label', '')}
             attrs['_anchor'] = record
             if 'site-nav' in ancestors:
-                self.nav_links.append(record)
+                if attrs.get('id') == 'language-switch' or attrs.get('lang') and attrs['lang'] != self.lang:
+                    record.update(lang=attrs.get('lang'), hreflang=attrs.get('hreflang'), rel=attrs.get('rel', ''))
+                    self.language_links.append(record)
+                else:
+                    self.nav_links.append(record)
             if 'map' in ancestors:
                 self.map_links.append(record)
             if 'skip-link' in attrs.get('class', '').split():
@@ -203,7 +218,7 @@ class Page(HTMLParser):
         if attrs.get('srcset'):
             self.resources.extend(part.strip().split()[0] for part in attrs['srcset'].split(',') if part.strip())
         for key in ('data-fact', 'title', 'href'):
-            self.references.update(ID_RE.findall(attrs.get(key, '')))
+            self.record_references(attrs.get(key, ''), explicit=key in ('data-fact', 'href'))
         if 'data-fact' in attrs:
             facts = tuple(sorted(ID_RE.findall(attrs['data-fact'])))
             if not facts or re.sub(r'(?:F-\d+|[\s,])+', '', attrs['data-fact']):
@@ -232,7 +247,7 @@ class Page(HTMLParser):
             return
         if any(t == 'style' for t, _ in self.stack):
             return
-        self.references.update(ID_RE.findall(data))
+        self.record_references(data)
         badge = any('badge' in attrs.get('class', '').split() for _, attrs in self.stack)
         for _, attrs in self.stack:
             if '_anchor' in attrs:
@@ -393,7 +408,7 @@ def check_site(root=ROOT):
             raise ValueError('SITE.urls.bank must be an HTTPS repository URL')
     except ValueError as error:
         errors.append(f'assets/js/site.js: {error}')
-    for route in ROUTES:
+    for route in NAV_ROUTES:
         pair = []
         for prefix, lang in (('', 'en'), ('zh', 'zh-CN')):
             path = root / prefix / route / 'index.html'
@@ -429,6 +444,26 @@ def check_site(root=ROOT):
                 return [re.sub(r'^/zh(?=/)', '', a['href']) for a in page.map_links]
             if map_targets(pair[0]) != map_targets(pair[1]):
                 errors.append(f'{route or "/"}: EN/ZH map destinations differ')
+    # Chinese-only details are discovered from public output, not a runtime registry.
+    article_paths = sorted((root / 'zh/articles').glob('*/index.html'))
+    for path in article_paths:
+        page = Page(path)
+        pages[path.resolve()] = page
+        label = path.relative_to(root)
+        canonical = 'https://co-arising.github.io/' + path.parent.relative_to(root).as_posix() + '/'
+        if page.page_id != 'article' or page.lang != 'zh-CN':
+            errors.append(f'{label}: article detail requires data-page=article and lang=zh-CN')
+        if page.language_index != '/articles/':
+            errors.append(f'{label}: article detail requires data-language-index=/articles/')
+        if page.canonical != canonical:
+            errors.append(f'{label}: incorrect article canonical')
+        if any(lang != 'zh-CN' or href != canonical for lang, href in page.alternates.items()):
+            errors.append(f'{label}: unpaired article must not advertise a translated alternate')
+        switches = page.language_links
+        if len(switches) != 1 or switches[0]['href'] != '/articles/' or switches[0].get('lang') != 'en':
+            errors.append(f'{label}: article language switch must lead to the English index without query/fragment')
+        elif switches[0].get('hreflang') or 'alternate' in switches[0].get('rel', '').split():
+            errors.append(f'{label}: English index link is not a translated alternate')
     missing = root / '404.html'
     pages[missing.resolve()] = Page(missing)
     if pages[missing.resolve()].page_id != 'not-found':
@@ -451,11 +486,11 @@ def check_site(root=ROOT):
             errors.append(f'{label}: duplicate IDs {sorted(page.duplicates)}')
         if page.references - facts - deferred:
             errors.append(f'{label}: unregistered F/DEF references {sorted(page.references - facts - deferred)}')
-        expected_nav = {('/zh' if page.lang == 'zh-CN' else '') + '/' + (r + '/' if r else '') for r in ROUTES}
+        expected_nav = {('/zh' if page.lang == 'zh-CN' else '') + '/' + (r + '/' if r else '') for r in NAV_ROUTES}
         actual_nav = [a['href'] for a in page.nav_links]
         if set(actual_nav) != expected_nav or len(actual_nav) != len(expected_nav):
-            errors.append(f'{label}: static navigation must link all nine known routes once')
-        if any(not (a['text'].strip() or a['label'].strip()) for a in page.nav_links + page.map_links):
+            errors.append(f'{label}: static navigation must link all {len(NAV_ROUTES)} known routes once')
+        if any(not (a['text'].strip() or a['label'].strip()) for a in page.nav_links + page.language_links + page.map_links):
             errors.append(f'{label}: navigation/map link missing accessible label')
         mains = [a.get('id') for t, a in page.elements if t == 'main']
         if len(mains) != 1 or not mains[0] or not any(a['href'] == '#' + mains[0] and a['text'].strip() for a in page.skip_links):
@@ -513,7 +548,9 @@ def check_site(root=ROOT):
         if meta.get(key) != counts[table]:
             errors.append(f'Graph {table} count differs from metadata')
     # Deliberately public prose only: test fixtures may contain negative private-path examples.
-    public_text = [*pages, *root.glob('docs/*.md'), root / 'SITE-FACTS.md', root / 'LEDGER.md', root / 'README.md', root / 'tools/checks.md']
+    public_text = [*pages, *root.glob('docs/*.md'), *root.glob('content/articles/*.md'),
+                   *root.glob('content/articles/*.json'), root / 'SITE-FACTS.md', root / 'LEDGER.md',
+                   root / 'README.md', root / 'tools/checks.md']
     for path in public_text:
         if public_path_findings(path.read_text()):
             errors.append(f'{path.relative_to(root)}: private path or key material in public text')

@@ -13,7 +13,7 @@ from urllib.parse import parse_qs, quote, urlsplit
 # Playwright is optional maintenance tooling. Import/launch failures become BLOCKED.
 
 ROOT = Path(__file__).resolve().parents[1]
-ROUTES = ('', 'why-co-arising/', 'dsl/', 'pipeline/', 'bank-demo/', 'explorer/', 'compare/', 'guide/', 'status/')
+ROUTES = ('', 'why-co-arising/', 'dsl/', 'pipeline/', 'bank-demo/', 'explorer/', 'compare/', 'guide/', 'status/', 'articles/')
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -261,9 +261,9 @@ def verify(browser, base, evidence, engine='chromium', extended=False):
         plain = new_context(java_script_enabled=False)
         plainpage = plain.new_page()
         plainpage.goto(base + '/zh/guide/')
-        require(plainpage.locator('#site-nav a').count() == 9, 'no-JS navigation absent')
+        require(plainpage.locator('#site-nav a').count() == 10, 'no-JS navigation absent')
         require('Counter' in plainpage.locator('#l1').inner_text(), 'no-JS content missing')
-        note('no JavaScript', 'Chinese guide and all 9 navigation destinations remain readable')
+        note('no JavaScript', 'Chinese guide and all 10 navigation destinations remain readable')
         plain.close()
 
         page.set_viewport_size({'width': 360, 'height': 800})
@@ -374,7 +374,7 @@ def verify_mobile_navigation(new_context, base, evidence, note, require):
                     page.wait_for_url(base + prefix + route)
                     if route == 'explorer/':
                         page.wait_for_function("document.querySelectorAll('#xp-node-list button[data-node]').length === 40 && document.querySelector('#xp-node-list').getAttribute('aria-busy') === 'false'")
-                for route in ('pipeline/', 'compare/', 'status/'):
+                for route in ('pipeline/', 'compare/', 'status/', 'articles/'):
                     page.goto(base + prefix)
                     page.locator('#nav-reference summary').tap()
                     link = page.locator(f'#nav-reference a[href="{prefix + route}"]')
@@ -396,7 +396,7 @@ def verify_mobile_navigation(new_context, base, evidence, note, require):
                 target = '/zh/status/#DEF-21' if prefix == '/' else '/status/#DEF-21'
                 page.locator('#language-switch').tap()
                 page.wait_for_url(base + target)
-        note('mobile navigation', '360/390 CSS px × EN/ZH: conditional scroll guidance, measured 44px targets, five primary links after explicit horizontal input, three Reference links, keyboard Escape/focus, theme/language taps and fragment clearance')
+        note('mobile navigation', '360/390 CSS px × EN/ZH: conditional scroll guidance, measured 44px targets, five primary links after explicit horizontal input, four Reference links, keyboard Escape/focus, theme/language taps and fragment clearance')
     finally:
         (evidence / 'mobile-layout.json').write_text(json.dumps(measurements, ensure_ascii=False, indent=2))
         context.close()
@@ -541,13 +541,13 @@ def verify_extended(new_context, base, evidence, note, require):
                         require(box['overflow'] <= 1, f'overflow at {width}/{theme}/{prefix + route}: {box}')
                         require(box['offset'] >= box['nav'] and box['offset'] <= box['nav'] + 24, f'navigation offset not measured: {box}')
                         expected = {prefix + item for item in ROUTES}
-                        require(set(box['links']) == expected and len(box['links']) == 9, 'enhanced navigation lost/duplicated a route')
+                        require(set(box['links']) == expected and len(box['links']) == 10, 'enhanced navigation lost/duplicated a route')
                         measurements.append({'width': width, 'theme': theme, 'route': prefix + route, **box})
             page.goto(base + '/zh/status/#facts')
             page.wait_for_function("document.querySelector('#facts h2').getBoundingClientRect().top >= document.querySelector('#site-nav').getBoundingClientRect().bottom")
             page.screenshot(path=str(evidence / f'extended-{width}.png'))
         (evidence / 'layout.json').write_text(json.dumps(measurements, ensure_ascii=False, indent=2))
-        note('extended layout', '768/1280 × EN/ZH × auto/light/dark: home/guide/dsl/explorer; actual nav height/offset and nine-route counts retained in layout.json')
+        note('extended layout', '768/1280 × EN/ZH × auto/light/dark: home/guide/dsl/explorer; actual nav height/offset and ten-route counts retained in layout.json')
 
         page.set_viewport_size({'width': 1280, 'height': 900})
         for route in ('zh/', 'zh/guide/', 'zh/dsl/', 'zh/explorer/'):
@@ -578,7 +578,7 @@ def verify_extended(new_context, base, evidence, note, require):
             for prefix in ('/', '/zh/'):
                 for route in ROUTES:
                     fallback.goto(base + prefix + route)
-                    require(fallback.locator('#site-nav a').count() == 9, f'{mode}: static navigation missing')
+                    require(set(fallback.locator('#site-nav .row > a:not(.nav-link)').evaluate_all("links => links.map(a => a.getAttribute('href'))")) == {prefix + item for item in ROUTES}, f'{mode}: static navigation missing')
                     require(fallback.locator('main').is_visible(), f'{mode}: main not visible')
                     if route == '':
                         invite = fallback.locator('#community a.btn')
@@ -592,7 +592,7 @@ def verify_extended(new_context, base, evidence, note, require):
                     skip = fallback.locator('a.skip-link')
                     require(skip.count() == 1 and skip.get_attribute('href') == '#' + fallback.locator('main').get_attribute('id'), f'{mode}: skip link broken')
             fallback.screenshot(path=str(evidence / f'extended-{mode}.png'))
-        note('fallbacks', 'all 18 routes keep nine static navigation anchors, visible main and a matching skip link under no-JS and failed site.js')
+        note('fallbacks', 'all 20 paired routes keep ten unique static navigation destinations, visible main and a matching skip link under no-JS and failed site.js')
 
         failed = new_context()
         failed.route('**/assets/data/**', lambda route: route.abort())

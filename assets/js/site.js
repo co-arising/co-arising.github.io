@@ -31,6 +31,7 @@ const SITE = {
       group: "Reference & evidence",
       groupZh: "参考与证据",
       items: [
+        { href: "/articles/", label: "Insights", labelZh: "技术观察" },
         { href: "/pipeline/", label: "Pipeline", labelZh: "生成流程" },
         { href: "/compare/", label: "Landscape", labelZh: "工具对比" },
         { href: "/status/", label: "Status & evidence", labelZh: "状态与证据" },
@@ -38,7 +39,7 @@ const SITE = {
     },
   ],
   audited: "2026-11-11",
-  contentUpdated: "2026-11-14",
+  contentUpdated: "2026-11-17",
 };
 
 const STR = {
@@ -101,11 +102,19 @@ const STR = {
   const rawPath = location.pathname.replace(/index\.html$/, "");
   const stripped = rawPath.replace(/^\/zh(?=\/|$)/, "") || "/";
   const normalized = stripped.endsWith("/") ? stripped : stripped + "/";
-  const notFound = document.body.dataset.page === "not-found" || !routes.has(normalized);
+  /* Only a trusted Chinese article document can opt into an unpaired detail route. */
+  const isArticle = LANG === "zh" && document.body.dataset.page === "article"
+    && /^\/articles\/[^/]+\/$/.test(normalized);
+  const notFound = document.body.dataset.page === "not-found" || (!routes.has(normalized) && !isArticle);
   const here = notFound ? null : normalized;
+  const navHere = isArticle ? "/articles/" : here;
   const isRoot = here === "/";
+  /* This is an index, not a translation. Ignore malformed or external declarations. */
+  const languageIndex = document.body.dataset.languageIndex === "/articles/"
+    ? document.body.dataset.languageIndex : "/articles/";
 
   const counterpart = () => {
+    if (isArticle) return languageIndex;
     const base = LANG === "zh" ? (here || "/") : "/zh" + (here || "/");
     return base + (notFound ? "" : (location.search || "") + (location.hash || ""));
   };
@@ -113,13 +122,13 @@ const STR = {
   /* ---------- nav + footer injection ---------- */
   if (nav) {
     const links = (group) => group.items.map((item) => {
-      const active = here === item.href ? ' aria-current="page"' : "";
+      const active = navHere === item.href ? ' aria-current="page"' : "";
       const href = LANG === "zh" ? "/zh" + item.href : item.href;
       const label = LANG === "zh" ? item.labelZh : item.label;
       return `<a class="nav-link" href="${href}"${active}>${label}</a>`;
     }).join("");
     const secondary = SITE.nav[1];
-    const inReference = secondary.items.some((item) => item.href === here);
+    const inReference = secondary.items.some((item) => item.href === navHere);
     const langA = LANG === "zh" ? "en" : "zh-CN";
     nav.innerHTML = `<div class="topline"></div><div class="site-nav"><div class="row nav-enhanced">
       <a class="brand" href="${LANG === "zh" ? "/zh/" : "/"}"${isRoot ? ' aria-current="page"' : ""}><img class="brand-icon" src="/assets/img/co-arising-icon.png" width="32" height="32" alt="" />co-arising</a>
@@ -207,6 +216,12 @@ const STR = {
   }
 
   const languageLink = document.getElementById("language-switch");
+  if (languageLink && isArticle) {
+    languageLink.textContent = "EN index";
+    languageLink.setAttribute("title", "English article index (this article is available in Chinese)");
+    languageLink.removeAttribute("rel");
+    languageLink.removeAttribute("hreflang");
+  }
   const updateLanguageLink = () => { if (languageLink) languageLink.setAttribute("href", counterpart()); };
   updateLanguageLink();
   window.addEventListener("hashchange", updateLanguageLink);
