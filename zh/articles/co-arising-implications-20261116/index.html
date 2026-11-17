@@ -43,7 +43,7 @@
       </aside>
       <article id="article-body" class="article-body"><h2 id="section-1">〇、一句话结论</h2>
 <p><strong>工业界用 2024–2026 两年的集体试错，恰好验证了 co-arising 坚持的"确定性元模型编译 + 切片完形填空（Cloze）+ 双向代码锚定"才是终局方向；而先行者（AWS Kiro、GitHub Spec-Kit、MetaGPT、Nuanced）栽过的跟头，则构成一份价值千金的产品避坑指南。</strong></p>
-<hr />
+<hr>
 <h2 id="section-2">一、核心战略印证：外部演进为什么恰好证明 co-arising 的壁垒</h2>
 <h3 id="section-2-1">1.1 叙事定位成立："AI 编程的架构安全带"切中主航道</h3>
 <p>将 co-arising 从"Scala/DDD 后端脚手架"重塑为"AI 时代的复杂系统防幻觉与架构治理引擎"，与工业界经历"Vibe Coding 幻灭期"后的最新共识高度吻合——连 Karpathy 本人都已把 Vibe Coding 迭代为 Agentic Engineering，核心诉求正是"拿 Agent 杠杆 + 确定性护栏 + 软件质量零妥协"。这个故事正处于 2026 年下半年 VC 寻找"Post-Vibe-Coding 基础设施"的主航道上。</p>
@@ -88,7 +88,7 @@
 <h3 id="section-2-5">1.5 "逆参数知识效应（Inverse PKE）"为极致上下文压缩提供学术依据</h3>
 <p><a href="https://arxiv.org/html/2604.00555v5">FAOS 论文</a> 的定律：LLM 预训练语料越薄弱的私有业务规则，本体锚定带来的准确率增益越大（高达 2 倍以上，p &lt; .001）；反之把通用概念塞进上下文反而引发"上下文干扰"。</p>
 <p><strong>对 co-arising 的意义</strong>：这呼应了 co-arising 已验证的"宏展开 + 单行微语法压缩 + 业务切片完形填空（Context Pack Cloze）"路线——把几万行源码或全量图谱塞给 LLM 不仅贵，还会引发上下文干扰。<strong>80% 的通用架构样板交给确定性编译器（零 Token、零幻觉），只把 LLM 最缺的 20% 核心私有业务不变量通过精准切片喂给 Agent。</strong></p>
-<hr />
+<hr>
 <h2 id="section-3">二、五大产品与架构启发：吸取先行者教训</h2>
 <h3 id="section-3-1">启发 1：警惕"Plan Mode 之死"——死磕单行微语法，绝不陷入"Markdown/YAML 审查地狱"</h3>
 <ul>
@@ -132,7 +132,7 @@
 <li><strong>前车之鉴</strong>：<a href="https://www.aymannadeem.com/artificial/intelligence,/developer/tools/2026/09/24/plan-mode-is-dead.html">Ayman Nadeem 提出 2026 年最深刻的未解之谜</a>——"当 5 个甚至 100 个并行 Agent 同时高速修改系统时，人类如何在不读每一行代码、也不读几万字 AI 废话的前提下，保持对系统全局心智模型（Mental Model）的掌控？"</li>
 <li><strong>落地动作</strong>：这正是 co-arising 的 <strong>CQRS 图谱投影 + 可视化领域看板</strong>大显身手的地方。不让人类画图，而是利用双向代码锚定，在每次 Agent 提交 PR 时自动将变更映射为 <a href="https://arxiv.org/html/2603.15021v1">C4 模型 / Mermaid 事件流差异图（Visual Diff on Truth-Tree）</a>——让架构师一眼看到："这次 PR 只是填补了 <code>OrderAggregate</code> 内部的一个绿色完形填空节点，完全没有触碰红色的跨上下文边界"。</li>
 </ul>
-<hr />
+<hr>
 <h2 id="section-4">三、融合后的理想闭环工作流（四步）</h2>
 <p>将上述启发融会贯通，co-arising 可以打造一条极具说服力的四步标准执行流：</p>
 <pre class="code"><code>┌─────────────────────────────────────────────────────────────┐
@@ -160,7 +160,7 @@
 └─────────────────────────────────────────────────────────────┘
 </code></pre>
 <p>这套设计避开了早期多智能体框架与重型 SDD 工具的覆辙，把 2026 年底硅谷才摸索出的 Harness Engineering 推向了<strong>编译级高度</strong>。</p>
-<hr />
+<hr>
 <h2 id="section-5">四、"哪些进工具链、哪些做 Skill"：黄金分割线</h2>
 <h3 id="section-5-1">4.1 第一性原理</h3>
 <p>结合 Anthropic "Deterministic vs. Non-deterministic" 二分法与 Böckeler "Computational（CPU 计算级）vs. Inferential（GPU 语义推理级）"框架：</p>
@@ -286,12 +286,12 @@
 </ol>
 </li>
 </ul>
-<hr />
+<hr>
 <h2 id="section-6">五、商业叙事一句话</h2>
 <blockquote>
 <p><strong>Skill 负责把人类的模糊意图"编译"进确定性的领域真源（truthsrc），而工具链（Compiler + MCP + Hooks）则像物理定律一样，把编码 Agent 死死锁在真源划定的轨道内完成填空与自愈——既保留了 Vibe Coding 的对话式丝滑体验，又在底层实现了传统编译器级别的架构确定性。</strong></p>
 </blockquote>
-<hr />
+<hr>
 <h2 id="section-7">六、GTM 路线与避坑清单</h2>
 <h3 id="section-7-1">6.1 三步走路线图</h3>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：阶段 / 策略 / 要点"><table>
@@ -327,7 +327,7 @@
 <li><strong>增加 Brownfield（存量老系统）逆向采矿切入点</strong>：硅谷大厂与金融企业最大痛点不在从零写新项目，而在海量存量系统不敢让 Agent 碰。Phase 1 的 MCP Server 若能结合 AST 解析器先把存量 TypeScript/Java/Scala 代码库自动聚类映射为初始候选领域图谱，再让人类架构师在关键边界"加锁"（锁死 Aggregate 与 Invariant），PLG 冷启动阻力将降低一个数量级。</li>
 <li><strong>双速工作流</strong>：用同一套重型流程应对所有规模的问题必然失败，小改动必须零仪式感（见启发 4）。</li>
 </ol>
-<hr />
+<hr>
 <h2 id="section-8">七、关键外部参考（与本启发直接相关）</h2>
 <ul>
 <li><a href="https://martinfowler.com/articles/harness-engineering.html">Birgitta Böckeler: Harness engineering for coding agent users</a>（Ashby 定律、Harness 分类、Computational vs Inferential）</li>

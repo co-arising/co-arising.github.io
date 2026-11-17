@@ -10,13 +10,19 @@ import argparse
 from datetime import date
 import html
 import json
+import os
 from pathlib import Path
 import re
 import sys
+import tempfile
 from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
+sys.dont_write_bytecode = True
+
+import html5lib
 import markdown
+from markdown.blockprocessors import CodeBlockProcessor
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
@@ -107,11 +113,17 @@ class CaptionListSpacing(Preprocessor):
         result = []
         for line in lines:
             if (line and not line[0].isspace() and is_list(line) and result
-                    and result[-1].strip() and not is_list(result[-1])
-                    and not result[-1][0].isspace()):
+                    and re.fullmatch(r"\*\*[^\n]+\*\*", result[-1])):
                 result.append("")
             result.append(line)
         return result
+
+
+class StandardCodeBlock(CodeBlockProcessor):
+    """Keep conventional four-space code while allowing two-space nested lists."""
+    def __init__(self, parser):
+        super().__init__(parser)
+        self.tab_length = 4
 
 
 class PublishingMarkdown(Extension):
@@ -121,6 +133,7 @@ class PublishingMarkdown(Extension):
         md.preprocessors.deregister("html_block")
         md.inlinePatterns.deregister("html")
         md.preprocessors.register(CaptionListSpacing(md), "caption_lists", 24)
+        md.parser.blockprocessors.register(StandardCodeBlock(md.parser), "code", 80)
 
 
 def markdown_fragment(source):
@@ -129,20 +142,11 @@ def markdown_fragment(source):
         tab_length=2,
         output_format="xhtml",
     )
-    rendered = parser.convert(source)
-    # XML recognizes only five named entities. Convert other HTML entities to
-    # numeric references BEFORE XML parsing, never unescape markup wholesale.
-    def xml_entity(match):
-        name = match.group(1)
-        if name in {"amp", "lt", "gt", "quot", "apos"}:
-            return match.group(0)
-        decoded = html.unescape(match.group(0))
-        if decoded == match.group(0):
-            return "&amp;" + name + ";"
-        return "".join(f"&#{ord(char)};" for char in decoded)
-
-    rendered = re.sub(r"&([A-Za-z][A-Za-z0-9]+);", xml_entity, rendered)
-    return ET.fromstring("<div>" + rendered + "</div>")
+    # Parse with browser HTML semantics, including attribute-specific and numeric
+    # entity rules. An XML bridge would misdecode URLs and reject valid HTML text.
+    body = html5lib.parseFragment(parser.convert(source), treebuilder="etree", namespaceHTMLElements=False)
+    body.tag = "div"
+    return body
 
 
 def safe_url(value):
@@ -213,7 +217,7 @@ def render_body(source, metadata):
 
 
 def serialize(node):
-    return ET.tostring(node, encoding="unicode", method="xml", short_empty_elements=True)
+    return ET.tostring(node, encoding="unicode", method="html")
 
 
 def shell(locale, page, title, deck, route, content):
@@ -386,18 +390,29 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         pages = generate_pages()
-        stale = []
-        for relative in pages:
-            target = ROOT / relative
-            # Never follow a supplied filesystem alias out of the owned route.
+        # Check every path before writing any output. Replace with a fresh inode
+        # rather than truncating a pre-existing hardlinked file or backup.
+        targets = {relative: ROOT / relative for relative in pages}
+        for relative, target in targets.items():
             if target.resolve() != target:
                 raise ValueError(f"Symlinked output is not owned: {relative}")
+        stale = []
+        for relative, target in targets.items():
             if args.check:
                 if not target.is_file() or target.read_bytes() != pages[relative]:
                     stale.append(relative)
             else:
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(pages[relative])
+                temporary = None
+                try:
+                    with tempfile.NamedTemporaryFile(dir=target.parent, delete=False) as output:
+                        temporary = Path(output.name)
+                        output.write(pages[relative])
+                    temporary.chmod(0o644)
+                    os.replace(temporary, target)
+                finally:
+                    if temporary is not None and temporary.exists():
+                        temporary.unlink()
         if stale:
             print("Stale article outputs:\n" + "\n".join(stale), file=sys.stderr)
             return 1

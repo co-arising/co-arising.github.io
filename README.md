@@ -130,8 +130,11 @@ reviewed source. Publication metadata and site chrome are separate from that
 original prose. Review attribution and the editorial/verified-product distinction
 before publishing; adding a translated title does not create a translated article.
 
-The optional authoring tool requires Python **Markdown==3.4.1**, pinned in
-`tools/requirements-articles.txt`. It is not a deployment or browser dependency.
+The optional authoring tool requires Python **Markdown==3.4.1** and
+**html5lib==1.1**, pinned in `tools/requirements-articles.txt`. They are not
+deployment or browser dependencies. HTML5 parsing preserves browser entity/link
+semantics; conventional indented code uses four spaces while nested lists may use
+two. The imported compact list-caption syntax is a standalone `**caption**` line.
 
 ```sh
 python3 -m pip install -r tools/requirements-articles.txt

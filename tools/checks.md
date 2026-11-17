@@ -6,7 +6,9 @@ maintenance tools are not browser runtime dependencies.
 ## Article publication verification — 2026-11-17
 
 - Source/archive bytes and ordered external-link counts match the reviewed source;
-  13 article contract checks pass. Original quotations, lists, tables and diagrams
+  17 article contract checks pass, including HTML entity/link semantics, empty
+  elements, multiline inline syntax, indented code and hardlinked-output safety.
+  Original quotations, lists, tables and diagrams
   remain in the generated body; metadata and editorial framing are separate.
 - Strict static checks: 23 pages, zero errors/warnings. Node suite: 129 passed,
   5 skipped, no failures. Resource comparison against `e39a7bb`: no warnings/errors;
@@ -29,8 +31,9 @@ maintenance tools are not browser runtime dependencies.
 Prerequisites: Python **≥3.9** (standard library), Node **≥22.13**, Bash for
 parse-only shell syntax, and Git for optional baseline resource comparison. Python
 Playwright plus an existing browser installation are optional, not app dependencies.
-Article authoring additionally requires the pinned Python **Markdown==3.4.1** from
-`tools/requirements-articles.txt`; serving the checked-in site does not require it.
+Article authoring additionally requires pinned **Markdown==3.4.1** and
+**html5lib==1.1** from `tools/requirements-articles.txt`; serving the checked-in site
+does not require them.
 The check commands below do not install tools, run the bank, generate an application
 or publish. Select the intended interpreter when PATH points to an older Node/Python.
 

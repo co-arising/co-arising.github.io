@@ -123,7 +123,7 @@ class ArticleTests(unittest.TestCase):
     def test_pinned_maintenance_dependency(self):
         self.assertEqual(markdown.__version__, "3.4.1")
         requirements = (ROOT / "tools/requirements-articles.txt").read_text().splitlines()
-        self.assertEqual([line for line in requirements if line and not line.startswith("#")], ["Markdown==3.4.1"])
+        self.assertEqual([line for line in requirements if line and not line.startswith("#")], ["Markdown==3.4.1", "html5lib==1.1"])
 
     def test_exact_archived_source_bytes(self):
         self.assertEqual(set(HASHES), {item["source"] for item in self.items})
@@ -424,6 +424,55 @@ class ArticleTests(unittest.TestCase):
                 self.assertEqual(build.main([]), 1)
                 self.assertEqual(build.main(["--check"]), 1)
             self.assertEqual(external.read_bytes(), b"untouched")
+
+
+    def test_browser_entity_and_empty_element_semantics(self):
+        expected = "https://example.com/?a=1&copycat;=2"
+        for url in (expected, "https://example.com/?a=1&amp;copycat;=2"):
+            body = build.markdown_fragment(f"[link]({url})")
+            self.assertEqual(body.find(".//a").get("href"), expected)
+        body = build.markdown_fragment("[](https://example.com) innocent text")
+        serialized = build.serialize(body)
+        self.assertIn('<a href="https://example.com"></a> innocent text', serialized)
+        self.assertEqual(text(build.markdown_fragment("AT&T; revenue")), "AT&T; revenue")
+        self.assertEqual(text(build.markdown_fragment("&#128; &#146; &#X2192; &#0; &#x110000;")), "€ ’ → � �")
+
+    def test_multiline_inline_constructs_and_standard_code(self):
+        body = build.markdown_fragment("[caption\n- item](https://example.com)")
+        self.assertEqual(body.find(".//a").get("href"), "https://example.com")
+        self.assertFalse(list(body.iter("ul")))
+        body = build.markdown_fragment("`caption\n- item`")
+        self.assertIsNotNone(body.find(".//code"))
+        self.assertFalse(list(body.iter("ul")))
+        body = build.markdown_fragment("    if ready:\n        do_work()")
+        self.assertEqual(text(body.find("pre/code")), "if ready:\n    do_work()\n")
+
+    def test_hardlinked_outputs_do_not_modify_shared_inodes(self):
+        import os
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            backup = root / "backup.html"
+            backup.write_bytes(b"unowned backup")
+            for relative in build.OWNED_OUTPUTS[:2]:
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                os.link(backup, target)
+            with patch.object(build, "ROOT", root), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(build.main([]), 0)
+            self.assertEqual(backup.read_bytes(), b"unowned backup")
+            self.assertEqual((root / "articles/index.html").read_bytes(), self.pages["articles/index.html"])
+            self.assertNotEqual((root / "articles/index.html").stat().st_ino, (root / "zh/articles/index.html").stat().st_ino)
+
+    def test_future_manifest_article_stays_in_article_namespace(self):
+        third = dict(self.items[0], slug="future-article", source="future-article.md", title="Future article")
+        with tempfile.TemporaryDirectory() as directory:
+            content = Path(directory)
+            for item in self.items:
+                (content / item["source"]).write_bytes((build.CONTENT / item["source"]).read_bytes())
+            (content / third["source"]).write_text("# Future article\n\n## Topic\n\nContent.")
+            with patch.object(build, "load_manifest", return_value=self.items + [third]), patch.object(build, "CONTENT", content):
+                pages = build.generate_pages()
+            self.assertEqual(set(pages) - set(self.pages), {"zh/articles/future-article/index.html"})
 
 
 if __name__ == "__main__":
