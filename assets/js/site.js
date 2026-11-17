@@ -313,3 +313,50 @@ const STR = {
     return copied;
   }
 })();
+(function initObservability() {
+  // 1. 仅在生产域名启用，避免本地调试污染数据
+  if (window.location.hostname !== 'co-arising.github.io') return;
+
+  // 2. 动态加载外部探针（以 Cloudflare Web Analytics 为例，可替换为 Umami/PostHog/Clarity）
+  const beacon = document.createElement('script');
+  beacon.defer = true;
+  beacon.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  beacon.setAttribute('data-cf-beacon', '{"token": "e9dbf9df61e942c09a29ecf54b4a957e"}');
+  document.head.appendChild(beacon);
+
+  // 3. 统一上报辅助函数（兼容 PostHog / Umami / 自定义收集端）
+  function trackEvent(name, props) {
+    if (window.posthog && typeof window.posthog.capture === 'function') {
+      window.posthog.capture(name, props);
+    }
+    if (window.umami && typeof window.umami.track === 'function') {
+      window.umami.track(name, props);
+    }
+  }
+
+  // 4. 事件委托：自动追踪核心栏目、Demo、外链与下载点击
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link) return;
+    const href = link.getAttribute('href') || '';
+    if (
+      href.includes('github.com') ||
+      /^\/?(zh\/)?(dsl|explorer|bank-demo|pipeline|compare|downloads)\//.test(href)
+    ) {
+      trackEvent('nav_key_click', {
+        href,
+        text: (link.textContent || '').trim().slice(0, 60),
+        from: window.location.pathname,
+      });
+    }
+  });
+
+  // 5. 全局 JS 运行时异常捕获（含资源加载失败）
+  window.addEventListener('error', (e) => {
+    trackEvent('client_error', {
+      message: e.message || 'resource_load_error',
+      filename: e.filename || (e.target && (e.target.src || e.target.href)) || '',
+      page: window.location.pathname,
+    });
+  }, true);
+})();
