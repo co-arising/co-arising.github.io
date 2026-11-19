@@ -9,6 +9,8 @@
   const links = [...toc.querySelectorAll('a[href^="#"]')];
   const headings = links.map((link) => document.getElementById(link.hash.slice(1)));
   const mobile = window.matchMedia("(max-width: 760px)");
+  const zh = document.documentElement.lang.toLowerCase().startsWith("zh");
+  const progressLabel = zh ? "阅读进度" : "Reading progress";
   // Only set the initial disclosure state; subsequent user choices remain theirs.
   if (mobile.matches && !location.hash) toc.open = false;
   let pending = false;
@@ -20,7 +22,7 @@
     const distance = Math.max(1, rect.height - Math.max(1, innerHeight - offset));
     const fraction = Math.max(0, Math.min(1, (offset - rect.top) / distance));
     if (progress) progress.style.transform = `scaleX(${fraction})`;
-    if (position) position.textContent = `阅读进度 · ${Math.round(fraction * 100)}%`;
+    if (position) position.textContent = `${progressLabel} · ${Math.round(fraction * 100)}%`;
     let current = -1;
     headings.forEach((heading, index) => {
       if (heading && heading.getBoundingClientRect().top <= offset + 40) current = index;

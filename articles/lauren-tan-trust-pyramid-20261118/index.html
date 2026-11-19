@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>From &quot;AI Slop&quot; to 11,000 Merged PRs a Month: A Deep Evaluation and Adoption Guide of Lauren Tan&#x27;s AI Coding Engineering System (Staff Engineer, SpaceXSI) — co-arising</title>
+  <meta name="description" content="Grounded in two first-party talks and the open-source pstack, this evaluation tests the inverted trust pyramid and verification-first practice against 2024–2026 academic and industrial evidence, distilling a four-stage adoption route." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="From &quot;AI Slop&quot; to 11,000 Merged PRs a Month: A Deep Evaluation and Adoption Guide of Lauren Tan&#x27;s AI Coding Engineering System (Staff Engineer, SpaceXSI)" />
+  <meta property="og:description" content="Grounded in two first-party talks and the open-source pstack, this evaluation tests the inverted trust pyramid and verification-first practice against 2024–2026 academic and industrial evidence, distilling a four-stage adoption route." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/lauren-tan-trust-pyramid-20261118/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/lauren-tan-trust-pyramid-20261118/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/lauren-tan-trust-pyramid-20261118/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/lauren-tan-trust-pyramid-20261118/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/lauren-tan-trust-pyramid-20261118/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/lauren-tan-trust-pyramid-20261118/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/lauren-tan-trust-pyramid-20261118/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Engineering practice</span></nav>
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-18">2026-11-18</time> · English translation</p>
+      <h1>From &quot;AI Slop&quot; to 11,000 Merged PRs a Month: A Deep Evaluation and Adoption Guide of Lauren Tan&#x27;s AI Coding Engineering System (Staff Engineer, SpaceXSI)</h1>
+      <p class="article-deck">Grounded in two first-party talks and the open-source pstack, this evaluation tests the inverted trust pyramid and verification-first practice against 2024–2026 academic and industrial evidence, distilling a four-stage adoption route.</p>
+      <div class="article-actions"><a href="/content/articles/lauren-tan-trust-pyramid-20261118.en.md" download="lauren-tan-trust-pyramid-20261118.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/lauren-tan-trust-pyramid-20261118/">中文原文</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> Part 1: Lauren Tan's theory, engineering practice, and verified results</a></li><li><a href="#section-2"><span class="toc-number">02</span> Part 2: The deep evaluation — do academic papers and industry evidence actually support these practices?</a></li><li><a href="#section-3"><span class="toc-number">03</span> Part 3: Comparison with the "AI Coding Evolution Survey (2026-11-16)"</a></li><li><a href="#section-4"><span class="toc-number">04</span> Part 4: The project adoption field guide (architecture route, toolchain, and ready-to-reuse samples)</a></li><li><a href="#section-5"><span class="toc-number">05</span> Part 5: The essential question — is AI coding a theoretical math problem or an engineering problem of plugging leaks?</a></li><li><a href="#section-6"><span class="toc-number">06</span> Part 6: Horizontal comparison with 2026's industry benchmarks</a></li><li><a href="#section-7"><span class="toc-number">07</span> Part 7: First-party source index — talk videos, official transcripts, and slide-figure provenance</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+      </aside>
+      <article id="article-body" class="article-body"><blockquote>
+<p><strong>A note on the subject and sources</strong>: the video <a href="https://www.youtube.com/watch?v=OPAdcgNb4ts">《SpaceX 主任工程師教你：讓 AI 少寫垃圾》</a> circulating in the Chinese-speaking tech community (channel Agent 煉金術士, 2026-11-18) is derived from the public talks of <strong>Lauren Tan (online handle <code>@poteto</code>)</strong>, Staff Engineer at <strong>SpaceX Superintelligence (SpaceXSI)</strong>. Lauren Tan previously served on the core team of Meta's React Compiler (see her <a href="https://ai.engineer/speakers/lauren-tan">AI Engineer speaker profile</a>) and later led the architecture evolution of GrokBot, the multi-agent desktop product under Cursor and SpaceXSI. This article integrates her two first-party English sources — the AI Engineer CODE 2026 keynote <a href="https://www.youtube.com/watch?v=O_zcc6Xl12g">All Code Is Slop (Except Mine)</a> (2026-11-14, <a href="https://ai.engineer/code/2026/talks/lauren-tan">official transcript page</a>) and the 55-minute deep interview <a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">SpaceX AI Engineer: Stop Using AI Agents Like This</a> (2026-09-26) — and cross-examines them against her open-source skill library <a href="https://github.com/cursor/plugins/blob/main/pstack/README.md"><code>pstack</code></a>.</p>
+</blockquote>
+<hr>
+<h2 id="section-1">Part 1: Lauren Tan's theory, engineering practice, and verified results</h2>
+<h3 id="section-1-1">1.1 The core thesis: AI doesn't produce slop — AI is a hundred-fold amplifier of the codebase's environment</h3>
+<p>Opening her <a href="https://www.youtube.com/watch?v=O_zcc6Xl12g">AI Engineer CODE 2026 keynote</a>, Lauren Tan offers a counter-intuitive observation: the "AI slop" engineers complain about is, at its root, often just "code I didn't write". Long before the AI era, giants like Meta and Google were already fighting "human slop"; what made LLMs blow the problem out of proportion is that <strong>the codebase itself is the agent's largest context input</strong>.</p>
+<ul>
+<li><strong>Codebase as a garden</strong>: in 2024 an engineer reviewed 3 PRs a day from colleagues; today 300 agent PRs pour in daily. Code no longer arrives as discrete patches — it grows like a living organism. If the codebase keeps a temporary workaround or a deprecated pattern around, the next agent will mistake it for "the team's established convention" and replicate it rapidly, turning into uncontrolled weeds.</li>
+<li><strong>The cautionary tale — 183 timers spreading in 5 weeks</strong>: Lauren Tan disclosed a real incident in the Cursor client. Because the imperative style of the underlying VS Code clashed architecturally with React's declarative style, agents took to "papering over" UI flicker with imperative timers — <code>setTimeout</code>, <code>requestAnimationFrame</code>, <code>requestIdleCallback</code>. The first appeared on September 9; by October 3 it had been copied into a shared module; by October 17 — just over five weeks — there were <strong>183 timers</strong>, whose high-frequency creation and destruction triggered severe garbage-collection (GC) stalls that crippled desktop performance.</li>
+<li><strong>The new meta-problem of engineering</strong>: the software engineer's core responsibility has shifted from "typing code by hand" to <strong>"keeping — or even raising — code quality while output grows a hundred-fold"</strong>. The key is not fancier prompts but building a high-trust deterministic engineering environment around the agent.</li>
+</ul>
+<p><img alt="Codebase as a garden — every copy makes the next copy more likely" src="/assets/img/articles/lauren-tan-20261118/fig1-garden-copy.jpg"></p>
+<p><em>Figure 1: the weed-spread mechanism of "codebase as a garden" — one temporary workaround hardens into "the pattern" after three copies; a graphical rendering of the broken-windows effect (keynote video frame at 04:30, AI Engineer official channel)</em></p>
+<p><img alt="From one setTimeout on September 9 to 183 timers by October 19" src="/assets/img/articles/lauren-tan-20261118/fig2-timers-183.jpg"></p>
+<p><em>Figure 2: "quick fixes considered harmful" — the incident timeline of 183 timers spreading in five weeks: fix one flicker → copied into a shared module → spreads everywhere (keynote video frame at 07:50)</em></p>
+<h3 id="section-1-2">1.2 The core theoretical framework: the inverted trust pyramid and the trust curve</h3>
+<p>Lauren Tan arranges every investment used to correct agent behaviour into an <strong>Inverse Trust Pyramid</strong>, ordered by "determinism strength" and "marginal cost per intervention", in four layers from top (broadest, cheapest, hardest) to bottom (narrowest, most expensive, most fragile):</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Layer / Core means / Nature of constraint / Typical vehicles / Engineering principle"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Layer</th>
+<th style="text-align: left;" scope="col">Core means</th>
+<th style="text-align: left;" scope="col">Nature of constraint</th>
+<th style="text-align: left;" scope="col">Typical vehicles</th>
+<th style="text-align: left;" scope="col">Engineering principle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Layer 1 (top / strongest)</strong></td>
+<td style="text-align: left;"><strong>Codebase and API design</strong></td>
+<td style="text-align: left;">Physical determinism</td>
+<td style="text-align: left;">Framework abstractions, directory topology, banning high-risk APIs</td>
+<td style="text-align: left;">Make "the shortest path the correct path", so wrong usage cannot even be written</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Layer 2 (strong constraint)</strong></td>
+<td style="text-align: left;"><strong>Static analysis and deterministic checks</strong></td>
+<td style="text-align: left;">Mechanical determinism</td>
+<td style="text-align: left;">Custom lint rules, strong typing, dependency-graph checks, unit tests</td>
+<td style="text-align: left;">Every time you correct an agent, solidify it first into a deterministic rule that turns CI red</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Layer 3 (behavioural evidence)</strong></td>
+<td style="text-align: left;"><strong>Runtime and formal verification</strong></td>
+<td style="text-align: left;">Evidence-grade verification</td>
+<td style="text-align: left;">CDP-driven tools, Feature Map, TLA+, Lean 4, Bombadil</td>
+<td style="text-align: left;">Code review shrinks from "reading code line by line" to "reviewing verification artefacts (videos / screenshots / state diagrams / proofs)"</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Layer 4 (bottom / weakest)</strong></td>
+<td style="text-align: left;"><strong>Natural-language rules and human review</strong></td>
+<td style="text-align: left;">Probabilistic soft constraint</td>
+<td style="text-align: left;"><code>AGENTS.md</code>, Skills, human PR review</td>
+<td style="text-align: left;">Keep only the few principles that need human subjective judgement; human review is the most expensive bottleneck</td>
+</tr>
+</tbody>
+</table></div>
+<p><img alt="The poteto pyramid — the inverted trust pyramid slide" src="/assets/img/articles/lauren-tan-20261118/fig3-poteto-pyramid.jpg"></p>
+<p><em>Figure 3: the "the poteto pyramid" slide from the keynote — cost increases top-down and determinism decreases top-down: codebase → static analysis → verification → prose → human review, matching the four layers in the table above (keynote video frame at 02:30)</em></p>
+<p>In <a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">the 55-minute September interview</a> she further sketches the maturity ladder of the <strong>Trust Curve</strong>: an engineer must never spin up hundreds of parallel cloud agents while still not trusting a single agent (otherwise you are just burning tokens in a high-speed slop factory); instead you must climb in order through <strong>"local strong-intervention observation (Backseat Driver) → solidify deterministic checks and verification skills → extend to cloud background agents (such as Benny, which auto-reproduces Slack bugs) → gradually enable auto-merge"</strong>.</p>
+<h3 id="section-1-3">1.3 Five signature engineering practices</h3>
+<ol>
+<li><strong>The Dune framework and "eliminating errors by category"</strong>: Dune is the in-house framework built for the Electron desktop product GrokBot (think Next.js for Electron), held to one iron rule — <strong>"anything that requires nuance to use well often leads to slop"</strong>. The team <strong>banned React <code>useEffect</code> outright</strong> in product code (reserved for framework internals only), permanently erasing an entire class of race conditions and memory leaks from the code-review checklist. Leveraging "context through directory structure", they set top-level <code>electron-main</code> and <code>electron-renderer</code> directories, with a dependency-graph analyzer and lint rules strictly forbidding cross-process imports in CI, keeping heavy computation off the 60 FPS (16ms/frame) render main thread.</li>
+<li><strong>Cutting 99% of code comments (banning comment slop)</strong>: GrokBot had accumulated over 65,000 comments; the team slashed them to roughly 1,200. Lauren found that AI excels at appending an erudite-looking comment justifying a terrible hotfix as "necessary". Later agents read those comments, treat them as "inviolable historical edicts", and keep copying the broken pattern. Comments rot easily and cannot be enforced by a compiler; what actually works is deleting the comment and replacing it with a <strong>custom lint error carrying precise repair instructions</strong>, forcing the agent to fix the root cause.</li>
+<li><strong>The snowball effect of deterministic checks</strong>: the team kept the rule "every time an agent makes a mistake, solidify one deterministic rule". From <strong>7</strong> custom checks in July 2026 to <strong>167</strong> accumulated by November. As coverage became comprehensive enough, the human review checklist kept shrinking until reaching the tipping point of "almost no code left to review — only verification artefacts".</li>
+<li><strong>Verification-first and "the golden age of verification"</strong>:<ul>
+<li><strong>Runtime self-verification and the Feature Map</strong>: she wrote standalone CLI tools and skills wrapping the Chrome DevTools Protocol (CDP) or the iOS Simulator (such as <code>control-glass</code>), letting agents launch the app themselves and capture CPU flame graphs and heap snapshots. To fix agents not understanding "that thing in the left sidebar", she introduced the <strong>Feature Map</strong> — a structured dictionary describing every UI entry point, keyboard shortcut and DOM selector from the user's perspective, sharply cutting exploration token spend.</li>
+<li><strong>Democratizing formal verification and UI property testing</strong>: <strong>TLA+</strong> model-checks core user flows such as cross-device notifications; <strong>Lean 4</strong> proves the algorithm invariant of "scrolling without flicker/jank" for the in-house virtual scrolling list library; Antithesis's open-source <a href="https://github.com/antithesishq/bombadil"><strong>Bombadil</strong></a> runs autonomous exploratory property-based testing against the web/desktop UI; and the <code>statechart</code> skill in <code>pstack</code> visualizes user-visible state machines, paired with screen recordings and screenshots for human review.</li>
+<li><strong>The inverted token budget</strong>: Lauren cites frontline feedback from well-known engineer Cindy Sridharan (also collected in the <a href="https://martinfowler.com/fragments/2026-11-10.html">Martin Fowler column</a>) — today <strong>70% of the daily token budget goes to verifying patches, with only 20–30% generating code</strong>. Because agents slash the human cost of writing TLA+/Lean/property tests, software engineering is entering "the golden age of testing and verification".</li>
+</ul>
+</li>
+<li><strong>Skill engineering (<code>pstack</code>) and the anti-cheating eval loop</strong>: Lauren open-sourced her personal workflow as the official Cursor plugin <a href="https://github.com/cursor/plugins/blob/main/pstack/README.md"><code>pstack</code> (Potato Stack)</a> (already ported to other ecosystems, e.g. a <a href="https://github.com/PickleBoxer/pstack">Claude Code port</a>), containing the router <code>/poteto-mode</code>, root-cause skills <code>how</code>/<code>why</code>, architecture planning via <code>architect</code>, and 23 engineering principles. To prevent skill degradation she designed a strict <strong>Eval Playbook</strong>: a coordinator agent generates the rubric; subagents run concurrently in <strong>deliberately obfuscated, independently named directories</strong> (so agents don't detect "being evaluated" and change behaviour); then <strong>judge agents on different base models</strong> cross-score the results, paired with <code>/loop</code> for continuous hill-climbing.</li>
+</ol>
+<p><img alt="The runtime verification slide: Feature Map and verification CLIs" src="/assets/img/articles/lauren-tan-20261118/fig4-runtime-verification.jpg"></p>
+<p><em>Figure 4: the keynote slide for practice #4 above, "verification-first" — the Feature Map (what features exist / how users reach it / what proves it works) plus verification CLIs (launch the real app, capture screenshots and snapshots) form the self-verification loop of "agent checks its own work"; the slide footer also credits the runtime-verification skill in pstack (keynote video frame at 10:45)</em></p>
+<h3 id="section-1-4">1.4 Verified engineering results and honest boundaries</h3>
+<p>Per the frontline production data disclosed in the <a href="https://www.youtube.com/watch?v=O_zcc6Xl12g">AI Engineer CODE 2026 keynote</a> and the <a href="https://ai.engineer/code/2026/talks/lauren-tan">official transcript page</a>, after six months of environment infrastructure investment the GrokBot team delivered the following report card in October 2026:</p>
+<ul>
+<li><strong>Throughput leap</strong>: Lauren's personal monthly merged PRs jumped from <strong>68</strong> in March to <strong>3,127</strong> in October (about 100 PRs/day); the whole GrokBot team merged <strong>10,926 (roughly 11,000) PRs</strong> in October (about 350 PRs/day), with stable-release cadence rising to roughly daily.</li>
+<li><strong>Cross-functional empowerment, safely</strong>: <strong>227 contributors</strong> submitted at least one PR in October, including many product managers, designers and even GTM staff unfamiliar with the underlying code — the strict Dune architecture and CI gates absorbed the complexity so non-engineers could contribute production code safely.</li>
+<li><strong>Quality and performance metrics</strong>: the revert rate went down, not up — from <strong>0.98%</strong> in June to <strong>0.47%</strong>, stabilizing around 0.5% (from roughly 1 revert per 100 PRs to 1 per 200); cold start improved from <strong>2.3s</strong> to <strong>1.4s</strong>, with typing latency, new-conversation and conversation-switch speed all markedly better.</li>
+<li><strong>A sober look at the boundaries</strong>: three limitations must be stated objectively — first, Lauren candidly showed the <strong>regressed items</strong> in the same performance table (memory up, window-resize slower) rather than cherry-picking; second, as the <a href="https://ai.engineer/code/2026/talks/lauren-tan">AI Engineer commentary</a> reminds us, this is a single team's production report, <strong>not a controlled experiment</strong>; third, in the <a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">September interview</a> she admits to having "a nearly unlimited token allowance" inside an AI lab — ordinary teams should phase adoption by ROI and must not copy the full cloud automation wholesale.</li>
+</ul>
+<p><img alt="The &quot;everyone is more productive&quot; slide: contributor growth stacked chart" src="/assets/img/articles/lauren-tan-20261118/fig5-pr-productivity.jpg"></p>
+<p><em>Figure 5: "everyone is more productive" — active contributors stacked by monthly PR output: the team grew from 15 people in January to 227 in October, 22 of whom each merged 100+ PRs in October (keynote video frame at 14:05)</em></p>
+<p><img alt="The &quot;velocity without compromise&quot; slide: the performance report card" src="/assets/img/articles/lauren-tan-20261118/fig6-velocity-perf.jpg"></p>
+<p><em>Figure 6: "velocity without compromise" — the full performance ledger, May vs. October 2026: cold start 2,304ms→1,395ms (-39%), long-session typing latency -65%, while honestly marking regressions like memory +12%, idle CPU +100%, window resize +130% (keynote video frame at 14:55)</em></p>
+<hr>
+<h2 id="section-2">Part 2: The deep evaluation — do academic papers and industry evidence actually support these practices?</h2>
+<p>To test whether Lauren Tan's practices are "a Silicon Valley giant's personal feel" or "engineering science with generalizable laws", the table below cross-checks her six core claims against peer-reviewed papers, arXiv preprints and large-scale industry studies published in 2024–2026:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Lauren Tan's core claim / Support strength / Academic papers and industry evidence / Core conclusion and limitations"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Lauren Tan's core claim</th>
+<th style="text-align: left;" scope="col">Support strength</th>
+<th style="text-align: left;" scope="col">Academic papers and industry evidence</th>
+<th style="text-align: left;" scope="col">Core conclusion and limitations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Write fewer <code>AGENTS.md</code> files, write more deterministic code checks</strong></td>
+<td style="text-align: left;"><strong>Strong support</strong></td>
+<td style="text-align: left;">The ETH Zurich &amp; LogicStar AI paper <a href="https://arxiv.org/html/2602.11988v1">Evaluating AGENTS.md (<code>arXiv:2602.11988</code>)</a> measured that hand-written context files improve success rates by only <strong>+4%</strong> on average, while <strong>LLM-generated <code>AGENTS.md</code> files actually degrade performance by -3%</strong> — and both raise inference cost <strong>by more than 20%</strong>. Another large-scale study (<a href="https://arxiv.org/html/2611.02383v1"><code>arXiv:2611.02383</code></a>) found <strong>40.4%</strong> of instruction files were never maintained after their first write, 16.1% of multi-format rules conflicted, and roughly 70% lacked security and performance constraints.</td>
+<td style="text-align: left;">Strongly confirms that "natural-language rule files have low ROI and rot easily" — keep only a minimal build-command and tool index, and sink iron rules into code and CI.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Static analysis, type systems and lint feedback loops measurably cut errors</strong></td>
+<td style="text-align: left;"><strong>Strong support</strong></td>
+<td style="text-align: left;"><a href="https://arxiv.org/abs/2508.14419">Static Analysis as a Feedback Loop (<code>arXiv:2508.14419</code>)</a> shows that wiring static-analysis tools into an iterative feedback loop reduces readability violations of LLM-generated code by <strong>up to 74%</strong>, reliability warnings <strong>up to 44%</strong>, and security vulnerabilities <strong>up to 32%</strong>. <a href="https://arxiv.org/abs/2603.23613">LLMLOOP (<code>arXiv:2603.23613</code>)</a> further validates a five-stage iterative loop combining compilation, static analysis and tests, improving both code and test quality.</td>
+<td style="text-align: left;">Static analysis and compiler feedback are today's best-evidenced, best-value AI-coding quality levers.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. The broken-windows effect: codebase hygiene directly determines AI output quality</strong></td>
+<td style="text-align: left;"><strong>Strong support</strong></td>
+<td style="text-align: left;"><a href="https://www.gitclear.com/the_ai_code_quality_maintainability_gap">GitClear's 2025–2026 annual code-quality reports</a> (tracking 211M–623M lines of changes) show that after AI adoption, duplicated code blocks surged <strong>+81%</strong> (clone blocks at 4x baseline), copy-paste within commits rose <strong>+41%</strong>, defensive structures masking errors rose <strong>+47%</strong>, two-week churn doubled from 3.3% to <strong>5.7%–7.1%</strong>, and refactor-style moved code collapsed by 70%.</td>
+<td style="text-align: left;">Fully confirms that AI amplifies the entropy already present in a codebase; without clearing old debt (weeding), AI will only replicate bad patterns a hundred times faster.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Human line-by-line code review fails; the shift must be to verification artefacts</strong></td>
+<td style="text-align: left;"><strong>Strong support</strong></td>
+<td style="text-align: left;">The <a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/">METR 2025 randomized controlled trial</a> shows experienced open-source developers were <strong>19% slower</strong> using early AI tools on mature repositories (while believing they were 24% faster) — the time sink was precisely human review and correction. The paper <a href="https://arxiv.org/html/2607.08885v1">Programmers Are Poor and Overconfident Judges of LLM-Generated Code (<code>arXiv:2607.08885</code>)</a> further confirms that developers' naked-eye judgement of AI code is both inaccurate and overconfident.</td>
+<td style="text-align: left;">Confirms that "using humans as verifiers" inevitably becomes the bottleneck with high miss rates; shifting to automated runtime evidence review is the direction of travel.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. Ban 99% of code comments to stop "justification" from spreading</strong></td>
+<td style="text-align: left;"><strong>Moderate-to-strong support (context-dependent)</strong></td>
+<td style="text-align: left;">The paper <a href="https://arxiv.org/abs/2406.14836">Identifying Inaccurate Descriptions in LLM-generated Code Comments (<code>arXiv:2406.14836</code>)</a> finds that even the best LLMs produce comments where about <strong>20%</strong> contain falsifiable errors; <a href="https://arxiv.org/pdf/2602.16741">Can Adversarial Code Comments Fool AI Security Reviewers (<code>arXiv:2602.16741</code>)</a> directly demonstrates that comment content can deceive and mislead downstream LLM reviewers.</td>
+<td style="text-align: left;">Academia confirms that "inaccurate or defensive comments poison LLMs", but a blanket 99% comment ban is an aggressive engineering style; complex financial/algorithmic code still needs documentation verified by tests or contracts.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6. Bringing TLA+ / Lean 4 / UI property testing into everyday development</strong></td>
+<td style="text-align: left;"><strong>Frontier exploration (high potential, lacking large-sample controls)</strong></td>
+<td style="text-align: left;">Academia is advancing rapidly on LLM-assisted formal verification: <a href="https://arxiv.org/abs/2505.05758">APOLLO (<code>arXiv:2505.05758</code>)</a> and <a href="https://arxiv.org/pdf/2604.10392">Intent-aligned Formal Spec Synthesis (<code>arXiv:2604.10392</code>)</a> demonstrate LLM + Lean 4 co-automated proving; in industry, <a href="https://github.com/antithesishq/bombadil">Antithesis Bombadil</a> already runs UI property tests, and the <a href="https://martinfowler.com/fragments/2026-11-10.html">Martin Fowler column</a> also confirms the enterprise trend of "verification tokens far exceeding generation tokens (70% vs 30%)".</td>
+<td style="text-align: left;">The direction is highly forward-looking, but Lauren herself stresses it "remains experimental, by no means a silver bullet" — for now it best suits high-value core algorithms and critical state machines, not bulk CRUD code.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Overall evaluation</strong>: Lauren Tan's core architectural methodology (the pyramid's top three layers: strongly-constrained architecture/API → deterministic static-analysis loops → automated runtime verification) <strong>is backed by exceptionally solid academic papers and large-scale industry data</strong>; her outer-ring radical practices (the 99% comment ban, full auto-merge, everyday Lean/TLA+) are a frontier-engineering hacker route built atop very high infrastructure maturity, and should be phased and trimmed on adoption.</p>
+<hr>
+<h2 id="section-3">Part 3: Comparison with the "AI Coding Evolution Survey (2026-11-16)"</h2>
+<p>Placing Lauren Tan's (SpaceXSI) frontline practice side by side with the earlier survey <a href="https://co-arising.github.io/articles/ai-coding-evolution-20261116/">The AI Coding Evolution and Architecture Governance Survey (2026-11-16)</a> (covering the evolution from Vibe Coding, multi-agent roleplay and SDD/Plan Mode to Harness Engineering, plus the four technology schools) reveals strong strategic resonance — and makes her unique contributions and capability boundaries clearly identifiable.</p>
+<h3 id="section-3-1">3.1 Five core challenges where the two strongly corroborate each other</h3>
+<ol>
+<li><strong>The broken-windows effect and "poor code begets poorer code"</strong>: the 11/16 survey cites the Thoughtworks Radar and GitClear data showing AI imitates degraded patterns already in the codebase, forming an entropic positive-feedback death spiral; Lauren's gruesome incident of 183 timers spreading in five weeks in Cursor supplies the most concrete frontline evidence.</li>
+<li><strong>The failure of soft prompts and long-form Markdown specs</strong>: the 11/16 survey dissects the "Markdown review hell" of GitHub Spec-Kit and AWS Kiro, plus Chris Richardson's "agents arguing on behalf of bad code"; Lauren's metaphor — "pinning 'use less salt' notes on the restaurant wall beats nothing, but swapping in a fixed-measure salt spoon beats them all" — and the inverted pyramid's demotion of <code>AGENTS.md</code> to the bottom layer, converge exactly with <a href="https://code.claude.com/docs/en/best-practices">Anthropic's official best practices</a>: rules that keep being missed despite repeated emphasis must move into a hook.</li>
+<li><strong>Engineering Ashby's Law of Requisite Variety into practice</strong>: the 11/16 survey cites Birgitta Böckeler's <a href="https://martinfowler.com/articles/harness-engineering.html">Harness Engineering</a>: the only way to govern an LLM's unbounded degrees of freedom is "variety reduction through predefined topologies"; Lauren's <code>useEffect</code> ban in Dune, fixed directory boundaries and unified feature slots are a textbook frontend/desktop implementation of Ashby's Law.</li>
+<li><strong>Humans become the verification bottleneck; the review perspective shifts</strong>: the 11/16 survey notes "writing code is no longer the bottleneck — reading code is"; Lauren likewise admitted in the September interview that "early on, I was the biggest bottleneck", ultimately upgrading human review from line-by-line diffs to reviewing videos, screenshots, state diagrams and proofs.</li>
+<li><strong>The clean division between "deterministic toolchain vs. probabilistic Skills"</strong>: the 11/16 survey distills "zero-tolerance rules go into the compiler/hooks; fuzzy cognition goes into Skills/blind-review subagents"; Lauren likewise builds dependency checks, API bans and CDP-driven CLIs into deterministic code, while packaging investigation workflows, architecture planning and state-diagram generation into <code>pstack</code> skills.</li>
+</ol>
+<h3 id="section-3-2">3.2 Four unique engineering findings from Lauren Tan</h3>
+<p>Where the 11/16 survey focuses on macro architecture and backend domain modeling, Lauren Tan returned from the high-frequency client/desktop front line with four particularly sharp findings:</p>
+<ol>
+<li>
+<p><strong>Comments as the agent's justification escape hatch</strong>: the industry mostly discussed comments rotting for human readers; Lauren keenly pointed out that agents actively write comments to "launder" lazy hacks, inducing later agents to treat them as canon.</p>
+</li>
+<li>
+<p><strong>The Feature Map bridges the semantic gap between "vague human UI descriptions" and "code location"</strong>: when a user throws a screenshot and three question marks into Slack, or complains "the button in the left sidebar is laggy", a pure-AST code graph cannot map user-perceived interaction paths; a Feature Map maintained in the repository gives the agent a shared business vocabulary.</p>
+</li>
+<li><strong>The 70% verification-token inversion marks an "economics inflection point for formal methods"</strong>: TLA+ and Lean used to belong to aerospace or distributed-database kernels (like AWS); Lauren shows that once agents ghost-write verification specs, even frontend virtual-list components and cross-device notification flows cross formal verification's cost break-even line.</li>
+<li><strong>Eval awareness — the "anti-detection blind test"</strong>: while building <code>pstack</code>'s Eval Playbook she discovered that if test directory names contain <code>eval</code> or <code>test</code>, frontier models detect they are being assessed and deliberately pander; you must use obfuscated directory names plus cross-model blind-review judges to measure real capability.</li>
+</ol>
+<h3 id="section-3-3">3.3 Positioning the relationship: "elaborate expansion" or "structural complementarity"?</h3>
+<p>By the harness trichotomy cited in the 11/16 survey (Maintainability Harness / Architecture Fitness Harness / Domain Behaviour Harness), the relationship between the two is not a simple substitution but a precise "one vertical, one horizontal" pairing:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Dimension / The 11/16 survey's core direction (e.g. Co-arising / JDomInO / FAOS) / Lauren Tan's SpaceXSI / GrokBot practice / Relationship"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Dimension</th>
+<th style="text-align: left;" scope="col">The 11/16 survey's core direction (e.g. Co-arising / JDomInO / FAOS)</th>
+<th style="text-align: left;" scope="col">Lauren Tan's SpaceXSI / GrokBot practice</th>
+<th style="text-align: left;" scope="col">Relationship</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Core battlefield</strong></td>
+<td style="text-align: left;">Complex enterprise backends, finance/manufacturing distributed systems (DDD / CQRS / Event Sourcing / Saga)</td>
+<td style="text-align: left;">High-interaction desktop/frontend apps (Electron / React / TypeScript)</td>
+<td style="text-align: left;"><strong>Complementary scenarios</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Code shape and static guardrails</strong></td>
+<td style="text-align: left;">Abstract principles (ArchUnit, CodeScene, <code>Stop Hook</code>)</td>
+<td style="text-align: left;">granular field patterns (7 → 167 lint rules, <code>useEffect</code> ban, directory-level process isolation, self-healing errors)</td>
+<td style="text-align: left;"><strong>Elaborate expansion</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Runtime and behavioural verification</strong></td>
+<td style="text-align: left;">Calls for a Domain Behaviour Harness but says little about end-to-end interaction verification</td>
+<td style="text-align: left;">A complete verification arsenal (CDP CLI, Feature Map, Bombadil UI property tests, Statechart, TLA+/Lean 4)</td>
+<td style="text-align: left;"><strong>Strong supplement</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Global business semantics and bidirectional anchoring</strong></td>
+<td style="text-align: left;">Locks cross-service business invariants via the domain metamodel compiler (<code>truthsrc</code> → knowledge graph → deterministic skeleton + <code>@CoArisingNode</code> bidirectional anchoring + cloze fill-in)</td>
+<td style="text-align: left;">Relies mainly on framework conventions, single-directory feature cohesion and localized TLA+; does not touch cross-microservice distributed transactions or bidirectional metamodel compilation</td>
+<td style="text-align: left;"><strong>Core complementarity</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>In one sentence: <strong>on "single-repo code hygiene, static-analysis loops and runtime interaction verification", Lauren Tan is the ultimate elaborate expansion of the Harness Engineering route in the 11/16 survey; on "cross-context complex domain modeling, deterministic skeleton generation and knowledge–code bidirectional anchoring", the two together form the complete puzzle from complex backend business cores to high-frequency frontend delivery.</strong></p>
+<hr>
+<h2 id="section-4">Part 4: The project adoption field guide (architecture route, toolchain, and ready-to-reuse samples)</h2>
+<p>Never jump straight into building an "unattended software factory". As Lauren Tan repeatedly warns: <strong>if the inner loop produces slop, outer-loop automation just produces slop ten times faster.</strong> Adopt progressively in your own project through the following four stages.</p>
+<h3 id="section-4-1">4.1 The four-stage adoption roadmap</h3>
+<ol>
+<li><strong>Stage 0: clean the broken windows and set baseline gates (weeks 1–2)</strong><ul>
+<li>Clean out the 3–5 classes of legacy anti-patterns most often copied by AI (or explicitly isolate <code>legacy/</code> in directory naming and forbid new code from importing it).</li>
+<li>Slim <code>AGENTS.md</code> / <code>CLAUDE.md</code> to <strong>under 100 lines</strong>, keeping only build/test commands, a directory index and pointers to absolute prohibitions (following <a href="https://openai.com/index/harness-engineering/">OpenAI's Harness Engineering</a> "directory, not encyclopedia" principle).</li>
+</ul>
+</li>
+<li><strong>Stage 1: sink every manual correction into a deterministic check (weeks 3–6)</strong><ul>
+<li>Establish the team iron rule: <strong>whenever the same class of mistake is called out a second time in PR review, it must become a lint rule, a type constraint, an architecture test or a hook script — never a bolded reminder in a prompt.</strong></li>
+<li>Write <strong>agent-facing self-healing error messages (actionable error messages)</strong> for every custom rule — telling the agent directly "why this is wrong + which sanctioned API to use instead".</li>
+</ul>
+</li>
+<li><strong>Stage 2: close the runtime verification loop and build the Feature Map (months 2–3)</strong><ul>
+<li>Write a structured <code>FEATURE_MAP.md</code> / <code>feature-map.json</code> for the project, and wrap a reusable verification CLI (so the agent can launch the local service, run E2E/CDP screenshots or capture performance traces with one command).</li>
+<li>Pilot property testing (frontend via <code>Bombadil</code>; backend via <code>Hypothesis</code>/<code>jqwik</code>/<code>ScalaCheck</code>) or lightweight TLA+ specs on core state machines, money flows or concurrent algorithms.</li>
+</ul>
+</li>
+<li><strong>Stage 3: open the background outer loop and controlled autonomy (month 3 and beyond)</strong><ul>
+<li>Only after the inner loop's first-pass PR rate and CI interception precision stabilize, introduce background cloud agents for automatic bug reproduction, dependency upgrades, periodic architecture garbage collection (GC PRs) and pre-release auto-fuzzing.</li>
+</ul>
+</li>
+</ol>
+<h3 id="section-4-2">4.2 The cross-stack recommended toolchain matrix</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Defense layer / TypeScript / React / Electron / Java / Scala / Kotlin (JVM) / Rust / Go / Python"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Defense layer</th>
+<th style="text-align: left;" scope="col">TypeScript / React / Electron</th>
+<th style="text-align: left;" scope="col">Java / Scala / Kotlin (JVM)</th>
+<th style="text-align: left;" scope="col">Rust / Go</th>
+<th style="text-align: left;" scope="col">Python</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Architecture and dependency boundaries</strong></td>
+<td style="text-align: left;"><a href="https://github.com/sverweij/dependency-cruiser"><code>dependency-cruiser</code></a>, ESLint <code>no-restricted-imports</code>, Biome</td>
+<td style="text-align: left;"><a href="https://www.archunit.org/"><code>ArchUnit</code></a>, Spring Modulith, WartRemover</td>
+<td style="text-align: left;">Rust workspace crate boundaries, <code>depguard</code> (Go)</td>
+<td style="text-align: left;"><a href="https://import-linter.readthedocs.io/"><code>import-linter</code></a>, Ruff</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>High-risk API and style locking</strong></td>
+<td style="text-align: left;">TypeScript <code>strict: true</code>, custom ESLint AST rules</td>
+<td style="text-align: left;">Error Prone, SpotBugs, Scala 3 strong typing and <code>opaque type</code></td>
+<td style="text-align: left;"><code>clippy::deny</code>, <code>unsafe</code> ban, <code>golangci-lint</code></td>
+<td style="text-align: left;"><code>mypy --strict</code> / <code>pyright</code>, Ruff</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Runtime and interaction self-verification</strong></td>
+<td style="text-align: left;">Chrome DevTools Protocol (CDP), Playwright CLI</td>
+<td style="text-align: left;">Testcontainers, WireMock, JFR performance sampling</td>
+<td style="text-align: left;"><code>cargo nextest</code>, <code>go test -race</code></td>
+<td style="text-align: left;"><code>pytest</code> + Playwright / <code>cProfile</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Property testing and formal methods</strong></td>
+<td style="text-align: left;"><a href="https://github.com/antithesishq/bombadil"><code>Bombadil</code></a> (UI), <code>fast-check</code>, TLA+ / Lean 4</td>
+<td style="text-align: left;"><code>jqwik</code> / <code>ScalaCheck</code>, TLA+</td>
+<td style="text-align: left;"><code>proptest</code>, <code>Kani</code> / <code>Verus</code></td>
+<td style="text-align: left;"><code>Hypothesis</code>, CrossHair</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Agent harness control</strong></td>
+<td style="text-align: left;">Claude Code hooks (<code>PreToolUse</code>/<code>Stop</code>), Cursor <a href="https://github.com/cursor/plugins/blob/main/pstack/README.md"><code>pstack</code></a></td>
+<td style="text-align: left;">Same, plus a domain metamodel compile-time validator (e.g. Co-arising / JDomInO)</td>
+<td style="text-align: left;">Same, plus a Cargo check hook</td>
+<td style="text-align: left;">Same, plus Ruff/Pytest hooks</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-4-3">4.3 Four ready-to-reuse core engineering samples</h3>
+<h4>Sample 1: agent-facing "self-healing" architecture prohibition config (ESLint + dependency-cruiser)</h4>
+<p>The essence: <strong>the error message is not a cold warning for humans — it is a repair directive issued directly to the agent</strong>:</p>
+<pre class="code"><code class="language-javascript">// eslint.config.mjs — ban high-risk APIs and isolate the Electron process boundary
+export default [
+  {
+    files: ["src/features/**/*.{ts,tsx}"],
+    rules: {
+      // 1. Eliminate errors by category: ban useEffect at the feature layer; framework internals only
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "react",
+              importNames: ["useEffect"],
+              message:
+                "[AGENT-FIX] Product code must not use useEffect directly. For data-stream subscriptions use useLiveQuery from @framework/query; for event responses move the logic into an event handler.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["**/electron-main/**"],
+              message:
+                "[AGENT-FIX] Do not import main-process (electron-main) code from the renderer process (electron-renderer/features). Define type-safe IPC channels in src/ipc/contracts.ts and call through those.",
+            },
+          ],
+        },
+      ],
+      // 2. No imperative timers as hotfixes
+      "no-restricted-globals": [
+        "error",
+        {
+          name: "setTimeout",
+          message:
+            "[AGENT-FIX] Never bypass state synchronization or flicker with raw setTimeout. Investigate the state-machine root cause, or use the testable controlled clock provided by @framework/scheduler.",
+        },
+      ],
+    },
+  },
+];
+</code></pre>
+<h4>Sample 2: a user-perspective <code>FEATURE_MAP.json</code> (eliminating the agent's UI localization blind spot)</h4>
+<p>Maintain this file at the repository root, with a CI check ensuring every new route/page registers itself:</p>
+<pre class="code"><code class="language-json">{
+  "version": "1.0",
+  "verify_cli": "pnpm verify:app --feature &lt;id&gt; --record-video",
+  "features": [
+    {
+      "id": "sidebar.thread_switcher",
+      "user_aliases": ["left sidebar", "conversation list", "switch session"],
+      "entry_route": "/workspace",
+      "shortcut": "Cmd+K",
+      "code_owner_dir": "src/features/thread-sidebar/",
+      "selectors": {
+        "container": "[data-testid='thread-sidebar']",
+        "item": "[data-testid='thread-item']",
+        "new_chat_btn": "[data-testid='btn-new-chat']"
+      },
+      "invariants": [
+        "First-frame render when switching conversations takes &lt; 50ms (no long tasks &gt; 16ms)",
+        "Fast-scrolling 1,000 messages produces no DOM flicker or position jumps"
+      ]
+    }
+  ]
+}
+</code></pre>
+<h4>Sample 3: a deterministic <code>Stop</code> hook (exit-code 2 forced self-healing gate)</h4>
+<p>Following <a href="https://code.claude.com/docs/en/best-practices">Anthropic's Claude Code best practices</a>, hang zero-tolerance checks on the <code>Stop</code> hook that fires when the agent tries to end its turn. As long as architecture boundaries, types or core unit tests fail, the script exits with code <code>2</code>, blocking the turn and feeding precise repair instructions back to the agent:</p>
+<pre class="code"><code class="language-json">// .claude/settings.json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/agent-stop-gate.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+</code></pre>
+<pre class="code"><code class="language-bash">#!/usr/bin/env bash
+# scripts/agent-stop-gate.sh
+set -euo pipefail
+
+# 1. Type check + architecture-boundary lint
+if ! output=$(pnpm typecheck 2&gt;&amp;1 &amp;&amp; pnpm lint:arch 2&gt;&amp;1); then
+  echo "[HARNESS BLOCK] Type check or architecture-boundary validation failed. Fix the root cause per the errors below before ending the turn:" &gt;&amp;2
+  echo "$output" | tail -n 60 &gt;&amp;2
+  exit 2
+fi
+
+# 2. Run only the unit tests affected by the changed files
+if ! test_out=$(pnpm vitest related --run 2&gt;&amp;1); then
+  echo "[HARNESS BLOCK] Related unit tests failed. Do not edit assertions to mask the problem — fix the implementation:" &gt;&amp;2
+  echo "$test_out" | tail -n 60 &gt;&amp;2
+  exit 2
+fi
+
+exit 0
+</code></pre>
+<h4>Sample 4: UI property-test invariants (the Antithesis Bombadil approach) and an eval blind-test framework</h4>
+<p>Following the <a href="https://antithesishq.github.io/bombadil/browser/1-introduction.html">Antithesis Bombadil manual</a>, stop hand-writing brittle linear "click A then click B" scripts; instead declare the <strong>global invariants (properties)</strong> that must always hold under arbitrary randomized click exploration:</p>
+<pre class="code"><code class="language-typescript">// tests/properties/app-invariants.spec.ts (Bombadil / property-testing pseudocode sample)
+import { always, eventually, Property } from "bombadil";
+
+// Invariant 1: no matter how the agent randomly clicks/zooms/switches, the page must never show an uncaught exception or a React ErrorBoundary
+export const noUncaughtErrors: Property = always((state) =&gt; {
+  return state.consoleErrors.length === 0 &amp;&amp; !state.dom.exists("[data-testid='crash-fallback']");
+});
+
+// Invariant 2: after submitting a message, it must eventually appear in the current conversation list exactly once — never duplicated with the same ID
+export const noDuplicateMessages: Property = always((state) =&gt; {
+  const ids = state.dom.queryAll("[data-testid='msg-bubble']").map((el) =&gt; el.attr("data-msg-id"));
+  return new Set(ids).size === ids.length;
+});
+</code></pre>
+<p>When maintaining custom agent skills, you can build a lightweight blind-test rig following Lauren's <strong>Eval Playbook</strong>:</p>
+<ol>
+<li>Copy the repository into a temporary worktree with a semantically meaningless random name (e.g. <code>/tmp/ws_7f9a2c</code>; the strings <code>eval</code>/<code>benchmark</code> are strictly forbidden, to avoid triggering the model's evaluation-awareness bias);</li>
+<li>Run the skill under test through 5–10 real historical issues, recording the full tool-call trace and the final diff;</li>
+<li>Bring in <strong>independent judge models from a different vendor/model family</strong> (main model on Claude/Grok; judge on Gemini/GPT), feeding it only the rubric and the verification artefacts, scoring 1–10 and localizing failure modes, then iterate the skill in reverse.</li>
+</ol>
+<hr>
+<h2 id="section-5">Part 5: The essential question — is AI coding a theoretical math problem or an engineering problem of plugging leaks?</h2>
+<p>Examined across the four dimensions of "correctness, style, efficiency and architecture friendliness", AI coding is neither a pure theoretical-math problem nor a purely manual leak-plugging exercise of stacking patches, but a <strong>two-layer system where mathematics and cybernetics set the upper bound of controllability, while engineering loops continuously seal real-world leaks</strong>.</p>
+<h3 id="section-5-1">5.1 Where each dimension essentially belongs</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Quality dimension / Mathematical/theoretical property (sets the upper bound) / Engineering/patching property (sets the delivery) / Why a single dimension cannot win"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Quality dimension</th>
+<th style="text-align: left;" scope="col">Mathematical/theoretical property (sets the upper bound)</th>
+<th style="text-align: left;" scope="col">Engineering/patching property (sets the delivery)</th>
+<th style="text-align: left;" scope="col">Why a single dimension cannot win</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Code correctness</strong></td>
+<td style="text-align: left;"><strong>Strongly mathematical</strong>: reducible to type theory (the Curry–Howard isomorphism), pre/post contracts and state-machine invariants (TLA+/Lean)</td>
+<td style="text-align: left;"><strong>Strongly engineering</strong>: real business requirements are full of tacit common sense and external IO side effects (network jitter, dirty third-party API data) that resist full axiomatization</td>
+<td style="text-align: left;">Rice's Theorem long proved that non-trivial program semantics are undecidable in general; coverage must be layered — "core mathematical proofs + outer runtime/property tests"</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Architecture friendliness</strong></td>
+<td style="text-align: left;"><strong>Strongly cybernetic</strong>: governed by Ashby's Law of Requisite Variety — without compressing the legal solution space, a generator with unbounded degrees of freedom cannot be governed</td>
+<td style="text-align: left;"><strong>Strongly engineering</strong>: architecture topology and domain boundaries must be compiled into directory structures, dependency-graph checks and scaffold generators</td>
+<td style="text-align: left;">Architecture conveyed purely in natural-language documents always drifts; it must become a physical track where "if it doesn't compile, it doesn't merge"</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Execution efficiency</strong></td>
+<td style="text-align: left;"><strong>Moderately mathematical</strong>: algorithmic complexity, data-structure choice and concurrency models have clear theoretical optima</td>
+<td style="text-align: left;"><strong>Strongly engineering</strong>: real bottlenecks (Electron's 16ms frame budget, GC jitter, slow SQL) depend heavily on runtime profiles and hardware</td>
+<td style="text-align: left;">LLMs guessing bottlenecks statically from code are usually wrong; optimization must be driven by the agent measuring real flame graphs, heap snapshots and benchmarks</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Code style</strong></td>
+<td style="text-align: left;"><strong>Weakly mathematical</strong>: essentially team aesthetics and cognitive-load conventions</td>
+<td style="text-align: left;"><strong>Purely engineering-automatable</strong>: solved at zero cost by formatters (Prettier/Ruff/rustfmt) and deterministic linters</td>
+<td style="text-align: left;">Never let LLMs or humans debate style in review (Anthropic officially requires blind reviews to <code>skip style</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-5-2">5.2 The five decisive factors that make AI coding "controllable and efficient"</h3>
+<p>Synthesizing the 2026 convergence of practice from Lauren Tan, OpenAI, Stripe, Anthropic and academia: what decides whether a team can truly master AI coding is never "who bought the newest flagship model" but the following five multiplicative factors:</p>
+<ol>
+<li><strong>How much the legal solution space is compressed (space compression / topology design)</strong>: through strongly-typed languages (Rust / TypeScript strict / Scala), highly-constraining internal frameworks (like Dune) or domain metamodel compilers (like Co-arising), compress the agent's degrees of freedom until "the shortest path is the correct path".</li>
+<li><strong>The determinism and speed of the feedback loop (deterministic feedback latency)</strong>: every high-frequency error must be intercepted within seconds-to-minutes by deterministic machinery (compiler, dependency analyzer, Stop hook, unit tests), with error messages that point at the fix — keeping correction ahead of human involvement.</li>
+<li><strong>Asymmetric verification spend</strong>: exploit the generator–verifier gap from computational complexity theory and dare to invest 60–70% of the token and infrastructure budget into runtime self-verification, property testing, state diagrams and formal verification.</li>
+<li><strong>Codebase signal-to-noise and context hygiene</strong>: run periodic "architecture garbage collection" to clear deprecated patterns and defensive comments; and per the <a href="https://arxiv.org/html/2604.00555v5">Inverse Parametric Knowledge Effect (Inverse PKE, <code>arXiv:2604.00555</code>)</a>, trim context precisely, feeding the agent only the private business boundaries and Feature Maps it could not possibly know from pretraining.</li>
+<li><strong>The progressive trust ladder (inner loop before outer loop)</strong>: polish correctness, architectural conformance and verification evidence to high trust in the local single-agent inner loop first; only then open cloud parallel agents and background auto-merge — never skip trust-building and jump straight to the software factory.</li>
+</ol>
+<hr>
+<h2 id="section-6">Part 6: Horizontal comparison with 2026's industry benchmarks</h2>
+<p>Lauren Tan's SpaceXSI/GrokBot is not an outlier. From late 2025 through 2026, several top Silicon Valley engineering teams converged, on different stacks, on high-throughput, low-revert AI coding systems:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Benchmark team and system / Announced / Quantified results / Core harness and control mechanisms / Commonalities and differences vs. SpaceXSI"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Benchmark team and system</th>
+<th style="text-align: left;" scope="col">Announced</th>
+<th style="text-align: left;" scope="col">Quantified results</th>
+<th style="text-align: left;" scope="col">Core harness and control mechanisms</th>
+<th style="text-align: left;" scope="col">Commonalities and differences vs. SpaceXSI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>SpaceXSI — GrokBot / Dune</strong> (<a href="https://ai.engineer/code/2026/talks/lauren-tan">AI Engineer CODE 2026</a>)</td>
+<td style="text-align: left;">2026-11</td>
+<td style="text-align: left;">Team merges <strong>~11,000 PRs/month</strong> (3,127 PRs/month per person), 227 contributors, revert rate down to <strong>0.47%</strong>, cold start 2.3s → 1.4s</td>
+<td style="text-align: left;">Inverted trust pyramid; <code>useEffect</code> and 99% comment bans; 167 lint rules; Feature Map + CDP; TLA+/Lean 4/Bombadil; post-release auto-fuzz, fix and merge</td>
+<td style="text-align: left;">The only benchmark that imports <strong>formal verification + UI property testing</strong> into everyday desktop delivery at scale</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>OpenAI Codex — Harness Engineering</strong> (<a href="https://openai.com/index/harness-engineering/">OpenAI blog</a>)</td>
+<td style="text-align: left;">2026-02</td>
+<td style="text-align: left;">7 engineers shipped <strong>~1M lines of production code / ~1,500 PRs in 5 months, 0 lines hand-written</strong></td>
+<td style="text-align: left;">A ~100-line minimal <code>AGENTS.md</code> as a directory index only; structured <code>docs/</code> as the truth source; custom architecture-layer linters and structural tests; periodic "architecture garbage collection (GC)" scans for drift</td>
+<td style="text-align: left;">Core philosophy highly aligned with Lauren's ("the agent isn't hard — the harness is"); OpenAI emphasizes the <code>docs/</code> knowledge-base directory and periodic GC more</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Stripe — Minions</strong> (<a href="https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents">Stripe Dev blog</a>)</td>
+<td style="text-align: left;">2026-02</td>
+<td style="text-align: left;">Unattended one-shot agents merge <strong>1,000+ to 1,300+ PRs per week</strong> (zero human-written code; humans review then merge)</td>
+<td style="text-align: left;"><strong>Blueprint orchestration</strong>: the workflow is hard-partitioned into deterministic code nodes (lint/commit/CI) and constrained agent nodes; a strict <strong>two-strike circuit breaker</strong> (the same CI failure twice escalates to humans immediately — never burn tokens in a loop)</td>
+<td style="text-align: left;">Under finance-grade compliance, risk is controlled with "deterministic state-machine orchestration + two-strike fusing" rather than free agent autonomy</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ramp — Inspect</strong> (<a href="https://builders.ramp.com/post/why-we-built-our-background-agent">Ramp Builders blog</a> / <a href="https://www.infoq.com/news/2026/01/ramp-coding-agent-platform/">InfoQ</a>)</td>
+<td style="text-align: left;">2026-01 to 2026-10</td>
+<td style="text-align: left;">Climbed from <strong>~30%</strong> of the company's merged PRs to <strong>50–74%</strong>, sustaining multiple internal systems</td>
+<td style="text-align: left;">Every session runs in its own Modal sandbox, seamlessly wired to GitHub, Buildkite, Sentry, Datadog, LaunchDarkly and Slack, able to reproduce production alerts end-to-end and self-verify</td>
+<td style="text-align: left;">Its strength is <strong>full-stack observability integration</strong> (production telemetry feeding the agent loop directly)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Spotify — Honk &amp; Fleetshift</strong> (<a href="https://engineering.atspotify.com/2026/6/code-with-claude-coding-is-no-longer-the-constraint">Spotify engineering blog</a> / <a href="https://engineering.atspotify.com/2025/12/feedback-loops-background-coding-agents-part-3">Part 3 feedback loops</a>)</td>
+<td style="text-align: left;">2025-11 to 2026-06</td>
+<td style="text-align: left;">99%+ weekly active developer usage, PR frequency up <strong>+76%</strong>; 240 migration PRs saved 10 person-weeks; a backend-wide Java migration took only <strong>3 days</strong></td>
+<td style="text-align: left;">Extremely narrow-permission container sandboxes + bounded loops (max 10 rounds per run, max 3 retries); an independent <strong>LLM judge</strong> vetoes ~25% of candidate changes (about half of those later self-correct and pass); Fleetshift handles cross-repo scheduling</td>
+<td style="text-align: left;">Facing a huge microservice fleet, the core lesson is <strong>deliberately shrinking agent permissions and flexibility in exchange for predictability</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-6-1">Closing: the industry's grand convergence at the end of 2026</h3>
+<p>Putting the five answers from SpaceXSI, OpenAI, Stripe, Ramp and Spotify — the world's top engineering teams — side by side, one crystal-clear industry consensus emerges: <strong>the dividends of prompt engineering have peaked; what separates teams in 2026 is Harness Engineering and Verification Infrastructure.</strong> When the marginal cost of generating code approaches zero, an engineering team's only moat is the depth to which it has compiled its architectural taste, domain boundaries and acceptance criteria into deterministic systems.</p>
+<hr>
+<h2 id="section-7">Part 7: First-party source index — talk videos, official transcripts, and slide-figure provenance</h2>
+<h3 id="section-7-1">7.1 Original links to the two first-party talks and the open-source project</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Source / Publisher / date / Original link"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Source</th>
+<th style="text-align: left;" scope="col">Publisher / date</th>
+<th style="text-align: left;" scope="col">Original link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Standalone full version of the keynote "All Code Is Slop (Except Mine)" (17m31s)</td>
+<td style="text-align: left;">AI Engineer official channel, 2026-11-14</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g">youtube.com/watch?v=O_zcc6Xl12g</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">The same talk's official speaker page (segmented video, speaker profile, transcript entry)</td>
+<td style="text-align: left;">AI Engineer CODE 2026 official</td>
+<td style="text-align: left;"><a href="https://ai.engineer/code/2026/talks/lauren-tan">ai.engineer/code/2026/talks/lauren-tan</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Official machine transcript (sentence-anchored to the livestream timeline, with a recognition-error disclaimer)</td>
+<td style="text-align: left;">AI Engineer official</td>
+<td style="text-align: left;"><a href="https://ai.engineer/reading/code-2026/transcripts/lauren-tan.md">ai.engineer/reading/code-2026/transcripts/lauren-tan.md</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Day 1 livestream raw recording (this talk spans 01:01:02–01:18:38)</td>
+<td style="text-align: left;">AI Engineer official channel, 2026-11-12</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=3662s">youtube.com/watch?v=ZZ19zhYnDKY</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">The 55-minute deep interview "SpaceX AI Engineer: Stop Using AI Agents Like This" (conversation format, no slides)</td>
+<td style="text-align: left;">Perfology Clips channel, 2026-09-26</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">youtube.com/watch?v=u1hqfjrMhwQ</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Open-source skill library <code>pstack</code> (Potato Stack)</td>
+<td style="text-align: left;">Cursor official plugins repository</td>
+<td style="text-align: left;"><a href="https://github.com/cursor/plugins/blob/main/pstack/README.md">github.com/cursor/plugins: pstack</a></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-7-2">7.2 Slide availability and this article's figure index</h3>
+<p>As of this article's update date (2026-11-19), the official channel has <strong>not separately published</strong> this deck as a PDF or on Slideshare/Speakerdeck; the official speaker page embeds only one pyramid-slide screenshot (<code>/reading/code-2026/images/lauren-tan-3835.jpg</code>). The 55-minute interview is a conversation recording and likewise has no slides. Figures 1–6 in this article were all frame-captured by the editor from the standalone keynote video published on the AI Engineer official channel (1080p original frames scaled to 1280×720); each can be cross-checked against the original video via the timestamps below:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Figure / Slide content / Standalone video position / Livestream original anchor"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Figure</th>
+<th style="text-align: left;" scope="col">Slide content</th>
+<th style="text-align: left;" scope="col">Standalone video position</th>
+<th style="text-align: left;" scope="col">Livestream original anchor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Figure 1</td>
+<td style="text-align: left;">"each copy makes the next copy more likely" weed-spread diagram</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=270s">04:30</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=3932s">01:05:32</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Figure 2</td>
+<td style="text-align: left;">"quick fixes considered harmful" 183-timer incident</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=470s">07:50</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=4132s">01:08:52</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Figure 3</td>
+<td style="text-align: left;">"the poteto pyramid" inverted trust pyramid</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=150s">02:30</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=3812s">01:03:32</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Figure 4</td>
+<td style="text-align: left;">"runtime verification" Feature Map and verification CLIs</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=645s">10:45</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=4307s">01:11:47</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Figure 5</td>
+<td style="text-align: left;">"everyone is more productive" contributor-growth stacked chart</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=845s">14:05</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=4507s">01:15:07</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Figure 6</td>
+<td style="text-align: left;">"velocity without compromise" performance report card</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=895s">14:55</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=4557s">01:15:57</a></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Citation note</strong>: the screenshots above are copyrighted by AI Engineer and the speaker; this article uses them as quotation for technical commentary. The original banner carrying the talk title and speaker attribution is preserved beneath each screenshot to maintain provenance; the article's claims defer to the first-party sources linked above.</p></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Industry survey</span> · <time datetime="2026-11-16">2026-11-16</time></p>
+      <h3><a href="/articles/ai-coding-evolution-20261116/">The AI Coding Landscape: From Vibe Coding to Agentic Engineering</a></h3>
+      <p class="article-deck">From model drift and the Vibe Coding controversy to Agentic and Harness Engineering: an industry evolution survey that keeps every citation and reference link.</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

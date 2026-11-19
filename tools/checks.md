@@ -50,7 +50,8 @@ python3 -B tools/article-browser-checks.py --browser webkit
 ```
 
 - Static checks retain the 18 core pages plus 404 and add the paired article
-  indices and discovered `zh/articles/*/index.html` details: canonical/hreflang,
+  indices and discovered `zh/articles/*/index.html` plus `articles/*/index.html`
+  details: canonical/hreflang,
   stable section IDs, section-scoped example/fact markers, F/DEF references,
   local links, actual status-table definition anchors and main/skip links.
   The original nine core route pairs keep their ID/section contracts. Every page
@@ -59,9 +60,13 @@ python3 -B tools/article-browser-checks.py --browser webkit
   Five primary and four secondary enhanced links retain those destinations.
   Map/navigation links need accessible labels. Chinese-only details require their
   own canonical, trusted `data-page="article"` identity and
-  `data-language-index="/articles/"`; they must not advertise an English translation.
-  Their **EN index** link has neither translation metadata nor article query/hash.
-  Paired indices retain query/fragment state when switching language.
+  `data-language-index="/articles/"`. Paired EN/ZH details (both files present
+  for the same slug) advertise the EN/ZH/x-default hreflang trio, switch to the
+  translated counterpart with alternate metadata, and must keep identical EN/ZH
+  heading ids/sections; unpaired Chinese-only details must not advertise an
+  English translation — their **EN index** link has neither translation metadata
+  nor article query/hash. Paired indices retain query/fragment state when
+  switching language.
 - Article prose and attributed third-party data are editorial material, not
   verified product facts. Unmarked editorial F/DEF text is tracked separately;
   explicit `data-fact` and linked F/DEF identities still pass the strict registry
@@ -294,7 +299,8 @@ contract is not inferred from the website's Explorer tests.
 - [ ] Editorial quotations, external statistics and proposed engineering directions
       remain attributed and unverified, not recast as F-xx product-shipping proof.
 - [ ] Original Chinese article titles are not presented as translated EN titles;
-      EN detail translation is not advertised where only an index exists.
+      EN detail pages exist only for manifest items carrying the EN trio, and
+      their translations are pinned and checked like the Chinese originals.
 - [ ] EN/ZH code payloads, fact IDs, source references and failure boundaries agree.
 - [ ] F-24–F-29 retain candidate/date/platform scope. SQL rebuild is 66.847 s;
       actor64/readside47 share 23 generated tests.

@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Deterministic, maintenance-only publishing of the checked-in Chinese articles.
+"""Deterministic, maintenance-only publishing of the checked-in article pairs.
 
 Run with Python and requirements-articles.txt. --check never writes. There is
 intentionally no target option: routes are confined to the articles directories.
 Markdown parses the body; ElementTree adds publishing structure, never regex HTML.
+Chinese details live at /zh/articles/<slug>/; manifest items that carry the
+optional title_en/deck_en/source_en trio also publish an English pair page at
+/articles/<slug>/ with full hreflang counterparts.
 """
 
 import argparse
@@ -42,6 +45,10 @@ OWNED_OUTPUTS = (
     f"zh/articles/{STRATEGY_SLUG}/index.html",
     f"zh/articles/{PRACTICE_SLUG}/index.html",
     f"zh/articles/{CODE50_SLUG}/index.html",
+    f"articles/{SURVEY_SLUG}/index.html",
+    f"articles/{STRATEGY_SLUG}/index.html",
+    f"articles/{PRACTICE_SLUG}/index.html",
+    f"articles/{CODE50_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"
@@ -63,10 +70,34 @@ def esc(value):
     return html.escape(str(value), quote=True)
 
 
-def detail_route(slug):
+def detail_route(slug, locale="zh"):
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug):
         raise ValueError("Invalid article slug")
-    return f"/zh/articles/{slug}/"
+    prefix = "" if locale == "en" else "/zh"
+    if locale not in {"zh", "en"}:
+        raise ValueError("Article locale must be zh or en")
+    return f"{prefix}/articles/{slug}/"
+
+
+# Translated detail pages extend the base contract with this exact trio; items
+# without it stay Chinese-only details and keep their unpaired index fallback.
+EN_FIELDS = {"title_en", "deck_en", "source_en"}
+
+# Category names are a closed editorial set; unknown categories fail the build.
+CATEGORY_EN = {
+    "行业综述": "Industry survey",
+    "战略思考": "Strategy",
+    "工程实践": "Engineering practice",
+}
+
+
+def localized(item, locale):
+    """Manifest metadata for one locale: EN fields must exist when requested."""
+    if locale == "zh":
+        return item
+    if "source_en" not in item:
+        raise ValueError(f"Article {item['slug']} has no English translation fields")
+    return dict(item, title=item["title_en"], deck=item["deck_en"], source=item["source_en"])
 
 
 def load_manifest(path=MANIFEST):
@@ -79,19 +110,26 @@ def load_manifest(path=MANIFEST):
         raise ValueError("Manifest articles must be a nonempty list")
     slugs, sources = set(), set()
     for item in articles:
-        if not isinstance(item, dict) or set(item) != fields:
+        if not isinstance(item, dict) or set(item) not in (fields, fields | EN_FIELDS):
             raise ValueError("Article metadata fields do not match the contract")
         for field, value in item.items():
             if not isinstance(value, str) or not value.strip() or any(ord(c) < 32 for c in value):
                 raise ValueError(f"Invalid metadata field: {field}")
         detail_route(item["slug"])
         detail_route(item["related"])
-        if item["slug"] in slugs or item["source"] in sources:
+        if item["source"] != item["slug"] + ".md":
+            raise ValueError("Source must be the article slug plus .md, not a path")
+        if "source_en" in item:
+            if item["source_en"] != item["slug"] + ".en.md":
+                raise ValueError("English source must be the article slug plus .en.md, not a path")
+        if item["slug"] in slugs or item["source"] in sources or item.get("source_en") in sources:
             raise ValueError("Duplicate article slug or source")
         slugs.add(item["slug"])
         sources.add(item["source"])
-        if item["source"] != item["slug"] + ".md":
-            raise ValueError("Source must be the article slug plus .md, not a path")
+        if "source_en" in item:
+            sources.add(item["source_en"])
+        if item["category"] not in CATEGORY_EN:
+            raise ValueError(f"Article category has no English name: {item['category']}")
         if date.fromisoformat(item["date"]).isoformat() != item["date"]:
             raise ValueError("Article date must be YYYY-MM-DD")
     for item in articles:
@@ -256,7 +294,7 @@ def serialize(node):
     return ET.tostring(node, encoding="unicode", method="html")
 
 
-def shell(locale, page, title, deck, route, content):
+def shell(locale, page, title, deck, route, content, paired=False):
     zh = locale == "zh"
     language = "zh-CN" if zh else "en"
     skip = "跳至正文" if zh else "Skip to content"
@@ -267,9 +305,26 @@ def shell(locale, page, title, deck, route, content):
         current = ' aria-current="page"' if href == "/articles/" else ""
         nav.append(f'<a href="{localized}"{current}>{esc(zh_label if zh else en_label)}</a>')
     if page == "article":
-        alternate = ""
-        language_link = '<a class="nav-link" href="/articles/" lang="en" title="English article index; this article is in Chinese">EN index</a>'
         page_data = ' data-language-index="/articles/"'
+        if paired:
+            # A real translation pair: full hreflang trio plus a nav switch that
+            # leads to the counterpart detail, mirroring the paired-index model.
+            en_route = route[3:] if zh else route
+            zh_route = "/zh" + en_route
+            alternate = '\n'.join(
+                f'  <link rel="alternate" hreflang="{lang}" href="{SITE}{esc(path)}" />'
+                for lang, path in (("en", en_route), ("zh-CN", zh_route), ("x-default", en_route))
+            )
+            counterpart_route = en_route if zh else zh_route
+            language_link = (f'<a class="nav-link" href="{esc(counterpart_route)}" '
+                             f'lang="{"en" if zh else "zh-CN"}" rel="alternate" hreflang="{"en" if zh else "zh-CN"}">'
+                             f'{"EN" if zh else "中文"}</a>')
+            page_data += f' data-language-counterpart="{esc(counterpart_route)}"'
+        else:
+            # Unpaired Chinese-only detail: the switch deliberately falls back to
+            # the shared English index without translation metadata.
+            alternate = ""
+            language_link = '<a class="nav-link" href="/articles/" lang="en" title="English article index; this article is in Chinese">EN index</a>'
     else:
         alternate = '\n'.join(
             f'  <link rel="alternate" hreflang="{lang}" href="{SITE}{path}" />'
@@ -319,12 +374,19 @@ def shell(locale, page, title, deck, route, content):
 
 
 def card(item, locale="zh", stable_id=False):
+    # Items without the EN trio render as the Chinese original on both indices.
+    translated = "source_en" in item
+    if locale == "en" and translated:
+        meta, category, lang_attr, language = localized(item, "en"), CATEGORY_EN[item["category"]], "en", "English translation"
+    else:
+        meta, category, lang_attr = item, item["category"], "zh-CN"
+        language = "中文原文" if locale == "zh" else "Chinese article · 中文原文"
+    route_locale = locale if (locale == "zh" or translated) else "zh"
     ident = f' id="article-{esc(item["slug"])}"' if stable_id else ""
-    language = "中文原文" if locale == "zh" else "Chinese article · 中文原文"
-    return f'''<div class="article-card"{ident} lang="zh-CN">
-      <p class="article-meta"><span>{esc(item["category"])}</span> · <time datetime="{esc(item["date"])}">{esc(item["date"])}</time></p>
-      <h3><a href="{detail_route(item["slug"])}">{esc(item["title"])}</a></h3>
-      <p class="article-deck">{esc(item["deck"])}</p>
+    return f'''<div class="article-card"{ident} lang="{lang_attr}">
+      <p class="article-meta"><span>{esc(category)}</span> · <time datetime="{esc(item["date"])}">{esc(item["date"])}</time></p>
+      <h3><a href="{detail_route(item["slug"], route_locale)}">{esc(meta["title"])}</a></h3>
+      <p class="article-deck">{esc(meta["deck"])}</p>
       <p class="small">{language}</p>
     </div>'''
 
@@ -356,12 +418,12 @@ def list_page(items, locale):
     zh = locale == "zh"
     title = "技术观察" if zh else "Insights"
     deck = ("持续整理值得阅读的技术文章：连接行业新动向、架构方法与工程实践。本期从 AI Coding 的范式演进出发，再思考它对 co-arising 的启发。" if zh else
-            "A growing collection of technical readings connecting emerging ideas, architecture and engineering practice. This edition explores AI coding and its implications for co-arising. No English translations are available.")
+            "A growing collection of technical readings connecting emerging ideas, architecture and engineering practice. This edition explores AI coding and its implications for co-arising.")
     content = f'''    <header class="insights-hero">
       <p class="over">{"行业演进 · 工程思考" if zh else "Industry evolution · engineering perspectives"}</p>
       <h1 id="insights-title" class="insights-title">{esc(title)}</h1>
       <p class="insights-deck">{esc(deck)}</p>
-      <p class="page-outline"><a href="#articles">{"阅读文章" if zh else "Browse Chinese articles"}</a> · <a href="#editorial-context">{"发布说明" if zh else "Editorial context"}</a></p>
+      <p class="page-outline"><a href="#articles">{"阅读文章" if zh else "Read the articles"}</a> · <a href="#editorial-context">{"发布说明" if zh else "Editorial context"}</a></p>
     </header>
     {cover(locale)}
     <section id="articles" aria-labelledby="articles-heading">
@@ -377,33 +439,54 @@ def list_page(items, locale):
     return shell(locale, "articles", title, deck, "/zh/articles/" if zh else "/articles/", content)
 
 
-def detail_page(item, related, source):
-    body, toc = render_body(source, item)
-    note = f"<p>{EDITORIAL}</p>"
+EDITORIAL_EN = "These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references."
+STRATEGY_NOTE_EN = "The strategy article is a perspective and proposed engineering roadmap, not a list of delivered co-arising capabilities. Ratios, competitive positioning and proposed tool interfaces are not measured results or availability commitments."
+
+
+def detail_page(item, related, source, locale="zh"):
+    zh = locale == "zh"
+    meta = localized(item, locale)
+    paired = "source_en" in item
+    body, toc = render_body(source, meta)
+    if zh:
+        note = f"<p>{EDITORIAL}</p>"
+        status_href, breadcrumb = "/zh/status/", '<a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a>'
+        labels = {"meta": "中文原文", "download": "下载原始 Markdown", "read": "阅读全文",
+                  "toc_summary": "阅读目录", "toc_nav": "文章目录", "position": "阅读全文",
+                  "related": "继续阅读", "back": "返回文章索引"}
+    else:
+        note = f"<p>{EDITORIAL_EN}</p>"
+        status_href, breadcrumb = "/status/", '<a href="/">Home</a> / <a href="/articles/">Articles</a>'
+        labels = {"meta": "English translation", "download": "Download the English Markdown", "read": "Read the full article",
+                  "toc_summary": "Contents", "toc_nav": "Article contents", "position": "Read the full article",
+                  "related": "Continue reading", "back": "Back to article index"}
     if item["slug"] == STRATEGY_SLUG:
-        note += f"<p>{STRATEGY_NOTE}</p>"
+        note += f"<p>{STRATEGY_NOTE if zh else STRATEGY_NOTE_EN}</p>"
+    category = item["category"] if zh else CATEGORY_EN[item["category"]]
+    counterpart_route = detail_route(item["slug"], "en" if zh else "zh")
+    switch_label = "Read in English" if zh else "中文原文"
     content = f'''    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
     <header class="article-hero">
-      <nav class="article-breadcrumb" aria-label="面包屑"><a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a> / <span aria-current="page">{esc(item["category"])}</span></nav>
-      <p class="article-meta"><span>{esc(item["category"])}</span> · <time datetime="{esc(item["date"])}">{esc(item["date"])}</time> · 中文原文</p>
-      <h1>{esc(item["title"])}</h1>
-      <p class="article-deck">{esc(item["deck"])}</p>
-      <div class="article-actions"><a href="/content/articles/{esc(item["source"])}" download="{esc(item["source"])}">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a></div>
+      <nav class="article-breadcrumb" aria-label="{"面包屑" if zh else "Breadcrumb"}">{breadcrumb} / <span aria-current="page">{esc(category)}</span></nav>
+      <p class="article-meta"><span>{esc(category)}</span> · <time datetime="{esc(item["date"])}">{esc(item["date"])}</time> · {labels["meta"]}</p>
+      <h1>{esc(meta["title"])}</h1>
+      <p class="article-deck">{esc(meta["deck"])}</p>
+      <div class="article-actions"><a href="/content/articles/{esc(meta["source"])}" download="{esc(meta["source"])}">{labels["download"]}</a> · <a href="#article-body">{labels["read"]}</a>{"" if not paired else f' · <a href="{counterpart_route}">{switch_label}</a>'}</div>
     </header>
-    <aside class="editorial-note" aria-label="editorial distinction">{note}<p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
+    <aside class="editorial-note" aria-label="editorial distinction">{note}<p><a href="{status_href}">{"当前已交付能力与证据请以状态页为准" if zh else "Delivered capabilities and evidence live on the status page"}</a>{"。发布说明不改写下方原文观点。" if zh else ". The publication notes below do not rewrite the original views."}</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
-        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录">{serialize(toc)}</nav></details>
-        <p id="reading-position" class="reading-position">阅读全文</p>
+        <details class="article-toc" open="open"><summary>{labels["toc_summary"]}</summary><nav aria-label="{labels["toc_nav"]}">{serialize(toc)}</nav></details>
+        <p id="reading-position" class="reading-position">{labels["position"]}</p>
       </aside>
       {serialize(body)}
     </div>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
-      <h2 id="related-heading">继续阅读</h2>
-      {card(related)}
-      <p><a href="/zh/articles/">返回文章索引</a></p>
+      <h2 id="related-heading">{labels["related"]}</h2>
+      {card(related, locale)}
+      <p><a href="{"/zh/articles/" if zh else "/articles/"}">{labels["back"]}</a></p>
     </section>'''
-    return shell("zh", "article", item["title"], item["deck"], detail_route(item["slug"]), content)
+    return shell(locale, "article", meta["title"], meta["deck"], detail_route(item["slug"], locale), content, paired=paired)
 
 
 def generate_pages():
@@ -414,9 +497,13 @@ def generate_pages():
     }
     by_slug = {item["slug"]: item for item in items}
     for item in items:
-        source = (CONTENT / item["source"]).read_bytes().decode("utf-8")
-        output = detail_route(item["slug"]).lstrip("/") + "index.html"
-        pages[output] = detail_page(item, by_slug[item["related"]], source)
+        for locale in ("zh", "en"):
+            if locale == "en" and "source_en" not in item:
+                continue
+            meta = localized(item, locale)
+            source = (CONTENT / meta["source"]).read_bytes().decode("utf-8")
+            output = detail_route(item["slug"], locale).lstrip("/") + "index.html"
+            pages[output] = detail_page(item, by_slug[item["related"]], source, locale)
     return {path: value.encode("utf-8") for path, value in pages.items()}
 
 

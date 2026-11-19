@@ -13,7 +13,7 @@ assets retain their documented source identity and regeneration contracts.
 | Path | Role |
 |---|---|
 | `index.html`, core `*/index.html`, `zh/**/index.html`, `404.html` | 9 paired EN/ZH core pages + a shared 404; static navigation survives missing JavaScript |
-| `articles/index.html`, `zh/articles/index.html`, `zh/articles/*/index.html` | Paired editorial indices and Chinese-only article details; checked-in generated HTML |
+| `articles/index.html`, `zh/articles/index.html`, `articles/*/index.html`, `zh/articles/*/index.html` | Paired editorial indices and paired EN/ZH article details; checked-in generated HTML |
 | `content/articles/*.md`, `content/articles/manifest.json` | Original editorial Markdown and publication metadata; source for the article generator |
 | `assets/css/*.css` | design tokens → base → components → pages (in that order) |
 | `assets/js/site.js` | Shared `SITE` repository/nav configuration, language routes, optional theme persistence and code-only copy controls |
@@ -102,10 +102,12 @@ the literal `SITE` configuration, never its executable body. Runtime URL checks 
 finite first-party fetch/Worker/import patterns; ordinary external documentation
 links are not runtime loads. Browser observation is still needed for computed URLs.
 No second hand-maintained facts registry is introduced. Paired article indices
-share the language/section contract; Chinese-only details retain their own
-canonical URL and use **EN index**, not a fake English translation. That index
-link deliberately drops article-specific query/fragment state. Unknown paths
-remain on the existing 404 recovery path.
+share the language/section contract. Manifest items carrying the EN trio publish
+paired EN/ZH details with a full hreflang trio and a switch to the translated
+counterpart; details without it stay Chinese-only, retain their own canonical
+URL and use **EN index**, not a fake English translation. That index link
+deliberately drops article-specific query/fragment state. Unknown paths remain
+on the existing 404 recovery path.
 
 Resource reports inventory transitive literal dependencies (including on-demand
 Explorer data/WASM/Workers), with raw and deterministic per-file gzip sizes. Both
@@ -124,11 +126,15 @@ retain their captured scope rather than being inferred from UI success.
 ## Authoring and rebuilding articles
 
 Articles are authored in `content/articles/*.md`; `content/articles/manifest.json`
-records each stable slug, original title, deck, category, publication date, relative
-source filename and related article. Keep imported originals byte-identical to the
-reviewed source. Publication metadata and site chrome are separate from that
-original prose. Review attribution and the editorial/verified-product distinction
-before publishing; adding a translated title does not create a translated article.
+records each stable slug, original title and deck, optional English title/deck/
+source trio, category, publication date, relative source filename and related
+article. Keep imported originals byte-identical to the reviewed source.
+Publication metadata and site chrome are separate from that original prose.
+Review attribution and the editorial/verified-product distinction before
+publishing; adding a translated title does not create a translated article —
+the EN detail page exists only when the manifest item carries the full
+title_en/deck_en/source_en trio and the translated Markdown passes the same
+guard and hash pinning as the original.
 
 The optional authoring tool requires Python **Markdown==3.4.1** and
 **html5lib==1.1**, pinned in `tools/requirements-articles.txt`. They are not
@@ -150,8 +156,9 @@ The generator produces the EN/ZH indices and Chinese detail HTML from the manife
 and Markdown. Review and commit those outputs with their source/metadata changes;
 do not hand-edit generated article HTML. `--check` checks freshness without writing
 outputs. Run it after shared navigation or generator changes too. The live site
-serves the checked-in HTML without running Python. The English index links to the
-original Chinese articles; no English detail translation is currently provided.
+serves the checked-in HTML without running Python. The English index links to
+paired English details; items without the EN trio keep linking the Chinese
+originals.
 
 ## Rebuilding derived data
 

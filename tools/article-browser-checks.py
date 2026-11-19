@@ -22,75 +22,81 @@ class Handler(SimpleHTTPRequestHandler):
 
 def verify(browser, base, evidence):
     observations, errors = [], []
-    for width in (1280, 390):
-        context = browser.new_context(viewport={'width': width, 'height': 900}, accept_downloads=True)
-        page = context.new_page()
-        page.on('pageerror', lambda error: errors.append(str(error)))
-        try:
-            page.goto(base + '/zh/')
-            page.locator('#insights a.btn').click()
-            page.wait_for_url(base + '/zh/articles/')
-            page.evaluate('document.fonts.ready')
-            assert page.locator('.article-card').count() == len(SLUGS)
-            page.screenshot(path=str(evidence / f'index-{width}.png'), full_page=True)
-            page.locator('.article-card h3 a').first.click()
-            page.wait_for_url(base + '/zh/articles/' + SLUGS[0] + '/')
-            for slug in SLUGS:
-                page.goto(base + '/zh/articles/' + slug + '/')
+    for locale, index_path in (('zh', '/zh/articles/'), ('en', '/articles/')):
+        for width in (1280, 390):
+            context = browser.new_context(viewport={'width': width, 'height': 900}, accept_downloads=True)
+            page = context.new_page()
+            page.on('pageerror', lambda error: errors.append(str(error)))
+            try:
+                page.goto(base + ('/zh/' if locale == 'zh' else '/'))
+                page.locator('#insights a.btn').click()
+                page.wait_for_url(base + index_path)
                 page.evaluate('document.fonts.ready')
-                for theme in ('light', 'dark'):
-                    for _ in range(3):
-                        if page.locator('html').get_attribute('data-theme') == theme:
-                            break
-                        page.locator('#theme-toggle').click()
-                    assert page.locator('html').get_attribute('data-theme') == theme
-                    page.screenshot(path=str(evidence / f'{slug}-{width}-{theme}.png'))
-                    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'page-level overflow'
-                toc = page.locator('.article-toc')
-                if not toc.evaluate('element => element.open'):
-                    toc.locator('summary').click()
-                page.locator('.article-toc a[href="#section-3"]').click()
-                # Smooth scrolling settles late on long articles; wait for the
-                # current-section state instead of a fixed delay.
-                page.wait_for_function("() => document.querySelector('.article-toc a[aria-current]')?.getAttribute('href') === '#section-3'", timeout=8000)
-                heading_top = page.locator('#section-3').evaluate('element => element.getBoundingClientRect().top')
-                nav_bottom = page.locator('#site-nav').evaluate('element => element.getBoundingClientRect().bottom')
-                assert nav_bottom - 2 <= heading_top < 900, 'TOC target hidden by navigation'
-                assert '0%' != page.locator('#reading-position').text_content().split('·')[-1].strip()
-                observations.append({'width': width, 'slug': slug, 'headingTop': heading_top,
-                                     'navBottom': nav_bottom, 'progress': page.locator('#reading-position').text_content()})
-                page.screenshot(path=str(evidence / f'{slug}-{width}-reading.png'))
-                page.goto(base + '/zh/articles/' + slug + '/#section-2')
-                page.reload()
-                page.wait_for_function("() => { const top=document.querySelector('#section-2').getBoundingClientRect().top; return top >= document.querySelector('#site-nav').getBoundingClientRect().bottom - 2 && top < innerHeight; }")
-                assert page.locator('#section-2').is_visible()
-                with page.expect_download() as download:
-                    page.locator('.article-actions a[download]').click()
-                downloaded = Path(download.value.path()).read_bytes()
-                assert downloaded == (ROOT / 'content/articles' / f'{slug}.md').read_bytes(), 'source download bytes differ'
-                observations.append({'probe': 'deep-link reload and exact source download', 'width': width, 'slug': slug, 'bytes': len(downloaded)})
-                for region in page.locator('.article-table, pre.code').all():
-                    region.scroll_into_view_if_needed()
-                    dimensions = region.evaluate('e => ({width:e.clientWidth,scroll:e.scrollWidth,overflow:getComputedStyle(e).overflowX})')
-                    assert dimensions['overflow'] in ('auto', 'scroll'), dimensions
-                    if width == 390 and dimensions['scroll'] > dimensions['width']:
-                        region.evaluate('e => e.scrollLeft = e.scrollWidth')
-                        assert region.evaluate('e => e.scrollLeft > 0'), 'wide content not scrollable'
-                if slug == SLUGS[1]:
-                    code = page.locator('pre.code code').first.inner_text()
-                    assert '① 反向访谈' in code and '④ 独立子智能体' in code, 'workflow diagram missing'
-                    page.locator('pre.code').first.scroll_into_view_if_needed()
-                    page.screenshot(path=str(evidence / f'diagram-{width}.png'))
-                page.locator('.article-related h3 a').click()
-                other = RELATED[slug]
-                page.wait_for_url(base + '/zh/articles/' + other + '/')
-                page.locator('#language-switch').click()
-                page.wait_for_url(base + '/articles/')
-                assert 'No English translations' in page.locator('main').inner_text()
-                page.locator('#language-switch').click()
-                page.wait_for_url(base + '/zh/articles/')
-        finally:
-            context.close()
+                assert page.locator('.article-card').count() == len(SLUGS)
+                if locale == 'en':
+                    assert 'English translation' in page.locator('.article-card').first.inner_text()
+                page.screenshot(path=str(evidence / f'{locale}-index-{width}.png'), full_page=True)
+                page.locator('.article-card h3 a').first.click()
+                page.wait_for_url(base + index_path + SLUGS[0] + '/')
+                for slug in SLUGS:
+                    page.goto(base + index_path + slug + '/')
+                    page.evaluate('document.fonts.ready')
+                    for theme in ('light', 'dark'):
+                        for _ in range(3):
+                            if page.locator('html').get_attribute('data-theme') == theme:
+                                break
+                            page.locator('#theme-toggle').click()
+                        assert page.locator('html').get_attribute('data-theme') == theme
+                        page.screenshot(path=str(evidence / f'{locale}-{slug}-{width}-{theme}.png'))
+                        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'page-level overflow'
+                    toc = page.locator('.article-toc')
+                    if not toc.evaluate('element => element.open'):
+                        toc.locator('summary').click()
+                    page.locator('.article-toc a[href="#section-3"]').click()
+                    # Smooth scrolling settles late on long articles; wait for the
+                    # current-section state instead of a fixed delay.
+                    page.wait_for_function("() => document.querySelector('.article-toc a[aria-current]')?.getAttribute('href') === '#section-3'", timeout=8000)
+                    heading_top = page.locator('#section-3').evaluate('element => element.getBoundingClientRect().top')
+                    nav_bottom = page.locator('#site-nav').evaluate('element => element.getBoundingClientRect().bottom')
+                    assert nav_bottom - 2 <= heading_top < 900, 'TOC target hidden by navigation'
+                    assert '0%' != page.locator('#reading-position').text_content().split('·')[-1].strip()
+                    observations.append({'locale': locale, 'width': width, 'slug': slug, 'headingTop': heading_top,
+                                         'navBottom': nav_bottom, 'progress': page.locator('#reading-position').text_content()})
+                    page.screenshot(path=str(evidence / f'{locale}-{slug}-{width}-reading.png'))
+                    page.goto(base + index_path + slug + '/#section-2')
+                    page.reload()
+                    page.wait_for_function("() => { const top=document.querySelector('#section-2').getBoundingClientRect().top; return top >= document.querySelector('#site-nav').getBoundingClientRect().bottom - 2 && top < innerHeight; }")
+                    assert page.locator('#section-2').is_visible()
+                    source = f'{slug}.md' if locale == 'zh' else f'{slug}.en.md'
+                    with page.expect_download() as download:
+                        page.locator('.article-actions a[download]').click()
+                    downloaded = Path(download.value.path()).read_bytes()
+                    assert downloaded == (ROOT / 'content/articles' / source).read_bytes(), 'source download bytes differ'
+                    observations.append({'probe': 'deep-link reload and exact source download', 'locale': locale, 'width': width, 'slug': slug, 'bytes': len(downloaded)})
+                    for region in page.locator('.article-table, pre.code').all():
+                        region.scroll_into_view_if_needed()
+                        dimensions = region.evaluate('e => ({width:e.clientWidth,scroll:e.scrollWidth,overflow:getComputedStyle(e).overflowX})')
+                        assert dimensions['overflow'] in ('auto', 'scroll'), dimensions
+                        if width == 390 and dimensions['scroll'] > dimensions['width']:
+                            region.evaluate('e => e.scrollLeft = e.scrollWidth')
+                            assert region.evaluate('e => e.scrollLeft > 0'), 'wide content not scrollable'
+                    if slug == SLUGS[1]:
+                        code = page.locator('pre.code code').first.inner_text()
+                        expected_diagram = ('① 反向访谈', '④ 独立子智能体') if locale == 'zh' else ('① Reverse interview', '④ Independent subagent')
+                        assert all(fragment in code for fragment in expected_diagram), 'workflow diagram missing'
+                        page.locator('pre.code').first.scroll_into_view_if_needed()
+                        page.screenshot(path=str(evidence / f'{locale}-diagram-{width}.png'))
+                    page.locator('.article-related h3 a').click()
+                    other = RELATED[slug]
+                    page.wait_for_url(base + index_path + other + '/')
+                    # The paired translation switch leads to the counterpart detail.
+                    counterpart_path = '/articles/' + other + '/' if locale == 'zh' else '/zh/articles/' + other + '/'
+                    page.locator('#language-switch').click()
+                    page.wait_for_url(base + counterpart_path)
+                    page.locator('#language-switch').click()
+                    page.wait_for_url(base + index_path + other + '/')
+            finally:
+                context.close()
     context = browser.new_context(java_script_enabled=False, viewport={'width': 390, 'height': 900})
     try:
         page = context.new_page()

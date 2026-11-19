@@ -98,6 +98,8 @@ def measure(baseline=None):
                     for prefix in ('', 'zh/') for route in site.NAV_ROUTES]
     page_entries.extend(path.relative_to(ROOT).as_posix()
                         for path in sorted((ROOT / 'zh/articles').glob('*/index.html')))
+    page_entries.extend(path.relative_to(ROOT).as_posix()
+                        for path in sorted((ROOT / 'articles').glob('*/index.html')) if path.parent.name != 'articles')
     for entry in page_entries:
         now = inventory(current, entry)
         entries[entry] = {'current': now}

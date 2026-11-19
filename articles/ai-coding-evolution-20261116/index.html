@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The AI Coding Landscape: From Vibe Coding to Agentic Engineering — co-arising</title>
+  <meta name="description" content="From model drift and the Vibe Coding controversy to Agentic and Harness Engineering: an industry evolution survey that keeps every citation and reference link." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The AI Coding Landscape: From Vibe Coding to Agentic Engineering" />
+  <meta property="og:description" content="From model drift and the Vibe Coding controversy to Agentic and Harness Engineering: an industry evolution survey that keeps every citation and reference link." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/ai-coding-evolution-20261116/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/ai-coding-evolution-20261116/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/ai-coding-evolution-20261116/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/ai-coding-evolution-20261116/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/ai-coding-evolution-20261116/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/ai-coding-evolution-20261116/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/ai-coding-evolution-20261116/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Industry survey</span></nav>
+      <p class="article-meta"><span>Industry survey</span> · <time datetime="2026-11-16">2026-11-16</time> · English translation</p>
+      <h1>The AI Coding Landscape: From Vibe Coding to Agentic Engineering</h1>
+      <p class="article-deck">From model drift and the Vibe Coding controversy to Agentic and Harness Engineering: an industry evolution survey that keeps every citation and reference link.</p>
+      <div class="article-actions"><a href="/content/articles/ai-coding-evolution-20261116.en.md" download="ai-coding-evolution-20261116.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/ai-coding-evolution-20261116/">中文原文</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> Overview: a paradigm shift in progress</a></li><li><a href="#section-2"><span class="toc-number">02</span> Prehistory: two decades of model–code separation (2001–2024)</a></li><li><a href="#section-3"><span class="toc-number">03</span> The Vibe Coding explosion and its crisis (2025)</a></li><li><a href="#section-4"><span class="toc-number">04</span> The formal pivot: Agentic Engineering (Feb 2026–)</a></li><li><a href="#section-5"><span class="toc-number">05</span> The solution-design shake-up: four evolutionary stages</a></li><li><a href="#section-6"><span class="toc-number">06</span> Four industry schools: results and remaining blind spots</a></li><li><a href="#section-7"><span class="toc-number">07</span> Timeline of key events</a></li><li><a href="#section-8"><span class="toc-number">08</span> Reference link index</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+      </aside>
+      <article id="article-body" class="article-body"><hr>
+<h2 id="section-1">Overview: a paradigm shift in progress</h2>
+<p>Between 2025 and 2026, software development went through a dramatic convergence of paradigms: <strong>the twenty-year-old problem of "business design models" drifting apart from "underlying executable code" was hit with a hundred-fold acceleration by the explosion of AI coding, which in turn triggered an industry-wide governance pivot.</strong></p>
+<p>The through-line in one sentence:</p>
+<ul>
+<li>In <strong>February 2025</strong>, Karpathy coined Vibe Coding ("forget that the code even exists");</li>
+<li>Within <strong>half a year</strong>, empirical data showed code churn doubling and duplicated code quadrupling — in complex systems, AI became an "architecture demolition machine";</li>
+<li>In <strong>February 2026</strong>, Karpathy himself declared Vibe Coding passé and pivoted to <strong>Agentic Engineering</strong> — humans no longer write 99% of the code directly; instead they act as architecture supervisors, orchestrating agents through specifications, eval loops and deterministic guardrails;</li>
+<li>In parallel, the industry pushed hard along four fronts on "anti-hallucination and architecture governance", and best practice converged on <strong>Harness Engineering</strong>.</li>
+</ul>
+<hr>
+<h2 id="section-2">Prehistory: two decades of model–code separation (2001–2024)</h2>
+<p>Even in the era of purely hand-written code, keeping "high-level business semantic models" aligned with "underlying code" had been an ongoing struggle for over twenty years:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Period / Attempt / Outcome"><table>
+<thead>
+<tr>
+<th scope="col">Period</th>
+<th scope="col">Attempt</th>
+<th scope="col">Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2001–2006</td>
+<td>OMG pushes Model-Driven Architecture (MDA) with heavyweight UML/XMI one-way code generation</td>
+<td>One-way generation was only a "one-time act" at project start. Once programmers edited source directly, model and code disconnected permanently — <strong>Model Drift</strong> (per <a href="https://arxiv.org/html/2608.05612v1">the classic Czarnecki &amp; Helsen research cited by the JDomInO paper</a>)</td>
+</tr>
+<tr>
+<td>2003–2019</td>
+<td>Eric Evans introduces Domain-Driven Design (DDD), drawing consistency boundaries with bounded contexts and aggregate roots; the Swiss OST team open-sources <a href="https://contextmapper.org/">Context Mapper DSL (CML)</a> and the <a href="https://github.com/ContextMapper/context-mapper-archunit-extension">Context Mapper ArchUnit extension</a></td>
+<td>Model–implementation synchronization depended heavily on team discipline; deadline pressure inevitably caused model drift</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Key conclusion: model drift is not a failure of team discipline but a failure of the toolchain</strong> — a judgment later formalized by the JDomInO paper, and one of the theoretical starting points of the entire AI-coding governance era.</p>
+<hr>
+<h2 id="section-3">The Vibe Coding explosion and its crisis (2025)</h2>
+<h3 id="section-3-1">3.1 The concept explosion</h3>
+<p>In February 2025, a single tweet from Andrej Karpathy made Vibe Coding go viral:</p>
+<blockquote>
+<p>"There's a new kind of coding I call 'vibe coding', where you fully give in to the vibes, embrace exponentials, and forget that the code even exists. It's possible because the LLMs (e.g., Cursor Composer w Sonnet) are getting too good."</p>
+</blockquote>
+<p>Adoption was startlingly fast: <a href="https://www.foundra.ai/key-reads/vibe-coding-over-karpathy-agentic-engineering-first-time-founders-may-2026">in the YC Winter 2025 batch, 25% of startups had 95% of their code generated by AI</a>.</p>
+<h3 id="section-3-2">3.2 The empirical data: a "maintainability gap" behind doubled output</h3>
+<p>When the development mode shifted from "humans hand-writing code" to "agents mass-producing thousand-line PRs", three sets of hard data exposed the brutal reality:</p>
+<p><strong>① Code churn doubled, duplicated logic proliferated</strong></p>
+<p><a href="https://www.gitclear.com/the_ai_code_quality_maintainability_gap">GitClear's 2025–2026 research series</a> (analyzing between 153 and 211 million lines of changed code; see also <a href="https://www.kunalganglani.com/blog/ai-generated-code-maintainability-crisis">Kunal Ganglani's breakdown</a> and the <a href="https://larridin.com/developer-productivity-hub/code-turnover-rate-ai-quality-metric">Larridin report</a>):</p>
+<ul>
+<li>The churn rate — code modified or deleted within two weeks of being committed — soared from <strong>3.3%</strong> in 2020–2021 to <strong>5.7%–7.1%</strong>;</li>
+<li>Lacking global context awareness, AI tends to "rewrite new logic rather than reuse existing abstractions", driving a <a href="https://www.gitclear.com/ai_assistant_code_quality_2025_research">4x surge in duplicated code blocks</a> while refactor-flavored "Moved Code" fell off a cliff.</li>
+</ul>
+<p><strong>② Defect rates up 1.7x and review paralysis</strong></p>
+<ul>
+<li>The <a href="https://www.foundra.ai/key-reads/vibe-coding-over-karpathy-agentic-engineering-first-time-founders-may-2026">Foundra 2026 founders report</a>: AI-co-authored code carries <strong>1.7 times</strong> as many major issues as purely human-written code;</li>
+<li><a href="https://larridin.com/developer-productivity-hub/code-turnover-rate-ai-quality-metric">Larridin</a> and the <a href="https://threedots.tech/post/ddd-and-ai-coding/">Three Dots Labs engineering chronicle</a> both point out: "writing code is no longer the bottleneck — reading code is". AI-generated PRs look right on the surface (clean syntax, complete comments), so reviewers rubber-stamp them — until two weeks later, when cross-module cascading failures ignite.</li>
+</ul>
+<h3 id="section-3-3">3.3 Academia weighs in: the flow–debt trade-off and architectural semantic blindness</h3>
+<ul>
+<li><strong>The Flow–Debt Trade-off</strong>: in <a href="https://arxiv.org/abs/2512.11922">Vibe Coding in Practice: Flow, Technical Debt, and Guidelines for Sustainable Use (arXiv:2512.11922)</a>, Pekka Abrahamsson and colleagues, based on multiple in-house MVP experiments, show that Vibe Coding's silky experience comes at the cost of "Explicit Design Rationale", directly producing architectural inconsistency, security holes and runaway late-stage maintenance costs.</li>
+<li><strong>The broken-windows effect</strong>: the <a href="https://www.thoughtworks.com/radar/techniques/architecture-drift-reduction-with-llms">Thoughtworks Technology Radar</a> and the <a href="https://curohq.com/blogs/detecting-architectural-drift-with-ai-coding-agents">Curo architectural drift report (Sep 2026)</a> point out that human engineers evolving code remember team tacit knowledge, but every new AI-agent session starts amnesiac. Worse, agents imitate the degraded patterns already present in the codebase — a positive feedback death spiral where "poor code begets poorer code".</li>
+<li><strong>The research gap</strong>: <a href="https://arxiv.org/html/2505.16697v1">Software Architecture Meets LLMs: A Systematic Literature Review (arXiv:2505.16697)</a> confirms after a full survey that both "generating source from architecture designs" and "checking architectural conformance" remain severely underexplored.</li>
+<li><a href="https://www.augmentcode.com/blog/generating-tech-debt-at-the-speed-of-light">Augment Code calls this phenomenon</a> "<strong>generating technical debt at the speed of light</strong>"; <a href="https://www.liferay.com/blog/vibe-coding-technical-debt-why-it-happens-and-how-to-prevent-it">Liferay documented the black-box trap of rules copy-pasted across pages that nobody dared to touch</a>.</li>
+</ul>
+<h3 id="section-3-4">3.4 Voices from the community front line (Hacker News / Reddit)</h3>
+<p><strong>The local-attention trap</strong> — a <a href="https://news.ycombinator.com/item?id=44940089">top-voted comment on HN item?id=44940089</a> dissects why "watching AI write code" accelerates architectural decay:</p>
+<blockquote>
+<p>"Reading vibe code 'localizes' our attention to the correctness of the code produced and clogging the processes that otherwise think about connection of this code to other parts of the system."</p>
+</blockquote>
+<p><strong>AI cannot spontaneously deduplicate or refactor globally</strong> — <a href="https://news.ycombinator.com/item?id=44785562">HN discussion item?id=44785562</a>, where a developer likens Vibe Coding to "not declaring you'll build a 20-story tower first, but letting the LLM stack it room by room", and shares the typical failure of asking Claude Code to eliminate duplicated logic:</p>
+<blockquote>
+<p>"Once it became plain that there was duplicate functionality and that it was a problem, yeah, the first thing she did was tell Claude at a high level to factor out duplicate functionality. This didn't really work - it would often implement a factored-out piece of logic but just leave the pre-existing code alone."</p>
+</blockquote>
+<p><strong>AI will even argue on behalf of its own bad code</strong> — microservices authority Chris Richardson recorded in his <a href="https://microservices.io/post/architecture/2026/03/09/genai-development-platform-part-1-development-guardrails.html">GenAI development platform guardrails write-up (microservices.io, Mar 2026)</a> that when a Prompt Skill merely asks Claude Code to respect code-health checks, the agent frequently <strong>refuses to fix architectural smells</strong>, making excuses that the issues are "pre-existing" or "acceptable".</p>
+<p><strong>Collective community anxiety</strong>:</p>
+<ul>
+<li><a href="https://www.reddit.com/r/webdev/comments/1wi3mi5/is_vibe_coding_creating_a_hidden_technical_debt/">r/webdev: the hidden technical debt and 0-day crisis triggered by Vibe Coding</a></li>
+<li><a href="https://www.reddit.com/r/SaaS/comments/1tvqomh/the_hidden_trap_of_vibe_coding_you_dont_own_your/">r/SaaS: "You don't own your technical debt — your technical debt owns you"</a></li>
+<li><a href="https://www.reddit.com/r/ExperiencedDevs/comments/1t1scp3/how_are_experienced_teams_preventing/">r/ExperiencedDevs: how senior teams guard against AI architectural drift</a></li>
+</ul>
+<h3 id="section-3-5">3.5 Willison pours cold water: Vibe Engineering draws the production line (Oct 2025)</h3>
+<p>Django co-creator Simon Willison first warned in <a href="https://simonwillison.net/2025/Mar/6/vibe-coding/">Will the future of software development run on vibes? (Mar 2025)</a>:</p>
+<blockquote>
+<p>"Vibe coding your way to a production codebase is clearly a terrible idea."</p>
+</blockquote>
+<p>He then formalized <strong>Vibe Engineering</strong> in <a href="https://simonwillison.net/2025/Oct/7/vibe-engineering/">Vibe engineering (Oct 2025)</a>, stressing that senior engineers must discipline agents through up-front planning, specifications and automated test loops:</p>
+<blockquote>
+<p>"You're not just responsible for writing the code—you're researching approaches, deciding on high-level architecture, writing specifications, defining success criteria, designing agentic loops, planning QA, managing a growing army of weird digital interns who will absolutely cheat if you give them a chance, and spending so much time on code review."</p>
+</blockquote>
+<hr>
+<h2 id="section-4">The formal pivot: Agentic Engineering (Feb 2026–)</h2>
+<p>In February 2026, exactly one year after coining Vibe Coding, Karpathy declared it passé (see <a href="https://thenewstack.io/vibe-coding-is-passe/">The New Stack: Vibe coding is passé</a>) and, in the <a href="https://www.youtube.com/watch?v=96jN2OCOfLs">Sequoia AI Ascent 2026 fireside chat</a> (see also <a href="https://www.aibuilderclub.com/blog/karpathy-agentic-engineering">AI Builder Club's framework breakdown</a>), formally iterated it into <strong>Agentic Engineering</strong>:</p>
+<blockquote>
+<p>"At the time, LLM capability was low enough that you'd mostly use vibe coding for fun throwaway projects, demos, and explorations. It was good fun and it almost worked."</p>
+<p>"Today (1 year later), programming via LLM agents is increasingly becoming a default workflow for professionals, except with more oversight and scrutiny. The goal is to claim the leverage from the use of agents but without any compromise on the quality of the software."</p>
+<p>"Personally, my current favorite [is] 'agentic engineering': 'agentic' because the new default is that you are not writing the code directly 99% of the time, you are orchestrating agents who do and acting as oversight — 'engineering' to emphasize that there is an art &amp; science and expertise to it."</p>
+</blockquote>
+<p>The core demand: <strong>claim the leverage of AI coding agents while holding software quality to zero compromise through strong engineering discipline and deterministic architectural guardrails.</strong> The human role becomes "oversight" — orchestrating agents through specification design, eval loops and boundary control.</p>
+<p>Industry signals confirmed the pivot: the April 2026 <a href="https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/04/tr_technology_radar_vol_34_en.pdf">Thoughtworks Technology Radar Vol. 34</a> formally adopted <a href="https://www.thoughtworks.com/radar/techniques/architecture-drift-reduction-with-llms">"Architecture drift reduction with LLMs"</a> and <a href="https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/04/tr_technology_radar_vol_34_en.pdf">"Putting coding agents on a leash"</a>; <a href="https://www.infoq.com/hub/qcon-ai-boston-2026-solutions-track/">QCon AI Boston 2026</a> dedicated an evolution track to "anchoring AI coding agents with deterministic graph structures".</p>
+<hr>
+<h2 id="section-5">The solution-design shake-up: four evolutionary stages</h2>
+<p>Traditional drag-and-drop graphical UML (Visio, Enterprise Architect) is virtually extinct in the agile AI community — large models poorly understand pixel drawings and heavyweight XML, and diagrams drift out of sync with code far too fast. In its place, a rapid evolution:</p>
+<h3 id="section-5-1">Stage 1: single-prompt generation and the Vibe Coding wild west (2023 – early 2025)</h3>
+<p>Zero solution design; the prompt is everything. Developers give one sentence describing the outcome ("write a snake game in React"), leaving technology choices, module decomposition and data structures entirely to the LLM's imagination. The experience is delightful for standalone scripts under 500 lines, but in multi-module business complexity the agent quietly carves out the wrong abstraction boundaries beneath the surface, producing uncontrollable hidden cross-file coupling.</p>
+<h3 id="section-5-2">Stage 2: the prompt-roleplay multi-agent boom and disillusionment (2024 – mid 2025)</h3>
+<p>The community tried to imitate a human software company's pipeline: <a href="https://news.ycombinator.com/item?id=37076125">MetaGPT</a>, ChatDev, CrewAI, AutoGen — prompting "PM agent → architect agent → programmer agent → reviewer agent" into meetings, code and refactors. In real engineering it receded quickly for three reasons: hallucination cascades, token-burning circular debates, and "verbal review cannot replace deterministic compilation and tests".</p>
+<p><strong>Empirical reality checks</strong>:</p>
+<ul>
+<li>
+<p>The <a href="https://www.reddit.com/r/better_claw/comments/1uvht82/every_local_multiagent_setup_ranked_by_how_often/">r/better_claw 200-task local multi-agent benchmark (Jul 2026)</a>: multi-role orchestration frameworks hover at only <strong>54%–58%</strong> completion on complex tasks:</p>
+<blockquote>
+<p>"The 200-task benchmark on Qwen3 32B puts complex-task completion at 54%, and my runs agreed. The failure mode is structural: when a mid-pipeline agent hits a bad tool result, CrewAI's recovery option is basically 'start over,' and on a second run the intermediate results differ, so outcomes aren't reproducible... The catch: without hard iteration caps, the failure mode is two agents politely debating in circles at 20 tok/s on your GPU until you kill the process."</p>
+</blockquote>
+</li>
+<li>
+<p>The <a href="https://www.reddit.com/r/hermesagent/comments/1wvfi1b/multiagent_role_design_findings_how_i_use_the/">r/hermesagent multi-agent role-design retrospective (Oct 2026)</a> (synthesizing MetaGPT, ChatDev, Anthropic's multi-agent research and the NeurIPS 2025 MAST failure taxonomy):</p>
+<blockquote>
+<p>"Distinct inputs, outputs, tools and acceptance criteria help. Persona backstories ('you are a senior architect with 20 years of experience') show mixed or no benefit... The real gap is execution verification. A builder's self-tests and a reviewer's prose approval don't prove anything works. The MAST study lists verification as its own failure category. Debate and consensus panels don't reliably beat simpler baselines at equal cost... Authority belongs in code, not prompts... Baseline to beat: one accountable agent plus deterministic checks."</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="section-5-3">Stage 3: Spec-Driven Development (SDD) and the Plan Mode boom (mid 2025 – early 2026)</h3>
+<p>Led by <a href="https://towardsaws.com/aws-kiro-spec-driven-development-explained-from-requirements-to-working-code-0c31c0e4cfbb">AWS Kiro</a>, <a href="https://kevinwelter.com/en/blog/spec-driven-development">GitHub Spec Kit (specify CLI)</a>, <a href="https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html">Tessl</a> and the open-source <a href="https://github.com/bmad-code-org/bmad-method">BMAD-METHOD</a>, the SDD movement mandated running <strong>Constitution → Specify (requirements, usually in EARS syntax) → Plan (technical architecture with Mermaid C4 diagrams) → Tasks (atomic tasks)</strong> before coding (see the <a href="https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2">DEV 2026 SDD guide</a>).</p>
+<p>It soon hit the waterfall-style backlash of "AI-generated Markdown design docs being harder to review than the code". Thoughtworks Distinguished Engineer Birgitta Böckeler recorded four walls in her <a href="https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html">hands-on field report on Martin Fowler's site</a>:</p>
+<ol>
+<li>
+<p><strong>Markdown review hell (Verschlimmbesserung)</strong>:</p>
+<blockquote>
+<p>"With the amount of steps spec-kit took, and the amount of markdown files it created for me to review, this again felt like overkill for the size of the problem... To be honest, I'd rather review code than all these markdown files."</p>
+<p>"Especially with the more elaborate approaches that create lots of files, I can't help but think of the German compound word 'Verschlimmbesserung': Are we making something worse in the attempt of making it better?"</p>
+</blockquote>
+</li>
+<li>
+<p><strong>A false sense of control</strong> — even with lengthy design documents, agents ignored them and reinvented wheels anyway:</p>
+<blockquote>
+<p>"Even with all of these files and templates and prompts and workflows and checklists, I frequently saw the agent ultimately not follow all the instructions... it just took them as a new specification and generated them all over again, creating duplicates."</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Conflating "planning" with "a plan"</strong> — former GitHub senior engineer Ayman Nadeem's retrospective, <a href="https://www.aymannadeem.com/artificial/intelligence,/developer/tools/2026/09/24/plan-mode-is-dead.html">Plan mode is dead (Sep 2026)</a>:</p>
+<blockquote>
+<p>"The first thing we learned was that we had conflated planning with a plan... our specs were long... the problem was: they were AI-generated. There's something about the pacing and overly structured nature of AI-generated text that makes it very difficult to read. My eyes kept glazing over."</p>
+<p>"Real thinking doesn't happen this way... Our interface forced users to prematurely 'finish thinking' so that they could start building."</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Spec-as-Source repeats MDD's mistakes</strong> — <a href="https://www.thoughtworks.com/en-us/insights/blog/agile-engineering-practices/spec-driven-development-unpacking-2025-new-engineering-practices">Thoughtworks' Shangqi Liu column</a> and Böckeler's assessment of Tessl both warn: MDD's formal DSLs were at least "parseable and deterministic", whereas "natural-language specs + probabilistic LLMs" loses twice; academia (Deepak Babu Piskala, <a href="https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2">arXiv:2602.00180</a>) holds that <strong>Spec-Anchored</strong> (specs and code co-evolving through automated contract tests) is the sweet spot for production systems.</p>
+</li>
+</ol>
+<h3 id="section-5-4">Stage 4: Harness Engineering and controlled autonomy (H2 2026–)</h3>
+<p>Best practice shifted from "writing long static Markdown plan documents" to building <strong>deterministic harnesses</strong> wrapped around the model. See <a href="https://martinfowler.com/articles/harness-engineering.html">Harness engineering for coding agent users (Apr 2026) on Martin Fowler's site</a> and <a href="https://code.claude.com/docs/en/best-practices">Anthropic's official Claude Code best practices (updated Nov 2026)</a>. Five hard-won rules converged:</p>
+<p><strong>① The reverse interview replaces the long-form plan</strong></p>
+<p>Instead of having AI generate thousand-word documents nobody reads, the agent plays interviewer, pressing the human through rounds of follow-up questions until boundary conditions are decided, condensing everything into a minimal <code>SPEC.md</code>, then starting a fresh session to implement. The official Claude Code pattern:</p>
+<blockquote>
+<p>"Ask Claude to interview you instead: 'I want to add rate limiting to the public API but haven't thought it through yet. Interview me until you could write the spec, then write it to SPEC.md.' ... Once SPEC.md exists, start a fresh session to build from it, so the build begins with a clean context and a written definition of done."</p>
+</blockquote>
+<p><strong>② Severely separating "non-deterministic guidance" from "deterministic enforcement"</strong></p>
+<ul>
+<li><code>CLAUDE.md</code> cut to under 200 lines, containing only "the tacit information Claude cannot see from reading the code"; module rules split into <code>.claude/rules/api.md</code> files with path filters;</li>
+<li>
+<p>Zero-tolerance rules sink into <strong>computational hooks</strong>. The official golden rule:</p>
+<blockquote>
+<p>"If you keep adding emphasis to a CLAUDE.md line and Claude still misses it, that's a sign the line belongs in a hook... A Stop hook runs your script whenever Claude tries to end its turn, and sends Claude back to work if the script exits with code 2. This one is enforced by Claude Code (the harness), so the turn doesn't end until the typecheck passes."</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>③ Ashby's Law: compress the agent's degrees of freedom with high-constraint topology templates</strong></p>
+<p>Böckeler brings in cybernetics' Ashby's Law of Requisite Variety:</p>
+<blockquote>
+<p>"Ashby's Law of Requisite Variety is another interesting argument for these pre-defined topologies. The law says that a regulator must have at least as much variety as the system it governs, and it can only regulate what it has a model of. An LLM-based coding agent can produce almost anything, but committing to a topology narrows that space, making a comprehensive harness more achievable. Defining topologies is a variety-reduction move."</p>
+</blockquote>
+<p>This explains why architecture scaffold templates with strongly-typed languages, predefined bounded contexts and read/write separation contracts keep gaining popularity — <strong>defining an architecture topology is itself a variety-reduction move</strong>.</p>
+<p><strong>④ Blind review by context-unpolluted independent subagents, with mandatory skip style</strong></p>
+<p>After the main agent finishes coding and passes the Stop hook gate, spin up a brand-new subagent that never saw the coding conversation, feed it only <code>SPEC.md</code> + <code>git diff</code> for blind review, and always specify <code>skip style</code>:</p>
+<blockquote>
+<p>"In the terminal, /code-review reviews the diff in a fresh subagent that never saw your conversation. It isn't swayed by the reasoning that produced the code... Don't drop the skip style part of that prompt. A reviewer that's asked to find problems will always find something. If you fix every finding, you end up with extra abstraction layers and tests for cases that can't happen."</p>
+</blockquote>
+<p><strong>⑤ Always-on background "architecture garbage collection" (Janitor / GC loops)</strong></p>
+<p>OpenAI internal teams and Stripe (the Minions system) have disclosed (see the <a href="https://martinfowler.com/articles/harness-engineering.html">Martin Fowler case collection</a>) that even with up-front specs and commit gates, high-frequency parallel agents still produce progressive architectural entropy. Top teams run periodic "architecture garbage collection" outside the CI trunk — deterministic static scanners (dead code, cross-layer dependencies, duplicated logic) plus dedicated cleanup agents, issuing small-granularity refactor PRs on a schedule like a timed GC, preventing the broken-windows effect from accumulating.</p>
+<h3 id="section-5-5">Sidebar: what about architecture visualization? — UML replaced by text-based diagrams</h3>
+<p>The agile AI community did not abandon architecture visualization; it moved wholesale to <strong>Diagrams-as-Code</strong>:</p>
+<ul>
+<li><strong>The C4 model + Mermaid/PlantUML became the de facto standard</strong> (Context/Container/Component/Code zoom levels); see <a href="https://arxiv.org/html/2603.15021v1">Describing Agentic AI Systems with C4: Lessons from Industry Projects (arXiv:2603.15021)</a> and <a href="https://uxxu.io/blog/teach-your-llm-to-write-c4-diagrams/">How to Teach Your LLM to Write C4 Diagrams</a> — token-friendly, commits cleanly to Git and fits in prompt context;</li>
+<li>Tools emerged to let agents understand their own architectural position: <a href="https://github.com/jonverrier/McpDoc">AgentDoc / McpDoc</a> (auto-generating Mermaid C4 diagrams from a codebase via MCP), and <a href="https://ceaksan.com/en/ai-agent-living-architecture-documentation">C4X living architecture documentation</a> extending nodes with <code>AI_Agent</code>/<code>Memory</code>/<code>Tool</code>;</li>
+<li><a href="https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html">AWS Kiro</a>'s <code>design.md</code> stage auto-generates Mermaid component diagrams for human architect approval.</li>
+</ul>
+<hr>
+<h2 id="section-6">Four industry schools: results and remaining blind spots</h2>
+<p>Around "preventing AI coding hallucination and architectural decay", global teams in 2025–2026 pushed hard along four fronts.</p>
+<h3 id="section-6-1">School 1: syntax-level code knowledge graphs + MCP (the AST / call-graph school)</h3>
+<p><strong>Representatives</strong>: <a href="https://arxiv.org/html/2603.27277v1">Codebase-Memory (arXiv:2603.27277)</a> (Charité Berlin and Humboldt University, with <a href="https://github.com/DeusData/codebase-memory-mcp">GitHub: DeusData/codebase-memory-mcp</a>), <a href="https://www.reddit.com/r/LangChain/comments/1rksvwr/nomik_opensource_codebase_knowledge_graph_neo4j/">Nomik (Neo4j + MCP)</a>, <a href="https://github.com/eric050828/graph-codebase-mcp">graph-codebase-mcp</a>, <a href="https://github.com/sdsrss/code-graph-mcp">code-graph-mcp</a>, <a href="https://www.augmentcode.com/learn/graphify-63k-stars-knowledge-graphs">Graphify (60k+ stars)</a>, <a href="https://www.augmentcode.com/learn/understand-anything-71k-stars">Understand-Anything (71k stars)</a>, <a href="https://neo4j.com/blog/developer/knowledge-graphs-claude-neo4j-mcp/">Neo4j's official Claude + MCP recipe</a>; in academia CodexGraph (NAACL 2025), RepoGraph (ICLR 2025); commercially <a href="https://www.augmentcode.com/tools/sourcegraph-cody-vs-cursor-vs-augment-code-for-enterprise-development">Augment Code</a>, <a href="https://sourcegraph.com/">Sourcegraph</a>, <a href="https://www.greptile.com/enterprise">Greptile</a>.</p>
+<p><strong>Results</strong>: the <a href="https://arxiv.org/html/2603.27277v1">Codebase-Memory paper</a> demonstrates on a benchmark of real repositories across 31 languages that exposing structured graph queries via MCP instead of <code>grep</code> and file traversal <strong>cuts token consumption 10x</strong> (roughly 10,000 → 1,000 tokens/query), reduces tool calls 2.1x, with query latency under 1ms.</p>
+<p><strong>Blind spot</strong>: it understands syntax (AST) but is entirely blind to business domain semantics (DDD semantics) and asynchronous event causality. The <a href="https://arxiv.org/html/2608.05612v1">JDomInO paper (arXiv:2608.05612)</a> points out that AST/reflection-based static graphs can only see "class A calls class B" — they cannot tell which class is the aggregate root, which is an immutable value object, or where the bounded-context boundary lies; nor can they trace the <code>Command → DomainEvent → Policy/Saga → ReadModel</code> causal chains asynchronously dispatched over the event bus in CQRS / Event Sourcing.</p>
+<h3 id="section-6-2">School 2: DDD / event-storming modeling with roundtrip engineering (the model-driven &amp; roundtrip school)</h3>
+<p><strong>Representatives</strong>:</p>
+<ul>
+<li><a href="https://www.qlerify.com/">Qlerify</a> (a Swedish/Silicon-Valley team incubated by Techstats): in 2026 it shipped <a href="https://www.qlerify.com/spec-driven-development">Spec-Driven Development and the Qlerify MCP</a>, exporting event-storming and domain models into a machine-readable <code>qlerify-domain-model.json</code> pushed to GitHub, from which Claude Code / Cursor generate code via <code>/code-generation</code> and sync changes via <code>/sync</code>;</li>
+<li><a href="https://arxiv.org/html/2608.05612v1">The JDomInO toolchain (arXiv:2608.05612, Aug 2026)</a>: jointly developed by KIT's KASTEL institute and esentri AG with German federal research funding, built on a <code>domain.json</code> metamodel covering 12 tactical DDD and CQRS primitives (<code>AggregateRoot</code>, <code>DomainCommand</code>, <code>DomainEvent</code>, <code>QueryHandler</code>, <code>ReadModel</code>, etc.), with forward deterministic generation and reverse reconstruction;</li>
+<li><a href="https://threedots.tech/post/ddd-and-ai-coding/">Three Dots Labs' "DDD matters more when AI writes the code" (Aug 2026)</a>, which sparked <a href="https://www.reddit.com/r/softwarearchitecture/comments/1vtfcrt/domaindriven_design_matters_more_when_ai_writes/">heated discussion on r/softwarearchitecture</a> and community-built AI agent DDD skill packs.</li>
+</ul>
+<p><strong>Results</strong>: proved that "model drift is a toolchain failure"; feeding structured domain metamodels to LLMs instead of raw source means lower noise, better token efficiency, and upgrading natural language's "probabilistic intent guidance" into "unambiguous deterministic structural contracts".</p>
+<p><strong>Blind spots</strong>:</p>
+<ul>
+<li>Qlerify's validation is <strong>advisory</strong> — the official docs state "Validation is advisory. You can push a model that still has open issues", and <code>/sync</code> lets the coding agent read the code and then edit the model, with no compiler-grade two-way symbol-table locking;</li>
+<li>Section 6 of the JDomInO paper admits the reverse path uses best-effort <strong>name matching</strong>, with no persistent provenance anchors (Provenance Identity Markers) embedded in source code — rename or move a class and it desynchronizes; the independent model-integrity validator is unfinished; only single-bounded-context Java synchronization was validated, with no coverage of distributed Saga orchestration or Actor event sourcing.</li>
+</ul>
+<h3 id="section-6-3">School 3: enterprise ontology constraints and neuro-symbolic architecture (the neuro-symbolic &amp; ontology school)</h3>
+<p><strong>Representatives</strong>: <a href="https://arxiv.org/html/2604.00555v5">Ontology-Constrained Neural Reasoning in Enterprise Agentic Systems (arXiv:2604.00555, Jun 2026)</a> (published by Foundation AgenticOS/FAOS with Novartis): a role/domain/interaction three-layer ontology, 7 bounded contexts partitioned by DDD, 650+ agents deployed across 22 vertical industries; Skan AI's Agentic Ontology of Work (AOW); OG-RAG at EMNLP 2025 (fact recall +55%); Graph-Constrained Reasoning (GCR, KG-Trie constrained decoding) at ICML 2025. See also <a href="https://www.infoq.com/presentations/knowledge-graphs-agentic-systems-patterns/">InfoQ: knowledge graphs and production-grade agentic systems</a>.</p>
+<p><strong>Two key theoretical weapons</strong>:</p>
+<ol>
+<li><strong>The Inverse Parametric Knowledge Effect (Inverse PKE)</strong>: through 1,800 controlled cross-model experiments (Claude Sonnet 4, Qwen 2.5 72B, Gemma 4 26B), FAOS found that <strong>the thinner the LLM's pretraining coverage of a private business rule, a role-specific decision flow, or a non-generic domain, the larger the accuracy gain from ontology grounding (up to 2x or more, p &lt; .001)</strong>; conversely, stuffing universally-known concepts into context produces "contextual interference" and degrades performance.</li>
+<li><strong>Asymmetric Neurosymbolic Coupling</strong>: an L0–L5 six-level coupling maturity model — nearly all enterprise AI systems today sit at L1–L3 (input-side context injection, tool filtering), while <strong>L4–L5 (output-side ontological conformance checking and closed-loop evolution) is blank</strong>.</li>
+</ol>
+<p><strong>Blind spot</strong>: FAOS-class systems target business Q&amp;A and workflow routing; L4–L5 output-side formal verification remains on paper because "free text resists translation into OWL description logic". <strong>Software engineering and code generation are uniquely positioned to industrialize the L4–L5 loop first</strong> — because code has compiler ASTs, type systems, invariant guards and bidirectional provenance anchoring.</p>
+<h3 id="section-6-4">School 4: post-hoc deterministic guardrails and architecture fitness functions (the post-hoc guardrails &amp; runtime school)</h3>
+<p><strong>Representatives</strong>:</p>
+<ul>
+<li>Chris Richardson's <a href="https://microservices.io/post/architecture/2026/03/09/genai-development-platform-part-1-development-guardrails.html">GenAI development platform guardrail system</a> combines <a href="https://codescene.com/use-cases/ai-guardrails-within-your-ide">CodeScene's IDE-local quality gates and automatic PR review</a>, enforcing via a Git pre-commit hook that AI-touched files reach a perfect code-health score of 10;</li>
+<li>The <a href="https://www.thoughtworks.com/radar/techniques/architecture-drift-reduction-with-llms">Thoughtworks Technology Radar</a> recommends Spectral, <a href="https://loiane.com/2026/07/architecture-testing-java-archunit/">ArchUnit</a>, and <a href="https://dev.to/x4nent/the-modular-monolith-2026-complete-guide-spring-modulith-archunit-fitness-functions-and-lessons-878">Spring Modulith 1.4 with jMolecules</a> as "feedback sensors" for AI coding; the community has produced practices like <a href="https://dev.to/sasha_podles/from-prompts-to-invariants-re-architecting-systems-with-archunit-and-llms-1n50">turning prompts into invariant tests with ArchUnit</a> and <a href="https://www.the-main-thread.com/p/coding-agent-guardrails">Quarkus + ArchUnit repository-level guardrails</a>;</li>
+<li><a href="https://encore.dev/solutions/ai-development">Encore.dev</a> provides <code>api.encore.dev/mcp</code> and type-safe declarative infrastructure; the AWS Hydro team explored <a href="https://thenewstack.io/vibe-coding-is-passe/">using the compiler to catch coding agents' distributed errors at compile time</a>.</li>
+</ul>
+<p><strong>Blind spot</strong>: CodeScene governs "code smells and cyclomatic complexity", ArchUnit governs "package dependency direction", Encore governs "cloud resource declarations" — none of them can govern <strong>deep business domain invariants, the legality of aggregate-root state transitions, or cross-microservice distributed Saga transaction contracts</strong>.</p>
+<hr>
+<h2 id="section-7">Timeline of key events</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Time / Event"><table>
+<thead>
+<tr>
+<th scope="col">Time</th>
+<th scope="col">Event</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2001–2006</td>
+<td>OMG pushes MDA; one-way code generation hits model drift</td>
+</tr>
+<tr>
+<td>2003–2019</td>
+<td>DDD establishes the tactical primitives; DSL explorations such as Context Mapper DSL</td>
+</tr>
+<tr>
+<td>2023 – early 2025</td>
+<td>The "single-prompt generation" wild west; zero solution design</td>
+</tr>
+<tr>
+<td>2024 – mid 2025</td>
+<td>MetaGPT / ChatDev / AutoGen multi-agent roleplay boom and disillusionment</td>
+</tr>
+<tr>
+<td>Feb 2025</td>
+<td>Karpathy coins Vibe Coding; 25% of YC W25 companies at 95% AI code</td>
+</tr>
+<tr>
+<td>Mar 2025</td>
+<td>Willison warns that production-grade Vibe Coding is a terrible idea</td>
+</tr>
+<tr>
+<td>Mid 2025 – early 2026</td>
+<td>The SDD movement: AWS Kiro / GitHub Spec Kit / BMAD; then the Markdown-waterfall backlash</td>
+</tr>
+<tr>
+<td>Oct 2025</td>
+<td>Willison proposes Vibe Engineering</td>
+</tr>
+<tr>
+<td>Feb 2026</td>
+<td>Karpathy declares Vibe Coding passé; proposes Agentic Engineering</td>
+</tr>
+<tr>
+<td>Mar 2026</td>
+<td>Chris Richardson publishes GenAI guardrails in practice; the C4 for Agentic Systems paper</td>
+</tr>
+<tr>
+<td>Apr 2026</td>
+<td>Thoughtworks Technology Radar Vol. 34; Böckeler publishes Harness Engineering</td>
+</tr>
+<tr>
+<td>May 2026</td>
+<td>Karpathy elaborates Agentic Engineering at Sequoia AI Ascent 2026</td>
+</tr>
+<tr>
+<td>Jun 2026</td>
+<td>FAOS neuro-symbolic ontology paper (Inverse PKE, L0–L5 maturity)</td>
+</tr>
+<tr>
+<td>Aug 2026</td>
+<td>KIT's JDomInO tactical-DDD bidirectional sync paper; Three Dots Labs' "DDD matters more when AI writes the code"</td>
+</tr>
+<tr>
+<td>Sep 2026</td>
+<td>Ayman Nadeem's "Plan mode is dead"; Curo architectural drift report; QCon AI Boston evolution track</td>
+</tr>
+<tr>
+<td>Oct 2026</td>
+<td>Liferay's technical-debt black-box case retrospective</td>
+</tr>
+<tr>
+<td>Nov 2026</td>
+<td>Claude Code official best-practices update (reverse interview, hooks, blind-review subagents)</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="section-8">Reference link index</h2>
+<p><strong>The paradigm pivot</strong></p>
+<ul>
+<li><a href="https://thenewstack.io/vibe-coding-is-passe/">The New Stack: Vibe coding is passé</a></li>
+<li><a href="https://www.youtube.com/watch?v=96jN2OCOfLs">YouTube: Karpathy @ Sequoia AI Ascent 2026</a></li>
+<li><a href="https://www.aibuilderclub.com/blog/karpathy-agentic-engineering">AI Builder Club: Karpathy Agentic Engineering framework breakdown</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Vibe_coding">Wikipedia: Vibe coding</a></li>
+<li><a href="https://simonwillison.net/2025/Mar/6/vibe-coding/">Simon Willison: Will the future of software development run on vibes? (Mar 2025)</a></li>
+<li><a href="https://simonwillison.net/2025/Oct/7/vibe-engineering/">Simon Willison: Vibe engineering (Oct 2025)</a></li>
+<li><a href="https://www.foundra.ai/key-reads/vibe-coding-over-karpathy-agentic-engineering-first-time-founders-may-2026">Foundra: YC W25 data and the Agentic Engineering report</a></li>
+</ul>
+<p><strong>Empirical data and community</strong></p>
+<ul>
+<li><a href="https://www.gitclear.com/the_ai_code_quality_maintainability_gap">GitClear 2026 maintainability gap report</a> | <a href="https://www.gitclear.com/ai_assistant_code_quality_2025_research">GitClear 2025 research</a></li>
+<li><a href="https://www.kunalganglani.com/blog/ai-generated-code-maintainability-crisis">Kunal Ganglani: 153 million lines of changed code analyzed</a> | <a href="https://larridin.com/developer-productivity-hub/code-turnover-rate-ai-quality-metric">Larridin: Code Turnover Rate</a></li>
+<li><a href="https://www.augmentcode.com/blog/generating-tech-debt-at-the-speed-of-light">Augment Code: Generating tech debt at the speed of light</a></li>
+<li><a href="https://www.liferay.com/blog/vibe-coding-technical-debt-why-it-happens-and-how-to-prevent-it">Liferay: Vibe Coding technical debt</a></li>
+<li><a href="https://curohq.com/blogs/detecting-architectural-drift-with-ai-coding-agents">Curo: detecting architectural drift caused by AI coding agents</a></li>
+<li><a href="https://news.ycombinator.com/item?id=44940089">HN 44940089</a> | <a href="https://news.ycombinator.com/item?id=44785562">HN 44785562</a></li>
+<li><a href="https://microservices.io/post/architecture/2026/03/09/genai-development-platform-part-1-development-guardrails.html">Chris Richardson: GenAI development guardrails (microservices.io)</a></li>
+<li>Reddit: <a href="https://www.reddit.com/r/webdev/comments/1wi3mi5/is_vibe_coding_creating_a_hidden_technical_debt/">r/webdev</a> | <a href="https://www.reddit.com/r/SaaS/comments/1tvqomh/the_hidden_trap_of_vibe_coding_you_dont_own_your/">r/SaaS</a> | <a href="https://www.reddit.com/r/ExperiencedDevs/comments/1t1scp3/how_are_experienced_teams_preventing/">r/ExperiencedDevs</a></li>
+</ul>
+<p><strong>Core papers</strong></p>
+<ul>
+<li><a href="https://arxiv.org/abs/2512.11922">arXiv:2512.11922 — Vibe Coding in Practice (flow–debt)</a></li>
+<li><a href="https://arxiv.org/html/2505.16697v1">arXiv:2505.16697 — Software Architecture Meets LLMs (SLR)</a></li>
+<li><a href="https://arxiv.org/html/2603.27277v1">arXiv:2603.27277 — Codebase-Memory (AST graph + MCP)</a></li>
+<li><a href="https://arxiv.org/html/2608.05612v1">arXiv:2608.05612 — JDomInO (tactical DDD bidirectional sync)</a></li>
+<li><a href="https://arxiv.org/html/2604.00555v5">arXiv:2604.00555 — FAOS (ontology-constrained neural reasoning, Inverse PKE)</a></li>
+<li><a href="https://arxiv.org/html/2603.15021v1">arXiv:2603.15021 — Describing Agentic AI Systems with C4</a></li>
+</ul>
+<p><strong>Representative projects by school</strong></p>
+<ul>
+<li>AST graph school: <a href="https://github.com/DeusData/codebase-memory-mcp">DeusData/codebase-memory-mcp</a> | <a href="https://www.reddit.com/r/LangChain/comments/1rksvwr/nomik_opensource_codebase_knowledge_graph_neo4j/">Nomik</a> | <a href="https://github.com/eric050828/graph-codebase-mcp">graph-codebase-mcp</a> | <a href="https://github.com/sdsrss/code-graph-mcp">code-graph-mcp</a> | <a href="https://www.augmentcode.com/learn/graphify-63k-stars-knowledge-graphs">Graphify</a> | <a href="https://www.augmentcode.com/learn/understand-anything-71k-stars">Understand-Anything</a> | <a href="https://www.greptile.com/enterprise">Greptile</a> | <a href="https://sourcegraph.com/">Sourcegraph</a> | <a href="https://neo4j.com/blog/developer/knowledge-graphs-claude-neo4j-mcp/">Neo4j + Claude MCP</a></li>
+<li>DDD roundtrip school: <a href="https://www.qlerify.com/spec-driven-development">Qlerify SDD</a> | <a href="https://threedots.tech/post/ddd-and-ai-coding/">Three Dots Labs</a> | <a href="https://www.reddit.com/r/softwarearchitecture/comments/1vtfcrt/domaindriven_design_matters_more_when_ai_writes/">r/softwarearchitecture discussion</a> | <a href="https://contextmapper.org/">Context Mapper DSL</a> | <a href="https://github.com/ContextMapper/context-mapper-archunit-extension">Context Mapper ArchUnit extension</a></li>
+<li>Neuro-symbolic school: <a href="https://arxiv.org/html/2604.00555v5">FAOS paper</a> | <a href="https://www.infoq.com/presentations/knowledge-graphs-agentic-systems-patterns/">InfoQ talk</a></li>
+<li>Post-hoc guardrail school: <a href="https://codescene.com/use-cases/ai-guardrails-within-your-ide">CodeScene</a> | <a href="https://loiane.com/2026/07/architecture-testing-java-archunit/">ArchUnit guide</a> | <a href="https://dev.to/x4nent/the-modular-monolith-2026-complete-guide-spring-modulith-archunit-fitness-functions-and-lessons-878">Spring Modulith 1.4</a> | <a href="https://encore.dev/solutions/ai-development">Encore.dev</a> | <a href="https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2026/04/tr_technology_radar_vol_34_en.pdf">Thoughtworks Radar Vol. 34 PDF</a></li>
+</ul>
+<p><strong>SDD and Harness Engineering</strong></p>
+<ul>
+<li><a href="https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html">Birgitta Böckeler: three SDD tools field-tested (Martin Fowler)</a></li>
+<li><a href="https://martinfowler.com/articles/harness-engineering.html">Birgitta Böckeler: Harness engineering for coding agent users (Martin Fowler)</a></li>
+<li><a href="https://www.aymannadeem.com/artificial/intelligence,/developer/tools/2026/09/24/plan-mode-is-dead.html">Ayman Nadeem: Plan mode is dead</a></li>
+<li><a href="https://www.thoughtworks.com/en-us/insights/blog/agile-engineering-practices/spec-driven-development-unpacking-2025-new-engineering-practices">Thoughtworks' Shangqi Liu: Spec-Driven Development unpacked</a></li>
+<li><a href="https://code.claude.com/docs/en/best-practices">Claude Code official best practices (Nov 2026)</a></li>
+<li><a href="https://towardsaws.com/aws-kiro-spec-driven-development-explained-from-requirements-to-working-code-0c31c0e4cfbb">AWS Kiro</a> | <a href="https://kevinwelter.com/en/blog/spec-driven-development">GitHub Spec Kit</a> | <a href="https://github.com/bmad-code-org/bmad-method">BMAD-METHOD</a> | <a href="https://dev.to/krlz/spec-driven-development-in-2026-what-it-is-the-tooling-and-how-teams-actually-use-it-2fk2">DEV 2026 SDD guide</a></li>
+<li><a href="https://www.reddit.com/r/better_claw/comments/1uvht82/every_local_multiagent_setup_ranked_by_how_often/">r/better_claw: 200-task multi-agent benchmark</a> | <a href="https://www.reddit.com/r/hermesagent/comments/1wvfi1b/multiagent_role_design_findings_how_i_use_the/">r/hermesagent: multi-agent role design retrospective</a> | <a href="https://news.ycombinator.com/item?id=37076125">HN: MetaGPT discussion</a></li>
+<li><a href="https://uxxu.io/blog/teach-your-llm-to-write-c4-diagrams/">uxxu.io: Teach Your LLM to Write C4 Diagrams</a> | <a href="https://github.com/jonverrier/McpDoc">McpDoc</a> | <a href="https://ceaksan.com/en/ai-agent-living-architecture-documentation">C4X living architecture documentation</a> | <a href="https://www.infoq.com/hub/qcon-ai-boston-2026-solutions-track/">QCon AI Boston 2026</a></li>
+</ul></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Strategy</span> · <time datetime="2026-11-16">2026-11-16</time></p>
+      <h3><a href="/articles/co-arising-implications-20261116/">Implications for co-arising: Strategic Validation and an Engineering Route for the AI Coding Paradigm Shift</a></h3>
+      <p class="article-deck">Placing the industry shift back into the co-arising context: deterministic compilation, business slicing, code anchoring and the proposed engineering route; not a list of delivered capabilities.</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

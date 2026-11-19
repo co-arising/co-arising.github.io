@@ -33,7 +33,21 @@ HASHES = {
     "co-arising-implications-20261116.md": "c0a4ee7ce15480139662ef2e341a331d5868b02f20b38adad450d1067187e823",
     "lauren-tan-trust-pyramid-20261118.md": "0b68c0a2034492c61a2f8be0423f7675134d60dbd82ad4490c716aa76edc3495",
     "ai-engineer-code-2026-50-talks-20261119.md": "ee3039e90869d20c57c3de2297ddaafac9526e7968bae09f3218fd170ed6f70e",
+    "ai-coding-evolution-20261116.en.md": "43815570068d5ab19e85ecc77e19c7ad3b551dec98c49c237ad4064fd3acab2f",
+    "co-arising-implications-20261116.en.md": "7034a819d39fbd94c9acafa9ff700fc8b69bd60503b519815aba181852890967",
+    "lauren-tan-trust-pyramid-20261118.en.md": "ec5bbcf7aa91ba2ee7ff5a5bedb59920e77f668b2511f674615fb7c2ca74be60",
+    "ai-engineer-code-2026-50-talks-20261119.en.md": "53902d6ed8e00602a98a2035e833db580b82d10963c6d8e6429b600dd8146e3d",
 }
+
+
+def locale_variants(item):
+    """Yield (locale, metadata, source text) for the Chinese original and, when
+    the manifest item carries the EN trio, its English translation."""
+    variants = [("zh", item, (build.CONTENT / item["source"]).read_text(encoding="utf-8"))]
+    if "source_en" in item:
+        meta = build.localized(item, "en")
+        variants.append(("en", meta, (build.CONTENT / meta["source"]).read_text(encoding="utf-8")))
+    return variants
 
 
 class PageParser(HTMLParser):
@@ -131,54 +145,56 @@ class ArticleTests(unittest.TestCase):
         self.assertEqual([line for line in requirements if line and not line.startswith("#")], ["Markdown==3.4.1", "html5lib==1.1"])
 
     def test_exact_archived_source_bytes(self):
-        self.assertEqual(set(HASHES), {item["source"] for item in self.items})
+        expected_sources = {item["source"] for item in self.items} | {item.get("source_en") for item in self.items if "source_en" in item}
+        self.assertEqual(set(HASHES), expected_sources)
         for item in self.items:
-            with self.subTest(slug=item["slug"]):
-                archived = (build.CONTENT / item["source"]).read_bytes()
-                self.assertEqual(hashlib.sha256(archived).hexdigest(), HASHES[item["source"]])
-                self.assertEqual(archived.decode("utf-8").encode("utf-8"), archived)
-                # Workspace originals are optional after cloning the published site.
-                original = ROOT.parent / item["source"]
-                if original.is_file():
-                    self.assertEqual(archived, original.read_bytes())
+            for locale, meta, _ in locale_variants(item):
+                with self.subTest(slug=item["slug"], locale=locale):
+                    archived = (build.CONTENT / meta["source"]).read_bytes()
+                    self.assertEqual(hashlib.sha256(archived).hexdigest(), HASHES[meta["source"]])
+                    self.assertEqual(archived.decode("utf-8").encode("utf-8"), archived)
+                    # Workspace originals are optional after cloning the published site.
+                    original = ROOT.parent / meta["source"]
+                    if original.is_file():
+                        self.assertEqual(archived, original.read_bytes())
 
     def test_full_original_semantics_and_structure(self):
         for item in self.items:
-            with self.subTest(slug=item["slug"]):
-                source = (build.CONTENT / item["source"]).read_text(encoding="utf-8")
-                original = independent_source_ast(source)
-                self.assertEqual(text(original[0]), item["title"])
-                original.remove(original[0])
-                original.text = None
-                rendered, _ = build.render_body(source, item)
-                rendered.text = None
-                self.assertEqual(semantic_tree(rendered), semantic_tree(original, strategy=item["slug"] == build.STRATEGY_SLUG))
-                page = self.dom[build.detail_route(item["slug"]).lstrip("/") + "index.html"]
-                self.assertEqual(text(page.find(".//h1")), item["title"])
-                self.assertEqual(len(list(page.iter("h1"))), 1)
-                self.assertEqual(len(list(rendered.iter("h1"))), 0)
+            for locale, meta, source in locale_variants(item):
+                with self.subTest(slug=item["slug"], locale=locale):
+                    original = independent_source_ast(source)
+                    self.assertEqual(text(original[0]), meta["title"])
+                    original.remove(original[0])
+                    original.text = None
+                    rendered, _ = build.render_body(source, meta)
+                    rendered.text = None
+                    self.assertEqual(semantic_tree(rendered), semantic_tree(original, strategy=item["slug"] == build.STRATEGY_SLUG))
+                    page = self.dom[build.detail_route(item["slug"], locale).lstrip("/") + "index.html"]
+                    self.assertEqual(text(page.find(".//h1")), meta["title"])
+                    self.assertEqual(len(list(page.iter("h1"))), 1)
+                    self.assertEqual(len(list(rendered.iter("h1"))), 0)
 
     def test_original_ordered_external_links_and_counts(self):
         for item in self.items:
-            source = (build.CONTENT / item["source"]).read_text(encoding="utf-8")
-            # External links may be Markdown destinations or guarded raw-HTML
-            # href attributes; both must reach the body in exact source order.
-            matches = sorted(
-                chain(re.finditer(r"\]\((https?://[^)\s]+)\)", source),
-                      re.finditer(r'href="(https?://[^"\s]+)"', source)),
-                key=lambda match: match.start(),
-            )
-            expected = [html.unescape(match.group(1)) for match in matches]
-            body, _ = build.render_body(source, item)
-            actual = [node.get("href") for node in body.iter("a") if node.get("href").startswith(("http://", "https://"))]
-            self.assertGreater(len(expected), 10)
-            self.assertEqual(Counter(actual), Counter(expected))
-            self.assertEqual(actual, expected)
+            for locale, meta, source in locale_variants(item):
+                # External links may be Markdown destinations or guarded raw-HTML
+                # href attributes; both must reach the body in exact source order.
+                matches = sorted(
+                    chain(re.finditer(r"\]\((https?://[^)\s]+)\)", source),
+                          re.finditer(r'href="(https?://[^"\s]+)"', source)),
+                    key=lambda match: match.start(),
+                )
+                expected = [html.unescape(match.group(1)) for match in matches]
+                body, _ = build.render_body(source, meta)
+                actual = [node.get("href") for node in body.iter("a") if node.get("href").startswith(("http://", "https://"))]
+                self.assertGreater(len(expected), 10, (item["slug"], locale))
+                self.assertEqual(Counter(actual), Counter(expected), (item["slug"], locale))
+                self.assertEqual(actual, expected, (item["slug"], locale))
 
     def test_headings_stable_ascii_and_toc_main_sections_only(self):
         for item in self.items:
-            source = (build.CONTENT / item["source"]).read_text(encoding="utf-8")
-            body, toc = build.render_body(source, item)
+          for locale, meta, source in locale_variants(item):
+            body, toc = build.render_body(source, meta)
             original = independent_source_ast(source)
             expected = [text(node) for node in original.iter() if node.tag in {"h2", "h3"}]
             self.assertEqual([text(node) for node in body.iter() if node.tag in {"h2", "h3"}], expected)
@@ -198,11 +214,11 @@ class ArticleTests(unittest.TestCase):
 
     def test_blockquotes_code_tables_and_nested_lists_preserved(self):
         for item in self.items:
-            source = (build.CONTENT / item["source"]).read_text(encoding="utf-8")
-            body, _ = build.render_body(source, item)
+          for locale, meta, source in locale_variants(item):
+            body, _ = build.render_body(source, meta)
             oracle = independent_source_ast(source)
             for tag in ("blockquote", "pre", "code", "ul", "ol", "li", "table", "th", "strong"):
-                self.assertEqual(len(list(body.iter(tag))), len(list(oracle.iter(tag))), (item["slug"], tag))
+                self.assertEqual(len(list(body.iter(tag))), len(list(oracle.iter(tag))), (item["slug"], locale, tag))
             self.assertEqual([text(node) for node in body.iter("blockquote")], [text(node) for node in oracle.iter("blockquote")])
             expected_code = re.findall(r"^```[^\n]*\n(.*?)^```[ \t]*$", source, re.MULTILINE | re.DOTALL)
             self.assertEqual([text(node.find("code")) for node in body.iter("pre")], expected_code)
@@ -326,11 +342,11 @@ class ArticleTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exactly match"):
             build.render_body("# Different", self.items[0])
 
-    def test_routes_shell_language_and_no_fake_translation(self):
+    def test_routes_shell_language_and_translation_pairs(self):
         self.assertEqual(set(self.pages), set(build.OWNED_OUTPUTS))
         styles = [f"/assets/css/{name}.css" for name in ("tokens", "base", "components", "pages", "articles")]
         for path, dom in self.dom.items():
-            is_detail = path.count("/") > 2
+            is_detail = path not in ("articles/index.html", "zh/articles/index.html")
             zh = path.startswith("zh/")
             self.assertEqual(dom.find(".//html").get("lang"), "zh-CN" if zh else "en")
             body = dom.find(".//body")
@@ -347,34 +363,51 @@ class ArticleTests(unittest.TestCase):
             self.assertEqual(scripts, ["/assets/js/site.js"] + (["/assets/js/articles.js"] if is_detail else []))
             self.assertNotIn("fetch(", self.pages[path].decode())
             if is_detail:
+                current_item = next(item for item in self.items if item["slug"] in path)
+                locale = "zh" if zh else "en"
+                meta = build.localized(current_item, locale)
                 self.assertEqual(body.get("data-language-index"), "/articles/")
-                self.assertFalse(dom.findall('.//link[@rel="alternate"]'))
-                self.assertFalse([node for node in dom.iter() if node.get("hreflang") == "en"])
-                self.assertEqual(text(list(by_id(dom, "site-nav").iter("a"))[-1]), "EN index")
+                # Paired details advertise the full hreflang trio like paired indices.
+                self.assertEqual({node.get("hreflang"): node.get("href") for node in dom.findall('.//link[@rel="alternate"]')}, {
+                    "en": build.SITE + build.detail_route(current_item["slug"], "en"),
+                    "zh-CN": build.SITE + build.detail_route(current_item["slug"], "zh"),
+                    "x-default": build.SITE + build.detail_route(current_item["slug"], "en"),
+                })
+                counterpart = build.detail_route(current_item["slug"], "en" if zh else "zh")
+                self.assertEqual(body.get("data-language-counterpart"), counterpart)
+                switches = [node for node in by_id(dom, "site-nav").iter("a") if node.get("lang")]
+                self.assertEqual(len(switches), 1)
+                switch = switches[0]
+                self.assertEqual(switch.get("href"), counterpart)
+                self.assertEqual(switch.get("lang"), "en" if zh else "zh-CN")
+                self.assertEqual(switch.get("hreflang"), "en" if zh else "zh-CN")
+                self.assertIn("alternate", (switch.get("rel") or "").split())
+                self.assertEqual(text(switch), "EN" if zh else "中文")
                 download = next(a for a in dom.iter("a") if a.get("download"))
                 self.assertEqual(download.get("href"), "/content/articles/" + download.get("download"))
+                self.assertEqual(download.get("download"), meta["source"])
                 note = by_class(dom, "editorial-note")[0]
                 self.assertEqual(note.get("aria-label"), "editorial distinction")
-                self.assertIn(build.EDITORIAL, text(note))
-                self.assertNotIn(build.EDITORIAL, text(by_id(dom, "article-body")))
+                expected_editorial = build.EDITORIAL if zh else build.EDITORIAL_EN
+                self.assertIn(expected_editorial, text(note))
+                self.assertNotIn(expected_editorial, text(by_id(dom, "article-body")))
                 if build.STRATEGY_SLUG in path:
-                    self.assertIn(build.STRATEGY_NOTE, text(note))
-                self.assertIn("/zh/status/", [a.get("href") for a in note.iter("a")])
+                    self.assertIn(build.STRATEGY_NOTE if zh else build.STRATEGY_NOTE_EN, text(note))
+                self.assertIn("/zh/status/" if zh else "/status/", [a.get("href") for a in note.iter("a")])
                 sidebar = by_class(dom, "article-sidebar")[0]
                 toc = by_class(sidebar, "article-toc")[0]
                 self.assertIn("open", toc.attrib)
-                self.assertEqual(text(toc.find("summary")), "阅读目录")
-                self.assertEqual(toc.find("nav").get("aria-label"), "文章目录")
+                self.assertEqual(text(toc.find("summary")), "阅读目录" if zh else "Contents")
+                self.assertEqual(toc.find("nav").get("aria-label"), "文章目录" if zh else "Article contents")
                 self.assertIsNotNone(toc.find("nav/ol"))
-                self.assertEqual(text(by_id(sidebar, "reading-position")), "阅读全文")
+                self.assertEqual(text(by_id(sidebar, "reading-position")), "阅读全文" if zh else "Read the full article")
                 progress = by_class(dom, "reading-progress")[0]
                 self.assertEqual(progress.get("aria-hidden"), "true")
                 self.assertIsNotNone(by_id(progress, "reading-progress"))
                 related = by_class(dom, "article-related")[0]
                 self.assertEqual(len(by_class(related, "article-card")), 1)
-                current_item = next(item for item in self.items if item["slug"] in path)
-                self.assertIn(build.detail_route(current_item["related"]), [a.get("href") for a in related.iter("a")])
-                self.assertIn("/zh/articles/", [a.get("href") for a in related.iter("a")])
+                self.assertIn(build.detail_route(current_item["related"], locale), [a.get("href") for a in related.iter("a")])
+                self.assertIn(("/zh/articles/" if zh else "/articles/"), [a.get("href") for a in related.iter("a")])
 
     def test_discovery_pair_ids_sections_hreflang_and_decorative_cover(self):
         en = self.dom["articles/index.html"]
@@ -395,7 +428,16 @@ class ArticleTests(unittest.TestCase):
             self.assertEqual(svg.get("focusable"), "false")
             self.assertEqual([text(node) for node in svg.iter("text")], ["v i b e", "agent", "harness"])
             self.assertFalse([node for node in svg.iter() if node.tag in {"script", "image", "foreignobject"} or node.get("href") or node.get("src")])
-        self.assertIn("No English translations are available", text(en))
+        # Every EN index card now links the English translation, carrying the
+        # translated title, deck and category with an "English translation" tag.
+        for item in self.items:
+            card = by_id(en, "article-" + item["slug"])
+            self.assertIsNotNone(card, item["slug"])
+            self.assertEqual(card.get("lang"), "en")
+            self.assertEqual(text(card.find("h3/a")), item["title_en"])
+            self.assertIn(build.detail_route(item["slug"], "en"), [a.get("href") for a in card.iter("a")])
+            self.assertIn("English translation", text(card))
+        self.assertNotIn("No English translations are available", text(en))
         for path, dom in self.dom.items():
             ids = [node.get("id") for node in dom.iter() if node.get("id")]
             self.assertEqual(len(ids), len(set(ids)), path)
@@ -484,15 +526,33 @@ class ArticleTests(unittest.TestCase):
             self.assertNotEqual((root / "articles/index.html").stat().st_ino, (root / "zh/articles/index.html").stat().st_ino)
 
     def test_future_manifest_article_stays_in_article_namespace(self):
-        third = dict(self.items[0], slug="future-article", source="future-article.md", title="Future article")
+        # A future 7-field manifest item (no EN trio) stays a Chinese-only detail.
+        base = {k: v for k, v in self.items[0].items() if not k.endswith("_en")}
+        third = dict(base, slug="future-article", source="future-article.md", title="Future article")
         with tempfile.TemporaryDirectory() as directory:
             content = Path(directory)
             for item in self.items:
                 (content / item["source"]).write_bytes((build.CONTENT / item["source"]).read_bytes())
+                if "source_en" in item:
+                    (content / item["source_en"]).write_bytes((build.CONTENT / item["source_en"]).read_bytes())
             (content / third["source"]).write_text("# Future article\n\n## Topic\n\nContent.")
             with patch.object(build, "load_manifest", return_value=self.items + [third]), patch.object(build, "CONTENT", content):
                 pages = build.generate_pages()
             self.assertEqual(set(pages) - set(self.pages), {"zh/articles/future-article/index.html"})
+
+    def test_translated_manifest_item_publishes_both_locales(self):
+        translated = dict(self.items[0])
+        with tempfile.TemporaryDirectory() as directory:
+            content = Path(directory)
+            for item in self.items:
+                (content / item["source"]).write_bytes((build.CONTENT / item["source"]).read_bytes())
+                if "source_en" in item:
+                    (content / item["source_en"]).write_bytes((build.CONTENT / item["source_en"]).read_bytes())
+            with patch.object(build, "load_manifest", return_value=self.items), patch.object(build, "CONTENT", content):
+                pages = build.generate_pages()
+            for item in self.items:
+                self.assertIn(f"zh/articles/{item['slug']}/index.html", pages)
+                self.assertIn(f"articles/{item['slug']}/index.html", pages)
 
 
 if __name__ == "__main__":

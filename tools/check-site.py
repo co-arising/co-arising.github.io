@@ -449,26 +449,52 @@ def check_site(root=ROOT):
                 return [re.sub(r'^/zh(?=/)', '', a['href']) for a in page.map_links]
             if map_targets(pair[0]) != map_targets(pair[1]):
                 errors.append(f'{route or "/"}: EN/ZH map destinations differ')
-    # Chinese-only details are discovered from public output, not a runtime registry.
-    article_paths = sorted((root / 'zh/articles').glob('*/index.html'))
-    for path in article_paths:
-        page = Page(path)
-        pages[path.resolve()] = page
-        label = path.relative_to(root)
-        canonical = 'https://co-arising.github.io/' + path.parent.relative_to(root).as_posix() + '/'
-        if page.page_id != 'article' or page.lang != 'zh-CN':
-            errors.append(f'{label}: article detail requires data-page=article and lang=zh-CN')
-        if page.language_index != '/articles/':
-            errors.append(f'{label}: article detail requires data-language-index=/articles/')
-        if page.canonical != canonical:
-            errors.append(f'{label}: incorrect article canonical')
-        if any(lang != 'zh-CN' or href != canonical for lang, href in page.alternates.items()):
-            errors.append(f'{label}: unpaired article must not advertise a translated alternate')
-        switches = page.language_links
-        if len(switches) != 1 or switches[0]['href'] != '/articles/' or switches[0].get('lang') != 'en':
-            errors.append(f'{label}: article language switch must lead to the English index without query/fragment')
-        elif switches[0].get('hreflang') or 'alternate' in switches[0].get('rel', '').split():
-            errors.append(f'{label}: English index link is not a translated alternate')
+    # Article details are discovered from public output, not a runtime registry:
+    # Chinese at zh/articles/<slug>/, and — when the manifest item carries the EN
+    # trio — a paired English page at articles/<slug>/.
+    zh_details = {path.parent.name: path for path in sorted((root / 'zh/articles').glob('*/index.html'))}
+    en_details = {path.parent.name: path for path in sorted((root / 'articles').glob('*/index.html')) if path.parent.name != 'articles'}
+    for locale, details in (('zh-CN', zh_details), ('en', en_details)):
+        for slug, path in details.items():
+            page = Page(path)
+            pages[path.resolve()] = page
+            label = path.relative_to(root)
+            canonical = 'https://co-arising.github.io/' + path.parent.relative_to(root).as_posix() + '/'
+            if page.page_id != 'article' or page.lang != locale:
+                errors.append(f'{label}: article detail requires data-page=article and lang={locale}')
+            if page.language_index != '/articles/':
+                errors.append(f'{label}: article detail requires data-language-index=/articles/')
+            if page.canonical != canonical:
+                errors.append(f'{label}: incorrect article canonical')
+            paired = slug in zh_details and slug in en_details
+            en_url = 'https://co-arising.github.io/articles/' + slug + '/'
+            zh_url = 'https://co-arising.github.io/zh/articles/' + slug + '/'
+            switches = page.language_links
+            if paired:
+                if page.alternates != {'en': en_url, 'zh-CN': zh_url, 'x-default': en_url}:
+                    errors.append(f'{label}: paired article must advertise the EN/ZH/x-default hreflang trio')
+                counterpart = '/articles/' + slug + '/' if locale == 'zh-CN' else '/zh/articles/' + slug + '/'
+                if len(switches) != 1 or switches[0]['href'] != counterpart or switches[0].get('lang') != ('en' if locale == 'zh-CN' else 'zh-CN'):
+                    errors.append(f'{label}: paired article language switch must lead to its translated counterpart')
+                elif switches[0].get('hreflang') != ('en' if locale == 'zh-CN' else 'zh-CN') or 'alternate' not in switches[0].get('rel', '').split():
+                    errors.append(f'{label}: paired article language switch must carry translated-alternate metadata')
+            else:
+                if locale != 'zh-CN':
+                    errors.append(f'{label}: an English detail page must be paired with a Chinese original')
+                if any(lang != 'zh-CN' or href != canonical for lang, href in page.alternates.items()):
+                    errors.append(f'{label}: unpaired article must not advertise a translated alternate')
+                if len(switches) != 1 or switches[0]['href'] != '/articles/' or switches[0].get('lang') != 'en':
+                    errors.append(f'{label}: article language switch must lead to the English index without query/fragment')
+                elif switches[0].get('hreflang') or 'alternate' in switches[0].get('rel', '').split():
+                    errors.append(f'{label}: English index link is not a translated alternate')
+    # A translation pair must exist on both sides and keep identical heading
+    # structure — the structural gate on translation completeness.
+    for slug, zh_path in zh_details.items():
+        if slug in en_details:
+            zh_page, en_page = Page(zh_path), Page(en_details[slug])
+            for name in ('ids', 'sections'):
+                if getattr(zh_page, name) != getattr(en_page, name):
+                    errors.append(f'articles/{slug}/: EN/ZH {name} differ')
     missing = root / '404.html'
     pages[missing.resolve()] = Page(missing)
     if pages[missing.resolve()].page_id != 'not-found':

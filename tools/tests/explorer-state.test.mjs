@@ -83,6 +83,9 @@ function page({ url = '/explorer/', lang = 'en', badHash = false, fetchFails = f
   }
   const context = vm.createContext({ document, location, history, Worker, URLSearchParams, TextEncoder, Event, Uint8Array,
     window: {
+      /* Non-production hostname: the observability beacon guard must return
+         before touching this stubbed DOM. */
+      location: { hostname: 'localhost' },
       addEventListener: (name, fn) => { if (!windowEvents.has(name)) windowEvents.set(name, []); windowEvents.get(name).push(fn); },
       dispatchEvent: (event) => fireWindow(event.type),
       confirm: (message) => { confirmations.push(message); return confirmAnswer; },

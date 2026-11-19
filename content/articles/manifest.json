@@ -7,7 +7,10 @@
       "category": "行业综述",
       "date": "2026-11-16",
       "source": "ai-coding-evolution-20261116.md",
-      "related": "co-arising-implications-20261116"
+      "related": "co-arising-implications-20261116",
+      "title_en": "The AI Coding Landscape: From Vibe Coding to Agentic Engineering",
+      "deck_en": "From model drift and the Vibe Coding controversy to Agentic and Harness Engineering: an industry evolution survey that keeps every citation and reference link.",
+      "source_en": "ai-coding-evolution-20261116.en.md"
     },
     {
       "slug": "co-arising-implications-20261116",
@@ -16,7 +19,10 @@
       "category": "战略思考",
       "date": "2026-11-16",
       "source": "co-arising-implications-20261116.md",
-      "related": "ai-coding-evolution-20261116"
+      "related": "ai-coding-evolution-20261116",
+      "title_en": "Implications for co-arising: Strategic Validation and an Engineering Route for the AI Coding Paradigm Shift",
+      "deck_en": "Placing the industry shift back into the co-arising context: deterministic compilation, business slicing, code anchoring and the proposed engineering route; not a list of delivered capabilities.",
+      "source_en": "co-arising-implications-20261116.en.md"
     },
     {
       "slug": "lauren-tan-trust-pyramid-20261118",
@@ -25,7 +31,10 @@
       "category": "工程实践",
       "date": "2026-11-18",
       "source": "lauren-tan-trust-pyramid-20261118.md",
-      "related": "ai-coding-evolution-20261116"
+      "related": "ai-coding-evolution-20261116",
+      "title_en": "From \"AI Slop\" to 11,000 Merged PRs a Month: A Deep Evaluation and Adoption Guide of Lauren Tan's AI Coding Engineering System (Staff Engineer, SpaceXSI)",
+      "deck_en": "Grounded in two first-party talks and the open-source pstack, this evaluation tests the inverted trust pyramid and verification-first practice against 2024–2026 academic and industrial evidence, distilling a four-stage adoption route.",
+      "source_en": "lauren-tan-trust-pyramid-20261118.en.md"
     },
     {
       "slug": "ai-engineer-code-2026-50-talks-20261119",
@@ -34,7 +43,10 @@
       "category": "工程实践",
       "date": "2026-11-19",
       "source": "ai-engineer-code-2026-50-talks-20261119.md",
-      "related": "lauren-tan-trust-pyramid-20261118"
+      "related": "lauren-tan-trust-pyramid-20261118",
+      "title_en": "AI Engineer CODE 2026: All 50 Talks Ranked by Relevance and Fully Unpacked",
+      "deck_en": "A zero-truncation close reading of all 50 complete talk transcripts, ranked #01–#50 by relevance to deterministic verification and agent governance — each unpacked across problem, core theory, validated results and toolchain.",
+      "source_en": "ai-engineer-code-2026-50-talks-20261119.en.md"
     }
   ]
 }

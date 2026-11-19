@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const source = readFileSync(new URL('../../assets/js/site.js', import.meta.url), 'utf8');
 
-function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound = false, article = false, languageIndex = '/articles/', saved = null, blockedRead = false, blockedWrite = false, clipboardFails = false, fallbackWorks = false, layout = null } = {}) {
+function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound = false, article = false, languageIndex = '/articles/', counterpart, saved = null, blockedRead = false, blockedWrite = false, clipboardFails = false, fallbackWorks = false, layout = null } = {}) {
   const nodes = new Map();
   const timers = new Map();
   const windowEvents = new Map();
@@ -57,6 +57,7 @@ function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound 
   const code = new Element('code'); code.textContent = 'node "$TRUTHSRC_CLI" --help\n'; pre.appendChild(code);
   const body = new Element('body'); body.dataset.page = notFound ? 'not-found' : article ? 'article' : '';
   if (article) body.dataset.languageIndex = languageIndex;
+  if (article && counterpart !== undefined) body.dataset.languageCounterpart = counterpart;
   const html = new Element('html'); html.setAttribute('lang', lang);
   html.style.setProperty = (key, value) => { html.style[key] = value; };
   if (layout) nav.getBoundingClientRect = () => ({ height: nodes.get('nav-scroll-hint').hidden ? 110 : 135 });
@@ -68,7 +69,10 @@ function page({ lang = 'en', path = '/guide/', search = '', hash = '', notFound 
   };
   const location = { pathname: path, search, hash };
   const context = { document, location,
-    window: { addEventListener: (name, fn) => { if (!windowEvents.has(name)) windowEvents.set(name, []); windowEvents.get(name).push(fn); } },
+    /* hostname deliberately differs from production so the observability beacon
+       guard returns before touching the stubbed DOM. */
+    window: { location: { ...location, hostname: 'localhost' },
+      addEventListener: (name, fn) => { if (!windowEvents.has(name)) windowEvents.set(name, []); windowEvents.get(name).push(fn); } },
     localStorage: { getItem() { if (blockedRead) throw new Error('storage blocked'); return saved; }, setItem() { if (blockedWrite) throw new Error('storage blocked'); } },
     navigator: { clipboard: { async writeText(text) { if (clipboardFails) throw new Error('denied'); clipboard.push(text); } } },
     setTimeout: (fn) => { timers.set(++timerId, fn); return timerId; }, clearTimeout: (id) => timers.delete(id),
@@ -161,7 +165,34 @@ test('article indices are paired reference destinations and preserve URL state',
   }
 });
 
-test('trusted Chinese article details use EN index without pretending to translate', async () => {
+test('paired article details switch to the translated counterpart document', async () => {
+  for (const [lang, path, counterpart, href, label, switchLang] of [
+    ['zh-CN', '/zh/articles/ai-coding-evolution-20261116/', '/articles/ai-coding-evolution-20261116/', '/articles/ai-coding-evolution-20261116/', 'EN', 'en'],
+    ['en', '/articles/ai-coding-evolution-20261116/index.html', '/zh/articles/ai-coding-evolution-20261116/', '/zh/articles/ai-coding-evolution-20261116/', '中文', 'zh-CN'],
+  ]) {
+    const p = page({ lang, path, article: true, counterpart, search: '?reading=original', hash: '#original-heading' });
+    const link = p.nodes.get('language-switch');
+    assert.equal(link.getAttribute('href'), href);
+    assert.equal(link.textContent, label);
+    assert.equal(link.getAttribute('lang'), switchLang);
+    assert.equal(link.getAttribute('hreflang'), switchLang);
+    assert.equal(link.getAttribute('rel'), 'alternate');
+    assert.ok(p.nav.innerHTML.includes(`href="${lang === 'zh-CN' ? '/zh/articles/' : '/articles/'}" aria-current="page">${lang === 'zh-CN' ? '技术观察' : 'Insights'}</a>`));
+    assert.ok(p.nav.innerHTML.includes('class="nav-reference current"'));
+    assert.equal((p.nav.innerHTML.match(/aria-current="page"/g) || []).length, 1);
+    p.location.hash = '#another-heading'; p.location.search = '?changed=yes';
+    for (const event of ['hashchange', 'popstate', 'site:locationchange']) {
+      p.fireWindow(event);
+      assert.equal(link.getAttribute('href'), href);
+    }
+    for (const event of ['pointerdown', 'click']) {
+      await link.fire(event);
+      assert.equal(link.getAttribute('href'), href);
+    }
+  }
+});
+
+test('unpaired trusted Chinese article details use EN index without pretending to translate', async () => {
   for (const path of ['/zh/articles/ai-coding-evolution-20261116/', '/zh/articles/co-arising-implications-20261116/index.html']) {
     const p = page({ lang: 'zh-CN', path, article: true, search: '?reading=original', hash: '#original-heading' });
     const link = p.nodes.get('language-switch');
@@ -172,15 +203,10 @@ test('trusted Chinese article details use EN index without pretending to transla
     assert.equal(link.getAttribute('hreflang'), undefined);
     assert.equal(link.getAttribute('lang'), 'en');
     assert.ok(p.nav.innerHTML.includes('href="/zh/articles/" aria-current="page">技术观察</a>'));
-    assert.ok(p.nav.innerHTML.includes('class="nav-reference current"'));
     assert.equal((p.nav.innerHTML.match(/aria-current="page"/g) || []).length, 1);
     p.location.hash = '#another-heading'; p.location.search = '?changed=yes';
     for (const event of ['hashchange', 'popstate', 'site:locationchange']) {
       p.fireWindow(event);
-      assert.equal(link.getAttribute('href'), '/articles/');
-    }
-    for (const event of ['pointerdown', 'click']) {
-      await link.fire(event);
       assert.equal(link.getAttribute('href'), '/articles/');
     }
   }
@@ -192,14 +218,22 @@ test('article counterpart declarations cannot inject URLs or HTML', () => {
     assert.equal(p.nodes.get('language-switch').getAttribute('href'), '/articles/');
     assert.equal(p.nav.innerHTML.includes('unexpected'), false);
   }
+  for (const counterpart of ['', '/status/', '/zh/articles/example/?q=unsafe#heading', '//unexpected.example/', '/zh/articles/" onfocus="unexpected']) {
+    const p = page({ lang: 'zh-CN', path: '/zh/articles/example/', article: true, counterpart });
+    assert.equal(p.nodes.get('language-switch').getAttribute('href'), '/articles/');
+    assert.equal(p.nav.innerHTML.includes('unexpected'), false);
+  }
+  const en = page({ lang: 'en', path: '/articles/example/', article: true, counterpart: '/zh/articles/example/' });
+  assert.equal(en.nodes.get('language-switch').getAttribute('href'), '/zh/articles/example/');
+  const mismatched = page({ lang: 'en', path: '/articles/example/', article: true, counterpart: '/zh/articles/expected/' });
+  assert.equal(mismatched.nodes.get('language-switch').getAttribute('href'), '/articles/');
 });
 
-test('unknown nested routes are not articles without a trusted Chinese detail document', () => {
+test('unknown nested routes are not articles without a trusted detail document', () => {
   for (const options of [
     { path: '/articles/missing/' },
     { lang: 'zh-CN', path: '/zh/articles/missing/' },
     { lang: 'zh-CN', path: '/zh/articles/missing/', article: true, notFound: true },
-    { path: '/articles/missing/', article: true },
     { lang: 'zh-CN', path: '/zh/articles/missing/deeper/', article: true },
     { lang: 'zh-CN', path: '/zh/missing/nested/', article: true },
   ]) {

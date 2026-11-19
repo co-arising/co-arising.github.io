@@ -102,8 +102,10 @@ const STR = {
   const rawPath = location.pathname.replace(/index\.html$/, "");
   const stripped = rawPath.replace(/^\/zh(?=\/|$)/, "") || "/";
   const normalized = stripped.endsWith("/") ? stripped : stripped + "/";
-  /* Only a trusted Chinese article document can opt into an unpaired detail route. */
-  const isArticle = LANG === "zh" && document.body.dataset.page === "article"
+  /* Only trusted article documents can opt into detail routes — in either
+     locale; the generator marks paired translations with a same-shape
+     counterpart path for the other locale. */
+  const isArticle = document.body.dataset.page === "article"
     && /^\/articles\/[^/]+\/$/.test(normalized);
   const notFound = document.body.dataset.page === "not-found" || (!routes.has(normalized) && !isArticle);
   const here = notFound ? null : normalized;
@@ -112,9 +114,12 @@ const STR = {
   /* This is an index, not a translation. Ignore malformed or external declarations. */
   const languageIndex = document.body.dataset.languageIndex === "/articles/"
     ? document.body.dataset.languageIndex : "/articles/";
+  const languageCounterpart = document.body.dataset.languageCounterpart
+    === (LANG === "zh" ? normalized : "/zh" + normalized)
+    ? document.body.dataset.languageCounterpart : null;
 
   const counterpart = () => {
-    if (isArticle) return languageIndex;
+    if (isArticle) return languageCounterpart || languageIndex;
     const base = LANG === "zh" ? (here || "/") : "/zh" + (here || "/");
     return base + (notFound ? "" : (location.search || "") + (location.hash || ""));
   };
@@ -216,7 +221,10 @@ const STR = {
   }
 
   const languageLink = document.getElementById("language-switch");
-  if (languageLink && isArticle) {
+  if (languageLink && isArticle && !languageCounterpart) {
+    /* Unpaired Chinese-only details fall back to the shared English index and
+       must not pretend to be a translation; paired details keep the rendered
+       translated-alternate switch. */
     languageLink.textContent = "EN index";
     languageLink.setAttribute("title", "English article index (this article is available in Chinese)");
     languageLink.removeAttribute("rel");
