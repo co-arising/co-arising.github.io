@@ -38,7 +38,7 @@
     <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
-        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 第一部分：Lauren Tan 的理论体系、工程实践与已验证效果</a></li><li><a href="#section-2"><span class="toc-number">02</span> 第二部分：深度评估——学术论文与工业界实证是否足以支撑这些实践？</a></li><li><a href="#section-3"><span class="toc-number">03</span> 第三部分：与《AI Coding 演进调研（2026-11-16）》的理论对比</a></li><li><a href="#section-4"><span class="toc-number">04</span> 第四部分：项目落地实战指南（架构路线、工具链与可直接复用样例）</a></li><li><a href="#section-5"><span class="toc-number">05</span> 第五部分：本质之问——AI Coding 是一道理论数学题，还是一道“堵漏洞”的工程题？</a></li><li><a href="#section-6"><span class="toc-number">06</span> 第六部分：2026 年工业界同类标杆案例横向对比</a></li></ol></nav></details>
+        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 第一部分：Lauren Tan 的理论体系、工程实践与已验证效果</a></li><li><a href="#section-2"><span class="toc-number">02</span> 第二部分：深度评估——学术论文与工业界实证是否足以支撑这些实践？</a></li><li><a href="#section-3"><span class="toc-number">03</span> 第三部分：与《AI Coding 演进调研（2026-11-16）》的理论对比</a></li><li><a href="#section-4"><span class="toc-number">04</span> 第四部分：项目落地实战指南（架构路线、工具链与可直接复用样例）</a></li><li><a href="#section-5"><span class="toc-number">05</span> 第五部分：本质之问——AI Coding 是一道理论数学题，还是一道“堵漏洞”的工程题？</a></li><li><a href="#section-6"><span class="toc-number">06</span> 第六部分：2026 年工业界同类标杆案例横向对比</a></li><li><a href="#section-7"><span class="toc-number">07</span> 第七部分：一手资料索引——演讲视频、官方逐字稿与幻灯片图形出处</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">阅读全文</p>
       </aside>
       <article id="article-body" class="article-body"><blockquote>
@@ -53,6 +53,10 @@
 <li><strong>反面教材——5 周内蔓延 183 个定时器</strong>：Lauren Tan 披露了 Cursor 客户端中的一个真实事故。由于底层 VS Code 的命令式风格与 React 的声明式风格存在架构冲突，Agent 习惯用 <code>setTimeout</code>、<code>requestAnimationFrame</code>、<code>requestIdleCallback</code> 等命令式定时器来“遮盖”画面闪烁。9 月 9 日出现第 1 个，10 月 3 日被抄进公共模块，到 10 月 17 日仅 5 周多就扩散至 <strong>183 个定时器</strong>，高频创建销毁触发了严重的垃圾回收（GC）卡顿，彻底拖垮了桌面端性能。</li>
 <li><strong>工程新元命题（The New Meta）</strong>：软件工程师的核心职责已从“亲手敲代码”转变为 <strong>“在产出量提升百倍的同时，维持甚至提升代码质量”</strong>——而实现这一点的核心不是更花哨的 Prompt，而是围绕 Agent 构建高可信度（High-Trust）的确定性工程环境。</li>
 </ul>
+<p><img alt="代码库即花园——每一次复制都让下一次复制更有可能" src="/assets/img/articles/lauren-tan-20261118/fig1-garden-copy.jpg"></p>
+<p><em>图 1：「codebase as a garden」的杂草扩散机制——一个临时绕过经过三次复制就固化为「the pattern（既定模式）」，破窗效应的图形化表达（主题演讲视频 04:30 截帧，AI Engineer 官方频道）</em></p>
+<p><img alt="从 9 月 9 日的一个 setTimeout 到 10 月 19 日的 183 个定时器" src="/assets/img/articles/lauren-tan-20261118/fig2-timers-183.jpg"></p>
+<p><em>图 2：「quick fixes considered harmful」——5 周蔓延 183 个定时器的事故时间线：修一个闪烁 → 被抄进公共模块 → 全面扩散（主题演讲视频 07:50 截帧）</em></p>
 <h3 id="section-1-2">1.2 核心理论框架：信任倒金字塔与渐进式信任曲线</h3>
 <p>Lauren Tan 将所有用于纠偏 Agent 行为的投入，按“确定性强度”与“单次边际成本”排列为一个<strong>信任倒金字塔（Inverse Trust Pyramid）</strong>，自顶向下（从最宽、最便宜、最硬性，到最窄、最昂贵、最脆弱）分为四层：</p>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：层级 / 核心手段 / 约束性质 / 典型载体 / 工程原则"><table>
@@ -96,6 +100,8 @@
 </tr>
 </tbody>
 </table></div>
+<p><img alt="the poteto pyramid 信任倒金字塔幻灯片" src="/assets/img/articles/lauren-tan-20261118/fig3-poteto-pyramid.jpg"></p>
+<p><em>图 3：演讲原片中的「the poteto pyramid」幻灯片——cost 自上而下递增、确定性自上而下递减：codebase → static analysis → verification → prose → human review，与上表四层一一对应（主题演讲视频 02:30 截帧）</em></p>
 <p>在<a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">9 月的 55 分钟访谈</a>中，她进一步勾勒了<strong>信任曲线（Trust Curve）</strong>的演进阶梯：工程师绝不能在连单个 Agent 都不信任的阶段，就贸然并行拉起上百个云端 Agent（否则只是在烧 Token 制造高速垃圾工厂），而必须按 <strong>「本地强介入观察（Backseat Driver）→ 沉淀确定性检查与验证技能 → 扩展至云端后台 Agent（如自动复现 Slack Bug 的 Benny）→ 逐步放开自动合并（Auto-merge）」</strong> 的顺序爬坡。</p>
 <h3 id="section-1-3">1.3 五大标志性工程实践</h3>
 <ol>
@@ -110,6 +116,8 @@
 </li>
 <li><strong>技能工程化（<code>pstack</code>）与防作弊 Eval 闭环</strong>：Lauren 将个人工作流开源为 Cursor 官方插件 <a href="https://github.com/cursor/plugins/blob/main/pstack/README.md"><code>pstack</code>（Potato Stack）</a>（已衍生出 <a href="https://github.com/PickleBoxer/pstack">Claude Code 移植版</a> 等多生态版本），包含路由总控 <code>/poteto-mode</code>、根因排查技能 <code>how</code>/<code>why</code>、架构规划 <code>architect</code> 及 23 条工程原则。为防止技能退化，她设计了严格的 <strong>Eval Playbook</strong>：由协调 Agent 生成评分标准，在<strong>故意混淆命名的独立目录</strong>中并发运行子智能体（避免 Agent 察觉“正在被评测”而改变行为），再引入<strong>不同基座模型的 Judge Agent</strong> 交叉打分，并配合 <code>/loop</code> 持续爬山优化。</li>
 </ol>
+<p><img alt="运行时验证体系幻灯片：Feature Map 与验证 CLI" src="/assets/img/articles/lauren-tan-20261118/fig4-runtime-verification.jpg"></p>
+<p><em>图 4：上列第 4 项「验证优先」的演讲原片图示——Feature Map（what features exist / how users reach it / what proves it works）+ 验证 CLI（拉起真实应用、截图与快照），构成「agent checks its own work」的自证闭环；幻灯片底部亦直接标注了 pstack 中的 runtime-verification 技能出处（主题演讲视频 10:45 截帧）</em></p>
 <h3 id="section-1-4">1.4 已验证的工程效果与客观边界</h3>
 <p>根据 <a href="https://www.youtube.com/watch?v=O_zcc6Xl12g">AI Engineer CODE 2026 演讲</a>与 <a href="https://ai.engineer/code/2026/talks/lauren-tan">官方整理页</a>披露的一线生产数据，经过 6 个月的环境基建投入，GrokBot 团队在 2026 年 10 月交出了如下成绩单：</p>
 <ul>
@@ -118,6 +126,10 @@
 <li><strong>质量与性能指标</strong>：相对回滚率（Revert Rate）不升反降，从 6 月的 <strong>0.98%</strong> 降至 <strong>0.47%</strong> 并稳定在约 0.5%（从约每 100 个 PR 回滚 1 个改善为每 200 个回滚 1 个）；冷启动时间从 <strong>2.3 秒</strong> 优化至 <strong>1.4 秒</strong>，打字延迟、新建对话与切换对话速度均显著提升。</li>
 <li><strong>理性审视与边界条件</strong>：必须客观指出三点局限——第一，Lauren 坦诚展示了同一张性能表中<strong>变差的项目</strong>（内存占用上升、调整窗口大小变慢），并未报喜不报忧；第二，正如 <a href="https://ai.engineer/code/2026/talks/lauren-tan">AI Engineer 官方评述</a>所提醒的，这是单一团队的生产实践报告，<strong>并非严格受控对照实验</strong>；第三，Lauren 在<a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">9 月访谈</a>中也坦言身处 AI 实验室拥有“近乎无限的 Token 额度”，普通团队需按 ROI 分阶段落地，不可盲目照搬全量云端自动化。</li>
 </ul>
+<p><img alt="everyone is more productive 幻灯片：贡献者增长堆叠图" src="/assets/img/articles/lauren-tan-20261118/fig5-pr-productivity.jpg"></p>
+<p><em>图 5：「everyone is more productive」——活跃贡献者按当月 PR 产出分档堆叠：全团队从 1 月的 15 人增长至 10 月的 227 人，其中 22 人在 10 月各自合并了 100 个以上 PR（主题演讲视频 14:05 截帧）</em></p>
+<p><img alt="velocity without compromise 幻灯片：性能成绩单" src="/assets/img/articles/lauren-tan-20261118/fig6-velocity-perf.jpg"></p>
+<p><em>图 6：「velocity without compromise」——2026 年 5 月 vs 10 月的完整性能账本：冷启动 2,304ms→1,395ms（-39%）、长会话打字延迟 -65%，同时也诚实标注了内存占用 +12%、空闲 CPU +100%、窗口调整 +130% 等回退项（主题演讲视频 14:55 截帧）</em></p>
 <hr>
 <h2 id="section-2">第二部分：深度评估——学术论文与工业界实证是否足以支撑这些实践？</h2>
 <p>为检验 Lauren Tan 的实践究竟是“硅谷大厂的个人手感”还是“具备普适规律的工程科学”，下表将其 6 项核心主张与 2024–2026 年发表的同行评审论文、arXiv 预印本及大规模工业界实证报告进行了逐一核验：</p>
@@ -531,7 +543,102 @@ export const noDuplicateMessages: Property = always((state) =&gt; {
 </tbody>
 </table></div>
 <h3 id="section-6-1">结语：2026 年底的行业大合流</h3>
-<p>把 SpaceXSI、OpenAI、Stripe、Ramp 和 Spotify 这五份来自全球最顶尖工程团队的答卷放在一起，一个清晰无比的行业共识已经浮出水面：<strong>Prompt Engineering 的红利已经见顶，2026 年真正拉开团队差距的是 Harness Engineering（控制套具工程）与 Verification Infrastructure（验证基础设施）。</strong> 当代码生成的边际成本趋近于零，工程团队唯一的护城河，就是你把架构品位、领域边界与验收标准编译进确定性系统的深度。</p></article>
+<p>把 SpaceXSI、OpenAI、Stripe、Ramp 和 Spotify 这五份来自全球最顶尖工程团队的答卷放在一起，一个清晰无比的行业共识已经浮出水面：<strong>Prompt Engineering 的红利已经见顶，2026 年真正拉开团队差距的是 Harness Engineering（控制套具工程）与 Verification Infrastructure（验证基础设施）。</strong> 当代码生成的边际成本趋近于零，工程团队唯一的护城河，就是你把架构品位、领域边界与验收标准编译进确定性系统的深度。</p>
+<hr>
+<h2 id="section-7">第七部分：一手资料索引——演讲视频、官方逐字稿与幻灯片图形出处</h2>
+<h3 id="section-7-1">7.1 两场一手演讲与开源项目的原始链接</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：资料 / 发布方 / 日期 / 原始链接"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">资料</th>
+<th style="text-align: left;" scope="col">发布方 / 日期</th>
+<th style="text-align: left;" scope="col">原始链接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">主题演讲《All Code Is Slop (Except Mine)》独立完整版（17 分 31 秒）</td>
+<td style="text-align: left;">AI Engineer 官方频道，2026-11-14</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g">youtube.com/watch?v=O_zcc6Xl12g</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">同场演讲官方讲者页（分段视频、讲者档案与逐字稿入口）</td>
+<td style="text-align: left;">AI Engineer CODE 2026 官方</td>
+<td style="text-align: left;"><a href="https://ai.engineer/code/2026/talks/lauren-tan">ai.engineer/code/2026/talks/lauren-tan</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">官方机器逐字稿（按直播时间轴逐句锚定，含识别误差声明）</td>
+<td style="text-align: left;">AI Engineer 官方</td>
+<td style="text-align: left;"><a href="https://ai.engineer/reading/code-2026/transcripts/lauren-tan.md">ai.engineer/reading/code-2026/transcripts/lauren-tan.md</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Day 1 直播原始录像（本演讲位于 01:01:02–01:18:38 时段）</td>
+<td style="text-align: left;">AI Engineer 官方频道，2026-11-12</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=3662s">youtube.com/watch?v=ZZ19zhYnDKY</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">55 分钟深度访谈《SpaceX AI Engineer: Stop Using AI Agents Like This》（对谈形式，无幻灯片）</td>
+<td style="text-align: left;">Perfology Clips 频道，2026-09-26</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">youtube.com/watch?v=u1hqfjrMhwQ</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">开源技能库 <code>pstack</code>（Potato Stack）</td>
+<td style="text-align: left;">Cursor 官方 plugins 仓库</td>
+<td style="text-align: left;"><a href="https://github.com/cursor/plugins/blob/main/pstack/README.md">github.com/cursor/plugins：pstack</a></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-7-2">7.2 幻灯片可用形态说明与本文插图索引</h3>
+<p>截至本文更新日（2026-11-19），官方<strong>未单独发布</strong>这套幻灯片的 PDF 或 Slideshare/Speakerdeck 版本；官方讲者页仅内嵌一张金字塔幻灯片截图（<code>/reading/code-2026/images/lauren-tan-3835.jpg</code>）。55 分钟访谈为对谈录制，同样不存在幻灯片。本文图 1–图 6 均由编辑者从 AI Engineer 官方频道发布的独立版演讲视频逐帧截取（1080p 原帧缩放至 1280×720），按下表时间戳可逐一对照原片：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：图号 / 幻灯片内容 / 独立版视频位置 / 直播版原始锚点"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">图号</th>
+<th style="text-align: left;" scope="col">幻灯片内容</th>
+<th style="text-align: left;" scope="col">独立版视频位置</th>
+<th style="text-align: left;" scope="col">直播版原始锚点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">图 1</td>
+<td style="text-align: left;">「each copy makes the next copy more likely」杂草扩散图</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=270s">04:30</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=3932s">01:05:32</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">图 2</td>
+<td style="text-align: left;">「quick fixes considered harmful」183 定时器事故</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=470s">07:50</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=4132s">01:08:52</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">图 3</td>
+<td style="text-align: left;">「the poteto pyramid」信任倒金字塔</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=150s">02:30</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=3812s">01:03:32</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">图 4</td>
+<td style="text-align: left;">「runtime verification」Feature Map 与验证 CLI</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=645s">10:45</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=4307s">01:11:47</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">图 5</td>
+<td style="text-align: left;">「everyone is more productive」贡献者增长堆叠图</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=845s">14:05</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=4507s">01:15:07</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">图 6</td>
+<td style="text-align: left;">「velocity without compromise」性能成绩单</td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=O_zcc6Xl12g&amp;t=895s">14:55</a></td>
+<td style="text-align: left;"><a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=4557s">01:15:57</a></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>引用说明</strong>：以上截图版权归 AI Engineer 与演讲者所有，本文以引用评注方式用于技术评论；截图下方保留演讲标题与讲者署名的原始横幅以维持出处信息，正文观点仍以上方链接的一手资料为准。</p></article>
     </div>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">继续阅读</h2>

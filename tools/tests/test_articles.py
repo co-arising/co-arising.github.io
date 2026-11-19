@@ -29,7 +29,7 @@ SPEC.loader.exec_module(build)
 HASHES = {
     "ai-coding-evolution-20261116.md": "16a41c0909b15fc6737d70fd7571b486a9d351b9986708dc853f31024ba1f0da",
     "co-arising-implications-20261116.md": "d2f62b4646fc0e3118e5a93b44dfd97ec2de20038fc2b0d810fd26a78c537a32",
-    "lauren-tan-trust-pyramid-20261118.md": "6f4a834206e3ae7d1b46c8bf5ba1893c31e01ea410f809c1ccaa215c363e4b93",
+    "lauren-tan-trust-pyramid-20261118.md": "0b68c0a2034492c61a2f8be0423f7675134d60dbd82ad4490c716aa76edc3495",
 }
 
 
