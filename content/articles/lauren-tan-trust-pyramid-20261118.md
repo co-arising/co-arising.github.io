@@ -14,6 +14,14 @@
 * **反面教材——5 周内蔓延 183 个定时器**：Lauren Tan 披露了 Cursor 客户端中的一个真实事故。由于底层 VS Code 的命令式风格与 React 的声明式风格存在架构冲突，Agent 习惯用 `setTimeout`、`requestAnimationFrame`、`requestIdleCallback` 等命令式定时器来“遮盖”画面闪烁。9 月 9 日出现第 1 个，10 月 3 日被抄进公共模块，到 10 月 17 日仅 5 周多就扩散至 **183 个定时器**，高频创建销毁触发了严重的垃圾回收（GC）卡顿，彻底拖垮了桌面端性能。
 * **工程新元命题（The New Meta）**：软件工程师的核心职责已从“亲手敲代码”转变为 **“在产出量提升百倍的同时，维持甚至提升代码质量”**——而实现这一点的核心不是更花哨的 Prompt，而是围绕 Agent 构建高可信度（High-Trust）的确定性工程环境。
 
+![代码库即花园——每一次复制都让下一次复制更有可能](/assets/img/articles/lauren-tan-20261118/fig1-garden-copy.jpg)
+
+*图 1：「codebase as a garden」的杂草扩散机制——一个临时绕过经过三次复制就固化为「the pattern（既定模式）」，破窗效应的图形化表达（主题演讲视频 04:30 截帧，AI Engineer 官方频道）*
+
+![从 9 月 9 日的一个 setTimeout 到 10 月 19 日的 183 个定时器](/assets/img/articles/lauren-tan-20261118/fig2-timers-183.jpg)
+
+*图 2：「quick fixes considered harmful」——5 周蔓延 183 个定时器的事故时间线：修一个闪烁 → 被抄进公共模块 → 全面扩散（主题演讲视频 07:50 截帧）*
+
 ### 1.2 核心理论框架：信任倒金字塔与渐进式信任曲线
 
 Lauren Tan 将所有用于纠偏 Agent 行为的投入，按“确定性强度”与“单次边际成本”排列为一个**信任倒金字塔（Inverse Trust Pyramid）**，自顶向下（从最宽、最便宜、最硬性，到最窄、最昂贵、最脆弱）分为四层：
@@ -24,6 +32,10 @@ Lauren Tan 将所有用于纠偏 Agent 行为的投入，按“确定性强度�
 | **第 2 层（强约束）** | **静态分析与确定性检查** | 机械级确定性 | 自定义 Lint 规则、强类型系统、依赖图检查、单测 | 每次纠正 Agent 时，优先沉淀为一条让 CI 变红的确定性规则 |
 | **第 3 层（行为证据）** | **运行时与形式化验证** | 证据级验证 | CDP 驱动、Feature Map、TLA+、Lean 4、Bombadil | Code Review 从“逐行读代码”收缩为“审查验证产物（视频/截图/状态图/证明）” |
 | **第 4 层（最底/最弱）** | **自然语言规则与人工审查** | 概率性软约束 | `AGENTS.md`、Skills、人工 PR Review | 仅保留需要人类主观判断的少量原则；人工审查是最昂贵的瓶颈 |
+
+![the poteto pyramid 信任倒金字塔幻灯片](/assets/img/articles/lauren-tan-20261118/fig3-poteto-pyramid.jpg)
+
+*图 3：演讲原片中的「the poteto pyramid」幻灯片——cost 自上而下递增、确定性自上而下递减：codebase → static analysis → verification → prose → human review，与上表四层一一对应（主题演讲视频 02:30 截帧）*
 
 在[9 月的 55 分钟访谈](https://www.youtube.com/watch?v=u1hqfjrMhwQ)中，她进一步勾勒了**信任曲线（Trust Curve）**的演进阶梯：工程师绝不能在连单个 Agent 都不信任的阶段，就贸然并行拉起上百个云端 Agent（否则只是在烧 Token 制造高速垃圾工厂），而必须按 **「本地强介入观察（Backseat Driver）→ 沉淀确定性检查与验证技能 → 扩展至云端后台 Agent（如自动复现 Slack Bug 的 Benny）→ 逐步放开自动合并（Auto-merge）」** 的顺序爬坡。
 
@@ -38,6 +50,10 @@ Lauren Tan 将所有用于纠偏 Agent 行为的投入，按“确定性强度�
    * **Token 预算倒挂**：Lauren 援引知名工程师 Cindy Sridharan 的一线反馈（同期亦被 [Martin Fowler 专栏](https://martinfowler.com/fragments/2026-11-10.html)收录）——如今每日 **70% 的 Token 预算都花在验证补丁上，仅 20%–30% 用于生成代码**。因为 Agent 极大压低了编写 TLA+/Lean/属性测试的人力成本，软件工程正迈入“测试与验证的黄金时代”。
 5. **技能工程化（`pstack`）与防作弊 Eval 闭环**：Lauren 将个人工作流开源为 Cursor 官方插件 [`pstack`（Potato Stack）](https://github.com/cursor/plugins/blob/main/pstack/README.md)（已衍生出 [Claude Code 移植版](https://github.com/PickleBoxer/pstack) 等多生态版本），包含路由总控 `/poteto-mode`、根因排查技能 `how`/`why`、架构规划 `architect` 及 23 条工程原则。为防止技能退化，她设计了严格的 **Eval Playbook**：由协调 Agent 生成评分标准，在**故意混淆命名的独立目录**中并发运行子智能体（避免 Agent 察觉“正在被评测”而改变行为），再引入**不同基座模型的 Judge Agent** 交叉打分，并配合 `/loop` 持续爬山优化。
 
+![运行时验证体系幻灯片：Feature Map 与验证 CLI](/assets/img/articles/lauren-tan-20261118/fig4-runtime-verification.jpg)
+
+*图 4：上列第 4 项「验证优先」的演讲原片图示——Feature Map（what features exist / how users reach it / what proves it works）+ 验证 CLI（拉起真实应用、截图与快照），构成「agent checks its own work」的自证闭环；幻灯片底部亦直接标注了 pstack 中的 runtime-verification 技能出处（主题演讲视频 10:45 截帧）*
+
 ### 1.4 已验证的工程效果与客观边界
 
 根据 [AI Engineer CODE 2026 演讲](https://www.youtube.com/watch?v=O_zcc6Xl12g)与 [官方整理页](https://ai.engineer/code/2026/talks/lauren-tan)披露的一线生产数据，经过 6 个月的环境基建投入，GrokBot 团队在 2026 年 10 月交出了如下成绩单：
@@ -46,6 +62,14 @@ Lauren Tan 将所有用于纠偏 Agent 行为的投入，按“确定性强度�
 * **跨职能安全赋能**：10 月共有 **227 名贡献者** 提交了至少一个 PR，包括大量并不熟悉底层代码的产品经理、设计师甚至 GTM 人员——严苛的 Dune 架构与 CI 门禁吸收了复杂度，使非专业研发也能安全贡献生产代码。
 * **质量与性能指标**：相对回滚率（Revert Rate）不升反降，从 6 月的 **0.98%** 降至 **0.47%** 并稳定在约 0.5%（从约每 100 个 PR 回滚 1 个改善为每 200 个回滚 1 个）；冷启动时间从 **2.3 秒** 优化至 **1.4 秒**，打字延迟、新建对话与切换对话速度均显著提升。
 * **理性审视与边界条件**：必须客观指出三点局限——第一，Lauren 坦诚展示了同一张性能表中**变差的项目**（内存占用上升、调整窗口大小变慢），并未报喜不报忧；第二，正如 [AI Engineer 官方评述](https://ai.engineer/code/2026/talks/lauren-tan)所提醒的，这是单一团队的生产实践报告，**并非严格受控对照实验**；第三，Lauren 在[9 月访谈](https://www.youtube.com/watch?v=u1hqfjrMhwQ)中也坦言身处 AI 实验室拥有“近乎无限的 Token 额度”，普通团队需按 ROI 分阶段落地，不可盲目照搬全量云端自动化。
+
+![everyone is more productive 幻灯片：贡献者增长堆叠图](/assets/img/articles/lauren-tan-20261118/fig5-pr-productivity.jpg)
+
+*图 5：「everyone is more productive」——活跃贡献者按当月 PR 产出分档堆叠：全团队从 1 月的 15 人增长至 10 月的 227 人，其中 22 人在 10 月各自合并了 100 个以上 PR（主题演讲视频 14:05 截帧）*
+
+![velocity without compromise 幻灯片：性能成绩单](/assets/img/articles/lauren-tan-20261118/fig6-velocity-perf.jpg)
+
+*图 6：「velocity without compromise」——2026 年 5 月 vs 10 月的完整性能账本：冷启动 2,304ms→1,395ms（-39%）、长会话打字延迟 -65%，同时也诚实标注了内存占用 +12%、空闲 CPU +100%、窗口调整 +130% 等回退项（主题演讲视频 14:55 截帧）*
 
 ---
 
@@ -319,3 +343,33 @@ Lauren Tan 的 SpaceXSI/GrokBot 并非孤例。2025 年底至 2026 年，硅谷�
 ### 结语：2026 年底的行业大合流
 
 把 SpaceXSI、OpenAI、Stripe、Ramp 和 Spotify 这五份来自全球最顶尖工程团队的答卷放在一起，一个清晰无比的行业共识已经浮出水面：**Prompt Engineering 的红利已经见顶，2026 年真正拉开团队差距的是 Harness Engineering（控制套具工程）与 Verification Infrastructure（验证基础设施）。** 当代码生成的边际成本趋近于零，工程团队唯一的护城河，就是你把架构品位、领域边界与验收标准编译进确定性系统的深度。
+
+---
+
+## 第七部分：一手资料索引——演讲视频、官方逐字稿与幻灯片图形出处
+
+### 7.1 两场一手演讲与开源项目的原始链接
+
+| 资料 | 发布方 / 日期 | 原始链接 |
+| :--- | :--- | :--- |
+| 主题演讲《All Code Is Slop (Except Mine)》独立完整版（17 分 31 秒） | AI Engineer 官方频道，2026-11-14 | [youtube.com/watch?v=O_zcc6Xl12g](https://www.youtube.com/watch?v=O_zcc6Xl12g) |
+| 同场演讲官方讲者页（分段视频、讲者档案与逐字稿入口） | AI Engineer CODE 2026 官方 | [ai.engineer/code/2026/talks/lauren-tan](https://ai.engineer/code/2026/talks/lauren-tan) |
+| 官方机器逐字稿（按直播时间轴逐句锚定，含识别误差声明） | AI Engineer 官方 | [ai.engineer/reading/code-2026/transcripts/lauren-tan.md](https://ai.engineer/reading/code-2026/transcripts/lauren-tan.md) |
+| Day 1 直播原始录像（本演讲位于 01:01:02–01:18:38 时段） | AI Engineer 官方频道，2026-11-12 | [youtube.com/watch?v=ZZ19zhYnDKY](https://www.youtube.com/watch?v=ZZ19zhYnDKY&t=3662s) |
+| 55 分钟深度访谈《SpaceX AI Engineer: Stop Using AI Agents Like This》（对谈形式，无幻灯片） | Perfology Clips 频道，2026-09-26 | [youtube.com/watch?v=u1hqfjrMhwQ](https://www.youtube.com/watch?v=u1hqfjrMhwQ) |
+| 开源技能库 `pstack`（Potato Stack） | Cursor 官方 plugins 仓库 | [github.com/cursor/plugins：pstack](https://github.com/cursor/plugins/blob/main/pstack/README.md) |
+
+### 7.2 幻灯片可用形态说明与本文插图索引
+
+截至本文更新日（2026-11-19），官方**未单独发布**这套幻灯片的 PDF 或 Slideshare/Speakerdeck 版本；官方讲者页仅内嵌一张金字塔幻灯片截图（`/reading/code-2026/images/lauren-tan-3835.jpg`）。55 分钟访谈为对谈录制，同样不存在幻灯片。本文图 1–图 6 均由编辑者从 AI Engineer 官方频道发布的独立版演讲视频逐帧截取（1080p 原帧缩放至 1280×720），按下表时间戳可逐一对照原片：
+
+| 图号 | 幻灯片内容 | 独立版视频位置 | 直播版原始锚点 |
+| :--- | :--- | :--- | :--- |
+| 图 1 | 「each copy makes the next copy more likely」杂草扩散图 | [04:30](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=270s) | [01:05:32](https://www.youtube.com/watch?v=ZZ19zhYnDKY&t=3932s) |
+| 图 2 | 「quick fixes considered harmful」183 定时器事故 | [07:50](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=470s) | [01:08:52](https://www.youtube.com/watch?v=ZZ19zhYnDKY&t=4132s) |
+| 图 3 | 「the poteto pyramid」信任倒金字塔 | [02:30](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=150s) | [01:03:32](https://www.youtube.com/watch?v=ZZ19zhYnDKY&t=3812s) |
+| 图 4 | 「runtime verification」Feature Map 与验证 CLI | [10:45](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=645s) | [01:11:47](https://www.youtube.com/watch?v=ZZ19zhYnDKY&t=4307s) |
+| 图 5 | 「everyone is more productive」贡献者增长堆叠图 | [14:05](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=845s) | [01:15:07](https://www.youtube.com/watch?v=ZZ19zhYnDKY&t=4507s) |
+| 图 6 | 「velocity without compromise」性能成绩单 | [14:55](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=895s) | [01:15:57](https://www.youtube.com/watch?v=ZZ19zhYnDKY&t=4557s) |
+
+**引用说明**：以上截图版权归 AI Engineer 与演讲者所有，本文以引用评注方式用于技术评论；截图下方保留演讲标题与讲者署名的原始横幅以维持出处信息，正文观点仍以上方链接的一手资料为准。
