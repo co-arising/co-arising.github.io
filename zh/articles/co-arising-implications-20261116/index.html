@@ -46,7 +46,7 @@
 <hr>
 <h2 id="section-2">一、核心战略印证：外部演进为什么恰好证明 co-arising 的壁垒</h2>
 <h3 id="section-2-1">1.1 叙事定位成立："AI 编程的架构安全带"切中主航道</h3>
-<p>将 co-arising 从"Scala/DDD 后端脚手架"重塑为"AI 时代的复杂系统防幻觉与架构治理引擎"，与工业界经历"Vibe Coding 幻灭期"后的最新共识高度吻合——连 Karpathy 本人都已把 Vibe Coding 迭代为 Agentic Engineering，核心诉求正是"拿 Agent 杠杆 + 确定性护栏 + 软件质量零妥协"。这个故事正处于 2026 年下半年 VC 寻找"Post-Vibe-Coding 基础设施"的主航道上。</p>
+<p>将 co-arising 从"Scala/DDD 后端脚手架"重塑为"AI 时代的复杂系统防幻觉与架构治理引擎"，与工业界经历"Vibe Coding 幻灭期"后的最新共识高度吻合——连 Karpathy 本人都已把 Vibe Coding 迭代为 Agentic Engineering，核心诉求正是"拿 Agent 杠杆 + 确定性护栏 + 软件质量零妥协"。这个故事正处于 2026 年下半年行业寻找"Post-Vibe-Coding 基础设施"的主航道上。</p>
 <p>痛点叙事可直接引用的第三方硬数据（避免"技术洁癖"观感）：</p>
 <ul>
 <li>Karpathy 从 Vibe Coding 到 Agentic Engineering 的转向（<a href="https://thenewstack.io/vibe-coding-is-passe/">The New Stack</a>）</li>
@@ -56,10 +56,10 @@
 </ul>
 <h3 id="section-2-2">1.2 控制论"阿什比定律（Ashby's Law）"提供最硬核的理论背书</h3>
 <p>Thoughtworks 杰出工程师 Birgitta Böckeler 在 <a href="https://martinfowler.com/articles/harness-engineering.html">《Harness engineering for coding agent users》(2026.04)</a> 中指出：调节器只能监管它拥有显式模型的对象；LLM 编码 Agent 几乎能生成任何代码（无限多样性），唯有锁定预定义拓扑（Topology）降维减熵（variety-reduction），才能构建严密的控制套具。</p>
-<p><strong>对 co-arising 的意义</strong>：这等于在为 co-arising 写注脚。通用 IDE（Cursor、Windsurf）管不住架构腐化，是因为它们面对"无约束的图灵完备代码空间"；而 co-arising 通过 DDD + CQRS + Event Sourcing + Saga 的真理树元模型，先把架构拓扑锁死在有限的确定性轨道上，<strong>从信息论源头砍掉 80% 产生架构幻觉的自由度</strong>。</p>
+<p><strong>对 co-arising 的意义</strong>：这等于在为 co-arising 写注脚。通用 IDE（Cursor、Windsurf）管不住架构腐化，是因为它们面对"无约束的图灵完备代码空间"；而 co-arising 通过 DDD + CQRS + Event Sourcing + Saga 的真理树元模型，先把架构拓扑锁死在有限的确定性轨道上，<strong>从信息论源头砍掉 80%（工作假设，尚未实测）产生架构幻觉的自由度</strong>。</p>
 <h3 id="section-2-3">1.3 填补全行业公认最难的"Behaviour Harness（业务行为套具）"空白</h3>
 <p>Böckeler 的 Harness 分类体系中坦言：行业目前只做好了 Maintainability Harness（Linter / CodeScene 抓圈复杂度）与初级的 Architecture Fitness Harness（ArchUnit 抓包依赖）；而最难的 <strong>Behaviour Harness</strong>（确保 AI 生成的代码在业务行为上真正符合预期），全行业依然只能靠"自然语言 Spec + 盲信 AI 自己写的测试"。</p>
-<p><strong>对 co-arising 的意义</strong>：co-arising 不是又一个静态代码检查器——它是极少数能把<strong>业务不变量守卫（Invariant Guards）+ 状态折叠（State Fold）+ Given-When-Then 验收契约</strong>编译为确定性代码桩与双向对账表的系统。可以名正言顺地宣称：<strong>别人只做了"代码形状"的 Harness，co-arising 实现了工业界缺失的 Domain Behaviour Harness。</strong></p>
+<p><strong>对 co-arising 的意义</strong>：co-arising 不是又一个静态代码检查器——它是极少数能把<strong>业务不变量守卫（Invariant Guards）+ 状态折叠（State Fold）+ Given-When-Then 验收契约</strong>编译为确定性代码桩与双向对账表的系统。按这个设计，co-arising 的目标是：<strong>别人只做了"代码形状"的 Harness，co-arising 要实现工业界缺失的 Domain Behaviour Harness。</strong></p>
 <h3 id="section-2-4">1.4 "L3→L5 非对称神经符号鸿沟"是精准的竞争定位武器</h3>
 <p>借用 <a href="https://arxiv.org/html/2604.00555v5">FAOS 论文 (arXiv:2604.00555)</a> 的 L0–L5 耦合成熟度模型做竞争格局切割：</p>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：竞品 / 所处层级"><table>
@@ -84,10 +84,10 @@
 </tr>
 </tbody>
 </table></div>
-<p>同时直接解决了 <a href="https://arxiv.org/html/2608.05612v1">KIT JDomInO 论文 (arXiv:2608.05612)</a> 尚未攻克的两大难题：反向持久化锚点（Provenance Identity Markers）与跨上下文 Saga。</p>
+<p>同时把 <a href="https://arxiv.org/html/2608.05612v1">KIT JDomInO 论文 (arXiv:2608.05612)</a> 尚未攻克的两大难题列为首要攻关目标：反向持久化锚点（Provenance Identity Markers）与跨上下文 Saga。</p>
 <h3 id="section-2-5">1.5 "逆参数知识效应（Inverse PKE）"为极致上下文压缩提供学术依据</h3>
 <p><a href="https://arxiv.org/html/2604.00555v5">FAOS 论文</a> 的定律：LLM 预训练语料越薄弱的私有业务规则，本体锚定带来的准确率增益越大（高达 2 倍以上，p &lt; .001）；反之把通用概念塞进上下文反而引发"上下文干扰"。</p>
-<p><strong>对 co-arising 的意义</strong>：这呼应了 co-arising 已验证的"宏展开 + 单行微语法压缩 + 业务切片完形填空（Context Pack Cloze）"路线——把几万行源码或全量图谱塞给 LLM 不仅贵，还会引发上下文干扰。<strong>80% 的通用架构样板交给确定性编译器（零 Token、零幻觉），只把 LLM 最缺的 20% 核心私有业务不变量通过精准切片喂给 Agent。</strong></p>
+<p><strong>对 co-arising 的意义</strong>：这呼应了 co-arising 已验证的"宏展开 + 单行微语法压缩 + 业务切片完形填空（Context Pack Cloze）"路线——把几万行源码或全量图谱塞给 LLM 不仅贵，还会引发上下文干扰。<strong>80% 的通用架构样板交给确定性编译器（零 Token、零幻觉），只把 LLM 最缺的 20% 核心私有业务不变量通过精准切片喂给 Agent。</strong>（80/20 比例为工作假设，尚未实测）</p>
 <hr>
 <h2 id="section-3">二、五大产品与架构启发：吸取先行者教训</h2>
 <h3 id="section-3-1">启发 1：警惕"Plan Mode 之死"——死磕单行微语法，绝不陷入"Markdown/YAML 审查地狱"</h3>
@@ -144,8 +144,8 @@
 ├─────────────────────────────────────────────────────────────┤
 │ ② 确定性脚手架编译与切片 Context Pack 导出                     │
 │    基于 Inverse PKE 与 Ashby 定律降维                         │
-│    编译器零 Token、零幻觉生成 80% 的 CQRS/ES/Saga 强类型骨架   │
-│    与测试桩；为剩余 20% 复杂业务行为按切片导出极简 Context Pack │
+│    编译器零 Token、零幻觉生成大部分 CQRS/ES/Saga 强类型骨架   │
+│    与测试桩；为剩余核心业务行为按切片导出极简 Context Pack │
 ├─────────────────────────────────────────────────────────────┤
 │ ③ 受双层 Hooks 物理锁定的单点完形填空                          │
 │    PreToolUse 防越界 + Stop Hook (exit 2) 强制自愈            │
@@ -213,7 +213,7 @@
 <td>生成 CQRS/Saga/Actor 骨架、注入 <code>@ProvenanceId</code> 锚点、导出切片 Context Pack</td>
 <td><strong>工具链</strong></td>
 <td>co-arising Codegen 引擎 + MCP Server 工具集</td>
-<td>80% 结构样板零 Token 生成；按切片裁剪规避长上下文退化与上下文干扰</td>
+<td>大部分结构样板零 Token 生成；按切片裁剪规避长上下文退化与上下文干扰</td>
 </tr>
 <tr>
 <td>5. 业务逻辑完形填空</td>
@@ -268,7 +268,7 @@
 </ul>
 <p><strong>② cloze-fill Skill（受控切片完形填空工作流）</strong></p>
 <ul>
-<li>定位：指导编码 Agent 在极小上下文窗口内高效完成 20% 核心业务填空；</li>
+<li>定位：指导编码 Agent 在极小上下文窗口内高效完成核心业务填空；</li>
 <li>指令要点：第一步调用 <code>coarising_get_slice_context</code> 获取 Context Pack，<strong>严禁盲目全局 grep 或读取无关限界上下文文件</strong>；第二步仅在目标文件 <code>@cloze</code> 锚点区间内编写领域逻辑，覆盖 Context Pack 列出的所有 Given-When-Then 边界条件；第三步触发本地切片单测，通过后交 Stop Hook 对账。</li>
 </ul>
 <p><strong>③ brownfield-miner Skill（存量烂代码逆向提炼工作流）</strong></p>
@@ -293,7 +293,7 @@
 </blockquote>
 <hr>
 <h2 id="section-7">六、GTM 路线与避坑清单</h2>
-<h3 id="section-7-1">6.1 三步走路线图</h3>
+<h3 id="section-7-1">6.1 三步演进方向</h3>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：阶段 / 策略 / 要点"><table>
 <thead>
 <tr>
@@ -305,7 +305,7 @@
 <tbody>
 <tr>
 <td>Phase 1</td>
-<td>杀手级开源引流（Developer-First &amp; MCP Native）</td>
+<td>开源优先引流（Developer-First &amp; MCP Native）</td>
 <td>PLG 路线；第一时间推出官方 MCP Server；语言破圈（TypeScript/Python/Rust 轻量解析或通用架构契约 DSL）；GitHub 社区运营 + 实战教程</td>
 </tr>
 <tr>

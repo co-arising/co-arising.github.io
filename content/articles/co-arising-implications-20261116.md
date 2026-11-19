@@ -12,7 +12,7 @@
 
 ### 1.1 叙事定位成立："AI 编程的架构安全带"切中主航道
 
-将 co-arising 从"Scala/DDD 后端脚手架"重塑为"AI 时代的复杂系统防幻觉与架构治理引擎"，与工业界经历"Vibe Coding 幻灭期"后的最新共识高度吻合——连 Karpathy 本人都已把 Vibe Coding 迭代为 Agentic Engineering，核心诉求正是"拿 Agent 杠杆 + 确定性护栏 + 软件质量零妥协"。这个故事正处于 2026 年下半年 VC 寻找"Post-Vibe-Coding 基础设施"的主航道上。
+将 co-arising 从"Scala/DDD 后端脚手架"重塑为"AI 时代的复杂系统防幻觉与架构治理引擎"，与工业界经历"Vibe Coding 幻灭期"后的最新共识高度吻合——连 Karpathy 本人都已把 Vibe Coding 迭代为 Agentic Engineering，核心诉求正是"拿 Agent 杠杆 + 确定性护栏 + 软件质量零妥协"。这个故事正处于 2026 年下半年行业寻找"Post-Vibe-Coding 基础设施"的主航道上。
 
 痛点叙事可直接引用的第三方硬数据（避免"技术洁癖"观感）：
 
@@ -25,13 +25,13 @@
 
 Thoughtworks 杰出工程师 Birgitta Böckeler 在 [《Harness engineering for coding agent users》(2026.04)](https://martinfowler.com/articles/harness-engineering.html) 中指出：调节器只能监管它拥有显式模型的对象；LLM 编码 Agent 几乎能生成任何代码（无限多样性），唯有锁定预定义拓扑（Topology）降维减熵（variety-reduction），才能构建严密的控制套具。
 
-**对 co-arising 的意义**：这等于在为 co-arising 写注脚。通用 IDE（Cursor、Windsurf）管不住架构腐化，是因为它们面对"无约束的图灵完备代码空间"；而 co-arising 通过 DDD + CQRS + Event Sourcing + Saga 的真理树元模型，先把架构拓扑锁死在有限的确定性轨道上，**从信息论源头砍掉 80% 产生架构幻觉的自由度**。
+**对 co-arising 的意义**：这等于在为 co-arising 写注脚。通用 IDE（Cursor、Windsurf）管不住架构腐化，是因为它们面对"无约束的图灵完备代码空间"；而 co-arising 通过 DDD + CQRS + Event Sourcing + Saga 的真理树元模型，先把架构拓扑锁死在有限的确定性轨道上，**从信息论源头砍掉 80%（工作假设，尚未实测）产生架构幻觉的自由度**。
 
 ### 1.3 填补全行业公认最难的"Behaviour Harness（业务行为套具）"空白
 
 Böckeler 的 Harness 分类体系中坦言：行业目前只做好了 Maintainability Harness（Linter / CodeScene 抓圈复杂度）与初级的 Architecture Fitness Harness（ArchUnit 抓包依赖）；而最难的 **Behaviour Harness**（确保 AI 生成的代码在业务行为上真正符合预期），全行业依然只能靠"自然语言 Spec + 盲信 AI 自己写的测试"。
 
-**对 co-arising 的意义**：co-arising 不是又一个静态代码检查器——它是极少数能把**业务不变量守卫（Invariant Guards）+ 状态折叠（State Fold）+ Given-When-Then 验收契约**编译为确定性代码桩与双向对账表的系统。可以名正言顺地宣称：**别人只做了"代码形状"的 Harness，co-arising 实现了工业界缺失的 Domain Behaviour Harness。**
+**对 co-arising 的意义**：co-arising 不是又一个静态代码检查器——它是极少数能把**业务不变量守卫（Invariant Guards）+ 状态折叠（State Fold）+ Given-When-Then 验收契约**编译为确定性代码桩与双向对账表的系统。按这个设计，co-arising 的目标是：**别人只做了"代码形状"的 Harness，co-arising 要实现工业界缺失的 Domain Behaviour Harness。**
 
 ### 1.4 "L3→L5 非对称神经符号鸿沟"是精准的竞争定位武器
 
@@ -43,13 +43,13 @@ Böckeler 的 Harness 分类体系中坦言：行业目前只做好了 Maintaina
 | Qlerify 等 DDD 工具 | 软性 Advisory 提示，无编译级锁死 |
 | co-arising | **L4–L5：输入裁剪 + 输出确定性校验闭环的编译级引擎** |
 
-同时直接解决了 [KIT JDomInO 论文 (arXiv:2608.05612)](https://arxiv.org/html/2608.05612v1) 尚未攻克的两大难题：反向持久化锚点（Provenance Identity Markers）与跨上下文 Saga。
+同时把 [KIT JDomInO 论文 (arXiv:2608.05612)](https://arxiv.org/html/2608.05612v1) 尚未攻克的两大难题列为首要攻关目标：反向持久化锚点（Provenance Identity Markers）与跨上下文 Saga。
 
 ### 1.5 "逆参数知识效应（Inverse PKE）"为极致上下文压缩提供学术依据
 
 [FAOS 论文](https://arxiv.org/html/2604.00555v5) 的定律：LLM 预训练语料越薄弱的私有业务规则，本体锚定带来的准确率增益越大（高达 2 倍以上，p < .001）；反之把通用概念塞进上下文反而引发"上下文干扰"。
 
-**对 co-arising 的意义**：这呼应了 co-arising 已验证的"宏展开 + 单行微语法压缩 + 业务切片完形填空（Context Pack Cloze）"路线——把几万行源码或全量图谱塞给 LLM 不仅贵，还会引发上下文干扰。**80% 的通用架构样板交给确定性编译器（零 Token、零幻觉），只把 LLM 最缺的 20% 核心私有业务不变量通过精准切片喂给 Agent。**
+**对 co-arising 的意义**：这呼应了 co-arising 已验证的"宏展开 + 单行微语法压缩 + 业务切片完形填空（Context Pack Cloze）"路线——把几万行源码或全量图谱塞给 LLM 不仅贵，还会引发上下文干扰。**80% 的通用架构样板交给确定性编译器（零 Token、零幻觉），只把 LLM 最缺的 20% 核心私有业务不变量通过精准切片喂给 Agent。**（80/20 比例为工作假设，尚未实测）
 
 ---
 
@@ -105,8 +105,8 @@ Böckeler 的 Harness 分类体系中坦言：行业目前只做好了 Maintaina
 ├─────────────────────────────────────────────────────────────┤
 │ ② 确定性脚手架编译与切片 Context Pack 导出                     │
 │    基于 Inverse PKE 与 Ashby 定律降维                         │
-│    编译器零 Token、零幻觉生成 80% 的 CQRS/ES/Saga 强类型骨架   │
-│    与测试桩；为剩余 20% 复杂业务行为按切片导出极简 Context Pack │
+│    编译器零 Token、零幻觉生成大部分 CQRS/ES/Saga 强类型骨架   │
+│    与测试桩；为剩余核心业务行为按切片导出极简 Context Pack │
 ├─────────────────────────────────────────────────────────────┤
 │ ③ 受双层 Hooks 物理锁定的单点完形填空                          │
 │    PreToolUse 防越界 + Stop Hook (exit 2) 强制自愈            │
@@ -142,7 +142,7 @@ Böckeler 的 Harness 分类体系中坦言：行业目前只做好了 Maintaina
 | 2. 真源解析与宏展开 | truthsrc 单行微语法双向解析、M1/M2/M3 宏展开、元模型完整性校验 | **工具链** | co-arising CLI 编译器 + 确定性 Validator | 词法/语法解析与图拓扑合法性检查必须 100% 确定（补齐 JDomInO 缺失的独立校验器） |
 | 3a. 存量系统逆向冷启动（结构） | AST 静态扫描、调用链提取、数据库 Schema 导出 | **工具链** | CLI 扫描器 + 本地 SQLite/Neo4j 图构建器 | 静态结构提取用 Tree-Sitter/LSP 毫秒级完成，比 Agent 调 grep 省 10 倍 Token |
 | 3b. 存量系统逆向冷启动（语义） | 从静态类簇中识别聚合根与隐式领域事件 | **Skill** | `.claude/skills/brownfield-miner/SKILL.md`（`disable-model-invocation: true`） | 静态工具分不清通用类与 DDD 语义角色，需 LLM 做语义聚类并交人类确认 |
-| 4. 脚手架生成与切片打包 | 生成 CQRS/Saga/Actor 骨架、注入 `@ProvenanceId` 锚点、导出切片 Context Pack | **工具链** | co-arising Codegen 引擎 + MCP Server 工具集 | 80% 结构样板零 Token 生成；按切片裁剪规避长上下文退化与上下文干扰 |
+| 4. 脚手架生成与切片打包 | 生成 CQRS/Saga/Actor 骨架、注入 `@ProvenanceId` 锚点、导出切片 Context Pack | **工具链** | co-arising Codegen 引擎 + MCP Server 工具集 | 大部分结构样板零 Token 生成；按切片裁剪规避长上下文退化与上下文干扰 |
 | 5. 业务逻辑完形填空 | 在单个 `@cloze` 槽位内编写业务状态计算与领域算法 | **Skill** | `.claude/skills/cloze-fill/SKILL.md` | 局部业务算法需要灵活逻辑合成能力，适合 Agent 拿极简 Context Pack 按步骤填空 |
 | 6. 写保护与双向对账门禁 | 禁止篡改非 Cloze 生成区、回合结束自动编译测试与符号表反向对账 | **工具链** | `.claude/settings.json` 的 PreToolUse 与 Stop Hooks（`exit 2`） | 零容忍规则放 Prompt 必被绕过，必须 Hook 物理层阻断 |
 | 7. 契约盲审与防作弊检查 | 检查是否硬编码假数据骗过测试、是否完整兑现业务意图 | **Skill / Subagent** | `.claude/agents/contract-reviewer.md`（独立上下文 + `skip style`） | 静态编译抓不出"用 `if (id == 1) return true` 骗过测试"的语义作弊 |
@@ -173,7 +173,7 @@ Böckeler 的 Harness 分类体系中坦言：行业目前只做好了 Maintaina
 - 指令要点：新功能/业务变更时先调用 `coarising_analyze_impact` 查看上下文；严禁直接脑补全套模型，必须针对命令前置条件（Invariant Guard）、状态演进（State Fold）与异常补偿提出**不超过 4 道结构化选择题**；用户确认后按微语法规范更新真源树，调用 `coarising_compile_and_reconcile` 生成骨架与 Mermaid 事件流图供一眼核对。
 
 **② cloze-fill Skill（受控切片完形填空工作流）**
-- 定位：指导编码 Agent 在极小上下文窗口内高效完成 20% 核心业务填空；
+- 定位：指导编码 Agent 在极小上下文窗口内高效完成核心业务填空；
 - 指令要点：第一步调用 `coarising_get_slice_context` 获取 Context Pack，**严禁盲目全局 grep 或读取无关限界上下文文件**；第二步仅在目标文件 `@cloze` 锚点区间内编写领域逻辑，覆盖 Context Pack 列出的所有 Given-When-Then 边界条件；第三步触发本地切片单测，通过后交 Stop Hook 对账。
 
 **③ brownfield-miner Skill（存量烂代码逆向提炼工作流）**
@@ -197,11 +197,11 @@ Böckeler 的 Harness 分类体系中坦言：行业目前只做好了 Maintaina
 
 ## 六、GTM 路线与避坑清单
 
-### 6.1 三步走路线图
+### 6.1 三步演进方向
 
 | 阶段 | 策略 | 要点 |
 |------|------|------|
-| Phase 1 | 杀手级开源引流（Developer-First & MCP Native） | PLG 路线；第一时间推出官方 MCP Server；语言破圈（TypeScript/Python/Rust 轻量解析或通用架构契约 DSL）；GitHub 社区运营 + 实战教程 |
+| Phase 1 | 开源优先引流（Developer-First & MCP Native） | PLG 路线；第一时间推出官方 MCP Server；语言破圈（TypeScript/Python/Rust 轻量解析或通用架构契约 DSL）；GitHub 社区运营 + 实战教程 |
 | Phase 2 | 企业级架构治理平台（Top-Down SaaS） | 架构合规与漂移检测（CI/CD 插件将 PR 与领域图谱对比，越界即拦截）；可视化领域看板（Event Storming & Graph Studio），打破"设计文档与代码永远不一致"魔咒 |
 | Phase 3 | 生态扩展：自进化智能体（AI-First Agentic Loop） | 结构化领域模型 + 图谱 + 双向锚定 = "可执行的企业数字孪生架构脑"；自然语言业务变更 → AI 自动改模型 → 编译 → 测试验证 |
 
