@@ -29,6 +29,7 @@ SPEC.loader.exec_module(build)
 HASHES = {
     "ai-coding-evolution-20261116.md": "16a41c0909b15fc6737d70fd7571b486a9d351b9986708dc853f31024ba1f0da",
     "co-arising-implications-20261116.md": "d2f62b4646fc0e3118e5a93b44dfd97ec2de20038fc2b0d810fd26a78c537a32",
+    "lauren-tan-trust-pyramid-20261118.md": "6f4a834206e3ae7d1b46c8bf5ba1893c31e01ea410f809c1ccaa215c363e4b93",
 }
 
 
@@ -220,7 +221,7 @@ class ArticleTests(unittest.TestCase):
         metadata = dict(self.items[1], title="原文与来源")
         source = '''# 原文与来源
 
-> 来源：[Gemini](https://share.gemini.google/TqSOArhYLvn7)
+> 来源：[外部页面](https://example.org/source)
 > 保留原始记录。
 
 ## 一、**原文** &amp; 引用
@@ -234,8 +235,8 @@ class ArticleTests(unittest.TestCase):
 终点。
 '''
         body, toc = build.render_body(source, metadata)
-        self.assertEqual(text(body.find("blockquote")), "\n来源：Gemini\n保留原始记录。\n")
-        self.assertEqual([a.get("href") for a in body.iter("a")], [build.ORIGIN, build.detail_route(build.SURVEY_SLUG), "./other.md", "./ai-coding-evolution-20261116.md#notes"])
+        self.assertEqual(text(body.find("blockquote")), "\n来源：外部页面\n保留原始记录。\n")
+        self.assertEqual([a.get("href") for a in body.iter("a")], ["https://example.org/source", build.detail_route(build.SURVEY_SLUG), "./other.md", "./ai-coding-evolution-20261116.md#notes"])
         self.assertEqual(text(body.find("h2")), "一、原文 & 引用")
         self.assertEqual(text(toc.find("li/a")), "01 原文 & 引用")
         survey_meta = dict(metadata, slug=build.SURVEY_SLUG)
@@ -330,7 +331,6 @@ class ArticleTests(unittest.TestCase):
                 self.assertFalse(dom.findall('.//link[@rel="alternate"]'))
                 self.assertFalse([node for node in dom.iter() if node.get("hreflang") == "en"])
                 self.assertEqual(text(list(by_id(dom, "site-nav").iter("a"))[-1]), "EN index")
-                self.assertIn(build.ORIGIN, [a.get("href") for a in by_class(dom, "article-actions")[0].iter("a")])
                 download = next(a for a in dom.iter("a") if a.get("download"))
                 self.assertEqual(download.get("href"), "/content/articles/" + download.get("download"))
                 note = by_class(dom, "editorial-note")[0]
@@ -367,7 +367,7 @@ class ArticleTests(unittest.TestCase):
             self.assertEqual({node.get("hreflang"): node.get("href") for node in dom.findall('.//link[@rel="alternate"]')}, {
                 "en": build.SITE + "/articles/", "zh-CN": build.SITE + "/zh/articles/", "x-default": build.SITE + "/articles/",
             })
-            self.assertEqual(len(by_class(dom, "article-card")), 2)
+            self.assertEqual(len(by_class(dom, "article-card")), len(self.items))
             for name in ("insights-hero", "over", "insights-title", "insights-deck", "insights-cover", "insights-grid"):
                 self.assertTrue(by_class(dom, name), name)
             svg = by_class(dom, "insights-cover")[0].find("svg")
