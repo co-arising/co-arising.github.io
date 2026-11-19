@@ -33,6 +33,7 @@ SITE = "https://co-arising.github.io"
 SURVEY_SLUG = "ai-coding-evolution-20261116"
 STRATEGY_SLUG = "co-arising-implications-20261116"
 PRACTICE_SLUG = "lauren-tan-trust-pyramid-20261118"
+CODE50_SLUG = "ai-engineer-code-2026-50-talks-20261119"
 # Initial publication fixture; future valid manifest slugs stay in /zh/articles/.
 OWNED_OUTPUTS = (
     "articles/index.html",
@@ -40,6 +41,7 @@ OWNED_OUTPUTS = (
     f"zh/articles/{SURVEY_SLUG}/index.html",
     f"zh/articles/{STRATEGY_SLUG}/index.html",
     f"zh/articles/{PRACTICE_SLUG}/index.html",
+    f"zh/articles/{CODE50_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"
@@ -129,10 +131,11 @@ class StandardCodeBlock(CodeBlockProcessor):
 
 class PublishingMarkdown(Extension):
     def extendMarkdown(self, md):
-        # Raw HTML is displayed as escaped text, not executed. The independent
+        # Block/inline raw HTML passes through for editorial layout (scoped
+        # classes styled in assets/css/articles.css). render_body rejects
+        # active content at build time, and the runtime external-resource ban
+        # stays with check-site.py and the browser gate. The independent
         # entity processor stays enabled, so &copy; and &amp; retain their meaning.
-        md.preprocessors.deregister("html_block")
-        md.inlinePatterns.deregister("html")
         md.preprocessors.register(CaptionListSpacing(md), "caption_lists", 24)
         md.parser.blockprocessors.register(StandardCodeBlock(md.parser), "code", 80)
 
@@ -162,8 +165,40 @@ def safe_url(value):
     return value
 
 
+# Raw block/inline HTML is sanctioned for editorial layout only. Active content
+# is rejected at build time instead of being rendered or silently escaped; the
+# external-runtime-resource ban remains enforced by check-site.py and the
+# browser-observation gate on the generated pages.
+RAW_BANNED_ELEMENTS = frozenset({"script", "style", "iframe", "link", "meta", "object", "embed", "base", "form"})
+
+
+def strip_foreign_namespaces(body):
+    # html5lib keeps foreign content (SVG/MathML) in its own namespace, which
+    # ElementTree would serialize with ns0: prefixes the browser discards.
+    # Namespaces are stripped before the guard so <svg><script> cannot evade
+    # the banned-element check by hiding behind a foreign namespace.
+    for node in body.iter():
+        if isinstance(node.tag, str) and node.tag.startswith("{"):
+            node.tag = node.tag.rsplit("}", 1)[-1]
+        for key in [key for key in node.attrib if key.startswith("{")]:
+            node.attrib[key.rsplit("}", 1)[-1]] = node.attrib.pop(key)
+
+
+def guard_raw_html(body):
+    for node in body.iter():
+        if node.tag in RAW_BANNED_ELEMENTS:
+            raise ValueError(f"Raw HTML contains banned element: <{node.tag}>")
+        for attr, value in node.attrib.items():
+            if attr.lower().startswith("on"):
+                raise ValueError(f"Raw HTML contains event-handler attribute {attr} on <{node.tag}>")
+            if attr in {"href", "src"}:
+                safe_url(value)
+
+
 def render_body(source, metadata):
     body = markdown_fragment(source)
+    strip_foreign_namespaces(body)
+    guard_raw_html(body)
     headings = list(body.iter("h1"))
     if len(headings) != 1 or not len(body) or body[0] is not headings[0]:
         raise ValueError("Source must begin with exactly one H1")

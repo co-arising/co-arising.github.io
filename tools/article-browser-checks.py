@@ -10,7 +10,9 @@ import tempfile
 import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
-SLUGS = ('ai-coding-evolution-20261116', 'co-arising-implications-20261116')
+MANIFEST = json.loads((ROOT / 'content/articles/manifest.json').read_text(encoding='utf-8'))['articles']
+SLUGS = tuple(item['slug'] for item in MANIFEST)
+RELATED = {item['slug']: item['related'] for item in MANIFEST}
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -29,7 +31,7 @@ def verify(browser, base, evidence):
             page.locator('#insights a.btn').click()
             page.wait_for_url(base + '/zh/articles/')
             page.evaluate('document.fonts.ready')
-            assert page.locator('.article-card').count() == 2
+            assert page.locator('.article-card').count() == len(SLUGS)
             page.screenshot(path=str(evidence / f'index-{width}.png'), full_page=True)
             page.locator('.article-card h3 a').first.click()
             page.wait_for_url(base + '/zh/articles/' + SLUGS[0] + '/')
@@ -48,11 +50,12 @@ def verify(browser, base, evidence):
                 if not toc.evaluate('element => element.open'):
                     toc.locator('summary').click()
                 page.locator('.article-toc a[href="#section-3"]').click()
-                page.wait_for_timeout(900)
+                # Smooth scrolling settles late on long articles; wait for the
+                # current-section state instead of a fixed delay.
+                page.wait_for_function("() => document.querySelector('.article-toc a[aria-current]')?.getAttribute('href') === '#section-3'", timeout=8000)
                 heading_top = page.locator('#section-3').evaluate('element => element.getBoundingClientRect().top')
                 nav_bottom = page.locator('#site-nav').evaluate('element => element.getBoundingClientRect().bottom')
                 assert nav_bottom - 2 <= heading_top < 900, 'TOC target hidden by navigation'
-                assert page.locator('.article-toc a[aria-current]').get_attribute('href') == '#section-3'
                 assert '0%' != page.locator('#reading-position').text_content().split('·')[-1].strip()
                 observations.append({'width': width, 'slug': slug, 'headingTop': heading_top,
                                      'navBottom': nav_bottom, 'progress': page.locator('#reading-position').text_content()})
@@ -79,7 +82,7 @@ def verify(browser, base, evidence):
                     page.locator('pre.code').first.scroll_into_view_if_needed()
                     page.screenshot(path=str(evidence / f'diagram-{width}.png'))
                 page.locator('.article-related h3 a').click()
-                other = SLUGS[1] if slug == SLUGS[0] else SLUGS[0]
+                other = RELATED[slug]
                 page.wait_for_url(base + '/zh/articles/' + other + '/')
                 page.locator('#language-switch').click()
                 page.wait_for_url(base + '/articles/')

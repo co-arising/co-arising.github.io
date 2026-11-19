@@ -286,6 +286,11 @@ contract is not inferred from the website's Explorer tests.
 
 - [ ] Article Markdown and manifest metadata produce fresh checked-in outputs via
       `tools/build-articles.py --check`; originals retain reviewed source bytes.
+      Article Markdown may embed block/inline HTML for editorial layout only:
+      `render_body`'s guard rejects active content at build time (banned
+      `script`/`style`/`iframe`/`link`/`meta`/`object`/`embed`/`base`/`form`
+      elements, `on*` event-handler attributes, and unsafe `href`/`src` schemes);
+      the runtime external-resource ban above stays unchanged.
 - [ ] Editorial quotations, external statistics and proposed engineering directions
       remain attributed and unverified, not recast as F-xx product-shipping proof.
 - [ ] Original Chinese article titles are not presented as translated EN titles;

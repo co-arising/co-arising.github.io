@@ -7,9 +7,11 @@ from collections import Counter
 import contextlib
 import copy
 import hashlib
+import html
 from html.parser import HTMLParser
 import importlib.util
 import io
+from itertools import chain
 import json
 from pathlib import Path
 import re
@@ -30,6 +32,7 @@ HASHES = {
     "ai-coding-evolution-20261116.md": "16a41c0909b15fc6737d70fd7571b486a9d351b9986708dc853f31024ba1f0da",
     "co-arising-implications-20261116.md": "d2f62b4646fc0e3118e5a93b44dfd97ec2de20038fc2b0d810fd26a78c537a32",
     "lauren-tan-trust-pyramid-20261118.md": "0b68c0a2034492c61a2f8be0423f7675134d60dbd82ad4490c716aa76edc3495",
+    "ai-engineer-code-2026-50-talks-20261119.md": "ee3039e90869d20c57c3de2297ddaafac9526e7968bae09f3218fd170ed6f70e",
 }
 
 
@@ -101,13 +104,14 @@ def semantic_tree(node, strategy=False):
     """Ignore publishing attributes/wrappers, retain full ordered semantic AST."""
     if node.tag == "div" and node.get("class") == "article-table":
         return semantic_tree(node[0], strategy)
+    tag = node.tag.rsplit("}", 1)[-1] if isinstance(node.tag, str) else node.tag
     attrs = dict(node.attrib)
     for name in ("id", "class", "scope"):
         attrs.pop(name, None)
     if strategy and attrs.get("href") == "./ai-coding-evolution-20261116.md":
         attrs["href"] = build.detail_route(build.SURVEY_SLUG)
     return (
-        node.tag, attrs,
+        tag, attrs,
         " ".join((node.text or "").split()),
         tuple(semantic_tree(child, strategy) for child in node),
         " ".join((node.tail or "").split()),
@@ -157,7 +161,14 @@ class ArticleTests(unittest.TestCase):
     def test_original_ordered_external_links_and_counts(self):
         for item in self.items:
             source = (build.CONTENT / item["source"]).read_text(encoding="utf-8")
-            expected = re.findall(r"\]\((https?://[^)\s]+)\)", source)
+            # External links may be Markdown destinations or guarded raw-HTML
+            # href attributes; both must reach the body in exact source order.
+            matches = sorted(
+                chain(re.finditer(r"\]\((https?://[^)\s]+)\)", source),
+                      re.finditer(r'href="(https?://[^"\s]+)"', source)),
+                key=lambda match: match.start(),
+            )
+            expected = [html.unescape(match.group(1)) for match in matches]
             body, _ = build.render_body(source, item)
             actual = [node.get("href") for node in body.iter("a") if node.get("href").startswith(("http://", "https://"))]
             self.assertGreater(len(expected), 10)
@@ -247,9 +258,7 @@ class ArticleTests(unittest.TestCase):
         metadata = dict(self.items[0], title='标题 <安全> & "引文"')
         source = '''# 标题 <安全> & "引文"
 
-<script>alert("bad")</script>
-
-<img src="x" onerror="bad()" />
+<div class="co-report"><p class="co-note">版式原生 <strong>块级 HTML</strong> &amp; 实体 &#x1F642; 保留。</p></div>
 
 ## 一、**中文 &amp;** café &copy; &#x1F642;
 
@@ -262,18 +271,26 @@ class ArticleTests(unittest.TestCase):
 ```
 '''
         body, toc = build.render_body(source, metadata)
-        self.assertFalse(list(body.iter("script")))
-        self.assertFalse(list(body.iter("img")))
-        self.assertIn('<script>alert("bad")</script>', text(body))
+        # Guarded raw block HTML passes through as real elements.
+        self.assertIsNotNone(body.find("div/p/strong"))
+        self.assertEqual(text(body.find("div/p")), "版式原生 块级 HTML & 实体 🙂 保留。")
         self.assertEqual(text(body.find("h2")), "一、中文 & café © 🙂")
         self.assertIsNotNone(body.find("h2/strong"))
         self.assertIsNotNone(body.find("h3/em"))
         self.assertEqual(text(toc.find("li/a")), "01 中文 & café © 🙂")
         self.assertEqual(text(body.find("pre/code")), "<script> &copy; <tag> café\n")
         self.assertEqual(body.find(".//a").get("href"), "https://example.org/?a=1&b=2")
-        serialized = build.serialize(body)
-        self.assertIn("&lt;script&gt;", serialized)
-        self.assertNotIn('<script>', serialized)
+        # Active raw HTML is rejected at build time, never rendered or escaped.
+        for fragment, message in (
+            ("<script>alert(\"bad\")</script>", "banned element: <script>"),
+            ("<style>p { color: red }</style>", "banned element: <style>"),
+            ('<iframe src="https://cdn.example/frame"></iframe>', "banned element: <iframe>"),
+            ('<img src="x" onerror="bad()" />', "event-handler attribute onerror"),
+            ('<div onclick="bad()">x</div>', "event-handler attribute onclick"),
+            ('<a href="javascript:alert(1)">x</a>', "Unsafe article URL scheme"),
+        ):
+            with self.subTest(fragment=fragment), self.assertRaisesRegex(ValueError, re.escape(message)):
+                build.render_body('# 标题 <安全> & "引文"\n\n' + fragment + "\n", metadata)
         for url in ("javascript:alert(1)", "data:text/html,bad", "vbscript:bad", "java\nscript:bad", "//evil.example", "\\evil.example", " javascript:bad"):
             with self.subTest(url=url), self.assertRaises(ValueError):
                 build.safe_url(url)
@@ -281,11 +298,14 @@ class ArticleTests(unittest.TestCase):
             build.render_body('# Safe\n\n[x](javascript:alert(1))', dict(metadata, title="Safe"))
 
     def test_metadata_escaping_and_validation(self):
+        # Hostile metadata is escaped in the shell; the body itself goes through
+        # the raw-HTML guard, so the H1 fixture stays free of active content.
         special = '<img src=x onerror="bad()"> & "中文"'
-        item = dict(self.items[0], title=special, deck=special, category=special)
-        detail = build.detail_page(item, self.items[1], "# " + special + "\n\n## 安全\n\n内容。")
+        tamed = '标题 <安全> & "引文"'
+        item = dict(self.items[0], title=tamed, deck=special, category=special)
+        detail = build.detail_page(item, self.items[1], "# " + tamed + "\n\n## 安全\n\n内容。")
         dom = PageParser(detail).root
-        self.assertEqual(text(dom.find(".//h1")), special)
+        self.assertEqual(text(dom.find(".//h1")), tamed)
         self.assertEqual(dom.find('.//meta[@name="description"]').get("content"), special)
         self.assertFalse(list(dom.iter("img")))
         self.assertEqual(text(by_class(dom, "article-deck")[0]), special)

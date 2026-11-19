@@ -111,3 +111,82 @@
 @media (prefers-reduced-motion: reduce) {
   .article-card { transition: none; }
 }
+
+/* ---------- AI Engineer CODE 2026 50-talk dossier layout (.co-report) ----------
+   Faithful port of the source report's layout; every selector is scoped under
+   .co-report. Report colors map onto the theme tokens (teal = S tier / red =
+   A tier / ink ramp = B-C tiers and neutrals) so light and dark schemes both
+   work; fonts are the site's self-hosted IBM Plex stacks. */
+.co-report section { padding: 0; }
+.co-report .sec-head { display: block; }
+.co-report .measure { max-width: 68ch; }
+.co-report p { margin: 0 0 12px; }
+.co-report h2 {
+  font-size: clamp(24px, 2.4vw, 32px); line-height: 1.3; letter-spacing: -.015em;
+  font-weight: 700; margin: 0 0 12px; padding-top: 0;
+}
+.co-report .hero-strip {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;
+  border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line);
+  padding: 20px 0; margin: 0 0 44px;
+}
+.co-report .metric-val { font-family: var(--font-mono), var(--font-sans); font-size: clamp(28px, 3vw, 40px); font-weight: 600; line-height: 1.1; color: var(--ink); white-space: nowrap; }
+.co-report .metric-val.accent { color: var(--teal); }
+.co-report .metric-val.accent2 { color: var(--red); }
+.co-report .metric-label { font-size: 13px; color: var(--ink-3); margin-top: 6px; }
+.co-report .verdict-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; margin: 0 0 56px; }
+.co-report .verdict-left { grid-column: 1 / span 5; }
+.co-report .verdict-right { grid-column: 6 / span 7; }
+.co-report .verdict-left h2 { margin-top: 0; }
+.co-report .sec { margin-top: 68px; padding-top: 28px; border-top: 2px solid var(--ink); }
+.co-report .sec-desc { color: var(--ink-2); margin: 0 0 28px; }
+.co-report .chart-fig { margin: 0 0 56px; padding: 24px 0 0; border-top: 1px solid var(--line); }
+.co-report .fig-title { font-size: 18px; font-weight: 600; margin-bottom: 14px; color: var(--ink); }
+.co-report figcaption { font-size: 13px; color: var(--ink-3); margin-top: 8px; }
+.co-report .article-table { margin: 16px 0 0; }
+.co-report .article-table table { font-size: 14px; line-height: 1.5; }
+.co-report .article-table th {
+  font-family: var(--font-mono), var(--font-sans); font-size: 12px; font-weight: 600;
+  color: var(--ink-3); background: transparent; border-bottom: 2px solid var(--ink);
+  padding: 10px 12px 10px 0; white-space: nowrap;
+}
+.co-report .article-table td { padding: 12px 14px 12px 0; background: transparent; }
+.co-report td.num { font-family: var(--font-mono), var(--font-sans); white-space: nowrap; font-weight: 600; }
+.co-report td.score-s { color: var(--teal); }
+.co-report .org-sub { color: var(--ink-3); font-size: 13px; }
+.co-report .talk-row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; padding: 24px 0; border-top: 1px solid var(--line); }
+.co-report .talk-meta { grid-column: 1 / span 4; }
+.co-report .talk-body { grid-column: 5 / span 8; }
+.co-report .talk-rank-line { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+.co-report .rank-num { font-family: var(--font-mono), var(--font-sans); font-size: 20px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.co-report .tier-score { font-family: var(--font-mono), var(--font-sans); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.co-report .ts-s { color: var(--teal); }
+.co-report .ts-a { color: var(--red); }
+.co-report .ts-b { color: var(--ink-2); }
+.co-report .ts-c { color: var(--ink-3); }
+.co-report .talk-title { font-size: 18px; line-height: 1.35; font-weight: 600; margin: 0 0 8px; }
+.co-report .talk-title a { color: var(--ink); text-decoration: none; }
+.co-report .talk-title a:hover { color: var(--red); }
+.co-report .talk-speaker { font-size: 14px; color: var(--ink-2); margin: 0 0 8px; }
+.co-report .talk-link { font-size: 13px; margin: 0; }
+.co-report .talk-summary { margin: 0 0 14px; font-size: 15px; font-weight: 500; color: var(--ink); }
+.co-report .talk-dl { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 14px; line-height: 1.55; }
+.co-report .talk-dl dt { font-weight: 600; color: var(--ink-3); white-space: nowrap; }
+.co-report .talk-dl dd { margin: 0; color: var(--ink-2); }
+.co-report .sources-sec { margin-top: 68px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-3); }
+.co-report .sources-sec h2 { font-size: clamp(20px, 2vw, 26px); }
+.co-report .chart-axis { stroke: var(--line-strong); }
+.co-report .chart-grid { stroke: var(--line); }
+.co-report .bar-s { fill: var(--teal); }
+.co-report .bar-a { fill: var(--red); }
+.co-report .bar-b { fill: var(--ink-2); }
+.co-report .bar-c { fill: var(--ink-3); }
+.co-report .chart-label { fill: var(--ink); font-family: var(--font-sans); }
+.co-report .chart-mono { font-family: var(--font-mono), var(--font-sans); fill: var(--ink-2); }
+.co-report .chart-mono.chart-tick { fill: var(--ink-3); }
+.co-report .val-s { fill: var(--teal); }
+.co-report .val-a { fill: var(--red); }
+@media (max-width: 900px) {
+  .co-report .hero-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .co-report .verdict-left, .co-report .verdict-right, .co-report .talk-meta, .co-report .talk-body { grid-column: 1 / -1; }
+}
