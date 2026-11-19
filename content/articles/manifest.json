@@ -17,6 +17,15 @@
       "date": "2026-11-16",
       "source": "co-arising-implications-20261116.md",
       "related": "ai-coding-evolution-20261116"
+    },
+    {
+      "slug": "lauren-tan-trust-pyramid-20261118",
+      "title": "从「AI 垃圾」到月合并 11,000 PR：SpaceXSI 主任工程师 Lauren Tan 的 AI Coding 工程体系深度评估与落地指南",
+      "deck": "以两场一手演讲与开源 pstack 为信源，对照 2024–2026 学术与工业实证检验「信任倒金字塔」与「验证优先」的适用边界，并给出四阶段落地路线。",
+      "category": "工程实践",
+      "date": "2026-11-18",
+      "source": "lauren-tan-trust-pyramid-20261118.md",
+      "related": "ai-coding-evolution-20261116"
     }
   ]
 }

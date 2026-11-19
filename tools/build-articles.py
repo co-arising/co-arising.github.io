@@ -30,15 +30,16 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content" / "articles"
 MANIFEST = CONTENT / "manifest.json"
 SITE = "https://co-arising.github.io"
-ORIGIN = "https://share.gemini.google/TqSOArhYLvn7"
 SURVEY_SLUG = "ai-coding-evolution-20261116"
 STRATEGY_SLUG = "co-arising-implications-20261116"
+PRACTICE_SLUG = "lauren-tan-trust-pyramid-20261118"
 # Initial publication fixture; future valid manifest slugs stay in /zh/articles/.
 OWNED_OUTPUTS = (
     "articles/index.html",
     "zh/articles/index.html",
     f"zh/articles/{SURVEY_SLUG}/index.html",
     f"zh/articles/{STRATEGY_SLUG}/index.html",
+    f"zh/articles/{PRACTICE_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"
@@ -352,7 +353,7 @@ def detail_page(item, related, source):
       <p class="article-meta"><span>{esc(item["category"])}</span> · <time datetime="{esc(item["date"])}">{esc(item["date"])}</time> · 中文原文</p>
       <h1>{esc(item["title"])}</h1>
       <p class="article-deck">{esc(item["deck"])}</p>
-      <div class="article-actions"><a href="{ORIGIN}">Gemini 公开分享对话</a> · <a href="/content/articles/{esc(item["source"])}" download="{esc(item["source"])}">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a></div>
+      <div class="article-actions"><a href="/content/articles/{esc(item["source"])}" download="{esc(item["source"])}">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction">{note}<p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
