@@ -107,6 +107,15 @@ test('runtime URL scan follows finite fetch/Worker/import loads, not normal repo
   assert.deepEqual(result, ['//cdn.example/other.js', '/assets/data/local.json', '/assets/vendor/local.js', 'https://cdn.example/data.json', 'https://cdn.example/module.js', 'https://cdn.example/worker.js']);
 });
 
+test('the analytics beacon URL is exempt from the runtime scan; other external loads are not', () => {
+  const allowed = fixture(dir => amend(dir, 'assets/js/site.js', text =>
+    text + '\n{\n  const beacon = document.createElement("script");\n  beacon.src = "https://static.cloudflareinsights.com/beacon.min.js";\n  document.head.appendChild(beacon);\n}\n')).result;
+  assert.ok(!allowed.errors.some(e => e.includes('external runtime resource')));
+  const rogue = fixture(dir => amend(dir, 'assets/js/site.js', text =>
+    text + '\nfetch("https://cdn.example/telemetry.js");\n')).result;
+  assert.ok(rogue.errors.some(e => e.includes('external runtime resource') && e.includes('cdn.example/telemetry.js')));
+});
+
 function fixture(change) {
   const temporary = mkdtempSync(join(tmpdir(), 'co-arising-static-test-'));
   try {
