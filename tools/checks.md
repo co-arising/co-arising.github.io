@@ -333,6 +333,11 @@ contract is not inferred from the website's Explorer tests.
       explained. Sizes are not presented as measured performance timings.
 - [ ] Runtime assets are local; external GitHub/documentation links are not runtime
       requests. Neither cold nor cached-offline site availability is guaranteed.
+      Single sanctioned exception: the Cloudflare Web Analytics beacon
+      (`https://static.cloudflareinsights.com/beacon.min.js`) injected by
+      `assets/js/site.js` for production traffic statistics (ad9d34e), recorded in
+      `ALLOWED_EXTERNAL_RUNTIME` inside `tools/check-site.py`; that exact URL is
+      exempt from the external-runtime-resource scan, everything else still fails.
 - [ ] `.nojekyll` remains present; no framework/build/CDN dependency was introduced.
 - [ ] Review the final diff and staged file list; do not publish temporary evidence.
 - [ ] Commit/push only when authorized, then separately check the live deployment.

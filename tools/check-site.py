@@ -18,6 +18,11 @@ NAV_ROUTES = (*CORE_ROUTES, "articles")
 PRESETS = {"census", "describe", "blast", "lineage", "orphans", "sagas", "invariants"}
 ID_RE = re.compile(r"(?<![\w-])(?:F-\d+|DEF-\d+)(?![\w-])")
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
+# The Cloudflare Web Analytics beacon injected by assets/js/site.js is the single
+# sanctioned external runtime resource (production traffic statistics only; owner
+# decision in ad9d34e). Exact-match allowlist: every other runtime load, including
+# any mutation of this URL, must stay local to the repository.
+ALLOWED_EXTERNAL_RUNTIME = frozenset({"https://static.cloudflareinsights.com/beacon.min.js"})
 
 
 class LiteralParser:
@@ -471,6 +476,8 @@ def check_site(root=ROOT):
 
     def resource(url, path):
         label = path.relative_to(root)
+        if url in ALLOWED_EXTERNAL_RUNTIME:
+            return
         parsed = urlsplit(url)
         if parsed.scheme not in ('', 'data', 'blob') or parsed.netloc:
             errors.append(f'{label}: external runtime resource: {url}')
