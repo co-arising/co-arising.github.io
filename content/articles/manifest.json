@@ -47,6 +47,18 @@
       "title_en": "AI Engineer CODE 2026: All 50 Talks Ranked by Relevance and Fully Unpacked",
       "deck_en": "A zero-truncation close reading of all 50 complete talk transcripts, ranked #01–#50 by relevance to deterministic verification and agent governance — each unpacked across problem, core theory, validated results and toolchain.",
       "source_en": "ai-engineer-code-2026-50-talks-20261119.en.md"
+    },
+    {
+      "slug": "aws-kiro-smt-spec-analyzer-20261119",
+      "title": "规约本身就有 Bug：深度拆解 AWS Kiro 如何用 SMT 求解器在写代码前消灭 Spec 歧义与逻辑冲突",
+      "deck": "深度解析 AWS Automated Reasoning Group 工程师 Rajath Kotyal 在 AI Engineer CODE 2026 的高分演讲《Specs have bugs too》：完整溯源 Slides 与学术引用，对比引入 SMT 前后的 Spec 写法与工作流，剖析 SAT/SMT 与多采样逻辑等价聚类原理，提供可直接运行的 SMT-LIB2 / Python Z3 样例与开源生态清单，并提出对 co-arising（truthsrc）实践的四大工程补充。",
+      "category": "工程实践",
+      "date": "2026-11-19",
+      "source": "aws-kiro-smt-spec-analyzer-20261119.md",
+      "related": "ai-engineer-code-2026-50-talks-20261119",
+      "title_en": "Specs Have Bugs Too: How AWS Kiro Uses SMT Solvers to Eliminate Ambiguity and Logic Conflicts Before Writing Code",
+      "deck_en": "A technical deep dive into AWS Automated Reasoning Group engineer Rajath Kotyal's AI Engineer CODE 2026 talk 'Specs have bugs too': tracing slides and empirical citations, contrasting Before vs. After SMT specifications, demystifying SAT/SMT and multi-sample logical-equivalence clustering, sharing runnable SMT-LIB2 and Python Z3 snippets alongside open-source repositories, and proposing four architectural supplements for co-arising (truthsrc).",
+      "source_en": "aws-kiro-smt-spec-analyzer-20261119.en.md"
     }
   ]
 }

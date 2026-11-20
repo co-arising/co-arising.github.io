@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>规约本身就有 Bug：深度拆解 AWS Kiro 如何用 SMT 求解器在写代码前消灭 Spec 歧义与逻辑冲突 — co-arising</title>
+  <meta name="description" content="深度解析 AWS Automated Reasoning Group 工程师 Rajath Kotyal 在 AI Engineer CODE 2026 的高分演讲《Specs have bugs too》：完整溯源 Slides 与学术引用，对比引入 SMT 前后的 Spec 写法与工作流，剖析 SAT/SMT 与多采样逻辑等价聚类原理，提供可直接运行的 SMT-LIB2 / Python Z3 样例与开源生态清单，并提出对 co-arising（truthsrc）实践的四大工程补充。" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="规约本身就有 Bug：深度拆解 AWS Kiro 如何用 SMT 求解器在写代码前消灭 Spec 歧义与逻辑冲突" />
+  <meta property="og:description" content="深度解析 AWS Automated Reasoning Group 工程师 Rajath Kotyal 在 AI Engineer CODE 2026 的高分演讲《Specs have bugs too》：完整溯源 Slides 与学术引用，对比引入 SMT 前后的 Spec 写法与工作流，剖析 SAT/SMT 与多采样逻辑等价聚类原理，提供可直接运行的 SMT-LIB2 / Python Z3 样例与开源生态清单，并提出对 co-arising（truthsrc）实践的四大工程补充。" />
+  <meta property="og:url" content="https://co-arising.github.io/zh/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/articles/aws-kiro-smt-spec-analyzer-20261119/">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a> · <a href="/zh/articles/" aria-current="page">技术观察</a> · <a class="nav-link" href="/articles/aws-kiro-smt-spec-analyzer-20261119/" lang="en" rel="alternate" hreflang="en">EN</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript 已关闭——正文、目录、链接与下载仍可使用。</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="面包屑"><a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a> / <span aria-current="page">工程实践</span></nav>
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-19">2026-11-19</time> · 中文原文</p>
+      <h1>规约本身就有 Bug：深度拆解 AWS Kiro 如何用 SMT 求解器在写代码前消灭 Spec 歧义与逻辑冲突</h1>
+      <p class="article-deck">深度解析 AWS Automated Reasoning Group 工程师 Rajath Kotyal 在 AI Engineer CODE 2026 的高分演讲《Specs have bugs too》：完整溯源 Slides 与学术引用，对比引入 SMT 前后的 Spec 写法与工作流，剖析 SAT/SMT 与多采样逻辑等价聚类原理，提供可直接运行的 SMT-LIB2 / Python Z3 样例与开源生态清单，并提出对 co-arising（truthsrc）实践的四大工程补充。</p>
+      <div class="article-actions"><a href="/content/articles/aws-kiro-smt-spec-analyzer-20261119.md" download="aws-kiro-smt-spec-analyzer-20261119.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/aws-kiro-smt-spec-analyzer-20261119/">Read in English</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 演讲全景、Slides 核实与核心理论/实证引用溯源</a></li><li><a href="#section-2"><span class="toc-number">02</span> Before SMT vs. After SMT：规约写法与工作流的本质跃迁</a></li><li><a href="#section-3"><span class="toc-number">03</span> 架构师视角彻底搞懂：SMT 是怎么工作的？</a></li><li><a href="#section-4"><span class="toc-number">04</span> 开源生态清单与可直接运行的 SMT-LIB2 / Python Z3 样例</a></li><li><a href="#section-5"><span class="toc-number">05</span> 对 co-arising（truthsrc）整个实践的四大深度补充</a></li><li><a href="#section-6"><span class="toc-number">06</span> 结语：从“静态架构编译器”走向“神经符号领域验证引擎”</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">阅读全文</p>
+      </aside>
+      <article id="article-body" class="article-body"><p>2026 年，规约驱动开发（Spec-Driven Development，SDD）已成为 AI Coding 工程化的主流共识——几乎所有团队都在强调“先写 <code>spec.md</code> / <code>requirements.md</code>，再让 Coding Agent 动手写代码”。然而，在 <strong>AI Engineer CODE 2026</strong>（2026 年 11 月 11 日）的演讲 <a href="https://ai.engineer/code/2026/talks/online-aws-specification-analyzer">《Specs have bugs too》</a> 中，来自 <strong>AWS Automated Reasoning Group（自动推理组）</strong> 的软件工程师 <strong>Rajath Mahendrappa Kotyal</strong>（<a href="https://ai.engineer/speakers/rajath-mahendrappa-kotyal">AI Engineer 讲者档案</a> · <a href="https://github.com/rajathkotyal">GitHub <code>@rajathkotyal</code></a>）一针见血地戳破了 SDD 的核心盲区：</p>
+<blockquote>
+<p><strong>如果你的规约本身就包含隐藏歧义、跨句冲突和状态缺口，再强的 Coding Agent 也只会把错误的需求以 10 倍速编译成生产环境里的 Bug。</strong></p>
+</blockquote>
+<p>这篇深度解读将围绕五大核心问题展开：</p>
+<ol>
+<li><strong>演讲、Slides 与学术引用溯源</strong>：核实 Slides 获取方式、AWS 研发团队背景，以及演讲中所有关键统计数据的原始论文出处。</li>
+<li><strong>Before SMT vs. After SMT</strong>：没有 SMT 之前 Spec 怎么写，引入 SMT 之后 Spec 写法与人机协作工作流发生了怎样的质变。</li>
+<li><strong>底层原理全解</strong>：SMT 求解器究竟如何工作？AWS 的三阶段神经符号管线与“7–10 次采样 + 逻辑等价聚类”如何解决自然语言二义性。</li>
+<li><strong>开源生态与可运行样例</strong>：盘点 GitHub 上的核心开源项目，并提供可直接运行的 SMT-LIB2 与 Python <code>z3-solver</code> 完整代码片段。</li>
+<li><strong>对 <code>co-arising</code>（<code>truthsrc</code>）的四大深度补充</strong>：如何将 SMT 逻辑校验无缝嫁接到 <code>truthsrc</code> 编译器、苏格拉底式 <code>domain-interview</code> Skill、测试生成与 Saga 不变量验证中。</li>
+</ol>
+<h2 id="section-1">一、演讲全景、Slides 核实与核心理论/实证引用溯源</h2>
+<h3 id="section-1-1">1.1 讲者、研发团队与 Slides 获取情况</h3>
+<ul>
+<li><strong>演讲视频与官方文字版</strong>：录播位于 AI Engineer CODE 2026 Day 1 直播的 <a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=6648s"><code>1:50:46–1:58:35</code></a>，官方配套页面为 <a href="https://ai.engineer/code/2026/talks/online-aws-specification-analyzer">Specs have bugs too | AI Engineer CODE 2026</a>。</li>
+<li><strong>讲者背景</strong>：<a href="https://ai.engineer/speakers/rajath-mahendrappa-kotyal">Rajath Mahendrappa Kotyal</a> 毕业于卡内基梅隆大学（CMU），现任职于 AWS Automated Reasoning Group，参与构建了 Kiro 的 Requirements Analysis（需求分析）引擎，同时也是 AWS 开源 Rust 模型检查器 <a href="https://github.com/model-checking/kani">Kani</a> 的核心贡献者与评审者。</li>
+<li><strong>核心团队勘误</strong>：演讲末尾自动语音字幕（ASR）将致谢名单识别为 <code>"Anda Jin, Stefan, Nia and Delmos"</code>。经核对 AWS Kiro 团队于 2026 年 5 月 12 日发表的官方深度技术博客 <a href="https://kiro.dev/blog/deep-spec-analysis/">《Requirements analysis: catching requirement bugs before they become code》</a>，该特性的核心应用科学家（Applied Science）团队成员实为：<strong>Oyendrila Dobe、Jatin Arora、Stefan Zetzsche、Nadia Labai、Rémi Delmas</strong>。</li>
+<li><strong>关于 Slides 的说明</strong>：截至目前，AI Engineer CODE 2026 官方<strong>未单独提供独立下载的 PDF 版 Slides</strong>。但官方的 <a href="https://ai.engineer/code/2026/talks/online-aws-specification-analyzer">Reading Edition 页面</a> 已精确标注了关键幻灯片的时间戳（例如 <code>01:54:20</code> 分离 LLM 翻译与 Solver 校验的架构图、<code>01:55:00</code> 多采样逻辑等价聚类图、<code>01:55:40</code> 语义熵分流决策图）；且演讲中展示的所有方法论、示例、SMT 公式与流程图，均已在上述 <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro 官方长文</a> 中以高清图文形式完整公开。</li>
+</ul>
+<h3 id="section-1-2">1.2 演讲与 Slides 中的理论与实证引用溯源</h3>
+<p>演讲与 Kiro 官方文章中引用了多组震撼性的量化结论。下面将每一组关键数据完整溯源到其原始学术论文或工业实证出处：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：演讲 / Slides 中的核心论断 / 原始论文 / 实证出处 / 核心发现与工程含义"><table>
+<thead>
+<tr>
+<th scope="col">演讲 / Slides 中的核心论断</th>
+<th scope="col">原始论文 / 实证出处</th>
+<th scope="col">核心发现与工程含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>模糊、矛盾或不完整的 Prompt 会导致代码生成 Pass@1 下降 20–40%，且 60–90% 语法合法的代码语义上是错的</strong></td>
+<td><strong>Larbi et al. (2025)</strong>，<a href="https://arxiv.org/html/2507.20439"><em>When Prompts Go Wrong: Evaluating Code Model Robustness to Ambiguous, Contradictory, and Incomplete Task Descriptions</em></a>（arXiv:2507.20439，见 <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro 博客引用</a>）</td>
+<td>将清晰任务描述变异为含歧义、冲突或缺口的描述后，模型生成的代码往往“能编译、能跑通”，但实际行为与作者意图背道而驰。</td>
+</tr>
+<tr>
+<td><strong>欠定义（Underspecified）Prompt 在切换模型或微调提示词时，回归风险约翻倍（2×），准确率跌幅有时超过 20%</strong></td>
+<td><strong>Yang et al. (2025)</strong>，<em>What Prompts Don't Say: Understanding and Managing Underspecification in LLM Prompts</em>（arXiv:2505.13360，见 <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro 博客引用</a>）</td>
+<td>LLM 会用自身隐式偏见默默填补规约空白；升级到新模型后，新模型用不同的隐式偏见填空，导致代码在测试全绿的情况下发生静默行为漂移。</td>
+</tr>
+<tr>
+<td><strong>LLM 自动形式化（Auto-formalization）在工业界存在能力边界：擅长分类与实体抽取，但直接生成完备形式化规约仍面临“隐式领域知识”挑战</strong></td>
+<td><strong>Norheim et al. (2024)</strong>（MIT &amp; Airbus 联合研究），<em>Challenges in applying large language models to requirements engineering tasks</em>，<em>Design Science</em>, 10:e16（doi:10.1017/dsj.2024.8，见 <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro 博客引用</a>）</td>
+<td>解释了为什么 AWS 不让 LLM 一步到位做端到端证明，而是将“隐式领域知识（需求暗物质）”显式化为背景公理，并保留人类最终裁决权。</td>
+</tr>
+<tr>
+<td><strong>结构化自然语言需求语法标准（EARS）</strong></td>
+<td><strong>Mavin et al. (2009)</strong>（Rolls-Royce），<a href="https://alistairmavin.com/ears/"><em>Easy Approach to Requirements Syntax (EARS)</em></a>（17th IEEE RE'09，见 <a href="https://en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax">Wikipedia</a> 与 <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro 博客</a>）</td>
+<td>用极少的固定句式关键词（<code>WHEN</code>、<code>WHILE</code>、<code>IF...THEN</code>、<code>WHERE</code>、<code>SHALL</code>）约束自然语言，使其天然具备映射到一阶逻辑蕴含式（<code>antecedent =&gt; consequent</code>）的骨架。</td>
+</tr>
+<tr>
+<td><strong>AWS 内部实证：约 60% 的初版需求在进入编码前需要精炼</strong></td>
+<td>行业媒体与技术综述引述 AWS Kiro 内测数据（见 <a href="https://www.specira.ai/blog/specs-are-the-problem">Specira 分析</a> 与 <a href="https://stepto.net/blog/ai-formal-verification-vericoding-specifications-2026">Stepto 2026 综述</a>）</td>
+<td>在 <strong>35 个 AWS 内部项目、超过 1,400 条验收标准</strong> 的评估中，约 <strong>60%</strong> 的初版需求在交给 Agent 实现前被检出缺陷并需精炼。</td>
+</tr>
+<tr>
+<td><strong>学术界同期独立印证：歧义导致不同运行/模型间的功能分叉</strong></td>
+<td><a href="https://arxiv.org/html/2604.21505v3"><em>Orchid Benchmark (2026)</em></a>（arXiv:2604.21505）与 <a href="https://arxiv.org/html/2607.00711v2"><em>ClarifyCodeBench (2026)</em></a>（arXiv:2607.00711）</td>
+<td>人类开发者会在编码中持续澄清，而 LLM 被迫在单次生成中做“隐式押注”，直接将需求歧义固化为架构债。</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-2">二、Before SMT vs. After SMT：规约写法与工作流的本质跃迁</h2>
+<p>在没有 SMT 的时代，哪怕团队引入了“Spec 驱动开发”，写出来的 <code>requirements.md</code> 也往往停留在“人类读起来好像没毛病，但机器执行必然翻车”的状态。</p>
+<p>AWS 团队在 <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro 官方博客</a> 中将需求 Bug 归纳为四大类，并基于数十年系统工程经验（如 INCOSE 指南）提出合格规约必须满足的五项通用属性：<strong>可测试（Testable）、无实现细节（Solution-free）、无歧义（Unambiguous）、逻辑一致（Consistent）、状态完备（Complete）</strong>。</p>
+<h3 id="section-2-1">2.1 没有 SMT 之前：Spec 是怎么写的？</h3>
+<p>以 Kiro 官方博客与演讲中经典的 <strong>「删除房产（Delete Property）」</strong> 与 <strong>「电商订单处理（Order Processing）」</strong> 为例，没有 SMT 校验的初版 Spec 通常长这样（即便套用了 EARS 模板）：</p>
+<pre class="code"><code class="language-markdown">### 初版 Spec（Before SMT —— 看似清晰，实则暗藏四大雷区）
+
+**场景 A：删除房产（Delete Property）**
+- AC1: WHEN a Property Owner initiates property deletion, THE Platform SHALL prompt for confirmation before proceeding.
+- AC2: WHEN a Property Owner confirms deletion, THE Platform SHALL remove the Property record from the Platform.
+- AC3: WHEN a Property is deleted, THE Platform SHALL display a confirmation message and redirect to the properties list.
+- AC4: THE Platform SHALL implement soft deletion to retain Property records in the database for audit purposes while hiding them from the user interface.
+- AC5: WHEN a Property Owner attempts to delete a Property that does not belong to their User Account, THE Platform SHALL deny the deletion and display an authorization error message.
+
+**场景 B：电商订单（Order Processing）**
+- R1: WHEN an order is submitted AND inventory is available, THE Order System SHALL fulfill the order.
+- R2: WHEN an order is submitted AND inventory is not available, THE Order System SHALL place the order on backorder.
+- R3: THE Order System SHALL NOT place any order on backorder.
+- R4: WHEN an order is canceled, THE Order System SHALL refund all payments associated with the order.
+- R5: WHILE an order is in a canceled-and-refunded state, THE Order System SHALL NOT fulfill the order.
+</code></pre>
+<p>单看任何一条，工程师都会觉得“写得挺规范”。但把它交给 Coding Agent 后，灾难必然发生：</p>
+<ol>
+<li><strong>单句歧义（Ambiguity）</strong>：AC2 的 <code>"remove the record"</code> 究竟是物理删除（Hard Delete）还是标记隐藏（Soft Delete）？</li>
+<li><strong>跨句冲突（Inconsistency）</strong>：AC2 暗示删除，AC4 要求数据库保留；R2 要求缺货时转 <code>backorder</code>，R3 又全局禁止 <code>backorder</code>；更隐蔽的是，如果一个已取消并退款的订单被重新提交（<code>order_submitted</code>），当有库存时 <strong>R1 与 R5 冲突</strong>，无库存时 <strong>R2 与 R3 冲突</strong>——无论库存状态如何，都不存在合法的实现路径！</li>
+<li><strong>混杂实现细节与句式误用（Wrong Level of Detail）</strong>：AC4 写了 <code>"implement soft deletion"</code> 和 <code>"in the database"</code>（越界规定了 <em>How</em> 而非可观测的 <em>What</em>）；AC5 描述的是错误路径，却用了正常流关键词 <code>WHEN</code> 而非错误流关键词 <code>IF...THEN</code>。</li>
+<li><strong>状态覆盖缺口（Incompleteness）</strong>：房产不存在怎么办？房产名下还有未到期租约怎么办？用户点取消确认怎么办？订单既没提交也没取消处于空闲（Idle）状态时系统该干什么？</li>
+</ol>
+<h3 id="section-2-2">2.2 引入 SMT 之后：Spec 怎么写？工作流怎么变？</h3>
+<p>引入 SMT 并不是让产品经理或开发工程师去手写晦涩的数理逻辑公式。在 AWS Kiro 的实践中，<strong>人类依然只读写自然语言（EARS 规约），SMT 形式化完全隐藏在后台</strong>，但 Spec 的<strong>结构形态</strong>与<strong>编写工作流</strong>发生了根本变化：</p>
+<ol>
+<li><strong>写法规范化（Refinement 后的 Spec）</strong>：<ul>
+<li>剔除所有“论点式废话”（如“系统应支持鉴权”）与“实现处方”（如“使用数据库软删字段”），全部改写为<strong>输入、状态、触发事件与可观测输出一一对应</strong>的 EARS 句式。</li>
+<li>严格区分正常路径（<code>WHEN</code>）、状态持续（<code>WHILE</code>）、全局约束（<code>THE ... SHALL</code>）与异常错误路径（<code>IF ... THEN</code>）。</li>
+<li>显式补齐反推出来的异常分支（例如房产不存在、存在活跃租约、取消确认弹窗）。</li>
+</ul>
+</li>
+<li><strong>增加“后台三件套”（由系统自动维护，对人透明或可选审计）</strong>：<ul>
+<li><strong>Formal Schema（符号表）</strong>：显式声明实体、属性、事件、输入与输出变量，每个符号绑定自然语言溯源说明。</li>
+<li><strong>Rule Assertions（规则蕴含断言）</strong>：每条 EARS 语句精准对应一条逻辑蕴含式 <code>antecedent =&gt; consequent</code>。</li>
+<li><strong>Background Axioms（隐式领域公理）</strong>：显式写下人类默认常识（例如 <code>duration &gt;= 0</code>、“未提交的订单不能被取消”、“同一房产不能同时有两个活跃所有者”），避免求解器在现实中不可能的状态里误报。</li>
+</ul>
+</li>
+<li><strong>交互形态改变：从“写完就生成代码”变成“先答完几道 A/B 二选一澄清题”</strong>：<ul>
+<li>SMT 发现的任何冲突、歧义、缺口或意外场景，都不会吐出一堆数学报错，而是翻译成极简的<strong>二选一自然语言问题</strong>：<strong>选项 A 永远表示“保持现状”，选项 B 永远表示“按具体建议修改规约”</strong>。</li>
+</ul>
+</li>
+</ol>
+<p>下面是上节同一套「删除房产」与「电商订单」规约，经过 <strong>Refinement + SMT 逻辑校验 + 人类回答 A/B 澄清题</strong> 之后的完整改造版 Spec（其中场景 A 严格对应 <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro 官方博客</a> 给出的 8 条精炼验收标准；场景 B 展示了消除 <code>{R2, R3}</code> 冲突、<code>{R1, R5}</code> 条件冲突与 <code>Idle</code> 状态缺口并补全隐式领域公理后的无冲突版本）：</p>
+<pre class="code"><code class="language-markdown">### 改造后 Spec（After SMT —— 可测试、无实现泄漏、逻辑自洽且状态完备）
+
+**场景 A：删除房产（Delete Property）**
+- AC1 [UNCHANGED]: WHEN a Property Owner initiates property deletion, THE Platform SHALL prompt for confirmation before proceeding.
+- AC2 [AMENDED - 消除"remove"歧义与AC4冲突]: WHEN a Property Owner confirms deletion, THE Platform SHALL mark the Property record as deleted such that it is no longer visible in any user-facing view.
+- AC3 [UNCHANGED]: WHEN a Property is deleted, THE Platform SHALL display a confirmation message and redirect to the properties list.
+- AC4 [AMENDED - 剥离"soft deletion/database"实现细节]: WHEN a Property record is marked as deleted, THE Platform SHALL retain the record for admin/audit access while excluding it from all user-facing views.
+- AC5 [AMENDED - 异常流改用 IF-THEN 模式]: IF the Property does not belong to the requesting Property Owner's User Account, THEN THE Platform SHALL reject the deletion and display an authorization error.
+- AC6 [ADDED - 补齐业务前置缺口]: IF the Property has active leases, THEN THE Platform SHALL reject the deletion and indicate active leases exist.
+- AC7 [ADDED - 补齐异常输入缺口]: IF the Property does not exist, THEN THE Platform SHALL display a not-found error.
+- AC8 [ADDED - 补齐取消分支缺口]: WHEN a Property Owner cancels the confirmation prompt, THE Platform SHALL abort deletion and return to the previous view.
+
+**场景 B：电商订单（Order Processing，经人类回答 SMT A/B 澄清题后修订）**
+- R1 [AMENDED - 限定前置状态，消除与 R5 的条件冲突]: WHEN an order in Pending state is submitted AND inventory is available, THE Order System SHALL transition the order to Fulfilled and fulfill the order.
+- R2 [AMENDED - 人类在 R2/R3 冲突中裁决“禁止缺货延期，改为拒绝”]: WHEN an order in Pending state is submitted AND inventory is not available, THE Order System SHALL reject the submission and notify the customer of insufficient inventory.
+- R3 [KEPT - 全局不变量与 R2 彻底一致]: THE Order System SHALL NOT place any order on backorder.
+- R4 [AMENDED - 明确可取消的前提状态]: WHEN an order in Pending or Fulfilled state is canceled, THE Order System SHALL transition the order to Canceled and refund all payments associated with the order.
+- R5 [AMENDED - 明确已取消退款订单拒绝重新提交]: IF a submission is attempted WHILE an order is in a Canceled-and-refunded state, THEN THE Order System SHALL reject the submission and SHALL NOT fulfill the order.
+- R6 [ADDED - 填补 Idle 覆盖缺口]: WHILE an order is in Idle state with no submit or cancel event, THE Order System SHALL keep the order unchanged in Idle state without emitting fulfillment or refund actions.
+
+**后台自动维护的隐式领域公理（Background Axioms，对人类透明或可审计）**
+- Axiom 1: An order has exactly one mutually exclusive state in {Idle, Pending, Fulfilled, Canceled}.
+- Axiom 2: An order cannot be canceled before it has been created/submitted.
+- Axiom 3: A payment that has already been refunded cannot be refunded a second time.
+</code></pre>
+<p>对比前后的差异一目了然：初版 Spec 里的 5 条房产规则和 5 条订单规则，看似简洁，实则把至少 6 个关键业务决策静默甩给了 Coding Agent 去猜；而改造后的 Spec 每一条都满足“输入/状态/事件 → 可观测输出”的一一映射，且所有冲突核（<code>{R2, R3}</code>、<code>{R1, R5}</code>）和未定义状态（<code>Idle</code>、无租约检查、记录不存在）都在写第一行代码前被彻底焊死。</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：对比维度 / 没有 SMT 之前（传统 SDD） / 引入 SMT 之后（Neuro-Symbolic SDD）"><table>
+<thead>
+<tr>
+<th scope="col">对比维度</th>
+<th scope="col">没有 SMT 之前（传统 SDD）</th>
+<th scope="col">引入 SMT 之后（Neuro-Symbolic SDD）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Spec 核心形态</strong></td>
+<td>散文或松散 Markdown / 初版 EARS，常夹杂实现细节与隐含假设</td>
+<td>精炼后的可测试 EARS + 后台自动维护的 SMT-LIB Schema、蕴含断言与领域公理</td>
+</tr>
+<tr>
+<td><strong>缺陷发现时机</strong></td>
+<td>写完代码、跑完集成测试甚至上线产生回归后（修复成本最高）</td>
+<td>写第一行代码之前、Design 阶段之前（纯文本改写，几乎零成本）</td>
+</tr>
+<tr>
+<td><strong>处理歧义的方式</strong></td>
+<td>Coding Agent 凭概率隐式“猜一个”并静默写进代码</td>
+<td>多次采样 + 逻辑等价聚类算出语义熵，生成 A/B 二选一问题迫使人类拍板</td>
+</tr>
+<tr>
+<td><strong>多规则交互校验</strong></td>
+<td>依赖人工 Code Review / Design Review 肉眼扫查，跨 5 条以上规则极易漏检</td>
+<td>SMT 求解器穷举组合空间，自动给出最小冲突规则集（UNSAT Core）与覆盖缺口反例</td>
+</tr>
+<tr>
+<td><strong>人机职责边界</strong></td>
+<td>人类写模糊文档，LLM 既当翻译又当裁判又当码农</td>
+<td><strong>LLM 负责翻译与精炼，Solver 负责数学校验，人类负责业务意图拍板</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-3">三、架构师视角彻底搞懂：SMT 是怎么工作的？</h2>
+<p>很多工程团队听说“形式化验证 / SMT”就望而却步。其实从软件工程视角看，SMT 求解器的核心机制非常干净清晰。</p>
+<h3 id="section-3-1">3.1 从 SAT 到 SMT：为什么布尔逻辑不够用？</h3>
+<ul>
+<li><strong>SAT（Boolean Satisfiability，布尔可满足性）</strong>：给一个由布尔变量（<code>true</code>/<code>false</code>）与逻辑连接词（<code>AND</code>、<code>OR</code>、<code>NOT</code>）组成的公式，问：<strong>是否存在一组变量赋值，让整个公式为真？</strong> 如果存在，返回 <code>sat</code> 并给出一组具体赋值（称为 <strong>Model / 见证解</strong>）；如果无论怎么赋值都不可能为真，返回 <code>unsat</code>（不可满足）。</li>
+<li><strong>SMT（Satisfiability Modulo Theories，可满足性模理论）</strong>：真实业务规约里不仅有布尔开关，还有<strong>整数/实数算术</strong>（如 <code>balance &gt;= withdraw_amount</code>）、<strong>枚举与代数数据类型</strong>（如订单状态 <code>Pending | Submitted | Canceled</code>）、<strong>字符串</strong>、<strong>数组/集合</strong>与<strong>位向量</strong>。SMT 就是在 SAT 之上挂载了多个“一阶逻辑理论求解器（Theory Solvers）”，让机器能同时推理布尔逻辑与业务数据结构。</li>
+</ul>
+<h3 id="section-3-2">3.2 SMT 求解器内部如何运转：DPLL(T) / CDCL(T)</h3>
+<p>现代工业级 SMT 求解器（如微软的 <a href="https://github.com/z3prover/z3">Z3</a> 与斯坦福/爱荷华大学的 <a href="https://github.com/cvc5/cvc5">cvc5</a>）底层普遍采用 <strong>CDCL(T)</strong>（冲突驱动子句学习 + 理论求解器协同）架构，可以理解为“<strong>逻辑调度员 + 专科医生</strong>”的双层循环：</p>
+<ol>
+<li><strong>布尔抽象（Boolean Abstraction）</strong>：把所有算术/枚举原子条件替换成布尔占位符（例如把 <code>inventory &gt; 0</code> 记作布尔变量 $p_1$，<code>order_state == Canceled</code> 记作 $p_2$）。</li>
+<li><strong>SAT 内核搜索与传播</strong>：SAT 引擎尝试为这些布尔变量分配真假值，使其满足整体逻辑骨架。</li>
+<li><strong>理论求解器验算（Theory Solver Check）</strong>：把 SAT 引擎选出的真值组合交回对应的领域理论求解器检查（例如算术求解器会发现 $x &gt; 5$ 和 $x &lt; 3$ 不能同时为真）。</li>
+<li><strong>冲突学习与回溯（Conflict-Driven Clause Learning）</strong>：一旦理论求解器发现矛盾，它就提炼出一条新的排斥子句（Learned Clause）塞回 SAT 引擎，剪掉整个无效搜索分支，直到找到合法解（<code>sat</code>）或证明彻底无解（<code>unsat</code>）。</li>
+</ol>
+<p>在 Spec 分析中，SMT 求解器最值钱的三大能力恰好对应工程痛点：</p>
+<ul>
+<li><strong>查冲突（Consistency）</strong>：把所有规则合取（<code>R1 ∧ R2 ∧ ... ∧ Rn</code>）再加上“某条规则的前置条件被触发”，问求解器是否 <code>sat</code>。如果返回 <code>unsat</code>，说明规则集自相矛盾；开启 <code>produce-unsat-cores</code> 后，求解器能直接定位出<strong>最小冲突规则子集</strong>（如 <code>{R2, R3}</code> 或 <code>{R1, R5}</code>）。</li>
+<li><strong>查缺口（Completeness）</strong>：问求解器“是否存在一种输入/状态组合，使得<strong>所有</strong>业务规则的前置条件同时为假（<code>¬ant(R1) ∧ ¬ant(R2) ∧ ...</code>）？”如果返回 <code>sat</code>，求解器吐出的那组 Model（如 <code>order_submitted=false, order_canceled=false</code>）就是活生生的<strong>未定义状态反例（Idle Order）</strong>！</li>
+<li><strong>查等价（Logical Equivalence）</strong>：给定 LLM 翻译出的两个公式 $F_1$ 和 $F_2$，要判断它们在所有输入下是否完全等价，只需向求解器询问 <code>F1 ≠ F2</code> 是否可满足。如果返回 <strong><code>unsat</code></strong>，数学上即严格证明 $F_1 \equiv F_2$；如果返回 <strong><code>sat</code></strong>，求解器直接给出<strong>语义差异反例（Semantic Diff）</strong>——即精准指出在什么具体场景下两个理解会产生不同行为！</li>
+</ul>
+<h3 id="section-3-3">3.3 AWS Kiro 三阶段神经符号管线与“语义熵聚类”</h3>
+<p>仅仅把自然语言丢给 LLM 翻译一次再交给 SMT，有一个致命漏洞：<strong>如果原句本身有歧义，LLM 可能会默默挑一种自洽的解释翻译成 SMT，求解器检查完告诉你“逻辑一致”，但其实丢掉了另一种完全合法的业务解释。</strong></p>
+<p>Rajath Kotyal 在演讲（<code>01:55:00–01:55:40</code>）与 <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro 官方博客</a> 中最惊艳的创新，正是<strong>把 LLM 的非确定性（Nondeterminism）变废为宝，改造成“歧义探测器”</strong>：</p>
+<ol>
+<li><strong>Stage 1：逆向溯因精炼（Refinement）</strong><ul>
+<li>利用 LLM 的语境理解力，从 User Story 的成功态反向推导：要到达成功态需要什么前置条件？哪些异常会阻断它？自动改写 Thesis-level 句子、剔除实现细节、纠正 EARS 模式误用并补全显而易见的异常路径。</li>
+</ul>
+</li>
+<li><strong>Stage 2：多采样自动形式化 + 逻辑等价聚类（Auto-formalization &amp; Semantic Entropy Clustering）</strong><ul>
+<li>对同一条 EARS 需求，让 LLM 独立翻译 <strong>7–10 次</strong>生成候选 SMT-LIB2 公式。</li>
+<li><strong>关键一步</strong>：不是按文本字面相似度聚类（变量名不同、合取顺序不同但含义完全相同的公式应归为一类），而是调用 <strong>SMT 求解器两两判定逻辑等价</strong>，将所有输入下行为完全一致的公式聚成同一个语义簇（Semantic Cluster）。</li>
+<li>计算跨簇分布的<strong>语义熵（Semantic Entropy）</strong>，并按两个阈值分流：<ul>
+<li><strong>低于 <code>low_entropy</code></strong>：模型高度一致，直接采纳最大簇代表作为权威形式化结果。</li>
+<li><strong>高于 <code>high_entropy</code></strong>：模型发散严重、大概率在幻觉，系统拒答（Abstain）并要求重写该条需求。</li>
+<li><strong>介于两者之间（中熵）</strong>：说明原句存在 2 个以上稳健但互斥的合理读法（典型如 <code>"remove the record"</code> 的硬删 vs 软删）。系统用 SMT 算出前两大簇的 <strong>Semantic Diff（语义差异反例）</strong>，再翻译回人类可读的 <strong>A/B 二选一澄清题</strong>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Stage 3：逻辑分析与场景模拟（Logical Analysis &amp; Scenario Simulation）</strong><ul>
+<li>在确认无歧义的形式化模型上，执行冲突检测（含多规则 Case Split 条件冲突）、覆盖缺口检测。</li>
+<li>进一步从模型中采样 <strong>Accepted Scenarios（规约允许的行为）</strong> 与 <strong>Rejected Scenarios（规约禁止的行为）</strong>——相当于“在写代码前模拟运行 Spec”。为了不让海量场景淹没开发者，系统引入 <strong>LLM Judge</strong> 评估每个场景结合 User Story 是否“令人意外（Surprising）”，只把最反直觉的场景推送给人类确认。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>重要边界提醒</strong>：Rajath Kotyal 在演讲结尾非常坦诚地强调——<strong>除了人类自己，没有任何自动化的“规约正确性神谕（Oracle）”</strong>。一份在数学上 100% 一致且完备的 Spec，依然可能描述了一个完全错误的产品；且隐式领域知识（“需求暗物质”）的提取目前仍是前沿难题。SMT 的价值在于把可自动化的逻辑检错做到极致，把最关键的少数业务拍板留给人类。</p>
+</blockquote>
+<h2 id="section-4">四、开源生态清单与可直接运行的 SMT-LIB2 / Python Z3 样例</h2>
+<h3 id="section-4-1">4.1 GitHub 开源生态与参考样例工程</h3>
+<p>虽然 Kiro IDE 内置的 Requirements Analysis 引擎本身是商业产品特性，但其底层的标准、求解器以及 AWS 官方配套的神经符号自动推理工程已有非常丰富的开源项目可直接学习与集成：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：开源项目 / 仓库 / 维护方 / 定位与对工程落地的价值"><table>
+<thead>
+<tr>
+<th scope="col">开源项目 / 仓库</th>
+<th scope="col">维护方</th>
+<th scope="col">定位与对工程落地的价值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/z3prover/z3"><strong>Z3Prover/z3</strong></a></td>
+<td>Microsoft Research</td>
+<td>工业界事实标准的开源 SMT 求解器（MIT 协议），支持 SMT-LIB2，提供 Python（<code>pip install z3-solver</code>）、TypeScript/WebAssembly（npm <code>z3-solver</code>）与 C++/Java 绑定。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/cvc5/cvc5"><strong>cvc5/cvc5</strong></a></td>
+<td>Stanford / U. of Iowa</td>
+<td>新一代开源 SMT 求解器，在字符串理论、序列与代数数据类型推理方面表现优异，支持独立二进制与多语言绑定（如 <a href="https://github.com/cvc5/cvc5-rs"><code>cvc5/cvc5-rs</code></a>）。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/aws-samples/sample-automated-reasoning-formalization"><strong>aws-samples/sample-automated-reasoning-formalization (ARchitect)</strong></a></td>
+<td>AWS Samples</td>
+<td>AWS 官方开源桌面样例应用：利用 Kiro CLI 与 Bedrock Automated Reasoning 控制面 API，帮助非技术领域专家将自然语言文档形式化为逻辑策略并执行测试验证。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/aws-samples/amazon-bedrock-samples/blob/main/responsible_ai/automated-reasoning-rewriting-chatbot/README.md"><strong>aws-samples/amazon-bedrock-samples (<code>automated-reasoning-rewriting-chatbot</code>)</strong></a></td>
+<td>AWS Samples</td>
+<td>AWS 官方开源的“LLM 生成 + 自动推理反馈 + 迭代重写”闭环样例（Python Flask + React），并生成可数学验证的审计日志。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/cedar-policy/cedar-spec"><strong>cedar-policy/cedar-spec</strong></a></td>
+<td>AWS</td>
+<td>AWS 开源授权策略语言 Cedar 的形式化定义与证明工程（含 Lean 形式化、差分测试与属性测试生成器），是策略类 DSL 形式化的典范。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/model-checking/kani"><strong>model-checking/kani</strong></a></td>
+<td>AWS</td>
+<td>AWS 开源的 Rust 位精确模型检查器（演讲者 Rajath Kotyal 深度参与维护），展示如何把形式化验证无缝集成进日常语言工具链与 CI。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dafny-lang/dafny"><strong>dafny-lang/dafny</strong></a></td>
+<td>Microsoft / AWS 社区</td>
+<td>验证感知编程语言，将前置条件/后置条件/不变量直接编译为 SMT-LIB 交由 Z3 证明，并可编译输出 Go/Python/Java/C#/JS 代码。</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-4-2">4.2 样例片段 1：原生 SMT-LIB2 复现演讲中的电商订单冲突与缺口</h3>
+<p>将下面保存为 <code>order_spec.smt2</code>，在本地执行 <code>z3 order_spec.smt2</code>（或 <code>cvc5 order_spec.smt2</code>）即可直接复现 Kiro 演讲与博客中的全部三种逻辑分析结果：</p>
+<pre class="code"><code class="language-lisp">; order_spec.smt2 —— 复现 AWS Kiro 演讲中的 5 条订单规约分析
+(set-option :produce-unsat-cores true)
+(set-logic QF_DT) ; 使用带代数数据类型的无量词逻辑
+
+; 1. Schema 声明（事件、状态、输出）
+(declare-datatypes () ((OrderState Idle Submitted Canceled)))
+
+(declare-const order_submitted Bool)
+(declare-const order_canceled Bool)
+(declare-const inventory_available Bool)
+(declare-const order_state OrderState)
+
+(declare-const order_fulfilled Bool)
+(declare-const order_backordered Bool)
+(declare-const payments_refunded Bool)
+
+; 2. 规则蕴含断言（使用 :named 命名以便提取最小冲突核 UNSAT Core）
+; R1: WHEN submitted AND inventory_available =&gt; fulfill
+(assert (! (=&gt; (and order_submitted inventory_available) order_fulfilled) :named R1))
+; R2: WHEN submitted AND NOT inventory_available =&gt; backorder
+(assert (! (=&gt; (and order_submitted (not inventory_available)) order_backordered) :named R2))
+; R3: SHALL NOT place any order on backorder
+(assert (! (not order_backordered) :named R3))
+; R4: WHEN canceled =&gt; refund all payments
+(assert (! (=&gt; order_canceled payments_refunded) :named R4))
+; R5: WHILE canceled-and-refunded =&gt; SHALL NOT fulfill
+(assert (! (=&gt; (and (= order_state Canceled) payments_refunded) (not order_fulfilled)) :named R5))
+
+; --- 检查 A：直接冲突（触发 R2 前置条件）---
+(push)
+(assert (and order_submitted (not inventory_available)))
+(check-sat)        ; 输出: unsat
+(get-unsat-core)   ; 输出最小冲突规则集: (R2 R3)
+(pop)
+
+; --- 检查 B：条件冲突（已取消且已退款的订单被重新提交，跨库存状态分情况讨论）---
+(push)
+(assert (and (= order_state Canceled) payments_refunded order_submitted))
+(check-sat)        ; 输出: unsat（无论 inventory_available 为真或假，都会撞上 {R1,R5} 或 {R2,R3}）
+(get-unsat-core)   ; 输出冲突核
+(pop)
+
+; --- 检查 C：覆盖缺口（是否存在没有任何触发型规则命中的输入/状态组合？）---
+(push)
+(assert (not (and order_submitted inventory_available)))              ; not R1 antecedent
+(assert (not (and order_submitted (not inventory_available))))        ; not R2 antecedent
+(assert (not order_canceled))                                        ; not R4 antecedent
+(assert (not (and (= order_state Canceled) payments_refunded)))      ; not R5 antecedent
+(check-sat)        ; 输出: sat（证明存在覆盖缺口！）
+(get-model)        ; 输出具体反例，例如 order_state = Idle, order_submitted = false, order_canceled = false
+(pop)
+</code></pre>
+<h3 id="section-4-3">4.3 样例片段 2：Python <code>z3-solver</code> 复现“多采样逻辑等价聚类与语义差异探测”</h3>
+<p>下面这段 60 行左右的 Python 代码，直接还原了演讲中最核心的 <strong>“用 SMT 求解器聚类 LLM 的多次翻译，把单句歧义转化为精准 A/B 澄清题”</strong> 的底层引擎（本地安装 <code>pip install z3-solver</code> 即可运行）：</p>
+<pre class="code"><code class="language-python">import math
+from z3 import Bool, And, Not, Solver, sat, unsat
+
+# 声明房产删除规约的共享 Schema 变量
+confirmed = Bool("owner_confirmed_deletion")
+record_exists_in_db = Bool("record_exists_in_db")
+visible_to_user = Bool("visible_to_user")
+visible_to_admin = Bool("visible_to_admin")
+
+# 模拟 LLM 对 "WHEN Owner confirms deletion, Platform SHALL remove the record" 的 6 次采样翻译：
+# 注意：表面语法写法不同（如用 De Morgan 律或顺序不同），但语义上其实只有“硬删除”与“软删除”两簇
+samples = [
+    ("sample_1", And(confirmed, Not(record_exists_in_db), Not(visible_to_user), Not(visible_to_admin))),
+    ("sample_2", And(Not(visible_to_admin), Not(visible_to_user), Not(record_exists_in_db), confirmed)),
+    ("sample_3", And(confirmed, record_exists_in_db, Not(visible_to_user), visible_to_admin)),
+    ("sample_4", And(confirmed, Not(visible_to_user), record_exists_in_db, visible_to_admin)),
+    ("sample_5", And(confirmed, Not(record_exists_in_db), Not(visible_to_user), Not(visible_to_admin))),
+    ("sample_6", And(visible_to_admin, record_exists_in_db, Not(visible_to_user), confirmed)),
+]
+
+def are_logically_equivalent(f1, f2) -&gt; bool:
+    """用 Z3 严格判断两个公式是否在所有输入下完全等价"""
+    s = Solver()
+    s.add(f1 != f2)
+    return s.check() == unsat
+
+def semantic_diff_witness(f1, f2):
+    """提取两个不等价簇的分歧见证反例（用于生成自然语言 A/B 澄清题）"""
+    s = Solver()
+    s.add(f1 != f2)
+    if s.check() == sat:
+        return s.model()
+    return None
+
+# 1. 基于逻辑等价性进行语义聚类
+clusters = []
+for name, formula in samples:
+    placed = False
+    for cluster in clusters:
+        if are_logically_equivalent(cluster[0][1], formula):
+            cluster.append((name, formula))
+            placed = True
+            break
+    if not placed:
+        clusters.append([(name, formula)])
+
+# 2. 计算语义熵（Semantic Entropy）
+total = len(samples)
+entropy = -sum((len(c) / total) * math.log2(len(c) / total) for c in clusters)
+print(f"聚类数量: {len(clusters)} | 语义熵 H = {entropy:.3f} bits")
+for idx, c in enumerate(clusters, 1):
+    print(f"  簇 {idx} ({len(c)}/{total}): {[item[0] for item in c]}")
+
+# 3. 命中中熵区间 -&gt; 计算前两大簇的语义分歧反例
+if len(clusters) &gt;= 2:
+    clusters.sort(key=len, reverse=True)
+    witness = semantic_diff_witness(clusters[0][0][1], clusters[1][0][1])
+    print("\n检测到真实语义歧义！SMT 构造的分歧反例（Semantic Diff）：")
+    print(witness)
+    # 输出示例表明：在 confirmed=True 时，两簇在 record_exists_in_db 与 visible_to_admin 上取值相反
+    # 上层 LLM 据此自动生成 A/B 二选一问题交给人类拍板！
+</code></pre>
+<h2 id="section-5">五、对 <code>co-arising</code>（<code>truthsrc</code>）整个实践的四大深度补充</h2>
+<p>把 AWS Kiro Specification Analyzer 放到 <strong><code>co-arising</code>（<code>truthsrc</code>）</strong> 的架构坐标系里审视，会发现一个极其振奋的结论：<strong><code>co-arising</code> 实际上站在比纯自然语言 SDD 更高、更适合嫁接 SMT 求解器的起点上！</strong></p>
+<p>在 <code>co-arising</code> 的现有流水线中：</p>
+<ul>
+<li><strong>确定性 Toolchain</strong> 负责：<code>truthsrc</code> 单行微语法 &amp; M1/M2/M3 宏展开 → Canonical JSON 编译 → Neo4j/SQLite 知识图谱 → 确定性 AST/拓扑校验器（如检查孤儿领域事件、跨限界上下文引用、缺失 Saga 补偿）→ Context Pack 切片 → Scala/Akka（Event Sourcing + CQRS + Saga）确定性骨架生成 → <code>@CoArisingNode</code> 双向锚定与 <code>PreToolUse</code>/<code>Stop (exit 2)</code> 硬门禁。</li>
+<li><strong>认知层 Skills / Subagents</strong> 负责：<code>domain-interview</code>（苏格拉底式反向访谈）、<code>cloze-fill</code>（填空区实现）、<code>brownfield-miner</code>、<code>contract-reviewer</code>。</li>
+</ul>
+<p>对比 AWS 的实践，<code>co-arising</code> 已经漂亮地解决了 <strong>“架构漂移、拓扑断链与上下文退化”</strong>，但在 <strong>“业务谓词的逻辑自洽性与需求暗物质显式化”</strong> 上存在一块高价值空白。以下是四大可直接落地的补充方向：</p>
+<h3 id="section-5-1">补充一：给确定性 Toolchain 补上“逻辑校验层”——<code>truthsrc-smt</code> 编译器后端</h3>
+<ul>
+<li><strong>当前盲区</strong>：<code>co-arising</code> 现有的确定性校验器停留在<strong>语法与拓扑结构层</strong>（能查出“某个事件没人监听”或“Saga 少了补偿步骤”，但查不出两条 <code>Guard</code> 谓词互相打架、或者某条分支永远不可能被触发）。</li>
+<li><strong>先天优势</strong>：AWS Kiro 必须花很大力气用 LLM 把散文/EARS 翻译成 SMT Schema，因此不可避免地承受翻译幻觉成本；而 <code>truthsrc</code> 本身就是高度结构化的领域真值树微语法，天然具备 <code>Qualified Ref</code>、<code>Guard</code>、<code>Binding</code>、<code>Fold</code>、<code>Parameter</code>！这意味着 <strong><code>truthsrc</code> AST 到 SMT-LIB2 / Z3 的映射在很大程度上是确定性编译（Deterministic Compilation），而非概率性翻译！</strong></li>
+<li><strong>落地收益</strong>：在 <code>metarch-truthsrc</code> 编译器中新增一个静态分析 Pass（放入确定性 Toolchain 与 <code>Stop</code> Hook）：<ol>
+<li><strong>死分支检测（Dead Guard）</strong>：检查是否存在 <code>Guard</code> 与领域公理合取后为 <code>unsat</code>（永假条件）。</li>
+<li><strong>同触发器规则冲突（Rule Conflict）</strong>：当同一命令或事件触发多条状态转移/策略分支时，检查其 <code>Guard</code> 交集是否可满足且输出/效应互斥，直接报出 <strong>UNSAT Core</strong>。</li>
+<li><strong>状态覆盖缺口（State Coverage Gap）</strong>：对聚合根（Aggregate）的状态枚举与关键属性，检查 <code>¬Guard_1 ∧ ¬Guard_2 ∧ ...</code> 是否 <code>sat</code>，把未覆盖的合法状态组合暴露在生成 Scala/Akka 代码之前。</li>
+</ol>
+</li>
+</ul>
+<h3 id="section-5-2">补充二：把“语义熵聚类 + A/B 澄清题”植入 <code>domain-interview</code> Skill，显式沉淀“领域公理区”</h3>
+<ul>
+<li><strong>当前盲区</strong>：在 <code>co-arising</code> 的架构边界中，<code>domain-interview</code> 属于模糊认知层 Skill，目前依赖 LLM 的提示词工程进行苏格拉底式追问，容易出现“该问的漏问、不该问的问一堆”。</li>
+<li><strong>AWS 启发与升级方案</strong>：<ol>
+<li>当用户用自然语言向 <code>domain-interview</code> 阐述复杂业务规则（例如 <code>bank batch transfer</code> 的部分失败退款规则、或 <code>fab simulation</code> 的设备调度优先级）时，在生成 <code>truthsrc</code> 之前，对关键业务句执行 <strong>5–7 次低成本采样形式化 + Z3 等价聚类</strong>。</li>
+<li>只对<strong>中熵分叉点</strong>（确实存在 2 种以上互斥解释）和 <strong>SMT 模拟出的意外场景（Surprising Accepted/Rejected Scenarios）</strong> 向人类发起 <strong>A/B 二选一确认</strong>，把访谈信噪比拉满。</li>
+<li><strong>攻克 AWS 提到的“需求暗物质（Implicit Domain Knowledge）”</strong>：在 <code>truthsrc</code> 语法中引入显式的 <strong><code>Axiom</code> / <code>Invariant</code> 块</strong>（例如“批量转账总额恒等于明细之和”、“已冲正交易不可二次冲正”），让 <code>domain-interview</code> 访谈挖掘出的隐式业务常识不再散落在聊天记录里，而是作为一等公民写入 <code>truthsrc</code> 并持久参与后续所有版本的 SMT 回归证明。</li>
+</ol>
+</li>
+</ul>
+<h3 id="section-5-3">补充三：用 SMT 反例模型（Model）驱动 <code>Given-When-Then</code> 测试与填空区验收</h3>
+<ul>
+<li><strong>当前盲区</strong>：在 <code>co-arising</code> 的 <code>cloze-fill</code> 阶段，AI Agent 在受控手写区实现业务逻辑，需要高质量的测试来卡住语义正确性。纯靠 LLM 写单元测试容易只测 Happy Path，漏掉边界组合。</li>
+<li><strong>落地收益</strong>：SMT 求解器在检查 <code>Accepted Scenarios</code>、<code>Rejected Scenarios</code> 以及每条 <code>Guard</code> 的边界条件时，返回的 <code>get-model</code> 本身就是<strong>满足数学约束的精确输入数据向量</strong>。</li>
+<li>可以直接由 Toolchain 把这些 SMT 求解出的具体见证解，确定性地渲染为 Scala/Akka Event Sourcing 的 <strong><code>Given</code>（历史事件序列 / 聚合状态）→ <code>When</code>（触发命令与参数）→ <code>Then</code>（预期产出事件或拒绝异常）</strong> 测试骨架！这样 <code>contract-reviewer</code> 和 CI 测试就能把 <code>cloze-fill</code> 关进数学级的验收笼子里。</li>
+</ul>
+<h3 id="section-5-4">补充四：把 Saga 补偿与跨聚合不变量纳入有界模型检验（Bounded Model Checking）</h3>
+<ul>
+<li><strong>结合 <code>co-arising</code> 独特基因</strong>：AWS Kiro 目前的 Requirements Analysis 主要聚焦在单份 <code>requirements.md</code> 的静态逻辑一致性；而 <code>co-arising</code> 的核心护城河在于 <strong>Event Sourcing + CQRS + Saga（后向补偿）/ Monarch（前向恢复）</strong> 构成的分布式领域行为编排。</li>
+<li><strong>高阶演进方向</strong>：针对 <code>bank-wealth-demo</code> 及规划中的 <code>bank batch transfer</code>、<code>fab simulation</code> 等高复杂度场景，可以将 <code>truthsrc</code> 中的 Saga 状态机展开为有限步长（$k$ 步）的 SMT 转移系统：<ul>
+<li>自动验证：<strong>“如果在第 $i$ 步发生超时或下游拒绝并触发补偿链路，最终所有参与聚合的资金/库存不变量是否依然成立（无资金凭空增减、无资源死锁）？”</strong></li>
+<li>一旦验证返回反例，SMT 会直接给出一份精确到第几步失败的<strong>故障复现轨迹</strong>，在写第一行分布式协调代码前就把最难排查的并发与补偿 Bug 扼杀在摇篮里。</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-6">结语：从“静态架构编译器”走向“神经符号领域验证引擎”</h2>
+<p>回顾整场演讲，AWS Automated Reasoning Group 给整个 AI Coding 行业上了一堂极具分量的工程课：<strong>面对概率性的大模型，不能只靠更多自然语言 Prompt 去修补自然语言的漏洞，必须把确定性的数理逻辑引擎请回研发流水线的最前端。</strong></p>
+<p>对于 <code>co-arising</code> 而言，这并非推翻重来，而是一次精准的“拼图合龙”：</p>
+<ul>
+<li><code>truthsrc</code> 已经把业务语义压成了高密度的结构化微语法；</li>
+<li>只需要在确定性 Toolchain 里接上 Z3/SMT-LIB2 的逻辑求解器，在 <code>domain-interview</code> Skill 里接上多采样等价聚类与 A/B 澄清机制，就能把 <code>co-arising</code> 从 <strong>“防止架构漂移的认知编译器”</strong> 进一步升级为 <strong>“在写第一行代码前就能数学自证业务逻辑无冲突、无歧义、无缺口的领域行为验证引擎”</strong>。</li>
+</ul></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">继续阅读</h2>
+      <div class="article-card" lang="zh-CN">
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-19">2026-11-19</time></p>
+      <h3><a href="/zh/articles/ai-engineer-code-2026-50-talks-20261119/">AI Engineer CODE 2026 全部 50 场演讲相关性排序与全景拆解</a></h3>
+      <p class="article-deck">基于 50 份完整演讲字幕的零截断精读，按与确定性验证、Agent 工程治理等研究主航道的相关性排定 #01–#50 顺位，逐场拆解解决的问题、核心理论、验证成果与工具栈。</p>
+      <p class="small">中文原文</p>
+    </div>
+      <p><a href="/zh/articles/">返回文章索引</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

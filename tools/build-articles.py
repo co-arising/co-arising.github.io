@@ -37,6 +37,7 @@ SURVEY_SLUG = "ai-coding-evolution-20261116"
 STRATEGY_SLUG = "co-arising-implications-20261116"
 PRACTICE_SLUG = "lauren-tan-trust-pyramid-20261118"
 CODE50_SLUG = "ai-engineer-code-2026-50-talks-20261119"
+KIRO_SLUG = "aws-kiro-smt-spec-analyzer-20261119"
 # Initial publication fixture; future valid manifest slugs stay in /zh/articles/.
 OWNED_OUTPUTS = (
     "articles/index.html",
@@ -49,6 +50,8 @@ OWNED_OUTPUTS = (
     f"articles/{STRATEGY_SLUG}/index.html",
     f"articles/{PRACTICE_SLUG}/index.html",
     f"articles/{CODE50_SLUG}/index.html",
+    f"zh/articles/{KIRO_SLUG}/index.html",
+    f"articles/{KIRO_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"

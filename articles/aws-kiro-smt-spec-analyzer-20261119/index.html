@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Specs Have Bugs Too: How AWS Kiro Uses SMT Solvers to Eliminate Ambiguity and Logic Conflicts Before Writing Code — co-arising</title>
+  <meta name="description" content="A technical deep dive into AWS Automated Reasoning Group engineer Rajath Kotyal&#x27;s AI Engineer CODE 2026 talk &#x27;Specs have bugs too&#x27;: tracing slides and empirical citations, contrasting Before vs. After SMT specifications, demystifying SAT/SMT and multi-sample logical-equivalence clustering, sharing runnable SMT-LIB2 and Python Z3 snippets alongside open-source repositories, and proposing four architectural supplements for co-arising (truthsrc)." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Specs Have Bugs Too: How AWS Kiro Uses SMT Solvers to Eliminate Ambiguity and Logic Conflicts Before Writing Code" />
+  <meta property="og:description" content="A technical deep dive into AWS Automated Reasoning Group engineer Rajath Kotyal&#x27;s AI Engineer CODE 2026 talk &#x27;Specs have bugs too&#x27;: tracing slides and empirical citations, contrasting Before vs. After SMT specifications, demystifying SAT/SMT and multi-sample logical-equivalence clustering, sharing runnable SMT-LIB2 and Python Z3 snippets alongside open-source repositories, and proposing four architectural supplements for co-arising (truthsrc)." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/aws-kiro-smt-spec-analyzer-20261119/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/aws-kiro-smt-spec-analyzer-20261119/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/aws-kiro-smt-spec-analyzer-20261119/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Engineering practice</span></nav>
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-19">2026-11-19</time> · English translation</p>
+      <h1>Specs Have Bugs Too: How AWS Kiro Uses SMT Solvers to Eliminate Ambiguity and Logic Conflicts Before Writing Code</h1>
+      <p class="article-deck">A technical deep dive into AWS Automated Reasoning Group engineer Rajath Kotyal&#x27;s AI Engineer CODE 2026 talk &#x27;Specs have bugs too&#x27;: tracing slides and empirical citations, contrasting Before vs. After SMT specifications, demystifying SAT/SMT and multi-sample logical-equivalence clustering, sharing runnable SMT-LIB2 and Python Z3 snippets alongside open-source repositories, and proposing four architectural supplements for co-arising (truthsrc).</p>
+      <div class="article-actions"><a href="/content/articles/aws-kiro-smt-spec-analyzer-20261119.en.md" download="aws-kiro-smt-spec-analyzer-20261119.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/aws-kiro-smt-spec-analyzer-20261119/">中文原文</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. Talk Overview, Slides Availability &amp; Citation Audit</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. Before SMT vs. After SMT: How Specifications and Workflows Change</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. Under the Hood: How SMT Solvers Actually Work</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. Open-Source Ecosystem &amp; Runnable SMT-LIB2 / Python Z3 Examples</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. Four Architectural Supplements for co-arising (truthsrc)</a></li><li><a href="#section-6"><span class="toc-number">06</span> Closing Thought: From Architecture Compiler to Neuro-Symbolic Domain Verification Engine</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+      </aside>
+      <article id="article-body" class="article-body"><p>In 2026, Spec-Driven Development (SDD) has become the prevailing consensus in AI-assisted engineering: write a clear <code>spec.md</code> or <code>requirements.md</code> first, then hand it to a coding agent. Yet in his <strong>AI Engineer CODE 2026</strong> talk (November 11, 2026), <a href="https://ai.engineer/code/2026/talks/online-aws-specification-analyzer"><em>Specs have bugs too</em></a>, <strong>Rajath Mahendrappa Kotyal</strong> (<a href="https://ai.engineer/speakers/rajath-mahendrappa-kotyal">AI Engineer Speaker Profile</a> · <a href="https://github.com/rajathkotyal">GitHub <code>@rajathkotyal</code></a>) of the <strong>AWS Automated Reasoning Group</strong> exposed the blind spot at the heart of SDD:</p>
+<blockquote>
+<p><strong>If your specification itself harbors hidden ambiguities, cross-rule contradictions, and coverage gaps, a stronger coding agent will simply compile flawed requirements into production bugs at 10× speed.</strong></p>
+</blockquote>
+<p>This deep dive examines five core questions:</p>
+<ol>
+<li><strong>Talk Overview, Slides Availability &amp; Citation Audit</strong>: Verifying slide access, the AWS research team behind the feature, and the exact academic papers behind every statistic cited in the talk.</li>
+<li><strong>Before SMT vs. After SMT</strong>: How specifications look without SMT verification versus how both the spec structure and human-agent workflow transform once SMT enters the loop.</li>
+<li><strong>Under the Hood of SMT</strong>: How SAT/SMT solvers work (<code>CDCL(T)</code>), and how AWS's three-stage neuro-symbolic pipeline turns LLM non-determinism into an ambiguity detector via 7–10× sampling and logical-equivalence clustering.</li>
+<li><strong>Open-Source Ecosystem &amp; Runnable Code</strong>: Key GitHub repositories to study or integrate, plus self-contained SMT-LIB2 and Python <code>z3-solver</code> snippets reproducing the talk's exact examples.</li>
+<li><strong>Four Architectural Supplements for <code>co-arising</code> (<code>truthsrc</code>)</strong>: Concrete ways to plug SMT verification into <code>truthsrc</code>'s compiler toolchain, the <code>domain-interview</code> Skill, <code>Given-When-Then</code> test synthesis, and bounded Saga invariant checking.</li>
+</ol>
+<h2 id="section-1">1. Talk Overview, Slides Availability &amp; Citation Audit</h2>
+<h3 id="section-1-1">1.1 Speaker, Team &amp; Slides Status</h3>
+<ul>
+<li><strong>Video &amp; Official Reading Edition</strong>: Recorded during the AI Engineer CODE 2026 Day 1 livestream (<a href="https://www.youtube.com/watch?v=ZZ19zhYnDKY&amp;t=6648s"><code>1:50:46–1:58:35</code> on YouTube</a>), accompanied by the official reading edition at <a href="https://ai.engineer/code/2026/talks/online-aws-specification-analyzer">Specs have bugs too | AI Engineer CODE 2026</a>.</li>
+<li><strong>Speaker Background</strong>: <a href="https://ai.engineer/speakers/rajath-mahendrappa-kotyal">Rajath Mahendrappa Kotyal</a> holds a master's degree in Information Security from Carnegie Mellon University and works in the AWS Automated Reasoning Group. He helped build Kiro's Requirements Analysis engine and is also a contributor and reviewer on <a href="https://github.com/model-checking/kani">Kani</a>, AWS's open-source Rust model checker.</li>
+<li><strong>Team Credit Correction</strong>: The talk's auto-generated transcript rendered his closing acknowledgments as <code>"Anda Jin, Stefan, Nia and Delmos"</code>. Cross-checking the AWS Kiro team's official May 12, 2026 technical post, <a href="https://kiro.dev/blog/deep-spec-analysis/"><em>Requirements analysis: catching requirement bugs before they become code</em></a>, confirms the five Applied Science authors are <strong>Oyendrila Dobe, Jatin Arora, Stefan Zetzsche, Nadia Labai, and Rémi Delmas</strong>.</li>
+<li><strong>Slides Availability</strong>: AI Engineer CODE 2026 has <strong>not published a standalone downloadable PDF slide deck</strong> for this session. However, the official <a href="https://ai.engineer/code/2026/talks/online-aws-specification-analyzer">Reading Edition</a> timestamps key slides directly against the video (<code>01:54:20</code> separating LLM translation from solver checking, <code>01:55:00</code> multi-sample logical-equivalence clustering, and <code>01:55:40</code> entropy-based routing), and every method, worked example, SMT snippet, and diagram from the talk is published in full in the <a href="https://kiro.dev/blog/deep-spec-analysis/">AWS Kiro engineering blog post</a>.</li>
+</ul>
+<h3 id="section-1-2">1.2 Tracing the Theoretical &amp; Empirical Citations</h3>
+<p>The talk and companion Kiro post cite several striking quantitative findings. Below is the verified primary provenance for each claim:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Claim in Talk / Slides / Primary Paper / Empirical Source / Key Takeaway for Engineering Teams"><table>
+<thead>
+<tr>
+<th scope="col">Claim in Talk / Slides</th>
+<th scope="col">Primary Paper / Empirical Source</th>
+<th scope="col">Key Takeaway for Engineering Teams</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ambiguous, contradictory, or incomplete prompts cause 20–40% Pass@1 drops, with 60–90% of syntactically valid code being semantically wrong</strong></td>
+<td><strong>Larbi et al. (2025)</strong>, <a href="https://arxiv.org/html/2507.20439"><em>When Prompts Go Wrong: Evaluating Code Model Robustness to Ambiguous, Contradictory, and Incomplete Task Descriptions</em></a> (arXiv:2507.20439, cited in <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro Blog</a>)</td>
+<td>Mutating clear prompts into flawed ones produces code that compiles and runs cleanly while silently diverging from intended behavior.</td>
+</tr>
+<tr>
+<td><strong>Underspecified prompts are ~2× more likely to regress across model or prompt changes, with accuracy drops sometimes exceeding 20%</strong></td>
+<td><strong>Yang et al. (2025)</strong>, <em>What Prompts Don't Say: Understanding and Managing Underspecification in LLM Prompts</em> (arXiv:2505.13360, cited in <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro Blog</a>)</td>
+<td>LLMs silently fill gaps using undisclosed biases; upgrading models introduces a different hidden bias, causing silent behavioral drift even when existing tests pass.</td>
+</tr>
+<tr>
+<td><strong>LLM auto-formalization shows strong results for classification/entity extraction, but weak evidence for full requirement formalization due to implicit domain knowledge</strong></td>
+<td><strong>Norheim et al. (2024)</strong> (MIT &amp; Airbus), <em>Challenges in applying large language models to requirements engineering tasks</em>, <em>Design Science</em>, 10:e16 (doi:10.1017/dsj.2024.8, cited in <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro Blog</a>)</td>
+<td>Explains why AWS avoids one-shot end-to-end LLM proving, explicitly models background axioms ("dark matter" of requirements), and keeps humans as the final decision-maker.</td>
+</tr>
+<tr>
+<td><strong>EARS structured natural-language requirements syntax</strong></td>
+<td><strong>Mavin et al. (2009)</strong> (Rolls-Royce), <a href="https://alistairmavin.com/ears/"><em>Easy Approach to Requirements Syntax (EARS)</em></a> (17th IEEE RE'09; see <a href="https://en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax">Wikipedia</a> &amp; <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro Blog</a>)</td>
+<td>Constrains prose with a minimal set of clause keywords (<code>WHEN</code>, <code>WHILE</code>, <code>IF...THEN</code>, <code>WHERE</code>, <code>SHALL</code>) that map cleanly onto logical implications (<code>antecedent =&gt; consequent</code>).</td>
+</tr>
+<tr>
+<td><strong>AWS internal evaluation: ~60% of first-draft requirements needed refinement before safe implementation</strong></td>
+<td>Trade coverage &amp; technical reviews citing AWS Kiro internal testing (see <a href="https://www.specira.ai/blog/specs-are-the-problem">Specira Analysis</a> and <a href="https://stepto.net/blog/ai-formal-verification-vericoding-specifications-2026">Stepto 2026 Review</a>)</td>
+<td>Across <strong>35 internal AWS projects</strong> covering <strong>&gt;1,400 acceptance criteria</strong>, roughly <strong>60%</strong> of first-draft requirements required refinement prior to code generation.</td>
+</tr>
+<tr>
+<td><strong>Independent academic corroboration: ambiguity drives functional divergence across runs and models</strong></td>
+<td><a href="https://arxiv.org/html/2604.21505v3"><em>Orchid Benchmark (2026)</em></a> (arXiv:2604.21505) &amp; <a href="https://arxiv.org/html/2607.00711v2"><em>ClarifyCodeBench (2026)</em></a> (arXiv:2607.00711)</td>
+<td>Unlike humans who clarify iteratively during coding, LLMs are forced to make single-pass implicit bets that harden into architectural debt.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-2">2. Before SMT vs. After SMT: How Specifications and Workflows Change</h2>
+<p>Without formal verification, even teams practicing Spec-Driven Development routinely ship <code>requirements.md</code> files that read smoothly to a human reviewer while containing fatal logical flaws for an autonomous agent.</p>
+<p>Drawing on systems engineering standards (such as INCOSE's <em>Guide to Writing Requirements</em>), the <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro engineering post</a> groups requirement bugs into four classes—<strong>wrong level of detail, ambiguity, inconsistency, and incompleteness</strong>—and defines five domain-independent properties every sound specification must satisfy: <strong>Testable, Solution-free, Unambiguous, Consistent, and Complete</strong>.</p>
+<h3 id="section-2-1">2.1 Before SMT: How Specs Are Typically Written</h3>
+<p>Using the two flagship examples from the talk and the <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro blog</a>—<strong>Delete Property</strong> and <strong>Order Processing</strong>—here is what a typical first-draft specification looks like (even when already using EARS notation):</p>
+<pre class="code"><code class="language-markdown">### First-Draft Spec (Before SMT — Reads Cleanly, Hides Four Classes of Bugs)
+
+**Scenario A: Delete Property**
+- AC1: WHEN a Property Owner initiates property deletion, THE Platform SHALL prompt for confirmation before proceeding.
+- AC2: WHEN a Property Owner confirms deletion, THE Platform SHALL remove the Property record from the Platform.
+- AC3: WHEN a Property is deleted, THE Platform SHALL display a confirmation message and redirect to the properties list.
+- AC4: THE Platform SHALL implement soft deletion to retain Property records in the database for audit purposes while hiding them from the user interface.
+- AC5: WHEN a Property Owner attempts to delete a Property that does not belong to their User Account, THE Platform SHALL deny the deletion and display an authorization error message.
+
+**Scenario B: Order Processing**
+- R1: WHEN an order is submitted AND inventory is available, THE Order System SHALL fulfill the order.
+- R2: WHEN an order is submitted AND inventory is not available, THE Order System SHALL place the order on backorder.
+- R3: THE Order System SHALL NOT place any order on backorder.
+- R4: WHEN an order is canceled, THE Order System SHALL refund all payments associated with the order.
+- R5: WHILE an order is in a canceled-and-refunded state, THE Order System SHALL NOT fulfill the order.
+</code></pre>
+<p>Read sentence by sentence, nothing jumps off the page. Handed to a coding agent, however, four defects immediately trigger silent failures:</p>
+<ol>
+<li><strong>Single-Sentence Ambiguity</strong>: Does <code>"remove the record"</code> in AC2 mean hard-deleting the data or soft-deleting (retaining it for audit while hiding it from users)?</li>
+<li><strong>Cross-Rule Inconsistency</strong>: AC2 implies removal while AC4 requires retention. R2 mandates backordering on unavailable inventory while R3 globally forbids backorders. More subtly, if a canceled-and-refunded order is re-submitted (<code>order_submitted</code>), <strong>R1 contradicts R5</strong> when inventory is available, and <strong>R2 contradicts R3</strong> when inventory is unavailable—leaving <em>zero</em> valid implementations across all inventory states.</li>
+<li><strong>Wrong Level of Detail &amp; EARS Misuse</strong>: AC4 leaks implementation mechanics (<code>"implement soft deletion"</code>, <code>"in the database"</code>) instead of observable behavior; AC5 uses <code>WHEN</code> (reserved for nominal events in EARS) instead of <code>IF...THEN</code> (reserved for error conditions).</li>
+<li><strong>Completeness Gaps</strong>: What if the property does not exist? What if it has active leases? What if the owner cancels the confirmation dialog? What should the Order System do when an order sits in an <code>Idle</code> state with neither submit nor cancel events firing?</li>
+</ol>
+<h3 id="section-2-2">2.2 After SMT: How the Spec and Workflow Transform</h3>
+<p>Adopting SMT does <strong>not</strong> mean forcing product managers or engineers to author raw first-order logic. In AWS Kiro's workflow, <strong>humans still read and write natural-language EARS specs while SMT formalization stays under the hood</strong>, yet both the specification and the review loop change fundamentally:</p>
+<ol>
+<li><strong>Refined, Solution-Free EARS Structure</strong>:<ul>
+<li>Thesis-level statements and implementation recipes are stripped out so every criterion binds explicit inputs, states, and triggers to observable outputs.</li>
+<li>Nominal triggers (<code>WHEN</code>), state invariants (<code>WHILE</code>), ubiquitous rules (<code>THE ... SHALL</code>), and error paths (<code>IF ... THEN</code>) are strictly separated.</li>
+<li>Missing error and cancellation branches are surfaced via backward abductive reasoning from the user story's success state.</li>
+</ul>
+</li>
+<li><strong>A Three-Part Formal Model Maintained Behind the Scenes</strong>:<ul>
+<li><strong>Formal Schema</strong>: Declares entities, attributes, events, inputs, and outputs, each linked back to source prose.</li>
+<li><strong>Rule Assertions</strong>: Encodes every EARS rule as an implication <code>antecedent =&gt; consequent</code>.</li>
+<li><strong>Background Axioms</strong>: Explicitly captures implicit domain truths (e.g., <code>duration &gt;= 0</code>, an order cannot be canceled before submission, a refunded payment cannot be refunded twice) so the solver does not flag impossible states.</li>
+</ul>
+</li>
+<li><strong>Uniform Two-Option Clarification Loop (A/B Decisions)</strong>:<ul>
+<li>Every ambiguity, conflict, gap, or surprising scenario is translated back into a concise two-choice question: <strong>Option A always keeps the requirement as-is; Option B applies a concrete proposed revision</strong>.</li>
+</ul>
+</li>
+</ol>
+<p>Here is the exact <strong>After-SMT</strong> counterpart for both scenarios above—Scenario A mirrors the eight refined acceptance criteria published in the <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro blog</a>, while Scenario B shows the conflict-free, gap-closed Order Processing spec after resolving <code>{R2, R3}</code>, <code>{R1, R5}</code>, the <code>Idle</code> gap, and background axioms:</p>
+<pre class="code"><code class="language-markdown">### Revised Spec (After SMT — Testable, Solution-Free, Logically Consistent &amp; Complete)
+
+**Scenario A: Delete Property**
+- AC1 [UNCHANGED]: WHEN a Property Owner initiates property deletion, THE Platform SHALL prompt for confirmation before proceeding.
+- AC2 [AMENDED — resolves "remove" ambiguity &amp; AC4 conflict]: WHEN a Property Owner confirms deletion, THE Platform SHALL mark the Property record as deleted such that it is no longer visible in any user-facing view.
+- AC3 [UNCHANGED]: WHEN a Property is deleted, THE Platform SHALL display a confirmation message and redirect to the properties list.
+- AC4 [AMENDED — removes "soft deletion/database" implementation leak]: WHEN a Property record is marked as deleted, THE Platform SHALL retain the record for admin/audit access while excluding it from all user-facing views.
+- AC5 [AMENDED — switches error condition to IF-THEN]: IF the Property does not belong to the requesting Property Owner's User Account, THEN THE Platform SHALL reject the deletion and display an authorization error.
+- AC6 [ADDED — closes business precondition gap]: IF the Property has active leases, THEN THE Platform SHALL reject the deletion and indicate active leases exist.
+- AC7 [ADDED — closes missing-entity gap]: IF the Property does not exist, THEN THE Platform SHALL display a not-found error.
+- AC8 [ADDED — closes cancel-flow gap]: WHEN a Property Owner cancels the confirmation prompt, THE Platform SHALL abort deletion and return to the previous view.
+
+**Scenario B: Order Processing (Post Human A/B Clarification Decisions)**
+- R1 [AMENDED — scopes precondition to eliminate {R1, R5} conditional conflict]: WHEN an order in Pending state is submitted AND inventory is available, THE Order System SHALL transition the order to Fulfilled and fulfill the order.
+- R2 [AMENDED — human resolved {R2, R3} conflict in favor of rejecting out-of-stock orders]: WHEN an order in Pending state is submitted AND inventory is not available, THE Order System SHALL reject the submission and notify the customer of insufficient inventory.
+- R3 [KEPT — ubiquitous invariant now consistent with R2]: THE Order System SHALL NOT place any order on backorder.
+- R4 [AMENDED — scopes valid states for cancellation]: WHEN an order in Pending or Fulfilled state is canceled, THE Order System SHALL transition the order to Canceled and refund all payments associated with the order.
+- R5 [AMENDED — explicitly rejects re-submission of canceled-and-refunded orders]: IF a submission is attempted WHILE an order is in a Canceled-and-refunded state, THEN THE Order System SHALL reject the submission and SHALL NOT fulfill the order.
+- R6 [ADDED — closes Idle state completeness gap]: WHILE an order is in Idle state with no submit or cancel event, THE Order System SHALL keep the order unchanged in Idle state without emitting fulfillment or refund actions.
+
+**Background Domain Axioms (Maintained Under the Hood or Auditable)**
+- Axiom 1: An order occupies exactly one mutually exclusive state in {Idle, Pending, Fulfilled, Canceled}.
+- Axiom 2: An order cannot be canceled before it has been created/submitted.
+- Axiom 3: A payment that has already been refunded cannot be refunded a second time.
+</code></pre>
+<p>The side-by-side contrast makes the shift concrete: the compact first draft silently delegated at least six consequential product decisions to the coding agent's guesswork, whereas the After-SMT specification locks down every conflict core (<code>{R2, R3}</code>, <code>{R1, R5}</code>) and uncovered state before a single line of code is written.</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Dimension / Before SMT (Conventional SDD) / After SMT (Neuro-Symbolic SDD)"><table>
+<thead>
+<tr>
+<th scope="col">Dimension</th>
+<th scope="col">Before SMT (Conventional SDD)</th>
+<th scope="col">After SMT (Neuro-Symbolic SDD)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Spec Artifact</strong></td>
+<td>Free-form Markdown or first-draft EARS mixing behavior with implementation details</td>
+<td>Refined, testable EARS backed by an SMT-LIB schema, rule assertions, and domain axioms</td>
+</tr>
+<tr>
+<td><strong>When Bugs Surface</strong></td>
+<td>After code generation, integration testing, or production regressions</td>
+<td>Before design and coding—pure text edits at near-zero cost</td>
+</tr>
+<tr>
+<td><strong>Handling Ambiguity</strong></td>
+<td>Agent silently guesses one interpretation and bakes it into code</td>
+<td>Multi-sample logical-equivalence clustering computes semantic entropy and asks A/B questions</td>
+</tr>
+<tr>
+<td><strong>Multi-Rule Interaction</strong></td>
+<td>Manual design review; subtle interactions across 5+ rules easily slip through</td>
+<td>Exhaustive solver checks surface minimal UNSAT cores and concrete coverage-gap models</td>
+</tr>
+<tr>
+<td><strong>Division of Labor</strong></td>
+<td>Humans write vague prose; the LLM acts as translator, judge, and coder</td>
+<td><strong>The LLM translates, the solver checks, and the human decides</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-3">3. Under the Hood: How SMT Solvers Actually Work</h2>
+<h3 id="section-3-1">3.1 From SAT to SMT</h3>
+<ul>
+<li><strong>SAT (Boolean Satisfiability)</strong>: Given a propositional formula over Boolean variables (<code>true</code>/<code>false</code>) connected by <code>AND</code>, <code>OR</code>, and <code>NOT</code>, ask: <em>does there exist an assignment that makes the formula true?</em> If yes, return <code>sat</code> with a concrete assignment (<strong>Model</strong>); if impossible, return <code>unsat</code>.</li>
+<li><strong>SMT (Satisfiability Modulo Theories)</strong>: Real software specs involve more than Booleans—they rely on <strong>linear integer/real arithmetic</strong> (<code>balance &gt;= withdraw_amount</code>), <strong>enums and algebraic datatypes</strong> (<code>Idle | Pending | Fulfilled | Canceled</code>), <strong>strings</strong>, <strong>arrays</strong>, and <strong>bit-vectors</strong>. SMT extends SAT by coupling the Boolean core with specialized first-order <strong>Theory Solvers</strong> for each data domain.</li>
+</ul>
+<h3 id="section-3-2">3.2 Inside Modern Solvers: CDCL(T)</h3>
+<p>Industrial SMT solvers such as Microsoft Research's <a href="https://github.com/z3prover/z3">Z3</a> and Stanford/Iowa's <a href="https://github.com/cvc5/cvc5">cvc5</a> use <strong>CDCL(T)</strong> (Conflict-Driven Clause Learning modulo Theories), a tight two-layer loop:</p>
+<ol>
+<li><strong>Boolean Abstraction</strong>: Replace every domain predicate (e.g., <code>inventory &gt; 0</code>, <code>order_state == Canceled</code>) with a Boolean placeholder variable ($p_1, p_2, \dots$).</li>
+<li><strong>SAT Search &amp; Propagation</strong>: The SAT core searches for a truth assignment that satisfies the propositional skeleton.</li>
+<li><strong>Theory Solver Validation</strong>: The assigned predicates are handed to domain theory solvers (e.g., arithmetic detects that $x &gt; 5$ and $x &lt; 3$ cannot hold together).</li>
+<li><strong>Conflict-Driven Learning</strong>: Whenever a theory conflict occurs, the theory solver returns a blocking lemma (learned clause) to the SAT core, pruning entire regions of the search tree until a valid <code>sat</code> model is found or <code>unsat</code> is proven.</li>
+</ol>
+<p>In specification analysis, three SMT queries do the heavy lifting:</p>
+<ul>
+<li><strong>Consistency (Conflict Detection)</strong>: Assert all rules (<code>R1 ∧ R2 ∧ ... ∧ Rn</code>) plus a rule's trigger condition. If <code>unsat</code>, enable <code>produce-unsat-cores</code> to extract the <strong>minimal conflicting rule subset</strong> (e.g., <code>{R2, R3}</code> or <code>{R1, R5}</code>).</li>
+<li><strong>Completeness (Gap Detection)</strong>: Assert the negation of every trigger antecedent (<code>¬ant(R1) ∧ ¬ant(R2) ∧ ...</code>). If <code>sat</code>, the returned model (e.g., <code>order_state = Idle, order_submitted = false, order_canceled = false</code>) is a concrete <strong>coverage-gap counterexample</strong>.</li>
+<li><strong>Logical Equivalence</strong>: Given two candidate formalizations $F_1$ and $F_2$, test satisfiability of $F_1 \neq F_2$. Returning <strong><code>unsat</code></strong> mathematically proves $F_1 \equiv F_2$ across all inputs; returning <strong><code>sat</code></strong> yields a <strong>Semantic Diff witness</strong> pinpointing the exact scenario where the two readings diverge.</li>
+</ul>
+<h3 id="section-3-3">3.3 AWS Kiro's Three-Stage Neuro-Symbolic Pipeline &amp; Semantic Entropy Clustering</h3>
+<p>Translating a spec once with an LLM and checking it with SMT has a critical flaw: <strong>on an ambiguous sentence, an LLM will quietly commit to one internally consistent reading, and the solver will report "consistent" while the other valid reading disappears.</strong></p>
+<p>The standout contribution in Kotyal's talk (<code>01:55:00–01:55:40</code>) and the <a href="https://kiro.dev/blog/deep-spec-analysis/">Kiro blog</a> is turning LLM non-determinism into a precision ambiguity sensor:</p>
+<ol>
+<li><strong>Stage 1 — Abductive Refinement</strong>: An LLM works backward from the user story's success state to surface missing prerequisites and error paths, strip implementation language, and normalize EARS clauses.</li>
+<li><strong>Stage 2 — Auto-Formalization &amp; Semantic Entropy Clustering</strong>:<ul>
+<li>Sample <strong>7–10 independent SMT-LIB2 translations</strong> of each acceptance criterion.</li>
+<li>Cluster candidates by <strong>SMT logical equivalence</strong> rather than surface text similarity (different variable names or clause ordering collapse into one cluster if logically identical).</li>
+<li>Compute <strong>Semantic Entropy</strong> across clusters and route by two thresholds (<code>low_entropy</code>, <code>high_entropy</code>):<ul>
+<li><strong>Below <code>low_entropy</code></strong>: High agreement—accept the majority cluster representative.</li>
+<li><strong>Above <code>high_entropy</code></strong>: Severe divergence / likely hallucination—<strong>abstain</strong> and ask to reformulate the requirement.</li>
+<li><strong>Between thresholds (Medium Entropy)</strong>: Two or more coherent, mutually exclusive interpretations exist (e.g., hard delete vs. soft delete). Compute the SMT <strong>Semantic Diff</strong> between the top two clusters and translate that counterexample into an A/B clarification question.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Stage 3 — Logical Analysis &amp; Scenario Simulation</strong>:<ul>
+<li>Run consistency (including multi-rule case splits) and completeness checks over the formalized model.</li>
+<li>Sample concrete <strong>Accepted Scenarios</strong> and <strong>Rejected Scenarios</strong> directly from the model ("simulating the specification") and filter them through an <strong>LLM Judge</strong> to surface only surprising behaviors for human sign-off.</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>Crucial Boundary</strong>: As Kotyal candidly emphasized at the close of his talk, <strong>there is no automatic oracle for specification correctness other than the human author</strong>. A mathematically consistent, complete spec can still specify the wrong product, and capturing implicit domain knowledge remains an active frontier. SMT automates everything checkable by logic so humans can spend their attention on the few decisions that genuinely require business judgment.</p>
+</blockquote>
+<h2 id="section-4">4. Open-Source Ecosystem &amp; Runnable SMT-LIB2 / Python Z3 Examples</h2>
+<h3 id="section-4-1">4.1 Open-Source Projects Worth Studying and Integrating</h3>
+<p>While Kiro's built-in Requirements Analysis is a commercial feature, the underlying solvers, standards, and several official AWS neuro-symbolic sample repositories are open source:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Repository / Maintainer / Engineering Value"><table>
+<thead>
+<tr>
+<th scope="col">Repository</th>
+<th scope="col">Maintainer</th>
+<th scope="col">Engineering Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/z3prover/z3"><strong>Z3Prover/z3</strong></a></td>
+<td>Microsoft Research</td>
+<td>The de facto open-source SMT solver (MIT License) supporting SMT-LIB2 with Python (<code>pip install z3-solver</code>), WebAssembly/TypeScript (<code>z3-solver</code> on npm), and C++/Java bindings.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/cvc5/cvc5"><strong>cvc5/cvc5</strong></a></td>
+<td>Stanford / U. of Iowa</td>
+<td>Modern open-source SMT solver excelling at strings, sequences, and algebraic datatypes, with multi-language bindings including <a href="https://github.com/cvc5/cvc5-rs"><code>cvc5/cvc5-rs</code></a>.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/aws-samples/sample-automated-reasoning-formalization"><strong>aws-samples/sample-automated-reasoning-formalization (ARchitect)</strong></a></td>
+<td>AWS Samples</td>
+<td>Official AWS desktop sample combining Kiro CLI and Amazon Bedrock Automated Reasoning APIs so non-technical domain experts can formalize and test policy documents.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/aws-samples/amazon-bedrock-samples/blob/main/responsible_ai/automated-reasoning-rewriting-chatbot/README.md"><strong>aws-samples/amazon-bedrock-samples (<code>automated-reasoning-rewriting-chatbot</code>)</strong></a></td>
+<td>AWS Samples</td>
+<td>End-to-end neuro-symbolic rewrite loop (Python Flask + React) iterating on LLM outputs with Bedrock Automated Reasoning feedback and verifiable audit logs.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/cedar-policy/cedar-spec"><strong>cedar-policy/cedar-spec</strong></a></td>
+<td>AWS</td>
+<td>Formal Lean specification, differential testing, and property-based test generators for AWS's Cedar authorization language—a gold-standard reference for policy DSL verification.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/model-checking/kani"><strong>model-checking/kani</strong></a></td>
+<td>AWS</td>
+<td>Bit-precise open-source Rust model checker (co-maintained/reviewed by Rajath Kotyal), illustrating seamless CI integration of formal verification.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dafny-lang/dafny"><strong>dafny-lang/dafny</strong></a></td>
+<td>Microsoft / AWS Community</td>
+<td>Verification-aware language compiling preconditions, postconditions, and invariants into SMT-LIB for Z3 while targeting Go, Python, Java, C#, or JS.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-4-2">4.2 Snippet 1: Native SMT-LIB2 Reproducing the Order Conflicts &amp; Idle Gap</h3>
+<p>Save as <code>order_spec.smt2</code> and run <code>z3 order_spec.smt2</code> (or <code>cvc5 order_spec.smt2</code>) to reproduce all three logical findings from the talk:</p>
+<pre class="code"><code class="language-lisp">; order_spec.smt2 — Reproducing AWS Kiro's 5-rule Order Processing analysis
+(set-option :produce-unsat-cores true)
+(set-logic QF_DT) ; Quantifier-free logic with algebraic datatypes
+
+; 1. Schema declarations (events, state, outputs)
+(declare-datatypes () ((OrderState Idle Submitted Canceled)))
+
+(declare-const order_submitted Bool)
+(declare-const order_canceled Bool)
+(declare-const inventory_available Bool)
+(declare-const order_state OrderState)
+
+(declare-const order_fulfilled Bool)
+(declare-const order_backordered Bool)
+(declare-const payments_refunded Bool)
+
+; 2. Rule assertions (named for UNSAT core extraction)
+; R1: WHEN submitted AND inventory_available =&gt; fulfill
+(assert (! (=&gt; (and order_submitted inventory_available) order_fulfilled) :named R1))
+; R2: WHEN submitted AND NOT inventory_available =&gt; backorder
+(assert (! (=&gt; (and order_submitted (not inventory_available)) order_backordered) :named R2))
+; R3: SHALL NOT place any order on backorder
+(assert (! (not order_backordered) :named R3))
+; R4: WHEN canceled =&gt; refund all payments
+(assert (! (=&gt; order_canceled payments_refunded) :named R4))
+; R5: WHILE canceled-and-refunded =&gt; SHALL NOT fulfill
+(assert (! (=&gt; (and (= order_state Canceled) payments_refunded) (not order_fulfilled)) :named R5))
+
+; --- Check A: Direct conflict (trigger R2's antecedent) ---
+(push)
+(assert (and order_submitted (not inventory_available)))
+(check-sat)        ; Output: unsat
+(get-unsat-core)   ; Output minimal conflicting set: (R2 R3)
+(pop)
+
+; --- Check B: Conditional conflict (re-submitting a canceled-and-refunded order) ---
+(push)
+(assert (and (= order_state Canceled) payments_refunded order_submitted))
+(check-sat)        ; Output: unsat (conflicts on {R1, R5} or {R2, R3} regardless of inventory)
+(get-unsat-core)   ; Output conflict core
+(pop)
+
+; --- Check C: Completeness gap (no triggered rule applies) ---
+(push)
+(assert (not (and order_submitted inventory_available)))              ; not R1 antecedent
+(assert (not (and order_submitted (not inventory_available))))        ; not R2 antecedent
+(assert (not order_canceled))                                        ; not R4 antecedent
+(assert (not (and (= order_state Canceled) payments_refunded)))      ; not R5 antecedent
+(check-sat)        ; Output: sat (completeness gap proven!)
+(get-model)        ; Concrete counterexample, e.g. order_state = Idle, order_submitted = false, order_canceled = false
+(pop)
+</code></pre>
+<h3 id="section-4-3">4.3 Snippet 2: Python <code>z3-solver</code> Reproducing Multi-Sample Logical-Equivalence Clustering</h3>
+<p>Install <code>pip install z3-solver</code> and run this ~60-line script to reproduce the talk's core ambiguity detector—clustering syntactically different LLM formalizations by logical equivalence and extracting a Semantic Diff counterexample:</p>
+<pre class="code"><code class="language-python">import math
+from z3 import Bool, And, Not, Solver, sat, unsat
+
+# Shared schema variables for the Delete Property requirement
+confirmed = Bool("owner_confirmed_deletion")
+record_exists_in_db = Bool("record_exists_in_db")
+visible_to_user = Bool("visible_to_user")
+visible_to_admin = Bool("visible_to_admin")
+
+# Simulated 6 LLM samples for "WHEN Owner confirms deletion, Platform SHALL remove the record"
+# Despite syntactic differences (clause order), only 2 logical meanings exist: hard delete vs. soft delete
+samples = [
+    ("sample_1", And(confirmed, Not(record_exists_in_db), Not(visible_to_user), Not(visible_to_admin))),
+    ("sample_2", And(Not(visible_to_admin), Not(visible_to_user), Not(record_exists_in_db), confirmed)),
+    ("sample_3", And(confirmed, record_exists_in_db, Not(visible_to_user), visible_to_admin)),
+    ("sample_4", And(confirmed, Not(visible_to_user), record_exists_in_db, visible_to_admin)),
+    ("sample_5", And(confirmed, Not(record_exists_in_db), Not(visible_to_user), Not(visible_to_admin))),
+    ("sample_6", And(visible_to_admin, record_exists_in_db, Not(visible_to_user), confirmed)),
+]
+
+def are_logically_equivalent(f1, f2) -&gt; bool:
+    """Strictly verify logical equivalence across all possible inputs using Z3."""
+    s = Solver()
+    s.add(f1 != f2)
+    return s.check() == unsat
+
+def semantic_diff_witness(f1, f2):
+    """Extract a concrete counterexample where two clusters disagree (for A/B question generation)."""
+    s = Solver()
+    s.add(f1 != f2)
+    if s.check() == sat:
+        return s.model()
+    return None
+
+# 1. Cluster samples by logical equivalence
+clusters = []
+for name, formula in samples:
+    placed = False
+    for cluster in clusters:
+        if are_logically_equivalent(cluster[0][1], formula):
+            cluster.append((name, formula))
+            placed = True
+            break
+    if not placed:
+        clusters.append([(name, formula)])
+
+# 2. Compute Semantic Entropy
+total = len(samples)
+entropy = -sum((len(c) / total) * math.log2(len(c) / total) for c in clusters)
+print(f"Clusters: {len(clusters)} | Semantic Entropy H = {entropy:.3f} bits")
+for idx, c in enumerate(clusters, 1):
+    print(f"  Cluster {idx} ({len(c)}/{total}): {[item[0] for item in c]}")
+
+# 3. Medium entropy detected -&gt; compute Semantic Diff witness between top two clusters
+if len(clusters) &gt;= 2:
+    clusters.sort(key=len, reverse=True)
+    witness = semantic_diff_witness(clusters[0][0][1], clusters[1][0][1])
+    print("\nSemantic ambiguity detected! SMT counterexample (Semantic Diff):")
+    print(witness)
+    # Shows that when confirmed=True, the two clusters disagree on record_exists_in_db &amp; visible_to_admin
+    # An LLM translates this witness into a concise A/B question for the human author.
+</code></pre>
+<h2 id="section-5">5. Four Architectural Supplements for <code>co-arising</code> (<code>truthsrc</code>)</h2>
+<p>Evaluating AWS Kiro's Specification Analyzer through the lens of <strong><code>co-arising</code> (<code>truthsrc</code>)</strong> reveals an encouraging structural advantage: <strong><code>co-arising</code> actually starts from a stronger, more SMT-friendly foundation than prose-first SDD tools.</strong></p>
+<p>In <code>co-arising</code>'s current architecture:</p>
+<ul>
+<li><strong>Deterministic Toolchain</strong>: <code>truthsrc</code> single-line micro-grammar &amp; M1/M2/M3 macro expansion → Canonical JSON compilation → Neo4j/SQLite knowledge graph → deterministic AST/topology validator (checking orphan domain events, cross-Bounded-Context references, missing Saga compensations) → Context Pack slicing → deterministic Scala/Akka (Event Sourcing + CQRS + Saga) skeleton codegen → <code>@CoArisingNode</code> bidirectional anchoring and <code>PreToolUse</code> / <code>Stop (exit 2)</code> hard gates.</li>
+<li><strong>Cognitive Skills &amp; Subagents</strong>: <code>domain-interview</code> (Socratic reverse interview), <code>cloze-fill</code> (implementation inside isolated handwritten zones), <code>brownfield-miner</code>, and <code>contract-reviewer</code>.</li>
+</ul>
+<p>While <code>co-arising</code> already solves <strong>architecture drift, topological breaks, and context rot</strong>, it currently leaves an open high-leverage gap around <strong>predicate-level logical soundness and explicit domain axioms</strong>. Here are four concrete supplements:</p>
+<h3 id="section-5-1">Supplement 1: Add a Deterministic Logical Pass to the Toolchain (<code>truthsrc-smt</code> Backend)</h3>
+<ul>
+<li><strong>Current Gap</strong>: <code>co-arising</code>'s deterministic validator checks syntax and graph topology (e.g., whether an event has a subscriber or a Saga has a compensation step), but does not verify whether two <code>Guard</code> predicates contradict each other or whether a branch is unreachable.</li>
+<li><strong>Structural Advantage</strong>: AWS Kiro relies on probabilistic LLM translation from English/EARS into SMT-LIB, paying a recurring translation and sampling cost. Because <code>truthsrc</code> is already a typed, structured micro-grammar with explicit <code>Qualified Ref</code>, <code>Guard</code>, <code>Binding</code>, <code>Fold</code>, and <code>Parameter</code> constructs, <strong>compiling <code>truthsrc</code> ASTs to SMT-LIB2/Z3 can be largely deterministic rather than probabilistic.</strong></li>
+<li><strong>Concrete Checks</strong> (added as a compiler pass inside <code>metarch-truthsrc</code> and enforced via the <code>Stop</code> hook):<ol>
+<li><strong>Dead Guard Detection</strong>: Flag any <code>Guard</code> whose conjunction with domain axioms is <code>unsat</code>.</li>
+<li><strong>Rule Conflict Detection</strong>: When multiple transitions/policies share a trigger command or event, check whether overlapping <code>Guard</code> conditions emit conflicting effects and report the exact <strong>UNSAT Core</strong>.</li>
+<li><strong>State Coverage Gaps</strong>: Across an Aggregate's enum states and key attributes, test whether <code>¬Guard_1 ∧ ¬Guard_2 ∧ ...</code> is <code>sat</code> to surface unhandled state combinations before generating Scala/Akka code.</li>
+</ol>
+</li>
+</ul>
+<h3 id="section-5-2">Supplement 2: Upgrade <code>domain-interview</code> with Semantic-Entropy Clustering &amp; First-Class <code>Axiom</code> Blocks</h3>
+<ul>
+<li><strong>Current Gap</strong>: As a cognitive Skill, <code>domain-interview</code> currently relies on prompt-driven Socratic questioning, which can over-ask obvious questions while missing subtle rule ambiguities.</li>
+<li><strong>Upgrade Path</strong>:<ol>
+<li>When a domain expert describes complex rules in prose (e.g., partial-failure refund semantics in <code>bank batch transfer</code> or scheduling priorities in <code>fab simulation</code>), run <strong>5–7 lightweight formalization samples + Z3 equivalence clustering</strong> before emitting <code>truthsrc</code>.</li>
+<li>Ask the user <strong>A/B binary questions</strong> only on medium-entropy forks and SMT-simulated surprising scenarios, dramatically improving interview signal-to-noise ratio.</li>
+<li><strong>Capture the "Dark Matter" of Requirements</strong>: Introduce an explicit <strong><code>Axiom</code> / <code>Invariant</code> section</strong> in <code>truthsrc</code> (e.g., batch transfer total equals sum of line items; a reversed transaction cannot be reversed twice) so implicit domain knowledge uncovered during <code>domain-interview</code> becomes a durable, versioned artifact that feeds every future SMT regression check.</li>
+</ol>
+</li>
+</ul>
+<h3 id="section-5-3">Supplement 3: Synthesize Boundary <code>Given-When-Then</code> Tests Directly from SMT Models</h3>
+<ul>
+<li><strong>Current Gap</strong>: During <code>cloze-fill</code>, AI agents implement business logic inside isolated handwritten zones, where LLM-written unit tests tend to skew toward happy paths.</li>
+<li><strong>Upgrade Path</strong>: Every <code>sat</code> model returned by Z3 for <code>Accepted Scenarios</code>, <code>Rejected Scenarios</code>, and <code>Guard</code> boundary conditions is already a mathematically valid input vector. The deterministic toolchain can compile those models directly into Scala/Akka Event Sourcing <strong><code>Given</code> (prior event history / aggregate state) → <code>When</code> (command + parameters) → <code>Then</code> (expected domain events or rejection)</strong> test harnesses—locking <code>cloze-fill</code> and <code>contract-reviewer</code> inside a mathematically grounded verification cage.</li>
+</ul>
+<h3 id="section-5-4">Supplement 4: Bounded Model Checking for Saga Compensations &amp; Cross-Aggregate Invariants</h3>
+<ul>
+<li><strong>Where <code>co-arising</code> Goes Beyond Single-Doc SDD</strong>: AWS Kiro's Requirements Analysis currently focuses on static logical consistency within a <code>requirements.md</code> file. <code>co-arising</code>'s signature strength is distributed domain orchestration via <strong>Event Sourcing + CQRS + Saga (backward compensation) / Monarch (forward recovery)</strong>.</li>
+<li><strong>High-Leverage Next Step</strong>: For <code>bank-wealth-demo</code> and upcoming <code>bank batch transfer</code> / <code>fab simulation</code> demos, unroll <code>truthsrc</code> Saga state machines into a $k$-step bounded SMT transition system:<ul>
+<li>Automatically verify: <em>"If step $i$ times out or fails downstream and triggers compensation, do global ledger/inventory conservation invariants still hold across all participating aggregates (no funds created or lost, no resource deadlock)?"</em></li>
+<li>Whenever a counterexample exists, Z3 emits an exact step-by-step failure trace before the first line of Akka coordination code is written.</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-6">Closing Thought: From Architecture Compiler to Neuro-Symbolic Domain Verification Engine</h2>
+<p>AWS Automated Reasoning Group's core lesson for AI Coding in 2026 is clear: <strong>you cannot patch probabilistic natural-language ambiguity with yet more natural-language prompts—you have to put a deterministic mathematical reasoning engine at the very front of the pipeline.</strong></p>
+<p>For <code>co-arising</code>, this fits like a missing keystone rather than a rewrite: <code>truthsrc</code> has already distilled domain behavior into a compact, structured micro-grammar. Pairing that deterministic AST with a Z3/SMT-LIB2 compiler pass—and upgrading <code>domain-interview</code> with semantic-entropy A/B clarification—elevates <code>co-arising</code> from an <strong>architecture and cognitive compiler</strong> into a <strong>neuro-symbolic domain verification engine</strong> that proves business rules are unambiguous, conflict-free, and complete before a single line of code is generated.</p></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-19">2026-11-19</time></p>
+      <h3><a href="/articles/ai-engineer-code-2026-50-talks-20261119/">AI Engineer CODE 2026: All 50 Talks Ranked by Relevance and Fully Unpacked</a></h3>
+      <p class="article-deck">A zero-truncation close reading of all 50 complete talk transcripts, ranked #01–#50 by relevance to deterministic verification and agent governance — each unpacked across problem, core theory, validated results and toolchain.</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

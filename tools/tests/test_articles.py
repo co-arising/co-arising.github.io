@@ -37,6 +37,8 @@ HASHES = {
     "co-arising-implications-20261116.en.md": "7034a819d39fbd94c9acafa9ff700fc8b69bd60503b519815aba181852890967",
     "lauren-tan-trust-pyramid-20261118.en.md": "ec5bbcf7aa91ba2ee7ff5a5bedb59920e77f668b2511f674615fb7c2ca74be60",
     "ai-engineer-code-2026-50-talks-20261119.en.md": "53902d6ed8e00602a98a2035e833db580b82d10963c6d8e6429b600dd8146e3d",
+    "aws-kiro-smt-spec-analyzer-20261119.md": "bc509b54c4cb042cce2ec4aa1c3e0bbe7a7f70e9b58727074d729bc29db6ab86",
+    "aws-kiro-smt-spec-analyzer-20261119.en.md": "b58a15c73e0895a588eaaa84e3649df094b5b912230a070a91b302771ab0b5f2",
 }
 
 
