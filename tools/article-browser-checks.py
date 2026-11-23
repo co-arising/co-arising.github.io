@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / 'content/articles/manifest.json').read_text(encoding='utf-8'))['articles']
 SLUGS = tuple(item['slug'] for item in MANIFEST)
 RELATED = {item['slug']: item['related'] for item in MANIFEST}
+# Manifest items without the EN trio have no English detail page at all.
+ZH_ONLY = tuple(item['slug'] for item in MANIFEST if 'source_en' not in item)
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -39,6 +41,8 @@ def verify(browser, base, evidence):
                 page.locator('.article-card h3 a').first.click()
                 page.wait_for_url(base + index_path + SLUGS[0] + '/')
                 for slug in SLUGS:
+                    if locale == 'en' and slug in ZH_ONLY:
+                        continue
                     page.goto(base + index_path + slug + '/')
                     page.evaluate('document.fonts.ready')
                     for theme in ('light', 'dark'):
@@ -65,7 +69,11 @@ def verify(browser, base, evidence):
                     page.screenshot(path=str(evidence / f'{locale}-{slug}-{width}-reading.png'))
                     page.goto(base + index_path + slug + '/#section-2')
                     page.reload()
-                    page.wait_for_function("() => { const top=document.querySelector('#section-2').getBoundingClientRect().top; return top >= document.querySelector('#site-nav').getBoundingClientRect().bottom - 2 && top < innerHeight; }")
+                    try:
+                        page.wait_for_function("() => { const top=document.querySelector('#section-2').getBoundingClientRect().top; return top >= document.querySelector('#site-nav').getBoundingClientRect().bottom - 2 && top < innerHeight; }")
+                    except Exception:
+                        state = page.evaluate("() => ({ top: document.querySelector('#section-2')?.getBoundingClientRect().top, navBottom: document.querySelector('#site-nav')?.getBoundingClientRect().bottom, scrollY: scrollY, hash: location.hash })")
+                        raise AssertionError(f'deep-link reload unsettled: {locale}/{slug}/{width} state={state}')
                     assert page.locator('#section-2').is_visible()
                     source = f'{slug}.md' if locale == 'zh' else f'{slug}.en.md'
                     with page.expect_download() as download:

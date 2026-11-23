@@ -1,6 +1,10 @@
 /* Reading enhancements only: static text, anchors and disclosure work without JS. */
 (function () {
   "use strict";
+  // Deep links position themselves explicitly at load/refresh; leave the
+  // default restoration on: on heavy pages it lands after layout and would
+  // override that alignment with a stale offset.
+  if (location.hash && "scrollRestoration" in history) history.scrollRestoration = "manual";
   const body = document.getElementById("article-body");
   const progress = document.getElementById("reading-progress");
   const position = document.getElementById("reading-position");
@@ -38,7 +42,9 @@
   addEventListener("scroll", schedule, { passive: true });
   addEventListener("resize", schedule);
   addEventListener("load", () => {
-    // Font reflow can move a long Chinese heading after the browser restores a hash.
+    // Align at full layout (a heavy page's fonts.ready can resolve before the
+    // DOM finishes laying out, and the browser's late scroll restoration can
+    // then override an early alignment), and again after font reflow.
     const alignFragment = () => {
       let id;
       try { id = decodeURIComponent(location.hash.slice(1)); } catch (error) { return; }
@@ -46,8 +52,8 @@
       if (target && body.contains(target)) target.scrollIntoView({ block: "start", behavior: "instant" });
       schedule();
     };
+    alignFragment();
     if (document.fonts) document.fonts.ready.then(alignFragment);
-    else alignFragment();
   });
   if (typeof ResizeObserver === "function") new ResizeObserver(schedule).observe(body);
   links.forEach((link) => link.addEventListener("click", () => {

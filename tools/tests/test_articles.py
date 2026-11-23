@@ -39,6 +39,8 @@ HASHES = {
     "ai-engineer-code-2026-50-talks-20261119.en.md": "53902d6ed8e00602a98a2035e833db580b82d10963c6d8e6429b600dd8146e3d",
     "aws-kiro-smt-spec-analyzer-20261119.md": "bc509b54c4cb042cce2ec4aa1c3e0bbe7a7f70e9b58727074d729bc29db6ab86",
     "aws-kiro-smt-spec-analyzer-20261119.en.md": "b58a15c73e0895a588eaaa84e3649df094b5b912230a070a91b302771ab0b5f2",
+    "co-arising-ears-spec-20261123.md": "f18d1151bcae40b924699169a9a9d0c6e0f03dd87fdabe0c289b7eee2ec87cfd",
+    "co-arising-ears-spec-20261123.en.md": "98118f3333285cc54a8667a06a4e1cd023a2f25435d9b81e702a21e09a42fa51",
 }
 
 
@@ -369,22 +371,31 @@ class ArticleTests(unittest.TestCase):
                 locale = "zh" if zh else "en"
                 meta = build.localized(current_item, locale)
                 self.assertEqual(body.get("data-language-index"), "/articles/")
-                # Paired details advertise the full hreflang trio like paired indices.
-                self.assertEqual({node.get("hreflang"): node.get("href") for node in dom.findall('.//link[@rel="alternate"]')}, {
-                    "en": build.SITE + build.detail_route(current_item["slug"], "en"),
-                    "zh-CN": build.SITE + build.detail_route(current_item["slug"], "zh"),
-                    "x-default": build.SITE + build.detail_route(current_item["slug"], "en"),
-                })
-                counterpart = build.detail_route(current_item["slug"], "en" if zh else "zh")
-                self.assertEqual(body.get("data-language-counterpart"), counterpart)
                 switches = [node for node in by_id(dom, "site-nav").iter("a") if node.get("lang")]
                 self.assertEqual(len(switches), 1)
                 switch = switches[0]
-                self.assertEqual(switch.get("href"), counterpart)
-                self.assertEqual(switch.get("lang"), "en" if zh else "zh-CN")
-                self.assertEqual(switch.get("hreflang"), "en" if zh else "zh-CN")
-                self.assertIn("alternate", (switch.get("rel") or "").split())
-                self.assertEqual(text(switch), "EN" if zh else "中文")
+                if "source_en" in current_item:
+                    # Paired details advertise the full hreflang trio like paired indices.
+                    self.assertEqual({node.get("hreflang"): node.get("href") for node in dom.findall('.//link[@rel="alternate"]')}, {
+                        "en": build.SITE + build.detail_route(current_item["slug"], "en"),
+                        "zh-CN": build.SITE + build.detail_route(current_item["slug"], "zh"),
+                        "x-default": build.SITE + build.detail_route(current_item["slug"], "en"),
+                    })
+                    counterpart = build.detail_route(current_item["slug"], "en" if zh else "zh")
+                    self.assertEqual(body.get("data-language-counterpart"), counterpart)
+                    self.assertEqual(switch.get("href"), counterpart)
+                else:
+                    # Unpaired Chinese-only details must not advertise a translation.
+                    self.assertFalse(dom.findall('.//link[@rel="alternate"]'))
+                    self.assertIsNone(body.get("data-language-counterpart"))
+                    self.assertEqual(switch.get("href"), "/articles/")
+                    self.assertEqual(switch.get("lang"), "en")
+                    self.assertIn("EN index", text(switch))
+                if "source_en" in current_item:
+                    self.assertEqual(switch.get("lang"), "en" if zh else "zh-CN")
+                    self.assertEqual(switch.get("hreflang"), "en" if zh else "zh-CN")
+                    self.assertIn("alternate", (switch.get("rel") or "").split())
+                    self.assertEqual(text(switch), "EN" if zh else "中文")
                 download = next(a for a in dom.iter("a") if a.get("download"))
                 self.assertEqual(download.get("href"), "/content/articles/" + download.get("download"))
                 self.assertEqual(download.get("download"), meta["source"])
@@ -430,15 +441,21 @@ class ArticleTests(unittest.TestCase):
             self.assertEqual(svg.get("focusable"), "false")
             self.assertEqual([text(node) for node in svg.iter("text")], ["v i b e", "agent", "harness"])
             self.assertFalse([node for node in svg.iter() if node.tag in {"script", "image", "foreignobject"} or node.get("href") or node.get("src")])
-        # Every EN index card now links the English translation, carrying the
-        # translated title, deck and category with an "English translation" tag.
+        # Translated items show EN cards; items without the EN trio fall back
+        # to the Chinese original card linking the zh detail.
         for item in self.items:
             card = by_id(en, "article-" + item["slug"])
             self.assertIsNotNone(card, item["slug"])
-            self.assertEqual(card.get("lang"), "en")
-            self.assertEqual(text(card.find("h3/a")), item["title_en"])
-            self.assertIn(build.detail_route(item["slug"], "en"), [a.get("href") for a in card.iter("a")])
-            self.assertIn("English translation", text(card))
+            if "source_en" in item:
+                self.assertEqual(card.get("lang"), "en")
+                self.assertEqual(text(card.find("h3/a")), item["title_en"])
+                self.assertIn(build.detail_route(item["slug"], "en"), [a.get("href") for a in card.iter("a")])
+                self.assertIn("English translation", text(card))
+            else:
+                self.assertEqual(card.get("lang"), "zh-CN")
+                self.assertEqual(text(card.find("h3/a")), item["title"])
+                self.assertIn(build.detail_route(item["slug"], "zh"), [a.get("href") for a in card.iter("a")])
+                self.assertIn("Chinese article · 中文原文", text(card))
         self.assertNotIn("No English translations are available", text(en))
         for path, dom in self.dom.items():
             ids = [node.get("id") for node in dom.iter() if node.get("id")]
@@ -554,7 +571,10 @@ class ArticleTests(unittest.TestCase):
                 pages = build.generate_pages()
             for item in self.items:
                 self.assertIn(f"zh/articles/{item['slug']}/index.html", pages)
-                self.assertIn(f"articles/{item['slug']}/index.html", pages)
+                if "source_en" in item:
+                    self.assertIn(f"articles/{item['slug']}/index.html", pages)
+                else:
+                    self.assertNotIn(f"articles/{item['slug']}/index.html", pages)
 
 
 if __name__ == "__main__":

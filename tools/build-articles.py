@@ -38,6 +38,7 @@ STRATEGY_SLUG = "co-arising-implications-20261116"
 PRACTICE_SLUG = "lauren-tan-trust-pyramid-20261118"
 CODE50_SLUG = "ai-engineer-code-2026-50-talks-20261119"
 KIRO_SLUG = "aws-kiro-smt-spec-analyzer-20261119"
+SPEC_SLUG = "co-arising-ears-spec-20261123"
 # Initial publication fixture; future valid manifest slugs stay in /zh/articles/.
 OWNED_OUTPUTS = (
     "articles/index.html",
@@ -52,9 +53,13 @@ OWNED_OUTPUTS = (
     f"articles/{CODE50_SLUG}/index.html",
     f"zh/articles/{KIRO_SLUG}/index.html",
     f"articles/{KIRO_SLUG}/index.html",
+    f"zh/articles/{SPEC_SLUG}/index.html",
+    f"articles/{SPEC_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"
+SPEC_NOTE = "本文是前瞻性技术设计规范（v1.2.1），描述目标语言设计与验收标准，不属于已交付能力；文中命令、工具与产物均以实际落地版本为准，落地进度以状态页为准。"
+SPEC_NOTE_EN = "This article is a forward-looking technical design specification (v1.2.1). It describes the target language design and acceptance criteria, not delivered capabilities; commands, tools and artifacts named here are subject to the actually shipped versions, and landing progress is tracked on the status page."
 NAV = (
     ("/", "Home", "首页"),
     ("/why-co-arising/", "Why co-arising", "为何 co-arising"),
@@ -91,6 +96,7 @@ CATEGORY_EN = {
     "行业综述": "Industry survey",
     "战略思考": "Strategy",
     "工程实践": "Engineering practice",
+    "设计规范": "Design specification",
 }
 
 
@@ -465,6 +471,8 @@ def detail_page(item, related, source, locale="zh"):
                   "related": "Continue reading", "back": "Back to article index"}
     if item["slug"] == STRATEGY_SLUG:
         note += f"<p>{STRATEGY_NOTE if zh else STRATEGY_NOTE_EN}</p>"
+    if item["slug"] == SPEC_SLUG:
+        note += f"<p>{SPEC_NOTE if zh else SPEC_NOTE_EN}</p>"
     category = item["category"] if zh else CATEGORY_EN[item["category"]]
     counterpart_route = detail_route(item["slug"], "en" if zh else "zh")
     switch_label = "Read in English" if zh else "中文原文"

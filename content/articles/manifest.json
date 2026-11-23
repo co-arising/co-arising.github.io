@@ -59,6 +59,18 @@
       "title_en": "Specs Have Bugs Too: How AWS Kiro Uses SMT Solvers to Eliminate Ambiguity and Logic Conflicts Before Writing Code",
       "deck_en": "A technical deep dive into AWS Automated Reasoning Group engineer Rajath Kotyal's AI Engineer CODE 2026 talk 'Specs have bugs too': tracing slides and empirical citations, contrasting Before vs. After SMT specifications, demystifying SAT/SMT and multi-sample logical-equivalence clustering, sharing runnable SMT-LIB2 and Python Z3 snippets alongside open-source repositories, and proposing four architectural supplements for co-arising (truthsrc).",
       "source_en": "aws-kiro-smt-spec-analyzer-20261119.en.md"
+    },
+    {
+      "slug": "co-arising-ears-spec-20261123",
+      "title": "co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）",
+      "deck": "受控 EARS 唯一真源 + SMT-LIB 2 单跳确定性验证的完整语言规范：双语同构文法、bank-wealth-demo 四类实战样例、只读投影与 BDD 测试锁定，作为待落地的设计基准。",
+      "category": "设计规范",
+      "date": "2026-11-23",
+      "source": "co-arising-ears-spec-20261123.md",
+      "related": "aws-kiro-smt-spec-analyzer-20261119",
+      "title_en": "co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)",
+      "deck_en": "The complete language specification for the controlled-EARS single truth source with single-hop deterministic SMT-LIB 2 verification: bilingual isomorphic grammar, four bank-wealth-demo worked examples, read-only projections and locked BDD tests — the design baseline pending implementation.",
+      "source_en": "co-arising-ears-spec-20261123.en.md"
     }
   ]
 }

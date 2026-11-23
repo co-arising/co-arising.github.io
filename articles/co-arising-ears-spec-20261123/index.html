@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition) — co-arising</title>
+  <meta name="description" content="The complete language specification for the controlled-EARS single truth source with single-hop deterministic SMT-LIB 2 verification: bilingual isomorphic grammar, four bank-wealth-demo worked examples, read-only projections and locked BDD tests — the design baseline pending implementation." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)" />
+  <meta property="og:description" content="The complete language specification for the controlled-EARS single truth source with single-hop deterministic SMT-LIB 2 verification: bilingual isomorphic grammar, four bank-wealth-demo worked examples, read-only projections and locked BDD tests — the design baseline pending implementation." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/co-arising-ears-spec-20261123/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/co-arising-ears-spec-20261123/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/co-arising-ears-spec-20261123/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Design specification</span></nav>
+      <p class="article-meta"><span>Design specification</span> · <time datetime="2026-11-23">2026-11-23</time> · English translation</p>
+      <h1>co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)</h1>
+      <p class="article-deck">The complete language specification for the controlled-EARS single truth source with single-hop deterministic SMT-LIB 2 verification: bilingual isomorphic grammar, four bank-wealth-demo worked examples, read-only projections and locked BDD tests — the design baseline pending implementation.</p>
+      <div class="article-actions"><a href="/content/articles/co-arising-ears-spec-20261123.en.md" download="co-arising-ears-spec-20261123.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/co-arising-ears-spec-20261123/">中文原文</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p>This article is a forward-looking technical design specification (v1.2.1). It describes the target language design and acceptance criteria, not delivered capabilities; commands, tools and artifacts named here are subject to the actually shipped versions, and landing progress is tracked on the status page.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. Architecture Overview: Single Truth Source + Single-Hop Verification + Read-Only Projections</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. co-arising EARS 1.0 Language Specification</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. Four Complete Practical Examples from bank-wealth-demo (Bilingual Comparison)</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. Read-Only Projections Automatically Derived from the Truth Source (Style E + Style B)</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. Single-Hop Deterministic Compilation from Controlled EARS 1.0 to SMT-LIB 2</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. Mathematical Verification Artifacts: Clarification Cards + BDD Breakdown 1:1 Aligned with the Four Examples</a></li><li><a href="#section-7"><span class="toc-number">07</span> 7. Isolated BDD Test Locking and AI Agent Cloze-Completion Loop</a></li><li><a href="#section-8"><span class="toc-number">08</span> 8. References and Standards</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+      </aside>
+      <article id="article-body" class="article-body"><p><strong>Document Version</strong>: <code>1.2.1</code></p>
+<p><strong>Scope</strong>: <code>metarch-truthsrc</code> / <code>truthsrc-smt</code> / <code>co-arising</code> compiler and AI Agent Harness toolchain</p>
+<p><strong>Reference Benchmark Project</strong>: <code>co-arising/bank-wealth-demo</code> (single-order subscription and refund <code>FundOrder</code>, financial quota thresholds <code>FundQuota</code>, unified stream-batch SIP <code>SipPlan</code>, user story <code>CashFundPurchase</code>)</p>
+<p><strong>Core Principles</strong>: Controlled EARS as Single Truth Source, Authoring Freedom (allowing LLM plain-language drafting), One-Way Read-Only Projections for AC/Decision Tables, Natural Verb-Object Syntax &amp; High Information Density, Solution-Free (No Implementation Leakage), <code>SMT-LIB 2</code> Standard Solver-Agnostic</p>
+<h2 id="section-1">1. Architecture Overview: Single Truth Source + Single-Hop Verification + Read-Only Projections</h2>
+<p>Given completed structured domain modeling (Event / Command / Role / Aggregate / Policy / Timer / Context Mapping / User Story Mapping), <code>co-arising</code> establishes a <strong>single-hop deterministic verification loop</strong>, avoiding the lossy two-hop round-trip of "Plain-Language AC -&gt; LLM Translation -&gt; EARS -&gt; <code>.smt2</code>":</p>
+<pre class="code"><code>  [Authoring Assist Layer (Uncommitted)]   [Git Repo Single Truth Source]        [Deterministic Single-Hop Compilation &amp; Read-Only Projections]
+  ──────────────────────────────────────   ──────────────────────────────        ──────────────────────────────────────────────────────────────
+  Plain-Language Ideas / EventStorming                                           ┌─▶ Projection 1: Style E (PM-Friendly Plain-Language AC)
+        │                                                                        ├─▶ Projection 2: Style B (DMN Decision Table View)
+        ▼ (Optional LLM Drafting)                                                ├─▶ Projection 3: SMT-LIB 2 (.smt2) ──▶ Z3/cvc5
+  Domain Owner Review &amp; Merge ───────────▶ Controlled EARS 1.0 Truth Source      │     ├── Conflicts/Gaps ──▶ A/B Clarification Card
+                                           (Canonical EN + Bilingual Isomorphic  │     └── All Green      ──▶ Boundary Witness Samples
+                                            Lexicon)                             └─▶ Projection 4: TestIR ──▶ Locked Gherkin / ScalaTest
+                                                                                                          ──▶ @cloze TDD Cloze Completion
+
+</code></pre>
+<ol>
+<li>
+<p><strong>Authoring Freedom</strong>: The role responsible for the EARS truth source (Architect, Domain Expert, or Tech Lead) can use an LLM to rapidly draft plain-language requirements into Controlled EARS, but plain-language drafts are never committed as a persistence layer.</p>
+</li>
+<li>
+<p><strong>Single Truth Source</strong>: The Git repository maintains only one Controlled EARS source bound to the <code>truthsrc</code> symbol table (supporting <strong>Style A: Natural Indented</strong> as the primary standard, and optionally the isomorphic <strong>Style C: Block DSL</strong>).</p>
+</li>
+<li>
+<p><strong>One-Way Read-Only Projections</strong>: Plain-language AC for PM review (Style E) and decision tables for risk/architecture blind-spot checks (Style B) are deterministically generated by the compiler from the EARS truth source. They can be rebuilt at any time and never drift.</p>
+</li>
+</ol>
+<h2 id="section-2">2. <code>co-arising EARS 1.0</code> Language Specification</h2>
+<h3 id="section-2-1">2.1 Bilingual Isomorphic Keyword Table (Canonical EN + Optional CN Alias)</h3>
+<p>English keywords serve as the open-source primary standard (Canonical Profile), while the lexer natively supports Chinese isomorphic keywords and Unicode business predicate identifiers—both compile 100% into the exact same AST and <code>.smt2</code>.</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Semantic Category / Canonical EN / CN Profile Alias / Syntax &amp; Expression Conventions"><table>
+<thead>
+<tr>
+<th scope="col">Semantic Category</th>
+<th scope="col">Canonical EN</th>
+<th scope="col">CN Profile Alias</th>
+<th scope="col">Syntax &amp; Expression Conventions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Slice / Story Header</strong></td>
+<td><code>slice</code> / <code>story</code></td>
+<td><code>切片</code> / <code>故事</code></td>
+<td>Declares the owning aggregate slice or application-layer user story</td>
+</tr>
+<tr>
+<td><strong>Named Predicate Section</strong></td>
+<td><code>where:</code> / <code>extern</code></td>
+<td><code>定义:</code> / <code>外部判定</code></td>
+<td>Reuses high-frequency conditions; <strong>enforces positive/affirmative naming</strong> (no "un-/not-/no-" prefixes to prevent double negatives)</td>
+</tr>
+<tr>
+<td><strong>Global Axioms</strong></td>
+<td><code>axioms:</code> / <code>ALWAYS</code></td>
+<td><code>公理:</code> / <code>恒成立</code></td>
+<td>System baselines that hold in the initial state and after any state fold</td>
+</tr>
+<tr>
+<td><strong>Rules Section</strong></td>
+<td><code>rules:</code> / <code>[RULE_ID]</code></td>
+<td><code>规则:</code> / <code>[RULE_ID]</code></td>
+<td>Inline <code>[RULE_ID]</code> directly links to <code>truthsrc</code>'s stable <code>aggregateRuleRefs</code> anchor</td>
+</tr>
+<tr>
+<td><strong>EARS Structural Keywords</strong></td>
+<td><code>WHILE</code> / <code>WHEN</code> / <code>IF ... THEN</code> / <code>WHERE</code></td>
+<td><code>当处于</code> / <code>当收到</code> / <code>如果 ... 则</code> / <code>当启用</code></td>
+<td>Parser infers the sentence pattern from the leading keyword; no manual <code>pattern:</code> required</td>
+</tr>
+<tr>
+<td><strong>Modality</strong></td>
+<td><code>SHALL</code> / <code>SHALL NOT</code></td>
+<td><code>必须</code> / <code>禁止</code></td>
+<td>Mandatory behavior and prohibited behavior (source of SMT mutual-exclusion conflicts)</td>
+</tr>
+<tr>
+<td><strong>Natural Logic</strong></td>
+<td><code>and</code> / <code>or</code> / <code>not</code> / <code>in</code> / <code>is</code> / <code>is not</code></td>
+<td><code>且</code> / <code>或</code> / <code>不满足</code> / <code>属于</code> / <code>为</code> / <code>不为</code></td>
+<td>Replaces code logical operators; supports DMN FEEL-like intervals <code>[min..max]</code> and <code>[start..end)</code></td>
+</tr>
+<tr>
+<td><strong>Domain Action</strong></td>
+<td><code>reject [request] with &lt;Code&gt;</code></td>
+<td><code>拒绝请求，返回 &lt;Code&gt;</code></td>
+<td><strong>Strict verb-object grammar</strong>: the object is the rejected request; the error code is the reason/return code</td>
+</tr>
+<tr>
+<td><strong>Domain Action</strong></td>
+<td><code>emit</code> / <code>transition ... -&gt; ...</code> / <code>succeed-empty</code> / <code>keep</code></td>
+<td><code>发射</code> / <code>状态变为</code> / <code>幂等空成功</code> / <code>维持</code></td>
+<td>Covers event sourcing, state machine transitions, and idempotent side-effect-free replay semantics</td>
+</tr>
+<tr>
+<td><strong>Application Action</strong></td>
+<td><code>pin ... from (...)</code> / <code>dispatch</code> / <code>respond ... with</code> / <code>expose ... as</code></td>
+<td><code>固定</code> / <code>派发</code> / <code>响应</code> / <code>展示</code></td>
+<td>Dedicated to trusted boundaries and read-model isolation in <code>layer: application</code></td>
+</tr>
+<tr>
+<td><strong>Post-Fold</strong></td>
+<td><code>post:</code> (<code>x' = ...</code>)</td>
+<td><code>变更后:</code></td>
+<td>Used by Z3 for inductive invariant proofs (<code>Inv(s) ∧ Guard ∧ Post ⇒ Inv(s')</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-2-2">2.2 Formal EBNF Grammar (Style A Bilingual Isomorphic Core)</h3>
+<p>The syntactic layer relies solely on abstract keyword tokens (<code>KW_*</code>), while the lexical layer uniformly maps both Canonical EN and CN Profile aliases, guaranteeing 100% identical ASTs for bilingual inputs:</p>
+<pre class="code"><code class="language-ebnf">(* ═══ 1. Syntactic Productions (Language-Agnostic) ═══ *)
+SpecFile        ::= Header [ WhereSection ] [ AxiomsSection ] RulesSection ;
+Header          ::= (KW_SLICE | KW_STORY) QualifiedName [ KW_LAYER (KW_DOMAIN | KW_APP) ] ;
+
+WhereSection    ::= KW_WHERE_SEC ":" { PredDef | ExternDef } ;
+PredDef         ::= Ident "=" BoolExpr [ KW_AS StringLit ] ;   (* "as" is used for Style E plain-language projection *)
+ExternDef       ::= KW_EXTERN Ident [ "(" IdentList ")" ] [ KW_AS StringLit ] ;
+
+AxiomsSection   ::= KW_AXIOMS ":" { "[" RuleId "]" KW_ALWAYS (BoolExpr | Modality ActionList) } ;
+RulesSection    ::= KW_RULES ":" { RuleEntry } ;
+RuleEntry       ::= "[" RuleId "]" Statement [ PostSection ] ;
+
+Statement       ::= KW_ALWAYS Modality ActionList
+                  | [ KW_OPT BoolExpr ] [ KW_WHILE BoolExpr ] KW_WHEN Ident [ KW_AND BoolExpr ] Modality ActionList
+                  | [ KW_OPT BoolExpr ] [ KW_WHILE BoolExpr ] KW_IF BoolExpr [ KW_WHILE BoolExpr ] [ KW_WHEN Ident ] KW_THEN Modality ActionList ;
+
+Modality        ::= KW_SHALL | KW_SHALL_NOT ;
+ActionList      ::= Action { KW_AND Action } ;
+
+Action          ::= RejectAction
+                  | KW_EMIT Ident
+                  | KW_TRANSITION Path "-&gt;" Expr
+                  | KW_SUCCEED_EMPTY
+                  | KW_KEEP BoolExpr
+                  | KW_PIN Ident KW_FROM "(" IdentList ")"
+                  | KW_DISPATCH QualifiedName
+                  | KW_RESPOND Ident [ KW_WITH BoolExpr ]
+                  | KW_EXPOSE Ident KW_AS BoolExpr ;
+
+RejectAction    ::= "reject" [ "request" | Ident ] "with" Ident
+                  | "拒绝" [ "请求" | Ident ] ("，" | ",") "返回" Ident ;
+
+PostSection     ::= KW_POST ":" { Path "'" "=" Expr } ;
+
+BoolExpr        ::= OrExpr ;
+OrExpr          ::= AndExpr { KW_OR AndExpr } ;
+AndExpr         ::= NotExpr { KW_AND NotExpr } ;
+NotExpr         ::= KW_NOT NotExpr | AtomPred ;
+AtomPred        ::= Expr ("==" | "!=" | "&gt;" | "&gt;=" | "&lt;" | "&lt;=") Expr
+                  | Expr [ KW_NOT ] KW_IN ( SetLit | IntervalLit | Path )
+                  | Path KW_IS [ KW_NOT ] (KW_EMPTY | KW_NON_EMPTY)
+                  | "(" BoolExpr ")"
+                  | Ident [ "(" ArgList ")" ] ;
+IntervalLit     ::= ("[" | "(") Expr ".." Expr ("]" | ")") ;
+
+(* ═══ 2. Bilingual Lexical Productions ═══ *)
+KW_SLICE        ::= "slice"         | "切片" ;
+KW_STORY        ::= "story"         | "故事" ;
+KW_LAYER        ::= "layer"         | "层级" ;
+KW_DOMAIN       ::= "domain"        | "领域" ;
+KW_APP          ::= "application"   | "应用" ;
+KW_WHERE_SEC    ::= "where"         | "定义" ;
+KW_EXTERN       ::= "extern"        | "外部判定" ;
+KW_AXIOMS       ::= "axioms"        | "公理" ;
+KW_RULES        ::= "rules"         | "规则" ;
+KW_POST         ::= "post"          | "变更后" ;
+
+KW_ALWAYS       ::= "ALWAYS"        | "恒成立" ;
+KW_OPT          ::= "WHERE"         | "当启用" ;
+KW_WHILE        ::= "WHILE"         | "当处于" ;
+KW_WHEN         ::= "WHEN"          | "当收到" ;
+KW_IF           ::= "IF"            | "如果" ;
+KW_THEN         ::= "THEN"          | "则" ;
+KW_SHALL        ::= "SHALL"         | "必须" ;
+KW_SHALL_NOT    ::= "SHALL" "NOT"   | "禁止" ;
+
+KW_AND          ::= "and" | "AND"   | "且" ;
+KW_OR           ::= "or"  | "OR"    | "或" ;
+KW_NOT          ::= "not" | "NOT"   | "不满足" ;
+KW_IN           ::= "in"            | "属于" ;
+KW_IS           ::= "is"            | "为" ;
+KW_EMPTY        ::= "empty"         | "空" ;
+KW_NON_EMPTY    ::= "non-empty"     | "非空" ;
+
+KW_EMIT         ::= "emit"          | "发射" ;
+KW_TRANSITION   ::= "transition"    | "状态变为" ;
+KW_SUCCEED_EMPTY::= "succeed-empty" | "幂等空成功" ;
+KW_KEEP         ::= "keep"          | "维持" ;
+KW_PIN          ::= "pin"           | "固定" ;
+KW_FROM         ::= "from"          | "来自" ;
+KW_DISPATCH     ::= "dispatch"      | "派发" ;
+KW_RESPOND      ::= "respond"       | "响应" ;
+KW_WITH         ::= "with"          | "携带" ;
+KW_EXPOSE       ::= "expose"        | "展示" ;
+KW_AS           ::= "as"            | "作为" ;
+
+(* Supports both ASCII and Unicode business predicate identifiers *)
+Ident           ::= UnicodeLetter { UnicodeLetter | Digit | "_" | "-" } ;
+</code></pre>
+<p><em>(Note: Style C is an isomorphic block-structured variant that simply replaces indented blocks with <code>KW_SLICE X { KW_DEFINE ... KW_RULE [ID] { ... } }</code>, sharing the exact same parsed AST.)</em></p>
+<h3 id="section-2-3">2.3 Predicate Expressiveness and <code>SMT-LIB 2</code> Tiered Boundaries</h3>
+<p>Following AWS Cedar's design philosophy of "intentionally trading away Turing completeness for 100% analyzability," all predicates are automatically routed by SMT theory:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Predicate Tier / Share / Typical Enterprise Business Rules / SMT-LIB 2 Theory / Compiler Strategy"><table>
+<thead>
+<tr>
+<th scope="col">Predicate Tier</th>
+<th scope="col">Share</th>
+<th scope="col">Typical Enterprise Business Rules</th>
+<th scope="col">SMT-LIB 2 Theory</th>
+<th scope="col">Compiler Strategy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L1 Core Decidable Tier</strong></td>
+<td>~85%</td>
+<td>Fixed-point monetary amounts (cents), state machine enums, cursor ordering, dual-threshold accumulation, revision intervals <code>[effectiveSlot..end)</code>, Map membership</td>
+<td><code>QF_AUFLIA</code> + <code>DT</code></td>
+<td><strong>Default mode; millisecond-level, 100% decidable solving</strong></td>
+</tr>
+<tr>
+<td><strong>L2 Strings / Multi-Step Temporal / Local Multiplication</strong></td>
+<td>~10%</td>
+<td>Fund NAV and share floor-division sandwich checks (<code>shares * nav &lt;= netAmount</code>), multi-step state machines (pause -&gt; skip -&gt; resume never resurrects)</td>
+<td><code>QF_NIA</code> (slice-isolated) / <code>QF_SLIA</code> (cvc5) / <code>k</code>-step BMC</td>
+<td><strong>Enable <code>QF_NIA</code> per isolated slice (with 2s timeout); downgrade to <code>extern</code> during cross-aggregate verification</strong></td>
+</tr>
+<tr>
+<td><strong>L3 External I/O &amp; Black-Box Logic</strong></td>
+<td>~5%</td>
+<td>Session authentication, CSRF verification, external TA callback parsing, host deterministic IDs (<code>@host</code>)</td>
+<td><code>extern</code> uninterpreted Boolean predicates</td>
+<td>Preserves 100% Boolean branching and gap checks without intruding into infrastructure</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-3">3. Four Complete Practical Examples from <code>bank-wealth-demo</code> (Bilingual Comparison)</h2>
+<p>Sections 3.1 through 3.4 each provide both the <strong>Canonical EN</strong> and <strong>CN Profile</strong> versions. Their compiled ASTs and <code>.smt2</code> outputs are 100% equivalent.</p>
+<h3 id="section-3-1">3.1 Example 1 (Domain Logic · Single Order): Cash Fund Subscription &amp; Independent Refund (<code>FundOrder</code>)</h3>
+<h4>(1) Subscription Settlement Request: <code>FundOrder.RequestFundPurchaseSettlement</code></h4>
+<p><strong>Canonical EN (Style A)</strong></p>
+<pre class="code"><code>slice FundOrder.RequestFundPurchaseSettlement
+
+where:
+  validAmount      = amount.currency == "CNY" and amount.amount &gt; 0.00      as "subscription amount is positive CNY"
+  validAccounts    = investorAccountId != fundCollectionAccountId           as "investor account differs from collection account"
+  validIdentity    = operationId is non-empty and fundCode is non-empty     as "operation ID and fund code are non-empty"
+  sameAsRecorded   = operationId == order.operationId
+                     and investorAccountId == order.investorAccountId
+                     and fundCollectionAccountId == order.fundCollectionAccountId
+                     and fundCode == order.fundCode
+                     and amount == order.amount                             as "replay parameters match original subscription record"
+  extern matchesCashOriginal                                                as "matches trusted inbound original request"
+
+axioms:
+  [AX-FO-1] ALWAYS order.status in {"new", "payment-requested", "payment-succeeded", "ta-confirmed", "canceled"}
+
+rules:
+  [ORDER_RESOURCE]              IF fundOrderId != order.id
+                                THEN SHALL reject request with ORDER_RESOURCE
+
+  [ORDER_ACCOUNTS]              IF not validAccounts
+                                THEN SHALL reject request with ORDER_ACCOUNTS
+
+  [ORDER_AMOUNT]                IF not validAmount
+                                THEN SHALL reject request with ORDER_AMOUNT
+
+  [ORDER_OPERATION]             IF not validIdentity
+                                THEN SHALL reject request with ORDER_OPERATION
+
+  [CASH_ADMITTED_PAYMENT_MATCH] IF order.cashRequestSource is non-empty and not matchesCashOriginal
+                                THEN SHALL reject request with CASH_ADMITTED_PAYMENT_MATCH
+
+  [ORDER_REPLAY_CONFLICT]       IF not sameAsRecorded WHILE order.status != "new"
+                                THEN SHALL reject request with ORDER_REPLAY_CONFLICT
+
+  [ORDER_REQUEST_ONCE]          WHILE order.status != "new"
+                                WHEN RequestFundPurchaseSettlement AND sameAsRecorded
+                                SHALL succeed-empty
+
+  [SETTLEMENT_REQUESTED]        WHILE order.status == "new"
+                                WHEN RequestFundPurchaseSettlement
+                                  AND fundOrderId == order.id
+                                  AND validAccounts AND validAmount AND validIdentity
+                                  AND (order.cashRequestSource is empty or matchesCashOriginal)
+                                SHALL transition order.status -&gt; "payment-requested"
+                                  AND emit FundPurchaseSettlementRequested
+                                post:
+                                  order.status' = "payment-requested"
+                                  order.amount' = amount
+
+</code></pre>
+<p><strong>CN Profile (Style A)</strong></p>
+<pre class="code"><code>切片 FundOrder.RequestFundPurchaseSettlement
+
+定义:
+  申购金额合法     = amount.currency == "CNY" 且 amount.amount &gt; 0.00
+  出入账户不同     = investorAccountId != fundCollectionAccountId
+  身份与基金非空   = operationId 为 非空 且 fundCode 为 非空
+  重入参数一致     = operationId == order.operationId
+                     且 investorAccountId == order.investorAccountId
+                     且 fundCollectionAccountId == order.fundCollectionAccountId
+                     且 fundCode == order.fundCode
+                     且 amount == order.amount
+  外部判定 与入站原单一致
+
+公理:
+  [AX-FO-1] 恒成立 order.status 属于 {"new", "payment-requested", "payment-succeeded", "ta-confirmed", "canceled"}
+
+规则:
+  [ORDER_RESOURCE]              如果 fundOrderId != order.id
+                                则 必须 拒绝请求，返回 ORDER_RESOURCE
+
+  [ORDER_ACCOUNTS]              如果 不满足 出入账户不同
+                                则 必须 拒绝请求，返回 ORDER_ACCOUNTS
+
+  [ORDER_AMOUNT]                如果 不满足 申购金额合法
+                                则 必须 拒绝请求，返回 ORDER_AMOUNT
+
+  [ORDER_OPERATION]             如果 不满足 身份与基金非空
+                                则 必须 拒绝请求，返回 ORDER_OPERATION
+
+  [CASH_ADMITTED_PAYMENT_MATCH] 如果 order.cashRequestSource 为 非空 且 不满足 与入站原单一致
+                                则 必须 拒绝请求，返回 CASH_ADMITTED_PAYMENT_MATCH
+
+  [ORDER_REPLAY_CONFLICT]       当处于 order.status != "new"
+                                如果 不满足 重入参数一致
+                                则 必须 拒绝请求，返回 ORDER_REPLAY_CONFLICT
+
+  [ORDER_REQUEST_ONCE]          当处于 order.status != "new"
+                                当收到 RequestFundPurchaseSettlement 且 重入参数一致
+                                必须 幂等空成功
+
+  [SETTLEMENT_REQUESTED]        当处于 order.status == "new"
+                                当收到 RequestFundPurchaseSettlement
+                                  且 fundOrderId == order.id
+                                  且 出入账户不同 且 申购金额合法 且 身份与基金非空
+                                  且 (order.cashRequestSource 为 空 或 与入站原单一致)
+                                必须 状态变为 order.status -&gt; "payment-requested"
+                                  且 发射 FundPurchaseSettlementRequested
+                                变更后:
+                                  order.status' = "payment-requested"
+                                  order.amount' = amount
+
+</code></pre>
+<h4>(2) Independent Refund Slice: <code>FundOrder.RequestFundPurchaseRefund</code></h4>
+<p><strong>Canonical EN (Style C Block Variant)</strong></p>
+<pre class="code"><code>slice FundOrder.RequestFundPurchaseRefund {
+  define paymentSucceeded = paymentTxId == order.selectedPaymentTxId
+                            and order.cashPaymentFinalResults[paymentTxId] == "succeeded"
+  define taRejected       = order.taStatus == "rejected"
+  define refundPending    = order.refundOperationId is non-empty
+
+  rule [REFUND_RESOURCE]    { if fundOrderId != order.id then reject request with REFUND_RESOURCE }
+  rule [REFUND_PAYMENT]     { if not paymentSucceeded    then reject request with REFUND_PAYMENT }
+  rule [REFUND_TA_REJECTED] { if not taRejected          then reject request with REFUND_TA_REJECTED }
+
+  rule [REFUND_INTENT_ONCE] {
+    while refundPending
+    when RequestFundPurchaseRefund and paymentSucceeded and taRejected
+    then succeed-empty
+  }
+
+  rule [REFUND_REQUESTED] {
+    while not refundPending
+    when RequestFundPurchaseRefund and fundOrderId == order.id and paymentSucceeded and taRejected
+    then emit FundPurchaseRefundRequested
+     and transition order.refundOutcome -&gt; "pending"
+  }
+}
+
+</code></pre>
+<p><strong>CN Profile (Style C Block Variant)</strong></p>
+<pre class="code"><code>切片 FundOrder.RequestFundPurchaseRefund {
+  定义 付款已成功   = paymentTxId == order.selectedPaymentTxId
+                      且 order.cashPaymentFinalResults[paymentTxId] == "succeeded"
+  定义 TA已拒绝     = order.taStatus == "rejected"
+  定义 退款已发起   = order.refundOperationId 为 非空
+
+  规则 [REFUND_RESOURCE]    { 如果 fundOrderId != order.id 则 拒绝请求，返回 REFUND_RESOURCE }
+  规则 [REFUND_PAYMENT]     { 如果 不满足 付款已成功        则 拒绝请求，返回 REFUND_PAYMENT }
+  规则 [REFUND_TA_REJECTED] { 如果 不满足 TA已拒绝          则 拒绝请求，返回 REFUND_TA_REJECTED }
+
+  规则 [REFUND_INTENT_ONCE] {
+    当处于 退款已发起
+    当收到 RequestFundPurchaseRefund 且 付款已成功 且 TA已拒绝
+    必须 幂等空成功
+  }
+
+  规则 [REFUND_REQUESTED] {
+    当处于 不满足 退款已发起
+    当收到 RequestFundPurchaseRefund 且 fundOrderId == order.id 且 付款已成功 且 TA已拒绝
+    必须 发射 FundPurchaseRefundRequested
+      且 状态变为 order.refundOutcome -&gt; "pending"
+  }
+}
+
+</code></pre>
+<h3 id="section-3-2">3.2 Example 2 (Domain Logic · Financial Quotas &amp; NAV Shares): Dual-Threshold Control + Exact Share Conversion</h3>
+<p>In DDD, <strong>fund-wide / per-account subscription caps</strong> belong to <code>FundQuota</code> (pure <code>QF_AUFLIA</code>), while <strong>current-period fund NAV and share confirmation</strong> belong to <code>FundOrder.ConfirmTAShares</code> (isolated <code>QF_NIA</code> solving, using fixed-point integer floor-division sandwich inequalities instead of floating-point division).</p>
+<h4>(1) Dual-Threshold Control: <code>FundQuota.ReserveSubscriptionQuota</code></h4>
+<p><strong>Canonical EN</strong></p>
+<pre class="code"><code>slice FundQuota.ReserveSubscriptionQuota
+
+where:
+  validAmount   = amount in [quota.minPurchase..quota.maxSingleLimit]       as "single subscription amount is within valid range"
+  withinFundCap = quota.fundTotalUsed + amount &lt;= quota.fundTotalCap        as "within fund total subscription cap"
+  withinAcctCap = quota.accountUsed[accountId] + amount &lt;= quota.perAccountCap as "within per-account subscription cap"
+
+axioms:
+  [AX-Q-1] ALWAYS quota.fundTotalUsed &lt;= quota.fundTotalCap
+  [AX-Q-2] ALWAYS quota.accountUsed[accountId] &lt;= quota.perAccountCap
+
+rules:
+  [QUOTA_AMOUNT_RANGE] IF not validAmount   THEN SHALL reject request with QUOTA_AMOUNT_RANGE
+  [QUOTA_FUND_CAP]     IF not withinFundCap THEN SHALL reject request with QUOTA_FUND_CAP
+  [QUOTA_ACCOUNT_CAP]  IF not withinAcctCap THEN SHALL reject request with QUOTA_ACCOUNT_CAP
+
+  [QUOTA_RESERVED]     WHILE validAmount and withinFundCap and withinAcctCap
+                       WHEN ReserveSubscriptionQuota
+                       SHALL emit SubscriptionQuotaReserved
+                       post:
+                         quota.fundTotalUsed'          = quota.fundTotalUsed + amount
+                         quota.accountUsed'[accountId] = quota.accountUsed[accountId] + amount
+
+</code></pre>
+<p><strong>CN Profile</strong></p>
+<pre class="code"><code>切片 FundQuota.ReserveSubscriptionQuota
+
+定义:
+  单笔额度合法     = amount 属于 [quota.minPurchase..quota.maxSingleLimit]
+  在基金总门限内   = quota.fundTotalUsed + amount &lt;= quota.fundTotalCap
+  在单户总门限内   = quota.accountUsed[accountId] + amount &lt;= quota.perAccountCap
+
+公理:
+  [AX-Q-1] 恒成立 quota.fundTotalUsed &lt;= quota.fundTotalCap
+  [AX-Q-2] 恒成立 quota.accountUsed[accountId] &lt;= quota.perAccountCap
+
+规则:
+  [QUOTA_AMOUNT_RANGE] 如果 不满足 单笔额度合法   则 必须 拒绝请求，返回 QUOTA_AMOUNT_RANGE
+  [QUOTA_FUND_CAP]     如果 不满足 在基金总门限内 则 必须 拒绝请求，返回 QUOTA_FUND_CAP
+  [QUOTA_ACCOUNT_CAP]  如果 不满足 在单户总门限内 则 必须 拒绝请求，返回 QUOTA_ACCOUNT_CAP
+
+  [QUOTA_RESERVED]     当处于 单笔额度合法 且 在基金总门限内 且 在单户总门限内
+                       当收到 ReserveSubscriptionQuota
+                       必须 发射 SubscriptionQuotaReserved
+                       变更后:
+                         quota.fundTotalUsed'          = quota.fundTotalUsed + amount
+                         quota.accountUsed'[accountId] = quota.accountUsed[accountId] + amount
+
+</code></pre>
+<h4>(2) Current-Period NAV &amp; Share Confirmation: <code>FundOrder.ConfirmTAShares</code></h4>
+<p><strong>Canonical EN</strong></p>
+<pre class="code"><code>slice FundOrder.ConfirmTAShares
+
+where:
+  validNav       = nav &gt; 0.0000                                             as "current fund NAV is positive"
+  exactFloorMath = shares &gt;= 0
+                   and shares * nav &lt;= order.netAmount
+                   and (shares + 1) * nav &gt; order.netAmount                 as "confirmed shares equal exact floor division of net amount by NAV"
+
+rules:
+  [TA_INVALID_NAV]     IF not validNav       THEN SHALL reject request with TA_INVALID_NAV
+  [TA_SHARES_MISMATCH] IF not exactFloorMath THEN SHALL reject request with TA_SHARES_MISMATCH
+
+  [TA_CONFIRMED]       WHILE order.paymentOutcome == "succeeded" and order.taStatus != "confirmed"
+                       WHEN RecordFundTAConfirmed AND validNav AND exactFloorMath
+                       SHALL transition order.taStatus -&gt; "confirmed"
+                         AND emit FundTASharesConfirmed
+
+</code></pre>
+<p><strong>CN Profile</strong></p>
+<pre class="code"><code>切片 FundOrder.ConfirmTAShares
+
+定义:
+  本期净值合法   = nav &gt; 0.0000
+  份额折算精确   = shares &gt;= 0
+                   且 shares * nav &lt;= order.netAmount
+                   且 (shares + 1) * nav &gt; order.netAmount
+
+规则:
+  [TA_INVALID_NAV]     如果 不满足 本期净值合法 则 必须 拒绝请求，返回 TA_INVALID_NAV
+  [TA_SHARES_MISMATCH] 如果 不满足 份额折算精确 则 必须 拒绝请求，返回 TA_SHARES_MISMATCH
+
+  [TA_CONFIRMED]       当处于 order.paymentOutcome == "succeeded" 且 order.taStatus != "confirmed"
+                       当收到 RecordFundTAConfirmed 且 本期净值合法 且 份额折算精确
+                       必须 状态变为 order.taStatus -&gt; "confirmed"
+                         且 发射 FundTASharesConfirmed
+
+</code></pre>
+<h3 id="section-3-3">3.3 Example 3 (Domain Logic · Unified Stream-Batch): Finite Cash SIP (<code>SipPlan</code>)</h3>
+<p>Fully covers <code>SipPlan</code> in <code>bank-wealth-demo</code>: batch observation cursor (<code>observedCount</code>), stream dispatch cursor (<code>startCount</code>), discrete clock maturity (<code>dueSlot &lt;= currentTick</code>), multi-version revision effective intervals (<code>[effectiveSlot..revisionEnd)</code>), isolation between paused-skipped slots and <code>backlog</code>, and the "first-terminal-only counting, no auto-pause on three consecutive failures" invariant.</p>
+<p><strong>Canonical EN</strong></p>
+<pre class="code"><code>slice SipPlan.StreamBatchExecution
+
+where:
+  scheduleReady     = plan.initialized and plan.scheduleSealed              as "SIP plan is initialized and schedule is sealed"
+  slotValid         = position in plan.slots and plan.slots[position] == dueSlot as "position matches scheduled due slot"
+  slotDue           = dueSlot &lt;= plan.currentTick                           as "slot has reached current business clock"
+  inRevisionWindow  = revision in plan.revisions
+                      and plan.revisions[revision] == config
+                      and dueSlot &gt;= config.effectiveSlot
+                      and (revision not in plan.revisionEnds or dueSlot &lt; plan.revisionEnds[revision])
+                                                                            as "slot falls within revision effective interval"
+  alreadyTriggered  = dueSlot in plan.occurrences                           as "slot has already triggered an installment"
+  sameTriggerReplay = alreadyTriggered
+                      and plan.occurrences[dueSlot].revision == revision
+                      and plan.occurrences[dueSlot].config == config        as "trigger replay parameters match recorded occurrence"
+
+axioms:
+  [AX-SIP-1] ALWAYS plan.startCount &lt;= plan.observedCount and plan.observedCount &lt;= plan.scheduleCount
+  [AX-SIP-2] ALWAYS plan.successTotal + plan.failureTotal &lt;= plan.scheduleCount
+  [AX-SIP-3] ALWAYS plan.currentTick &gt;= -1
+
+rules:
+  # --- Batch Observation: due slots during pause are marked skipped and never enter backlog ---
+  [SIP_SKIP_ONCE]       WHILE dueSlot in plan.slotDisposition and plan.slotDisposition[dueSlot] == "skipped"
+                        WHEN SkipPausedSipDueSlot AND scheduleReady AND slotValid
+                        SHALL succeed-empty
+
+  [SIP_SKIP_CONFLICT]   IF dueSlot in plan.slotDisposition and plan.slotDisposition[dueSlot] != "skipped"
+                        WHEN SkipPausedSipDueSlot
+                        THEN SHALL reject request with SIP_OBSERVATION_CONFLICT
+
+  [SIP_SKIP_ORDER]      IF position != plan.observedCount
+                        WHEN SkipPausedSipDueSlot
+                        THEN SHALL reject request with SIP_OBSERVATION_ORDER
+
+  [SIP_SKIP_NOT_DUE]    IF not slotDue
+                        WHEN SkipPausedSipDueSlot
+                        THEN SHALL reject request with SIP_SLOT_DUE
+
+  [SIP_SKIP_NOT_PAUSED] IF not (plan.paused and dueSlot &gt;= plan.pauseTick)
+                        WHEN SkipPausedSipDueSlot
+                        THEN SHALL reject request with SIP_PAUSE_CLASSIFICATION
+
+  [SIP_SKIP_RECORDED]   WHILE scheduleReady and dueSlot not in plan.slotDisposition
+                        WHEN SkipPausedSipDueSlot
+                          AND slotValid AND position == plan.observedCount
+                          AND slotDue AND plan.paused AND dueSlot &gt;= plan.pauseTick
+                        SHALL emit SipPausedDueSlotSkipped
+                        post:
+                          plan.slotDisposition'[dueSlot] = "skipped"
+                          plan.observedCount'            = plan.observedCount + 1
+
+  # --- Stream Dispatch: strictly consumes backlog by startCount, never resurrects skipped ---
+  [SIP_ACTIVE_START]    IF plan.paused                                      WHEN TriggerSipInstallment THEN SHALL reject request with SIP_ACTIVE_START
+  [SIP_START_ORDER]     IF position != plan.startCount                      WHEN TriggerSipInstallment THEN SHALL reject request with SIP_START_ORDER
+  [SIP_BACKLOG_REQ]     IF plan.slotDisposition[dueSlot] != "backlog"       WHEN TriggerSipInstallment THEN SHALL reject request with SIP_BACKLOG_REQUIRED
+  [SIP_REV_INTERVAL]    IF not inRevisionWindow                             WHEN TriggerSipInstallment THEN SHALL reject request with SIP_REVISION_INTERVAL
+  [SIP_OCC_CONFLICT]    IF alreadyTriggered and not sameTriggerReplay       WHEN TriggerSipInstallment THEN SHALL reject request with SIP_OCCURRENCE_REPLAY_CONFLICT
+
+  [SIP_OCC_ONCE]        WHILE sameTriggerReplay
+                        WHEN TriggerSipInstallment AND scheduleReady AND slotValid
+                        SHALL succeed-empty
+
+  [SIP_TRIGGERED]       WHILE scheduleReady and not plan.paused and not alreadyTriggered
+                        WHEN TriggerSipInstallment
+                          AND slotValid AND position == plan.startCount
+                          AND plan.slotDisposition[dueSlot] == "backlog"
+                          AND inRevisionWindow
+                        SHALL emit SipInstallmentTriggered
+                        post:
+                          plan.occurrences'[dueSlot] = @host(StableSipOccurrence)
+                          plan.startCount'           = plan.startCount + 1
+
+  # --- Terminal Deduplication: count only on first terminal state, never auto-pause on failures ---
+  [SIP_TERMINAL_ONCE]   WHILE occurrenceId in plan.firstTerminals and plan.firstTerminals[occurrenceId] == "failed"
+                        WHEN RecordSipInstallmentFailed
+                        SHALL succeed-empty
+
+  [SIP_FAIL_NO_PAUSE]   WHILE occurrenceId not in plan.firstTerminals
+                        WHEN RecordSipInstallmentFailed
+                        SHALL emit SipInstallmentFailed
+                          AND keep plan.paused == plan.paused
+                        post:
+                          plan.firstTerminals'[occurrenceId] = "failed"
+                          plan.failureTotal'                 = plan.failureTotal + 1
+                          plan.paused'                       = plan.paused
+
+</code></pre>
+<p><strong>CN Profile</strong></p>
+<pre class="code"><code>切片 SipPlan.StreamBatchExecution
+
+定义:
+  日程已就绪       = plan.initialized 且 plan.scheduleSealed
+  槽位匹配         = position 属于 plan.slots 且 plan.slots[position] == dueSlot
+  槽位已到期       = dueSlot &lt;= plan.currentTick
+  在修订有效期内   = revision 属于 plan.revisions
+                     且 plan.revisions[revision] == config
+                     且 dueSlot &gt;= config.effectiveSlot
+                     且 (不满足 (revision 属于 plan.revisionEnds) 或 dueSlot &lt; plan.revisionEnds[revision])
+  当期已触发       = dueSlot 属于 plan.occurrences
+  触发重入一致     = 当期已触发
+                     且 plan.occurrences[dueSlot].revision == revision
+                     且 plan.occurrences[dueSlot].config == config
+
+公理:
+  [AX-SIP-1] 恒成立 plan.startCount &lt;= plan.observedCount 且 plan.observedCount &lt;= plan.scheduleCount
+  [AX-SIP-2] 恒成立 plan.successTotal + plan.failureTotal &lt;= plan.scheduleCount
+  [AX-SIP-3] 恒成立 plan.currentTick &gt;= -1
+
+规则:
+  # --- 批处理观察侧：暂停期间到期槽位记为 skipped，绝不进入 backlog ---
+  [SIP_SKIP_ONCE]       当处于 dueSlot 属于 plan.slotDisposition 且 plan.slotDisposition[dueSlot] == "skipped"
+                        当收到 SkipPausedSipDueSlot 且 日程已就绪 且 槽位匹配
+                        必须 幂等空成功
+
+  [SIP_SKIP_CONFLICT]   如果 dueSlot 属于 plan.slotDisposition 且 plan.slotDisposition[dueSlot] != "skipped"
+                        当收到 SkipPausedSipDueSlot
+                        则 必须 拒绝请求，返回 SIP_OBSERVATION_CONFLICT
+
+  [SIP_SKIP_ORDER]      如果 position != plan.observedCount
+                        当收到 SkipPausedSipDueSlot
+                        则 必须 拒绝请求，返回 SIP_OBSERVATION_ORDER
+
+  [SIP_SKIP_NOT_DUE]    如果 不满足 槽位已到期
+                        当收到 SkipPausedSipDueSlot
+                        则 必须 拒绝请求，返回 SIP_SLOT_DUE
+
+  [SIP_SKIP_NOT_PAUSED] 如果 不满足 (plan.paused 且 dueSlot &gt;= plan.pauseTick)
+                        当收到 SkipPausedSipDueSlot
+                        则 必须 拒绝请求，返回 SIP_PAUSE_CLASSIFICATION
+
+  [SIP_SKIP_RECORDED]   当处于 日程已就绪 且 不满足 (dueSlot 属于 plan.slotDisposition)
+                        当收到 SkipPausedSipDueSlot
+                          且 槽位匹配 且 position == plan.observedCount
+                          且 槽位已到期 且 plan.paused 且 dueSlot &gt;= plan.pauseTick
+                        必须 发射 SipPausedDueSlotSkipped
+                        变更后:
+                          plan.slotDisposition'[dueSlot] = "skipped"
+                          plan.observedCount'            = plan.observedCount + 1
+
+  # --- 流式派发侧：严格按 startCount 消费 backlog，永不复活 skipped ---
+  [SIP_ACTIVE_START]    如果 plan.paused                                    当收到 TriggerSipInstallment 则 必须 拒绝请求，返回 SIP_ACTIVE_START
+  [SIP_START_ORDER]     如果 position != plan.startCount                    当收到 TriggerSipInstallment 则 必须 拒绝请求，返回 SIP_START_ORDER
+  [SIP_BACKLOG_REQ]     如果 plan.slotDisposition[dueSlot] != "backlog"     当收到 TriggerSipInstallment 则 必须 拒绝请求，返回 SIP_BACKLOG_REQUIRED
+  [SIP_REV_INTERVAL]    如果 不满足 在修订有效期内                          当收到 TriggerSipInstallment 则 必须 拒绝请求，返回 SIP_REVISION_INTERVAL
+  [SIP_OCC_CONFLICT]    如果 当期已触发 且 不满足 触发重入一致              当收到 TriggerSipInstallment 则 必须 拒绝请求，返回 SIP_OCCURRENCE_REPLAY_CONFLICT
+
+  [SIP_OCC_ONCE]        当处于 触发重入一致
+                        当收到 TriggerSipInstallment 且 日程已就绪 且 槽位匹配
+                        必须 幂等空成功
+
+  [SIP_TRIGGERED]       当处于 日程已就绪 且 不满足 plan.paused 且 不满足 当期已触发
+                        当收到 TriggerSipInstallment
+                          且 槽位匹配 且 position == plan.startCount
+                          且 plan.slotDisposition[dueSlot] == "backlog"
+                          且 在修订有效期内
+                        必须 发射 SipInstallmentTriggered
+                        变更后:
+                          plan.occurrences'[dueSlot] = @host(StableSipOccurrence)
+                          plan.startCount'           = plan.startCount + 1
+
+  # --- 终态防重计数：首次终态才计数，三连败不自动暂停 ---
+  [SIP_TERMINAL_ONCE]   当处于 occurrenceId 属于 plan.firstTerminals 且 plan.firstTerminals[occurrenceId] == "failed"
+                        当收到 RecordSipInstallmentFailed
+                        必须 幂等空成功
+
+  [SIP_FAIL_NO_PAUSE]   当处于 不满足 (occurrenceId 属于 plan.firstTerminals)
+                        当收到 RecordSipInstallmentFailed
+                        必须 发射 SipInstallmentFailed
+                          且 维持 plan.paused == plan.paused
+                        变更后:
+                          plan.firstTerminals'[occurrenceId] = "failed"
+                          plan.failureTotal'                 = plan.failureTotal + 1
+                          plan.paused'                       = plan.paused
+
+</code></pre>
+<h3 id="section-3-4">3.4 Example 4 (Application Logic · User Story): <code>CashFundPurchase</code> (<code>PurchaseFundWithCash</code>)</h3>
+<p><strong>Canonical EN</strong></p>
+<pre class="code"><code>story CashFundPurchase layer application
+
+where:
+  validSubmit = amount.currency == "CNY" and amount.amount &gt; 0.00           as "submitted amount is positive CNY"
+  extern sessionAuthenticated(principal)                                    as "customer session is authenticated"
+  extern originAndCsrfValid                                                 as "origin and CSRF validation passed"
+  extern fundCodeActive(fundCode)                                           as "fund code is open for subscription"
+  extern requestExists(principal, clientRequestId)                          as "original record exists for this client request ID"
+  extern payloadMatchesOriginal(principal, clientRequestId, fundCode, amount) as "replay payload matches original request"
+
+axioms:
+  [AX-APP-1] ALWAYS BankCashSubmit SHALL NOT supply operationId, investorAccountId, fundCollectionAccountId
+
+rules:
+  [US-CFP-01] IF not sessionAuthenticated(principal) or not originAndCsrfValid
+              WHEN BankCashSubmitPort.submit
+              THEN SHALL reject request with UNAUTHORIZED_OR_CSRF
+
+  [US-CFP-02] IF not fundCodeActive(fundCode) or not validSubmit
+              WHEN BankCashSubmitPort.submit
+              THEN SHALL reject request with INVALID_CASH_SUBMIT
+
+  [US-CFP-03] WHILE not requestExists(principal, clientRequestId)
+              WHEN BankCashSubmitPort.submit
+                AND sessionAuthenticated(principal) AND originAndCsrfValid
+                AND fundCodeActive(fundCode) AND validSubmit
+              SHALL pin BankCashOriginal from (principal, clientRequestId)
+                AND dispatch FundOrder.RecordCashRequestSource
+                AND dispatch FundOrder.RequestFundPurchaseSettlement
+                AND respond BankCashAcknowledgement with ack.replayed == false and ack.accepted == true
+
+  [US-CFP-04] WHILE requestExists(principal, clientRequestId)
+              WHEN BankCashSubmitPort.submit AND payloadMatchesOriginal(principal, clientRequestId, fundCode, amount)
+              SHALL respond BankCashAcknowledgement with ack.replayed == true
+                AND SHALL NOT dispatch FundOrder.RequestFundPurchaseSettlement
+
+  [US-CFP-05] IF not payloadMatchesOriginal(principal, clientRequestId, fundCode, amount)
+              WHILE requestExists(principal, clientRequestId)
+              WHEN BankCashSubmitPort.submit
+              THEN SHALL reject request with CASH_SOURCE_CONFLICT
+
+  [US-CFP-06] WHILE order.paymentOutcome == "succeeded" and order.taStatus != "confirmed"
+              WHEN BankOrderQuery.get
+              SHALL expose bank-order-view as view.paymentCompleted == true and view.taFinalized == false
+
+</code></pre>
+<p><strong>CN Profile</strong></p>
+<pre class="code"><code>故事 CashFundPurchase layer application
+
+定义:
+  提交金额合法               = amount.currency == "CNY" 且 amount.amount &gt; 0.00
+  外部判定 客户会话已认证(principal)
+  外部判定 来源与CSRF合法
+  外部判定 基金代码可申购(fundCode)
+  外部判定 原请求已存在(principal, clientRequestId)
+  外部判定 重入参数与原单一致(principal, clientRequestId, fundCode, amount)
+
+公理:
+  [AX-APP-1] 恒成立 禁止 BankCashSubmit 携带 operationId, investorAccountId, fundCollectionAccountId
+
+规则:
+  [US-CFP-01] 如果 不满足 客户会话已认证(principal) 或 不满足 来源与CSRF合法
+              当收到 BankCashSubmitPort.submit
+              则 必须 拒绝请求，返回 UNAUTHORIZED_OR_CSRF
+
+  [US-CFP-02] 如果 不满足 基金代码可申购(fundCode) 或 不满足 提交金额合法
+              当收到 BankCashSubmitPort.submit
+              则 必须 拒绝请求，返回 INVALID_CASH_SUBMIT
+
+  [US-CFP-03] 当处于 不满足 原请求已存在(principal, clientRequestId)
+              当收到 BankCashSubmitPort.submit
+                且 客户会话已认证(principal) 且 来源与CSRF合法
+                且 基金代码可申购(fundCode) 且 提交金额合法
+              必须 固定 BankCashOriginal from (principal, clientRequestId)
+                且 派发 FundOrder.RecordCashRequestSource
+                且 派发 FundOrder.RequestFundPurchaseSettlement
+                且 响应 BankCashAcknowledgement with ack.replayed == false 且 ack.accepted == true
+
+  [US-CFP-04] 当处于 原请求已存在(principal, clientRequestId)
+              当收到 BankCashSubmitPort.submit 且 重入参数与原单一致(principal, clientRequestId, fundCode, amount)
+              必须 响应 BankCashAcknowledgement with ack.replayed == true
+                且 禁止 派发 FundOrder.RequestFundPurchaseSettlement
+
+  [US-CFP-05] 当处于 原请求已存在(principal, clientRequestId)
+              如果 不满足 重入参数与原单一致(principal, clientRequestId, fundCode, amount)
+              当收到 BankCashSubmitPort.submit
+              则 必须 拒绝请求，返回 CASH_SOURCE_CONFLICT
+
+  [US-CFP-06] 当处于 order.paymentOutcome == "succeeded" 且 order.taStatus != "confirmed"
+              当收到 BankOrderQuery.get
+              必须 展示 bank-order-view as view.paymentCompleted == true 且 view.taFinalized == false
+
+</code></pre>
+<h2 id="section-4">4. Read-Only Projections Automatically Derived from the Truth Source (Style E + Style B)</h2>
+<p>Using the <code>as "..."</code> business phrase labels in <code>where:</code>, the compiler deterministically generates two read-only review views with zero LLM involvement:</p>
+<h3 id="section-4-1">4.1 Style E Projection: PM-Friendly Plain-Language AC (Using <code>FundQuota</code> as an Example)</h3>
+<blockquote>
+<p><strong>Feature Specification: Fund Subscription Quota Reservation (Read-Only Projection, Truth Source: <code>fund-quota-reserve.ears</code>)</strong></p>
+<ul>
+<li>
+<p><strong>AC-1 <code>[QUOTA_AMOUNT_RANGE]</code></strong>: If "single subscription amount is within valid range" is not satisfied, the system shall reject the request with <code>QUOTA_AMOUNT_RANGE</code>.</p>
+</li>
+<li>
+<p><strong>AC-2 <code>[QUOTA_FUND_CAP]</code></strong>: If "within fund total subscription cap" is not satisfied, the system shall reject the request with <code>QUOTA_FUND_CAP</code>.</p>
+</li>
+<li>
+<p><strong>AC-3 <code>[QUOTA_ACCOUNT_CAP]</code></strong>: If "within per-account subscription cap" is not satisfied, the system shall reject the request with <code>QUOTA_ACCOUNT_CAP</code>.</p>
+</li>
+<li>
+<p><strong>AC-4 <code>[QUOTA_RESERVED]</code></strong>: While "single subscription amount is within valid range", "within fund total subscription cap", and "within per-account subscription cap" are all satisfied, when a quota reservation request is received, the system shall emit <code>SubscriptionQuotaReserved</code> and accumulate both the fund total used quota and the per-account used quota.</p>
+</li>
+</ul>
+</blockquote>
+<h3 id="section-4-2">4.2 Style B Projection: DMN Decision Table View (At-a-Glance Blind-Spot Detection)</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Rule ID / validAmount / withinFundCap / withinAcctCap / Outcome"><table>
+<thead>
+<tr>
+<th scope="col">Rule ID</th>
+<th scope="col"><code>validAmount</code></th>
+<th scope="col"><code>withinFundCap</code></th>
+<th scope="col"><code>withinAcctCap</code></th>
+<th scope="col">Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>QUOTA_AMOUNT_RANGE</code></td>
+<td><code>false</code></td>
+<td>any</td>
+<td>any</td>
+<td><code>reject request with QUOTA_AMOUNT_RANGE</code></td>
+</tr>
+<tr>
+<td><code>QUOTA_FUND_CAP</code></td>
+<td><code>true</code></td>
+<td><code>false</code></td>
+<td>any</td>
+<td><code>reject request with QUOTA_FUND_CAP</code></td>
+</tr>
+<tr>
+<td><code>QUOTA_ACCOUNT_CAP</code></td>
+<td><code>true</code></td>
+<td><code>true</code></td>
+<td><code>false</code></td>
+<td><code>reject request with QUOTA_ACCOUNT_CAP</code></td>
+</tr>
+<tr>
+<td><code>QUOTA_RESERVED</code></td>
+<td><code>true</code></td>
+<td><code>true</code></td>
+<td><code>true</code></td>
+<td><code>emit SubscriptionQuotaReserved</code> + update totals</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-5">5. Single-Hop Deterministic Compilation from Controlled EARS 1.0 to <code>SMT-LIB 2</code></h2>
+<p><code>truthsrc-smt</code> translates the EARS AST directly into standard <code>.smt2</code> (compatible with both <code>z3 -smt2</code> and <code>cvc5</code>):</p>
+<ul>
+<li>
+<p><strong>Type Mapping</strong>: <code>Money</code> is scaled to integer cents (<code>×100</code>); <code>nav</code> is scaled to 4-decimal fixed-point integers (<code>×10000</code>); <code>Map[K, V]</code> compiles to an existence bitmap <code>(Array K Bool)</code> + value array <code>(Array K V)</code>; every rule binds a precise provenance tag via <code>(! &lt;expr&gt; :named &lt;RuleId&gt;)</code>.</p>
+</li>
+<li>
+<p><strong>Five Standard <code>(push 1) ... (pop 1)</code> Health Checks</strong>:</p>
+<ol>
+<li>
+<p><strong>Mutual-Exclusion Conflict</strong>: <code>SAT(Axioms ∧ G_emit ∧ G_reject)</code> expects <code>unsat</code>.</p>
+</li>
+<li>
+<p><strong>Logical Gap</strong>: <code>SAT(Axioms ∧ ¬(G_1 ∨ ... ∨ G_n))</code> expects <code>unsat</code>.</p>
+</li>
+<li>
+<p><strong>Inductive Invariant Proof</strong>: <code>SAT(Inv(s) ∧ G_i ∧ Post(s, s') ∧ ¬Inv(s'))</code> expects <code>unsat</code>.</p>
+</li>
+<li>
+<p><strong>Dead Rule Detection</strong>: <code>UNSAT(Axioms ∧ G_i)</code> expects <code>sat</code>.</p>
+</li>
+<li>
+<p><strong>Boundary Witness Synthesis</strong>: For each boundary condition (e.g., <code>amount == minPurchase</code>, <code>quota.fundTotalUsed + amount == fundTotalCap</code>, <code>dueSlot == currentTick</code>), invoke <code>(get-model)</code> to export exact BDD test samples.</p>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="section-5-1">Compilation Snippet Example: Dual-Threshold Invariant Proof (<code>QF_AUFLIA</code>) + Share Sandwich Check (<code>QF_NIA</code> Isolated)</h3>
+<pre class="code"><code>; === A. FundQuota Slice (QF_AUFLIA, millisecond-level) ===
+(set-option :produce-models true)
+(set-option :produce-unsat-cores true)
+(set-logic QF_AUFLIA)
+
+(declare-const amount Int)
+(declare-const min_purchase Int)
+(declare-const max_single Int)
+(declare-const fund_used Int)
+(declare-const fund_used_next Int)
+(declare-const fund_cap Int)
+
+(assert (! (&lt;= fund_used fund_cap) :named AX-Q-1))
+
+; Inductive invariant proof: QUOTA_RESERVED can never breach fund total cap
+(push 1)
+  (assert (! (and (&gt;= amount min_purchase) (&lt;= amount max_single) (&lt;= (+ fund_used amount) fund_cap)) :named QUOTA_RESERVED))
+  (assert (= fund_used_next (+ fund_used amount)))
+  (assert (&gt; fund_used_next fund_cap)) ; Negation: assume cap is breached
+  (check-sat) ; Expect unsat
+(pop 1)
+
+; Boundary witness synthesis: valid boundary sample hitting the exact fund total cap
+(push 1)
+  (assert (and (&gt; min_purchase 0) (&lt; min_purchase max_single) (&gt; fund_cap max_single)))
+  (assert (and (&gt;= amount min_purchase) (&lt;= amount max_single) (= (+ fund_used amount) fund_cap)))
+  (check-sat)
+  (get-model)
+(pop 1)
+
+</code></pre>
+<pre class="code"><code>; === B. ConfirmTAShares Isolated Slice (QF_NIA isolated + 2s timeout) ===
+(set-logic QF_NIA)
+(declare-const nav Int)        ; 4-decimal fixed point, e.g., 1.2500 =&gt; 12500
+(declare-const net_amount Int) ; 4-decimal aligned net amount, e.g., 100.00 =&gt; 1000000
+(declare-const shares Int)
+(assert (and (&gt; nav 0) (&gt;= shares 0) (&lt;= (* shares nav) net_amount) (&gt; (* (+ shares 1) nav) net_amount)))
+(check-sat)
+(get-model)
+
+</code></pre>
+<h2 id="section-6">6. Mathematical Verification Artifacts: Clarification Cards + BDD Breakdown 1:1 Aligned with the Four Examples</h2>
+<h3 id="section-6-1">6.1 Conflict &amp; Gap Clarification Card (for PMs / Architects)</h3>
+<p>When Z3 catches <code>sat</code> (a gap or conflict), <code>co-arising check-spec --format json</code> outputs the counterexample model and <code>:named</code> rule IDs, projecting them into an A/B clarification card:</p>
+<blockquote>
+<p><strong>[Requirement Gap Clarification] <code>SipPlan.SkipPausedSipDueSlot</code> misses the unsealed schedule scenario</strong></p>
+<ul>
+<li>
+<p><strong>Z3 Counterexample</strong>: <code>plan.initialized = true, plan.scheduleSealed = false, plan.paused = true, dueSlot = 1, currentTick = 1</code>.</p>
+</li>
+<li>
+<p><strong>Decision Required</strong>:</p>
+<ul>
+<li>
+<p><strong>Option A</strong>: Explicitly reject by adding <code>[SIP_SCHEDULE_SEALED] IF not plan.scheduleSealed WHEN SkipPausedSipDueSlot THEN SHALL reject request with SIP_SCHEDULE_SEALED</code>.</p>
+</li>
+<li>
+<p><strong>Option B</strong>: Allow early skipping of unsealed schedules.</p>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3 id="section-6-2">6.2 Gherkin (<code>.feature</code>) Breakdown — Strictly 1:1 Aligned with Section 3's Four Examples</h3>
+<pre class="code"><code># AUTO-GENERATED BY co-arising EARS 1.0 (LOCKED — DO NOT EDIT)
+
+# --- Aligned with Example 3.1: Single-Order Cash Fund Subscription &amp; Independent Refund ---
+@layer:domain @aggregate:FundOrder @slice:RequestFundPurchaseSettlement
+Feature: Single-Order Cash Fund Subscription Settlement and Independent Refund
+
+  @spec:SETTLEMENT_REQUESTED @spec:ORDER_AMOUNT @spec:ORDER_ACCOUNTS @z3-witness
+  Scenario Outline: Subscription settlement amount and account boundary validation
+    Given FundOrder "ord-001" has status "new"
+    When RequestFundPurchaseSettlement(investor=&lt;inv&gt;, collection=&lt;col&gt;, amount=&lt;amt&gt; &lt;ccy&gt;) is sent
+    Then the outcome shall be &lt;outcome&gt;
+
+    Examples:
+      | inv     | col     | amt    | ccy | outcome                              |
+      | acc-inv | acc-col | 0.01   | CNY | emit FundPurchaseSettlementRequested |
+      | acc-inv | acc-col | 0.00   | CNY | reject ORDER_AMOUNT                  |
+      | acc-inv | acc-inv | 100.00 | CNY | reject ORDER_ACCOUNTS                |
+
+  @spec:REFUND_REQUESTED @spec:REFUND_INTENT_ONCE @spec:REFUND_TA_REJECTED
+  Scenario: Independent refund is allowed only when payment succeeded and TA rejected; duplicate requests succeed-empty
+    Given FundOrder "ord-001" has final payment outcome "succeeded" and taStatus "rejected"
+    When RequestFundPurchaseRefund(order="ord-001", paymentTxId="tx-1") is sent
+    Then emit FundPurchaseRefundRequested and transition refundOutcome to "pending"
+    When the identical RequestFundPurchaseRefund(order="ord-001", paymentTxId="tx-1") is sent again
+    Then return idempotent empty success (succeed-empty)
+
+# --- Aligned with Example 3.2: Financial Dual-Threshold &amp; NAV Share Confirmation ---
+@layer:domain @aggregate:FundQuota @aggregate:FundOrder
+Feature: Fund Subscription Dual-Threshold and TA Current-Period NAV Share Confirmation
+
+  @spec:QUOTA_RESERVED @spec:QUOTA_FUND_CAP @spec:QUOTA_ACCOUNT_CAP @z3-witness
+  Scenario Outline: Fund total cap and per-account cap boundary enforcement
+    Given fund purchase range is [10.00..50000.00], fund total cap is 100000.00 (used 99000.00), per-account cap is 20000.00 (used 19500.00)
+    When account "acc-inv" requests ReserveSubscriptionQuota(amount=&lt;amt&gt; CNY)
+    Then the outcome shall be &lt;outcome&gt;
+
+    Examples:
+      | amt     | outcome                           |
+      | 500.00  | emit SubscriptionQuotaReserved    |
+      | 500.01  | reject QUOTA_ACCOUNT_CAP          |
+      | 1000.01 | reject QUOTA_FUND_CAP             |
+      | 9.99    | reject QUOTA_AMOUNT_RANGE         |
+
+  @spec:TA_CONFIRMED @spec:TA_SHARES_MISMATCH @z3-witness:QF_NIA
+  Scenario Outline: TA current-period NAV and share exact sandwich validation
+    Given FundOrder "ord-001" has net subscription amount 100.00 CNY and payment succeeded
+    When RecordFundTAConfirmed(nav=&lt;nav&gt;, shares=&lt;shares&gt;) is received
+    Then the outcome shall be &lt;outcome&gt;
+
+    Examples:
+      | nav    | shares | outcome                    |
+      | 1.2500 | 80     | emit FundTASharesConfirmed |
+      | 1.2500 | 81     | reject TA_SHARES_MISMATCH  |
+      | 0.0000 | 0      | reject TA_INVALID_NAV      |
+
+# --- Aligned with Example 3.3: Unified Stream-Batch Finite Cash SIP (SipPlan) ---
+@layer:domain @aggregate:SipPlan @slice:StreamBatchExecution
+Feature: Unified Stream-Batch Finite Cash SIP Scheduling, Skipping, and Deduplicated Counting
+
+  @spec:SIP_SKIP_RECORDED @spec:SIP_BACKLOG_REQ @bmc:4-step
+  Scenario: Due slots during pause are marked skipped and must never be resurrected after resume
+    Given SipPlan "plan-1" is sealed and paused at tick=1, with position=0 mapped to dueSlot=1
+    When the clock advances to tick=1 and SkipPausedSipDueSlot(position=0, dueSlot=1) is executed
+    Then emit SipPausedDueSlotSkipped, set slotDisposition[1] to "skipped", and set observedCount to 1
+    When the plan resumes and TriggerSipInstallment(position=0, dueSlot=1) is attempted
+    Then reject the request with SIP_BACKLOG_REQUIRED
+
+  @spec:SIP_FAIL_NO_PAUSE @spec:SIP_TERMINAL_ONCE
+  Scenario: Consecutive failures do not auto-pause and duplicate failure receipts are counted once
+    Given SipPlan "plan-1" is active (paused=false) and occurrence "occ-1" has no recorded terminal state
+    When RecordSipInstallmentFailed("occ-1") is received twice consecutively
+    Then the first call emits SipInstallmentFailed, increments failureTotal by 1, and keeps paused=false
+    And the second call returns idempotent empty success (failureTotal unchanged)
+
+# --- Aligned with Example 3.4: Application-Layer User Story (CashFundPurchase) ---
+@layer:application @story:cash-fund-purchase
+Feature: Cash Fund Purchase User Story (Trusted Inbound, Replay Deduplication, and View Isolation)
+
+  @spec:US-CFP-03 @spec:US-CFP-04 @spec:US-CFP-05 @spec:US-CFP-06
+  Scenario: Replay after lost response recovers original order without double debit, and payment success does not equal TA finalization
+    Given authenticated customer "cust-1" has sufficient account balance
+    When the customer submits BankCashSubmit(clientRequestId="req-101", fundCode="FUND-A", amount=100.00 CNY)
+    Then pin BankCashOriginal and return ack(replayed=false, accepted=true)
+    When the customer resends with the same clientRequestId="req-101" and identical parameters
+    Then return ack(replayed=true) and do not dispatch RequestFundPurchaseSettlement again
+    When the customer resends with the same clientRequestId="req-101" but tampered amount 200.00 CNY
+    Then reject the request with CASH_SOURCE_CONFLICT
+    When the payment saga succeeds but TA has not yet confirmed, and the customer queries BankOrderQuery
+    Then bank-order-view exposes paymentCompleted=true and taFinalized=false
+
+</code></pre>
+<h3 id="section-6-3">6.3 ScalaTest and Multi-Language <code>EarsTestEmitter</code> Projections</h3>
+<p>From <code>TestIR</code>, the compiler simultaneously generates locked ScalaTest files tailored to <code>bank-wealth-demo</code> (placed in <code>generated-tests/scala/example/bankwealth/ears/</code>), with each test carrying a <code>@CoArisingSpec</code> anchor:</p>
+<pre class="code"><code>// LOCKED BDD ORACLE — GENERATED BY co-arising EARS 1.0 (DO NOT MODIFY)
+package example.bankwealth.ears
+
+import org.scalatest.funsuite.AnyFunSuite
+import example.bankwealth.domain._
+import example.bankwealth.domain.SipPlanProtocol._
+import example.bankwealth.domain.values._
+
+final class SipPlanStreamBatchEarsSpec extends AnyFunSuite {
+  // @CoArisingSpec(id="SIP_BACKLOG_REQ", witness="bmc-skip-no-resurrect")
+  test("[SIP_BACKLOG_REQ] paused skipped dueSlot cannot be resurrected after resume") {
+    // Driven by the same ActorTestKit + PersistenceTestKit as BankSipStateSpec:
+    // 1. CreateSipPlan -&gt; AppendSipDueSlot(0, 1L) -&gt; SealSipSchedule -&gt; PauseSipPlan(1L)
+    // 2. AdvanceSipClock(1L) -&gt; SkipPausedSipDueSlot(0, 1L) -&gt; Accepted(SipPausedDueSlotSkipped)
+    // 3. ResumeSipPlan -&gt; TriggerSipInstallment(0, 1L, ...) -&gt; Refused("SIP_BACKLOG_REQUIRED")
+  }
+
+  // @CoArisingSpec(id="SIP_FAIL_NO_PAUSE", witness="first-terminal-idempotent")
+  test("[SIP_FAIL_NO_PAUSE] duplicate failure receipts count once and never auto-pause") {
+    // Assert after first RecordSipInstallmentFailed: failureTotal == 1 &amp;&amp; !paused
+    // Assert after second RecordSipInstallmentFailed: Accepted(Vector.empty) &amp;&amp; failureTotal == 1
+  }
+}
+
+</code></pre>
+<p>For future multi-language expansion (TypeScript / Java / Rust / Go), implementing the unified <code>EarsTestEmitter</code> interface suffices to reuse the entire upstream EARS + SMT asset suite:</p>
+<pre class="code"><code>trait EarsTestEmitter {
+  def language: String                 // "scala" | "typescript" | "java" | "rust" | "go"
+  def framework: String                // "scalatest" | "vitest" | "junit5" | "cargo-test"
+  def emitDomainSpec(ir: TestIR): GeneratedFile
+  def emitApplicationSpec(ir: TestIR): GeneratedFile
+}
+
+</code></pre>
+<h2 id="section-7">7. Isolated BDD Test Locking and AI Agent Cloze-Completion Loop</h2>
+<h3 id="section-7-1">7.1 Territory Read/Write Protection Matrix</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Directory Path / Asset Role / Write Permission / Physical Protection Mechanism"><table>
+<thead>
+<tr>
+<th scope="col">Directory Path</th>
+<th scope="col">Asset Role</th>
+<th scope="col">Write Permission</th>
+<th scope="col">Physical Protection Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>truth/**/*.ears</code></td>
+<td>Single truth source of behavior</td>
+<td>Human-approved (LLM drafting allowed before human merge)</td>
+<td><code>co-arising check-spec</code> (Z3/cvc5 gate)</td>
+</tr>
+<tr>
+<td><code>projections/ac/**</code> &amp; <code>projections/tables/**</code></td>
+<td>Style E plain-language AC &amp; Style B decision tables</td>
+<td><strong>Compiler read-only projection only</strong></td>
+<td>Rebuilt from truth source at any time; reverse editing strictly forbidden</td>
+</tr>
+<tr>
+<td><code>generated-tests/**</code> &amp; <code>generated-scaffold/**</code></td>
+<td><strong>Locked BDD test oracles &amp; code scaffolds</strong></td>
+<td><strong>Compiler-writable only (Agent forbidden)</strong></td>
+<td><code>PreToolUse</code> Hook (<code>exit 2</code>) + SHA-256 digest verification</td>
+</tr>
+<tr>
+<td><code>handwritten/**</code> (<code>@cloze</code> slots)</td>
+<td><strong>AI Agent behavioral logic cloze-completion zone</strong></td>
+<td>Edits allowed only within <code>@cloze:start(&lt;id&gt;)..@cloze:end(&lt;id&gt;)</code></td>
+<td><code>PreToolUse</code> line-range lock + <code>Stop</code> Hook (<code>exit 2</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-7-2">7.2 Deterministic Anti-Cheating Hooks (<code>.claude/settings.json</code>)</h3>
+<pre class="code"><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [{ "type": "command", "command": "node tools/coarising-guard-write.mjs" }]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [{ "type": "command", "command": "node tools/coarising-verify-cloze.mjs --slice $COARISING_ACTIVE_SLICE" }]
+      }
+    ]
+  }
+}
+
+</code></pre>
+<ul>
+<li>
+<p><strong><code>PreToolUse</code> (<code>coarising-guard-write.mjs</code>)</strong>: If the Agent attempts to modify <code>generated-tests/</code>, <code>generated-scaffold/</code>, or lines outside <code>@cloze</code> slots in <code>handwritten/</code>, it immediately blocks the write with <strong><code>exit 2</code></strong>, forcing the Agent to pass tests strictly by implementing business logic.</p>
+</li>
+<li>
+<p><strong><code>Stop</code> (<code>coarising-verify-cloze.mjs</code>)</strong>: Automatically executes a three-step check before ending a turn—(1) verifies SHA-256 digests of <code>generated-tests/</code> to prevent <code>sed</code>-based tampering bypasses; (2) runs <code>sbt "testOnly *EarsSpec"</code> to pass the full domain and application BDD suite; (3) runs reverse AST anchor reconciliation (<code>verify-handwritten-map.mjs</code>). If any check fails, it prints the failing <code>@CoArisingSpec(id=...)</code> to <code>stderr</code> and intercepts with <strong><code>exit 2</code></strong>, forcing the Agent to self-heal in place.</p>
+</li>
+<li>
+<p><strong>Blind Contract Review Sign-off</strong>: Once all checks are green, an independent subagent (<code>contract-reviewer</code>) with zero conversation-history contamination is spun up, fed only the <code>*.ears</code> truth source, <code>TestIR</code>, and the <code>@cloze</code> <code>git diff</code> with <strong><code>skip style</code></strong> enforced. It intercepts any hardcoded cheating tailored to Z3 boundary witnesses, and finally persists a layered multi-domain Digest (Provenance Record).</p>
+</li>
+</ul>
+<hr>
+<h2 id="section-8">8. References and Standards</h2>
+<p>The external standards, tools and projects below are the design references and landing dependencies of this specification; the numbering maps to the sections that cite them:</p>
+<ul>
+<li><a href="https://z3prover.github.io/">Z3 Prover (Microsoft Research)</a> — the primary solver for the <code>.smt2</code> health checks in Section 5</li>
+<li><a href="https://cvc5.github.io/">cvc5</a> — the alternative solver for string-theory slices such as <code>QF_SLIA</code></li>
+<li><a href="https://smt-lib.org/">SMT-LIB 2 standard</a> — the standard syntax behind the theory tiers in Section 2.3 and the compilation target in Section 5</li>
+<li><a href="https://www.cedarpolicy.com/">AWS Cedar</a> — the design-philosophy reference for "trading away Turing completeness for 100% analyzability"</li>
+<li><a href="https://en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax">EARS (Easy Approach to Requirements Syntax)</a> — the origin of the controlled sentence patterns</li>
+<li><a href="https://www.omg.org/spec/DMN/">OMG DMN specification</a> — the reference for the Style B decision tables and FEEL-like interval syntax</li>
+<li><a href="https://cucumber.io/docs/gherkin/reference/">Gherkin syntax reference</a> — the grammar of the locked <code>.feature</code> projections in Section 6.2</li>
+<li><a href="https://www.scalatest.org/">ScalaTest</a> — the <code>AnyFunSuite</code> test-oracle framework in Section 6.3</li>
+<li><a href="https://www.scala-sbt.org/">sbt</a> — the build entry point of <code>testOnly *EarsSpec</code> in the Stop-hook triple check</li>
+<li><a href="https://doc.akka.io/libraries/akka-persistence-testkit/current/index.html">Akka Persistence Test Kit</a> — the test driver of the event-sourced examples</li>
+<li><a href="https://code.claude.com/docs/en/best-practices">Claude Code best practices</a> — the mechanism behind the Section 7 hooks (<code>exit 2</code>) and the blind-review subagent</li>
+<li><a href="https://github.com/co-arising/bank-wealth-demo">co-arising/bank-wealth-demo</a> — the reference benchmark project behind the four worked examples in Section 3</li>
+</ul></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-19">2026-11-19</time></p>
+      <h3><a href="/articles/aws-kiro-smt-spec-analyzer-20261119/">Specs Have Bugs Too: How AWS Kiro Uses SMT Solvers to Eliminate Ambiguity and Logic Conflicts Before Writing Code</a></h3>
+      <p class="article-deck">A technical deep dive into AWS Automated Reasoning Group engineer Rajath Kotyal&#x27;s AI Engineer CODE 2026 talk &#x27;Specs have bugs too&#x27;: tracing slides and empirical citations, contrasting Before vs. After SMT specifications, demystifying SAT/SMT and multi-sample logical-equivalence clustering, sharing runnable SMT-LIB2 and Python Z3 snippets alongside open-source repositories, and proposing four architectural supplements for co-arising (truthsrc).</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>
