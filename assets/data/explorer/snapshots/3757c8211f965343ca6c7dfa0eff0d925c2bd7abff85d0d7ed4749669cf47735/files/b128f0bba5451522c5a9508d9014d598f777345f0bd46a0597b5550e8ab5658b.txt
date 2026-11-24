@@ -1,0 +1,5 @@
+package example.bankwealth.application.saga
+
+import example.bankwealth.domain.values.{FundOrderId, Money, TxId}
+
+final case class ReserveCashFundOrderPrepareInput(txid: TxId, resource: FundOrderId, amount: Money)

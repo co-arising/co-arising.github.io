@@ -1,0 +1,10 @@
+package example.bankwealth.domain.values
+
+final case class BankSipCreateIntent(
+  principalId: String,
+  clientRequestId: String,
+  authorityVersion: String,
+  request: BankSipCreate,
+  planId: PlanId,
+  config: SipRevisionConfig
+)

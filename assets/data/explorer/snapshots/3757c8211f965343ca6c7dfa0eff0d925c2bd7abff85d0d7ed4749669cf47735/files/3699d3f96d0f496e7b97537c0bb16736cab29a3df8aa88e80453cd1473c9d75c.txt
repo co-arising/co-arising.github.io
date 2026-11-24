@@ -1,0 +1,5 @@
+package example.bankwealth.application.api
+
+import example.bankwealth.domain.values.FundOrderId
+
+final case class BankOrderKey(orderId: FundOrderId)

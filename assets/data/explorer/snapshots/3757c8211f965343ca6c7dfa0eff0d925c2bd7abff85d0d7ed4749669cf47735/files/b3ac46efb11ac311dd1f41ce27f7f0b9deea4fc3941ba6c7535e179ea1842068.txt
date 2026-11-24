@@ -1,0 +1,10 @@
+package example.bankwealth.domain.values
+
+final case class BankPaymentOriginal(
+  operationId: OperationId,
+  fundOrderId: FundOrderId,
+  investorAccountId: AccountId,
+  fundCollectionAccountId: AccountId,
+  fundCode: String,
+  amount: Money
+)

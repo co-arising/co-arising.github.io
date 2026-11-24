@@ -1,0 +1,16 @@
+package example.bankwealth.application.saga
+
+import example.bankwealth.domain.values.{FundOrderId, Money, TxId}
+
+final case class ReserveCashFundOrderCompensateReceipt(
+  transaction: TxId,
+  definitionVersion: String,
+  argsDigest: String,
+  participant: String,
+  resource: FundOrderId,
+  step: String,
+  phase: String,
+  payloadTxid: TxId,
+  payloadResource: FundOrderId,
+  payloadAmount: Money
+)

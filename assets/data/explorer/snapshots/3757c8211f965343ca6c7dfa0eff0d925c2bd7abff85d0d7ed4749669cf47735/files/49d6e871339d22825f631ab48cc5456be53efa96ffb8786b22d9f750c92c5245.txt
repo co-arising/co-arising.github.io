@@ -1,0 +1,5 @@
+package example.bankwealth.application.api
+
+import example.bankwealth.domain.values.OperationId
+
+final case class BankRecoveryAcknowledgement(operationId: OperationId, status: String)

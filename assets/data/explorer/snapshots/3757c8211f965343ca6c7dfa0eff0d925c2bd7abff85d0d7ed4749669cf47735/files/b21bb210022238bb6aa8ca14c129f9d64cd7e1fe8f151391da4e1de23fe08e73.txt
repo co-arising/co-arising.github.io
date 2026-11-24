@@ -1,0 +1,29 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: host-computation
+id: "[\"bankwealth\",\"BalanceAfterCommitIncomingCredits\"]"
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "@ref(bankwealth:port#BalanceAfterCommitIncomingCredits)",
+    "version": "bank-v1-1",
+    "command": "@ref(bankwealth:command/CreditBalance#CommitIncomingCredits)",
+    "outputType": "@type(nominal:bankwealth:type#Money)",
+    "inputDependencies": [
+      "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#txid)",
+      "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#resource)",
+      "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#amount)",
+      "@ref(bankwealth:state-field/CreditBalance#accountBalance)"
+    ],
+    "stableIdentityContract": {
+      "id": "BalanceAfterCommitIncomingCredits-identity",
+      "version": "1",
+      "keys": [
+        "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#txid)",
+        "@ref(bankwealth:parameter/CreditBalance/CommitIncomingCredits#resource)"
+      ]
+    }
+  }

@@ -1,0 +1,3 @@
+package example.bankwealth.application.api
+
+final case class BankPendingPageKey(limit: Long, after: Long)

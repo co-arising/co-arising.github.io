@@ -1,0 +1,9 @@
+package example.bankwealth.application.saga
+
+final case class BankTaEffectReconcile(
+  operation: String,
+  request: BankTaEffectRequest,
+  decision: String,
+  evidence: Option[BankTaEffectObservation],
+  authorization: String
+)

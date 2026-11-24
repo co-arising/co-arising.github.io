@@ -1,0 +1,13 @@
+package example.bankwealth.application.saga
+
+import example.bankwealth.domain.values.{AccountId, TxId}
+
+final case class DebitFundCollectionCommitQuery(
+  transaction: TxId,
+  definitionVersion: String,
+  argsDigest: String,
+  participant: String,
+  resource: AccountId,
+  step: String,
+  phase: String
+)

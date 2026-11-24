@@ -1,0 +1,10 @@
+package example.bankwealth.application.projection
+
+import example.bankwealth.domain.values.BankCashOriginal
+
+final case class BankCashRequestView(
+  original: BankCashOriginal,
+  paymentStatus: String,
+  taStatus: String,
+  refundStatus: String
+)

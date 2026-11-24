@@ -1,0 +1,9 @@
+package example.bankwealth.application.saga
+
+import example.bankwealth.domain.values.{FundOrderId, TaRequestId, TxId}
+
+final case class BankTaEffectRequest(
+  taRequestId: TaRequestId,
+  fundOrderId: FundOrderId,
+  paymentTxId: TxId
+)

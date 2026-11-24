@@ -1,0 +1,9 @@
+package example.bankwealth.application.saga
+
+final case class BankSipDispatchObservation(
+  operation: String,
+  request: BankSipDispatchRequest,
+  status: String,
+  evidence: String,
+  result: Option[BankSipDispatchResult]
+)

@@ -1,0 +1,30 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: host-computation
+id: "[\"bankwealth\",\"StableSipOccurrence\"]"
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "@ref(bankwealth:port#StableSipOccurrence)",
+    "version": "bank-v1-1",
+    "command": "@ref(bankwealth:command/SipPlan#TriggerSipInstallment)",
+    "outputType": "@type(nominal:bankwealth:type#SipOccurrence)",
+    "inputDependencies": [
+      "@ref(bankwealth:state-field/SipPlan#id)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#revision)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#dueSlot)",
+      "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#config)"
+    ],
+    "stableIdentityContract": {
+      "id": "sip-plan-revision-slot",
+      "version": "1",
+      "keys": [
+        "@ref(bankwealth:state-field/SipPlan#id)",
+        "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#revision)",
+        "@ref(bankwealth:parameter/SipPlan/TriggerSipInstallment#dueSlot)"
+      ]
+    }
+  }
