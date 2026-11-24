@@ -1,0 +1,7 @@
+package example.bankwealth.domain.values
+
+final case class BankSipOccurrencePage(
+  metadata: BankReadMetadata,
+  occurrences: Vector[BankSipOccurrenceView],
+  nextAfter: Option[Long]
+)

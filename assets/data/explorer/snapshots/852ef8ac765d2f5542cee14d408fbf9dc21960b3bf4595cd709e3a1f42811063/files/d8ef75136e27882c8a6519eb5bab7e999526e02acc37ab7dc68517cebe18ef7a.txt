@@ -1,0 +1,7 @@
+package example.bankwealth.domain.values
+
+final case class BankSipPlanPage(
+  metadata: BankReadMetadata,
+  plans: Vector[BankSipPlanView],
+  nextAfter: Option[Long]
+)

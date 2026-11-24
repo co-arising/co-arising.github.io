@@ -1,0 +1,8 @@
+package example.bankwealth.domain.values
+
+final case class BankSipRevise(
+  revision: RevisionId,
+  effectiveSlot: Long,
+  fundCode: String,
+  amount: MoneyWire
+)

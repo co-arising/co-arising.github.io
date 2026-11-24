@@ -1,0 +1,3 @@
+package example.bankwealth.domain.values
+
+final case class CreditFundCollectionCompensateInput(txid: TxId, resource: AccountId, amount: Money)

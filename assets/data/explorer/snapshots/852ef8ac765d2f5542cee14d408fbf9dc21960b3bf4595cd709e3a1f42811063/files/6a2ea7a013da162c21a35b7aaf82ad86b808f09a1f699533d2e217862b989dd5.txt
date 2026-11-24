@@ -1,0 +1,178 @@
+package example.bankwealth.application
+
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.duration._
+
+import akka.actor.typed.{ActorRef, Behavior, PostStop}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.persistence.typed.PersistenceId
+import com.google.protobuf.ByteString
+import example.bankwealth.domain.values.{AccountId, FundOrderId, Money, OperationId, TxId}
+import example.bankwealth.infrastructure.serialization.DomainConverters
+import net.imadz.monarch.{StageError, StageFailedException}
+import net.imadz.monarch.persistence.{PersistentMonarch, RunObserver, StateCodec}
+
+/** Durable execution plan of the independent refund pipeline: one stage,
+  * `return-principal`, which delegates to the invocation host and folds its
+  * authoritative result into the plan state. Stage outcomes are the monarch
+  * contract: business rejections stop the stage, unknown effects demand
+  * manual recovery — never an implicit retry. */
+object BankIndependentRefundExecution {
+
+  final case class Inputs(
+    fundOrderId: FundOrderId,
+    paymentTxId: TxId,
+    investorAccountId: AccountId,
+    fundCollectionAccountId: AccountId,
+    amount: Money,
+    refundOperationId: OperationId,
+  )
+
+  final case class ReturnPrincipalRequest(
+    fundOrderId: FundOrderId,
+    paymentTxId: TxId,
+    investorAccountId: AccountId,
+    fundCollectionAccountId: AccountId,
+    amount: Money,
+    refundOperationId: OperationId,
+  )
+
+  sealed trait ReturnPrincipalResult
+  final case class ReturnPrincipalSucceeded(refundTxid: TxId) extends ReturnPrincipalResult
+  case object ReturnPrincipalRejected extends ReturnPrincipalResult
+  case object ReturnPrincipalCompensated extends ReturnPrincipalResult
+  case object ReturnPrincipalRecoveryRequired extends ReturnPrincipalResult
+  case object ReturnPrincipalUnknown extends ReturnPrincipalResult
+
+  final case class State(inputs: Inputs, refundTxid: Option[TxId] = None)
+
+  final case class Outputs(refundTxid: TxId)
+
+  /** Unconfirmed predecessor output is refused — never defaulted. */
+  def outputs(state: State): Outputs =
+    Outputs(state.refundTxid.getOrElse(throw new IllegalArgumentException("unconfirmed predecessor output")))
+
+  /** Exact finite plan codec: the protobuf face owns the slot layout
+    * (input0…input5) until the proto-family replacement; every slot decode is
+    * fail-closed and the plan version is pinned. */
+  val codec: StateCodec[State] = StateCodec[State](
+    state =>
+      example.bankwealth.infrastructure.executionproto.bankindependentrefundv1ExecutionStatePB(
+        planversion = PlanVersion,
+        input0 = Some(DomainConverters.encodeFundOrderIdPO(state.inputs.fundOrderId)),
+        input1 = Some(DomainConverters.encodeTxIdPO(state.inputs.paymentTxId)),
+        input2 = Some(DomainConverters.encodeAccountIdPO(state.inputs.investorAccountId)),
+        input3 = Some(DomainConverters.encodeAccountIdPO(state.inputs.fundCollectionAccountId)),
+        input4 = Some(DomainConverters.encodeMoneyPO(state.inputs.amount)),
+        input5 = Some(DomainConverters.encodeOperationIdPO(state.inputs.refundOperationId)),
+        output0 = state.refundTxid.map(DomainConverters.encodeTxIdPO),
+      ).toByteArray,
+    bytes => {
+      val pb = example.bankwealth.infrastructure.executionproto.bankindependentrefundv1ExecutionStatePB.parseFrom(bytes)
+      require(pb.planversion == PlanVersion, "exact finite plan version required")
+      def durable[A](slot: Option[A], name: String): A =
+        slot.getOrElse(throw new IllegalArgumentException(s"missing durable input $name"))
+      State(
+        Inputs(
+          fundOrderId = DomainConverters.decodeFundOrderIdPO(durable(pb.input0, "input0")),
+          paymentTxId = DomainConverters.decodeTxIdPO(durable(pb.input1, "input1")),
+          investorAccountId = DomainConverters.decodeAccountIdPO(durable(pb.input2, "input2")),
+          fundCollectionAccountId = DomainConverters.decodeAccountIdPO(durable(pb.input3, "input3")),
+          amount = DomainConverters.decodeMoneyPO(durable(pb.input4, "input4")),
+          refundOperationId = DomainConverters.decodeOperationIdPO(durable(pb.input5, "input5")),
+        ),
+        pb.output0.map(DomainConverters.decodeTxIdPO),
+      )
+    },
+  )
+
+  def install(returnPrincipalHost: ActorRef[BankRefundHost.Request]): Installed = {
+    require(returnPrincipalHost != null, "the exact invocation host actor is required")
+    new Installed(returnPrincipalHost)
+  }
+
+  final class Installed private[BankIndependentRefundExecution] (val returnPrincipalHost: ActorRef[BankRefundHost
+      .Request])
+
+  // ----------------------------------------------------------------- knowledge
+  private val PlanVersion = "bank-v1-1"
+  private val StageId = "return-principal"
+
+  /** Bounded retry of the pending-invocation poll (R1): the host answers
+    * Pending while the saga runs; the bridge re-asks with exponential backoff
+    * inside the stage deadline — never an unbounded 20 ms loop. */
+  private val RetryInitial = 100.millis
+  private val RetryFactor = 2
+  private val RetryMax = 5.seconds
+  private val StageDeadline = 60.seconds
+
+  /** R1 bounded backoff schedule: attempt 0 waits RetryInitial, doubling per
+    * attempt and capped at RetryMax — the poll loop is finite by construction. */
+  def backoffMillis(attempt: Int): Long =
+    math.min(RetryMax.toMillis, math.round(RetryInitial.toMillis * math.pow(RetryFactor, attempt.toDouble)))
+
+  def behavior(
+    persistenceId: String,
+    installed: Installed,
+    observer: RunObserver[State],
+  )(implicit ec: ExecutionContext): Behavior[PersistentMonarch.Command[State]] = Behaviors.setup { context =>
+    require(persistenceId != null && persistenceId.nonEmpty && installed != null && observer != null,
+      "explicit owned finite execution and installed objects required")
+
+    final case class InvocationCall(state: State,
+        attempt: Int, deadline: scala.concurrent.duration.Deadline, promise: Promise[ReturnPrincipalResult])
+    val invocationBridge = context.spawnAnonymous(Behaviors.setup[InvocationCall] { bridgeContext =>
+      Behaviors.receiveMessage[InvocationCall] { call =>
+        bridgeContext.spawnAnonymous(Behaviors.setup[BankRefundHost.Reply] { replyContext =>
+          installed.returnPrincipalHost ! BankRefundHost.Invoke(call.state, replyContext.self)
+          Behaviors.receiveMessage[BankRefundHost.Reply] {
+            case BankRefundHost.Completed(result) => call.promise.trySuccess(result); Behaviors.stopped
+            case BankRefundHost.Conflict(reason) =>
+                call.promise.tryFailure(new IllegalArgumentException(reason)); Behaviors.stopped
+            case BankRefundHost.Pending(_) if call.deadline.isOverdue() =>
+              call.promise
+                  .tryFailure(new IllegalStateException("return-principal stage deadline exceeded")); Behaviors.stopped
+            case BankRefundHost.Pending(_) =>
+              replyContext.scheduleOnce(backoffMillis(call.attempt).millis, bridgeContext.self,
+                call.copy(attempt = call.attempt + 1))
+              Behaviors.same
+          }.receiveSignal { case (_, PostStop) =>
+            call.promise.tryFailure(new IllegalStateException("owned invocation observer stopped")); Behaviors.same
+          }
+        })
+        Behaviors.same
+      }
+    })
+
+    def invokeReturnPrincipal(state: State): Future[ReturnPrincipalResult] = {
+      val promise = Promise[ReturnPrincipalResult]()
+      invocationBridge ! InvocationCall(state, attempt = 0, deadline = Deadline.now + StageDeadline, promise)
+      promise.future
+    }
+
+    val plan = Vector(StageId)
+    PersistentMonarch.behavior[String, State](
+      PersistenceId.ofUniqueId(persistenceId),
+      plan,
+      (step, state) => step match {
+        case StageId => invokeReturnPrincipal(state).map {
+          case ReturnPrincipalSucceeded(refundTxid) => state.copy(refundTxid = Some(refundTxid))
+          case ReturnPrincipalRejected => throw StageFailedException(StageError(StageId,
+              Some("Rejected"), "business-rejection", "business-rejection:Rejected:stop"))
+          case ReturnPrincipalCompensated => throw StageFailedException(StageError(StageId,
+              Some("Compensated"), "business-rejection", "business-rejection:Compensated:stop"))
+          case ReturnPrincipalRecoveryRequired => throw StageFailedException(StageError(StageId,
+            Some("RecoveryRequired"), "infrastructure-failure",
+            "infrastructure-failure:RecoveryRequired:manual-recovery"))
+          case ReturnPrincipalUnknown => throw StageFailedException(StageError(StageId,
+              Some("Unknown"), "unknown-effect", "unknown-effect:Unknown:manual-recovery"))
+        }
+        case _ => Future.failed(new IllegalArgumentException("unknown static step"))
+      },
+      codec,
+      identity[String],
+      None,
+      observer,
+    )
+  }
+}

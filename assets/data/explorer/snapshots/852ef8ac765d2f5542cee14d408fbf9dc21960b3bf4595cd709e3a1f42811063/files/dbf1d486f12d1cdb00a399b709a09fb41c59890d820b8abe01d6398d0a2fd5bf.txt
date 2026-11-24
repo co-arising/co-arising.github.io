@@ -1,0 +1,3 @@
+package example.bankwealth.domain.values
+
+final case class BankRecoveryAcknowledgement(operationId: OperationId, status: String)

@@ -1,0 +1,16 @@
+package example.bankwealth.domain.values
+
+final case class ReserveInvestorFundsCompensateReceipt(
+  transaction: TxId,
+  definitionVersion: String,
+  argsDigest: String,
+  participant: String,
+  resource: AccountId,
+  step: String,
+  phase: String,
+  payloadTxid: TxId,
+  payloadResource: AccountId,
+  payloadAmount: Money,
+  payloadCurrency: String,
+  payloadAvailable: Money
+)

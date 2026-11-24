@@ -1,0 +1,7 @@
+package example.bankwealth.domain.values
+
+final case class ReserveCashFundOrderCompensateInput(
+  txid: TxId,
+  resource: FundOrderId,
+  amount: Money
+)

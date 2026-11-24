@@ -1,0 +1,9 @@
+package example.bankwealth.domain.values
+
+final case class BankSipDispatchReconcile(
+  operation: String,
+  request: BankSipDispatchRequest,
+  decision: String,
+  evidence: Option[BankSipDispatchObservation],
+  authorization: String
+)

@@ -1,0 +1,60 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: ObserveSipDueSlot
+payload:
+  {
+    "name": "ObserveSipDueSlot",
+    "parameters": [
+      "position: Long @BUSINESS_INPUT",
+      "dueSlot: Long @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_SLOT_DECLARED/SIP_SLOT_DECLARED: \"state.slots.contains(param.position)\")",
+      "@guard[invariantRef](reject SIP_SLOT_MATCH/SIP_SLOT_MATCH: \"state.slots(param.position) == param.dueSlot\")",
+      "@guard[invariantRef](reject SIP_OBSERVATION_CONFLICT/SIP_OBSERVATION_CONFLICT: \"!state.slotDisposition.contains(param.dueSlot) || state.slotDisposition(param.dueSlot) == \\\"backlog\\\"\")",
+      "@guard[invariantRef](succeed-empty SIP_OBSERVATION_ONCE/SIP_OBSERVATION_ONCE: \"!state.slotDisposition.contains(param.dueSlot)\")",
+      "@guard[invariantRef](reject SIP_OBSERVATION_ORDER/SIP_OBSERVATION_ORDER: \"param.position == state.observedCount\")",
+      "@guard[invariantRef](reject SIP_SLOT_DUE/SIP_SLOT_DUE: \"param.dueSlot <= state.currentTick\")",
+      "@guard[invariantRef](reject SIP_PAUSE_CLASSIFICATION/SIP_PAUSE_CLASSIFICATION: \"!state.paused || param.dueSlot < state.pauseTick\")"
+    ],
+    "produces": [
+      "SipDueSlotObserved"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipDueSlotObserved": {
+      "name": "SipDueSlotObserved",
+      "payloads": [
+        "position: Long @PROPAGATED",
+        "dueSlot: Long @PROPAGATED",
+        "disposition: String @PROPAGATED"
+      ],
+      "bindings": [
+        "position <- param.position",
+        "dueSlot <- param.dueSlot",
+        "disposition <- \"literal:backlog\""
+      ],
+      "foldAssignments": [
+        "slotDisposition := @fold[put](key=event.dueSlot, value=event.disposition)",
+        "observedCount := @fold[integer-apply](delta=\"literal:1\", sign=+1)"
+      ]
+    }
+  }

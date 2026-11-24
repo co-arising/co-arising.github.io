@@ -1,0 +1,11 @@
+package example.bankwealth.domain.values
+
+final case class SipOccurrence(
+  planId: PlanId,
+  revision: RevisionId,
+  dueSlot: Long,
+  occurrenceId: OccurrenceId,
+  operationId: OperationId,
+  fundOrderId: FundOrderId,
+  config: SipRevisionConfig
+)

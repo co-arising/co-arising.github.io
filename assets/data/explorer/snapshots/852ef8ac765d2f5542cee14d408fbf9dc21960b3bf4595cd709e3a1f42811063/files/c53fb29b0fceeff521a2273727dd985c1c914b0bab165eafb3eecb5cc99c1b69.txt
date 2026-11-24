@@ -1,0 +1,8 @@
+package example.bankwealth.domain.values
+
+final case class BankCashRequestView(
+  original: BankCashOriginal,
+  paymentStatus: String,
+  taStatus: String,
+  refundStatus: String
+)

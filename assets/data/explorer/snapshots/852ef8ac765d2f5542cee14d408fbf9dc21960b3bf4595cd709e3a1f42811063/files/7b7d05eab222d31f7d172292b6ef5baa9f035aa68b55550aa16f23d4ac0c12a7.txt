@@ -1,0 +1,11 @@
+package example.bankwealth.domain.values
+
+final case class ReserveInvestorFundsPrepareQuery(
+  transaction: TxId,
+  definitionVersion: String,
+  argsDigest: String,
+  participant: String,
+  resource: AccountId,
+  step: String,
+  phase: String
+)

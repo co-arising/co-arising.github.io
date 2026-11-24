@@ -1,0 +1,7 @@
+package example.bankwealth.domain.values
+
+final case class BankTaEffectRequest(
+  taRequestId: TaRequestId,
+  fundOrderId: FundOrderId,
+  paymentTxId: TxId
+)
