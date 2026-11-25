@@ -1,0 +1,69 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: artifact-contract
+id: bank-sip-technical
+version: bank-v1-1
+author: agent-assisted-bank-v1
+payload:
+  {
+    "id": "bank-sip-technical",
+    "version": "bank-v1-1",
+    "artifact": "@ref(bankwealth:artifact#BankSipTechnical)",
+    "status": "selected",
+    "provenance": [
+      {
+        "document": "bank-v1",
+        "pointer": "/pipelines/2"
+      }
+    ],
+    "references": [
+      "@ref(bankwealth:pipeline#bank-sip-dispatch-v1)"
+    ],
+    "ports": [
+      {
+        "ref": "@ref(bankwealth:port#BankSipDispatchExecute)",
+        "version": "bank-v1-1",
+        "inputType": "@type(nominal:bankwealth:type#BankSipDispatchOperation)",
+        "outputType": "@type(nominal:bankwealth:type#BankSipDispatchObservation)",
+        "required": true
+      },
+      {
+        "ref": "@ref(bankwealth:port#BankSipDispatchQuery)",
+        "version": "bank-v1-1",
+        "inputType": "@type(nominal:bankwealth:type#BankSipDispatchOperation)",
+        "outputType": "@type(optional:nominal:bankwealth:type#BankSipDispatchObservation)",
+        "required": true
+      },
+      {
+        "ref": "@ref(bankwealth:port#BankSipDispatchReconcilePort)",
+        "version": "bank-v1-1",
+        "inputType": "@type(nominal:bankwealth:type#BankSipDispatchReconcile)",
+        "outputType": "@type(primitive:boolean)",
+        "required": true
+      }
+    ],
+    "deployment": {
+      "id": "bank-owned-sip-dispatch",
+      "version": "bank-v1-1",
+      "secretRefs": []
+    },
+    "implementations": [
+      {
+        "port": "@ref(bankwealth:port#BankSipDispatchExecute)",
+        "id": "bankwealth.BankSipDispatchExecute",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": "@ref(bankwealth:port#BankSipDispatchQuery)",
+        "id": "bankwealth.BankSipDispatchQuery",
+        "version": "bank-v1-1"
+      },
+      {
+        "port": "@ref(bankwealth:port#BankSipDispatchReconcilePort)",
+        "id": "bankwealth.BankSipDispatchReconcilePort",
+        "version": "bank-v1-1"
+      }
+    ]
+  }
