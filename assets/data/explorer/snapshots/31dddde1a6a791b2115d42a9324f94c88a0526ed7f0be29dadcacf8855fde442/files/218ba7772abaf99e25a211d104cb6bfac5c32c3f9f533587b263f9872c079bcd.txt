@@ -1,0 +1,52 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: RecordSipInstallmentOutcomeUnknown
+payload:
+  {
+    "name": "RecordSipInstallmentOutcomeUnknown",
+    "parameters": [
+      "occurrence: SipOccurrence @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_OCCURRENCE_KNOWN/SIP_OCCURRENCE_KNOWN: \"state.occurrences.contains(param.occurrence.dueSlot)\")",
+      "@guard[invariantRef](reject SIP_ORIGINAL_ASSOCIATION/SIP_ORIGINAL_ASSOCIATION: \"state.occurrences(param.occurrence.dueSlot) == param.occurrence && param.occurrence.planId == state.id\")",
+      "@guard[invariantRef](succeed-empty SIP_LATE_PROGRESS/SIP_LATE_PROGRESS: \"!state.firstTerminals.contains(param.occurrence.occurrenceId)\")",
+      "@guard[invariantRef](succeed-empty SIP_PROGRESS_ONCE/SIP_PROGRESS_ONCE: \"!state.occurrenceProgress.get(param.occurrence.occurrenceId).contains(\\\"outcome-unknown\\\")\")"
+    ],
+    "produces": [
+      "SipInstallmentOutcomeUnknown"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipInstallmentOutcomeUnknown": {
+      "name": "SipInstallmentOutcomeUnknown",
+      "payloads": [
+        "occurrence: SipOccurrence @PROPAGATED",
+        "outcome: String @PROPAGATED"
+      ],
+      "bindings": [
+        "occurrence <- param.occurrence",
+        "outcome <- \"literal:outcome-unknown\""
+      ],
+      "foldAssignments": [
+        "occurrenceProgress := @fold[put](key=event.occurrence.occurrenceId, value=event.outcome)"
+      ]
+    }
+  }

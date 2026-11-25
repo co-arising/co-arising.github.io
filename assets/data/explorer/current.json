@@ -1,10 +1,10 @@
 {
   "schemaVersion": "co-arising.explorer-current/v1",
   "state": "available",
-  "snapshot": "19f6827336ce52bdf2b9c21b2016d857df9933998dc0b52c46ccb3f9e5771448",
+  "snapshot": "31dddde1a6a791b2115d42a9324f94c88a0526ed7f0be29dadcacf8855fde442",
   "manifest": {
-    "path": "snapshots/19f6827336ce52bdf2b9c21b2016d857df9933998dc0b52c46ccb3f9e5771448/manifest.json",
+    "path": "snapshots/31dddde1a6a791b2115d42a9324f94c88a0526ed7f0be29dadcacf8855fde442/manifest.json",
     "bytes": 1299,
-    "sha256": "80088ff520ccf5dea31c8fdf8558c84891ccef9a257b9104b8bbde92f006db57"
+    "sha256": "3d1b3b7710877c15caf2378564f74943bb9c91f990f11b3c19d4d3a7b11fb604"
   }
 }
