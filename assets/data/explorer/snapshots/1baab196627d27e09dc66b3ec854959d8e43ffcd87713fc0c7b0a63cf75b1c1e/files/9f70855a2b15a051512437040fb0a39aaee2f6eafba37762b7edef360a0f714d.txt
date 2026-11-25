@@ -1,0 +1,3 @@
+package example.bankwealth.domain.values
+
+final case class FundShare(fundCode: String, shares: TaExactText, nav: TaExactText)

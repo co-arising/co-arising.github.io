@@ -1,0 +1,15 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: formal-product
+schemaVersion: "truthsrc.formal-product/v1"
+family: technical-port
+id: BankSipPlanQuery
+version: bank-v1-service-1
+author: agent-assisted-bank-v1-service-integration
+payload:
+  {
+    "name": "BankSipPlanQuery",
+    "version": "bank-v1-service-1",
+    "inputType": "@type(nominal:bankwealth:type#BankPlanKey)",
+    "outputType": "@type(nominal:bankwealth:type#BankSipPlanResponse)"
+  }

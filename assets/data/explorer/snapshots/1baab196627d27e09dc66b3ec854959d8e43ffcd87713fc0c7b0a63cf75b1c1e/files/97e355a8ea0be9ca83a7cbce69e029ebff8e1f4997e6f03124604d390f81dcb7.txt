@@ -1,0 +1,32 @@
+package example.bankwealth.infrastructure.bootstrap
+
+import akka.actor.typed.ActorSystem
+import akka.cluster.sharding.typed.ShardedDaemonProcessSettings
+import akka.cluster.sharding.typed.scaladsl.ShardedDaemonProcess
+import akka.projection.ProjectionBehavior
+import example.bankwealth.application.projection.{BankJournalReadsideProjection, BankJournalReadsideProjectionHandler}
+import example.bankwealth.application.projection.repository.BankJournalReadsideRepository
+import net.imadz.common.application.projection.ScalikeJdbcSession
+
+trait BankJournalReadsideBootstrap {
+  def initBankJournalReadsideProjection(
+    system: ActorSystem[_],
+    readJournalPluginId: String,
+    tags: Vector[String],
+    repository: BankJournalReadsideRepository,
+    bindings: BankJournalReadsideProjectionHandler.Bindings,
+    sessionFactory: () => ScalikeJdbcSession = () => new ScalikeJdbcSession()
+  ): Unit = {
+    ShardedDaemonProcess(system).init(
+      name = BankJournalReadsideProjection.projectionName,
+      numberOfInstances = tags.size,
+      behaviorFactory = index => ProjectionBehavior(
+        BankJournalReadsideProjection.createProjection(system, readJournalPluginId, tags(index), repository, bindings, sessionFactory)
+      ),
+      settings = ShardedDaemonProcessSettings(system),
+      stopMessage = Some(ProjectionBehavior.Stop)
+    )
+  }
+}
+
+object BankJournalReadsideBootstrap extends BankJournalReadsideBootstrap

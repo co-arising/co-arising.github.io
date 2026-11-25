@@ -1,0 +1,74 @@
+package example.bankwealth.application.process
+
+import example.bankwealth.domain.values.{AccountId, Money, TxId}
+
+object CreditFundCollectionStep {
+  final case class CreditFundCollectionPrepareInput(txid: TxId, resource: AccountId, amount: Money)
+  final case class CreditFundCollectionPrepareReceipt(
+    transaction: TxId,
+    definitionVersion: String,
+    argsDigest: String,
+    participant: String,
+    resource: AccountId,
+    step: String,
+    phase: String,
+    payloadTxid: TxId,
+    payloadResource: AccountId,
+    payloadAmount: Money
+  )
+  final case class CreditFundCollectionPrepareQuery(
+    transaction: TxId,
+    definitionVersion: String,
+    argsDigest: String,
+    participant: String,
+    resource: AccountId,
+    step: String,
+    phase: String
+  )
+  final case class CreditFundCollectionCommitInput(txid: TxId, resource: AccountId, amount: Money)
+  final case class CreditFundCollectionCommitReceipt(
+    transaction: TxId,
+    definitionVersion: String,
+    argsDigest: String,
+    participant: String,
+    resource: AccountId,
+    step: String,
+    phase: String,
+    payloadTxid: TxId,
+    payloadResource: AccountId,
+    payloadAmount: Money,
+    payloadCurrency: String,
+    payloadAvailable: Money
+  )
+  final case class CreditFundCollectionCommitQuery(
+    transaction: TxId,
+    definitionVersion: String,
+    argsDigest: String,
+    participant: String,
+    resource: AccountId,
+    step: String,
+    phase: String
+  )
+  final case class CreditFundCollectionCompensateInput(txid: TxId, resource: AccountId, amount: Money)
+  final case class CreditFundCollectionCompensateReceipt(
+    transaction: TxId,
+    definitionVersion: String,
+    argsDigest: String,
+    participant: String,
+    resource: AccountId,
+    step: String,
+    phase: String,
+    payloadTxid: TxId,
+    payloadResource: AccountId,
+    payloadAmount: Money
+  )
+  final case class CreditFundCollectionCompensateQuery(
+    transaction: TxId,
+    definitionVersion: String,
+    argsDigest: String,
+    participant: String,
+    resource: AccountId,
+    step: String,
+    phase: String
+  )
+}

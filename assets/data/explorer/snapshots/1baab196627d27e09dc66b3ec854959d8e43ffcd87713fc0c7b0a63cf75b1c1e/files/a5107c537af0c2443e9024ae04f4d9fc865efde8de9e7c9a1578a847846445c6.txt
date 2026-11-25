@@ -1,0 +1,20 @@
+package example.bankwealth.application.projection
+
+import example.bankwealth.domain.values.PlanId
+import example.bankwealth.interfaces.api.ApiCommands.BankSipCreateIntent
+
+final case class BankSipPlanView(
+  planId: PlanId,
+  original: Option[BankSipCreateIntent],
+  initialized: Boolean,
+  scheduleSealed: Boolean,
+  paused: Boolean,
+  currentTick: Long,
+  dueSlots: Vector[Long],
+  revisions: Vector[BankSipRevisionView],
+  scheduleCount: Long,
+  observedCount: Long,
+  startCount: Long,
+  successTotal: Long,
+  failureTotal: Long
+)

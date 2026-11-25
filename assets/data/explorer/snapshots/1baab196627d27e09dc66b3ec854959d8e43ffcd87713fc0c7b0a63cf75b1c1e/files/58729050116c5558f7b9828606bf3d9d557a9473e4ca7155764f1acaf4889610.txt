@@ -1,0 +1,10 @@
+package example.bankwealth.domain.values
+
+final case class SipPlanOrigination(
+  principalId: String,
+  clientRequestId: String,
+  authorityVersion: String,
+  planId: PlanId,
+  config: SipRevisionConfig,
+  dueSlots: Vector[Long]
+)

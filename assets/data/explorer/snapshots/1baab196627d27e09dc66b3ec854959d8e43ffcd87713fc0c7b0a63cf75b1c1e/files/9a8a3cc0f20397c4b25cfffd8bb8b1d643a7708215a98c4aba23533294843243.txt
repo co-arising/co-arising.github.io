@@ -1,0 +1,12 @@
+package example.bankwealth.interfaces.api
+
+import ApiCommands.BankCashOriginal
+import example.bankwealth.domain.values.{OperationId, PlanId}
+
+object ApiAcknowledgements {
+  final case class BankCashAcknowledgement(original: BankCashOriginal, status: String)
+  final case class BankSipAcknowledgement(planId: PlanId, status: String)
+  final case class BankTickAcknowledgement(slot: Long, plans: Long)
+  final case class BankRecoveryAcknowledgement(operationId: OperationId, status: String)
+  final case class BankServiceBootstrapAcknowledgement(namespace: String, status: String)
+}
