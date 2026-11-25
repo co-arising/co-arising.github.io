@@ -1,0 +1,40 @@
+package example.bankwealth.interfaces.api
+
+import ApiWire.MoneyWire
+import example.bankwealth.application.process.protocol.BankPaymentMessages.BankPaymentOriginal
+import example.bankwealth.domain.values.{PlanId, RevisionId, SipRevisionConfig}
+
+object ApiCommands {
+  final case class BankCashSubmit(clientRequestId: String, fundCode: String, amount: MoneyWire)
+  final case class BankCashOriginal(
+    principalId: String,
+    clientRequestId: String,
+    authorityVersion: String,
+    request: BankCashSubmit,
+    payment: BankPaymentOriginal
+  )
+  final case class BankSipCreate(
+    clientRequestId: String,
+    fundCode: String,
+    amount: MoneyWire,
+    effectiveSlot: Long,
+    dueSlots: Vector[Long]
+  )
+  final case class BankSipCreateIntent(
+    principalId: String,
+    clientRequestId: String,
+    authorityVersion: String,
+    request: BankSipCreate,
+    planId: PlanId,
+    config: SipRevisionConfig
+  )
+  final case class BankSipRevise(
+    revision: RevisionId,
+    effectiveSlot: Long,
+    fundCode: String,
+    amount: MoneyWire
+  )
+  final case class BankSipRevisionInput(planId: PlanId, request: BankSipRevise)
+  final case class BankTick(slot: Long)
+  final case class BankServiceBootstrapInput(namespace: String)
+}
