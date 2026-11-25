@@ -1,0 +1,64 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: TriggerSipInstallment
+payload:
+  {
+    "name": "TriggerSipInstallment",
+    "parameters": [
+      "position: Long @BUSINESS_INPUT",
+      "dueSlot: Long @BUSINESS_INPUT",
+      "revision: RevisionId @BUSINESS_INPUT",
+      "config: SipRevisionConfig @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_SLOT_DECLARED/SIP_SLOT_DECLARED: \"state.slots.contains(param.position)\")",
+      "@guard[invariantRef](reject SIP_SLOT_MATCH/SIP_SLOT_MATCH: \"state.slots(param.position) == param.dueSlot\")",
+      "@guard[invariantRef](reject SIP_OCCURRENCE_REPLAY_CONFLICT/SIP_OCCURRENCE_REPLAY_CONFLICT: \"!state.occurrences.contains(param.dueSlot) || (state.occurrences(param.dueSlot).revision == param.revision && state.occurrences(param.dueSlot).config == param.config)\")",
+      "@guard[invariantRef](succeed-empty SIP_OCCURRENCE_ONCE/SIP_OCCURRENCE_ONCE: \"!state.occurrences.contains(param.dueSlot)\")",
+      "@guard[invariantRef](reject SIP_ACTIVE_START/SIP_ACTIVE_START: \"!state.paused\")",
+      "@guard[invariantRef](reject SIP_START_ORDER/SIP_START_ORDER: \"param.position == state.startCount\")",
+      "@guard[invariantRef](reject SIP_BACKLOG_REQUIRED/SIP_BACKLOG_REQUIRED: \"state.slotDisposition.get(param.dueSlot).contains(\\\"backlog\\\")\")",
+      "@guard[invariantRef](reject SIP_REVISION_DECLARED/SIP_REVISION_DECLARED: \"state.revisions.contains(param.revision)\")",
+      "@guard[invariantRef](reject SIP_RETAINED_CONFIG/SIP_RETAINED_CONFIG: \"state.revisions(param.revision) == param.config && param.config.revision == param.revision\")",
+      "@guard[invariantRef](reject SIP_REVISION_INTERVAL/SIP_REVISION_INTERVAL: \"param.dueSlot >= param.config.effectiveSlot && (!state.revisionEnds.contains(param.revision) || param.dueSlot < state.revisionEnds(param.revision))\")"
+    ],
+    "produces": [
+      "SipInstallmentTriggered"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipInstallmentTriggered": {
+      "name": "SipInstallmentTriggered",
+      "payloads": [
+        "position: Long @PROPAGATED",
+        "occurrence: SipOccurrence @PROPAGATED"
+      ],
+      "bindings": [
+        "position <- param.position",
+        "occurrence <- @host(bankwealth:port#StableSipOccurrence@bank-v1-1)"
+      ],
+      "foldAssignments": [
+        "occurrences := @fold[put](key=event.occurrence.dueSlot, value=event.occurrence)",
+        "occurrenceProgress := @fold[put](key=event.occurrence.occurrenceId, value=\"literal:pending\")",
+        "startCount := @fold[integer-apply](delta=\"literal:1\", sign=+1)"
+      ]
+    }
+  }

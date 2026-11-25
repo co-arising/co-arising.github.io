@@ -1,0 +1,56 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: aggregate
+name: CreditBalance
+context: bankwealth
+order:
+  commands: ["InitializeAccount","ReserveFunds","DeductFunds","ReleaseReservedFunds","RecordIncomingCredits","CommitIncomingCredits","CancelIncomingCredit"]
+  events: ["AccountInitialized","ReserveFundsConfirmed","DeductFundsConfirmed","ReleaseReservedFundsConfirmed","RecordIncomingCreditsConfirmed","CommitIncomingCreditsConfirmed","CancelIncomingCreditConfirmed"]
+payload:
+  {
+    "name": "CreditBalance",
+    "entity": "CreditBalanceEntity",
+    "identifier": "id: AccountId @BUSINESS_INPUT",
+    "stateFields": [
+      "id: AccountId = \"\"",
+      "initialized: Boolean = false",
+      "accountBalance: \"Map[String, Money]\" = []",
+      "reservedAmount: \"Map[TxId, Money]\" = []",
+      "incomingCredits: \"Map[TxId, Money]\" = []",
+      "committedOutgoing: \"Map[TxId, Money]\" = []",
+      "committedIncoming: \"Map[TxId, Money]\" = []",
+      "compensatedOutgoing: \"Map[TxId, Money]\" = []",
+      "compensatedIncoming: \"Map[TxId, Money]\" = []"
+    ],
+    "aggregateRuleRefs": [
+      "@rule(ACCOUNT_ID/ACCOUNT_ID | \"资金账户标识必须与当前聚合一致\")",
+      "@rule(ACCOUNT_CURRENCY/ACCOUNT_CURRENCY | \"账户币种必须为 CNY 且与初始金额币种一致\")",
+      "@rule(ACCOUNT_INIT_CONFLICT/ACCOUNT_INIT_CONFLICT | \"账户已初始化且初始余额与请求冲突\")",
+      "@rule(ACCOUNT_INIT_ONCE/ACCOUNT_INIT_ONCE | \"账户已初始化，幂等忽略重复初始化\")",
+      "@rule(ACCOUNT_SEED_NONNEGATIVE/ACCOUNT_SEED_NONNEGATIVE | \"账户初始金额不能为负数\")",
+      "@rule(LEDGER_RESOURCE/LEDGER_RESOURCE | \"账务操作目标账户标识必须与当前聚合一致\")",
+      "@rule(LEDGER_CNY/LEDGER_CNY | \"账务操作币种必须为 CNY\")",
+      "@rule(LEDGER_POSITIVE/LEDGER_POSITIVE | \"账务操作金额必须为正数\")",
+      "@rule(LEDGER_COMMITTEDOUTGOING_MATCH/LEDGER_COMMITTEDOUTGOING_MATCH | \"已扣款交易的金额与重放请求不一致\")",
+      "@rule(LEDGER_COMPENSATEDOUTGOING_MATCH/LEDGER_COMPENSATEDOUTGOING_MATCH | \"已释放预占交易的金额与重放请求不一致\")",
+      "@rule(LEDGER_RESERVEDAMOUNT_MATCH/LEDGER_RESERVEDAMOUNT_MATCH | \"已预占交易的金额与重放请求不一致\")",
+      "@rule(LEDGER_ALREADY_COMMITTED/LEDGER_ALREADY_COMMITTED | \"该笔交易已完成扣款，幂等忽略重复预占\")",
+      "@rule(LEDGER_ALREADY_COMPENSATED/LEDGER_ALREADY_COMPENSATED | \"该笔交易已释放补偿，幂等忽略重复预占\")",
+      "@rule(LEDGER_ALREADY_PREPARED/LEDGER_ALREADY_PREPARED | \"该笔交易已预占，幂等忽略重复预占\")",
+      "@rule(LEDGER_SUFFICIENT/LEDGER_SUFFICIENT | \"账户可用余额不足，无法预占扣款金额\")",
+      "@rule(LEDGER_COMMIT_ONCE/LEDGER_COMMIT_ONCE | \"该笔交易已提交，幂等忽略重复提交\")",
+      "@rule(LEDGER_NOT_COMPENSATED/LEDGER_NOT_COMPENSATED | \"该笔交易已补偿取消，禁止再提交\")",
+      "@rule(LEDGER_PREPARED/LEDGER_PREPARED | \"未找到该笔交易对应的预占记录，无法提交\")",
+      "@rule(LEDGER_COMPENSATE_ONCE/LEDGER_COMPENSATE_ONCE | \"该笔交易已完成补偿，幂等忽略重复补偿\")",
+      "@rule(LEDGER_NOT_COMMITTED/LEDGER_NOT_COMMITTED | \"该笔交易已提交入账，禁止再补偿取消\")",
+      "@rule(LEDGER_COMMITTEDINCOMING_MATCH/LEDGER_COMMITTEDINCOMING_MATCH | \"已入账交易的金额与重放请求不一致\")",
+      "@rule(LEDGER_COMPENSATEDINCOMING_MATCH/LEDGER_COMPENSATEDINCOMING_MATCH | \"已取消入账交易的金额与重放请求不一致\")",
+      "@rule(LEDGER_INCOMINGCREDITS_MATCH/LEDGER_INCOMINGCREDITS_MATCH | \"待入账交易的金额与重放请求不一致\")"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "approvedBy": "user-approved-p24-p25-bank-joint",
+      "sourceVersion": "bank-v1-p23-design-2"
+    }
+  }

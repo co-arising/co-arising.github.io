@@ -1,0 +1,9 @@
+include "persistence.conf"
+play.application.loader = "example.bankwealth.infrastructure.bootstrap.BankServiceLoader"
+play.http.secret.key = ${PLAY_SECRET}
+service.connections."bank-mongo-connection" = ${MONGO_URI}
+service.connections."bank-mysql-connection" = ${MYSQL_JDBC_URL}
+db.default.driver = "com.mysql.cj.jdbc.Driver"
+db.default.url = ${service.connections."bank-mysql-connection"}
+db.default.username = ${MYSQL_USER}
+db.default.password = ${MYSQL_PASSWORD}
