@@ -1,0 +1,3 @@
+package example.bankwealth.application.api
+
+final case class MoneyWire(minorUnits: String, currency: String)

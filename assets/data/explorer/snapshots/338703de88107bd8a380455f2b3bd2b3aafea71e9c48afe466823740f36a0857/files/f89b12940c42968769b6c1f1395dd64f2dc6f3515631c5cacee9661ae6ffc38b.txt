@@ -1,0 +1,5 @@
+package example.bankwealth.application.process
+
+import example.bankwealth.domain.values.{AccountId, Money, TxId}
+
+final case class ReserveInvestorFundsCommitInput(txid: TxId, resource: AccountId, amount: Money)

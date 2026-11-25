@@ -1,0 +1,3 @@
+package example.bankwealth.application.integration
+
+final case class BankSipDispatchOperation(operation: String, request: BankSipDispatchRequest)

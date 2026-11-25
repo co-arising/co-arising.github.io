@@ -1,0 +1,16 @@
+package example.bankwealth.application.process
+
+import example.bankwealth.domain.values.{AccountId, Money, TxId}
+
+final case class CreditOriginalInvestorCompensateReceipt(
+  transaction: TxId,
+  definitionVersion: String,
+  argsDigest: String,
+  participant: String,
+  resource: AccountId,
+  step: String,
+  phase: String,
+  payloadTxid: TxId,
+  payloadResource: AccountId,
+  payloadAmount: Money
+)

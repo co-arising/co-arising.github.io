@@ -1,0 +1,5 @@
+package example.bankwealth.application.integration
+
+import example.bankwealth.domain.values.OperationId
+
+final case class BankSipDispatchResult(operationId: OperationId)

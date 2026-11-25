@@ -1,0 +1,3 @@
+package example.bankwealth.application.api
+
+final case class BankTickAcknowledgement(slot: Long, plans: Long)

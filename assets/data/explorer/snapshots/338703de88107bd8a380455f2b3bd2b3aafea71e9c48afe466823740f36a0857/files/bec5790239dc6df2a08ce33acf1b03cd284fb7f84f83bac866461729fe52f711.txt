@@ -1,0 +1,11 @@
+package example.bankwealth.application.projection
+
+import example.bankwealth.application.api.MoneyWire
+import example.bankwealth.domain.values.AccountId
+
+final case class BankAccountView(
+  accountId: AccountId,
+  initialized: Boolean,
+  available: MoneyWire,
+  reserved: MoneyWire
+)

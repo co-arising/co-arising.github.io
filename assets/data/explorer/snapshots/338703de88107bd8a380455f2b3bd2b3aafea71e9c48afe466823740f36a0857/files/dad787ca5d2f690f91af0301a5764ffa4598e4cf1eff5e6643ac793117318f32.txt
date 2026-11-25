@@ -1,0 +1,3 @@
+package example.bankwealth.application.api
+
+final case class BankCashSubmit(clientRequestId: String, fundCode: String, amount: MoneyWire)

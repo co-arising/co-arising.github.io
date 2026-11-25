@@ -1,0 +1,9 @@
+package example.bankwealth.application.integration
+
+final case class BankSipDispatchReconcile(
+  operation: String,
+  request: BankSipDispatchRequest,
+  decision: String,
+  evidence: Option[BankSipDispatchObservation],
+  authorization: String
+)

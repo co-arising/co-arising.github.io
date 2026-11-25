@@ -1,0 +1,5 @@
+package example.bankwealth.application.projection
+
+import example.bankwealth.domain.values.TaExactText
+
+final case class BankTaSharesView(fundCode: String, shares: TaExactText, nav: TaExactText)

@@ -1,0 +1,8 @@
+package example.bankwealth.application.projection
+
+final case class BankProjectionWatermark(
+  persistenceId: String,
+  lastSequence: Long,
+  observedSequence: Option[Long],
+  disposition: String
+)

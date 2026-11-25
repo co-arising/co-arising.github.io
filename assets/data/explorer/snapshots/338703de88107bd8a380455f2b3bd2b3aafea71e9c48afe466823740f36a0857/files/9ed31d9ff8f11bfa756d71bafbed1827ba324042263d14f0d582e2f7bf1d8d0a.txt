@@ -1,0 +1,3 @@
+package example.bankwealth.infrastructure.persistence
+
+final case class MoneyPO(minorUnits: String, currency: String)

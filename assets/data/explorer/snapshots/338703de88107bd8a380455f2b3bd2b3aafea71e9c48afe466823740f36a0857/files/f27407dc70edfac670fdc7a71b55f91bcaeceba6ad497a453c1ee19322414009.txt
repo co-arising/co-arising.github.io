@@ -1,0 +1,12 @@
+package example.bankwealth.application.api
+
+import example.bankwealth.domain.values.{AccountId, FundOrderId, Money, OperationId, TxId}
+
+final case class BankRefundOriginal(
+  fundOrderId: FundOrderId,
+  paymentTxId: TxId,
+  investorAccountId: AccountId,
+  fundCollectionAccountId: AccountId,
+  amount: Money,
+  refundOperationId: OperationId
+)

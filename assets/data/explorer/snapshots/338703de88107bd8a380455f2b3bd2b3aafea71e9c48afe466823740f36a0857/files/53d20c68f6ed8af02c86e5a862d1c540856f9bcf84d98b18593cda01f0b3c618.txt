@@ -1,0 +1,5 @@
+package example.bankwealth.application.integration
+
+import example.bankwealth.domain.values.TaRequestId
+
+final case class BankTaEffectResult(taRequestId: TaRequestId)

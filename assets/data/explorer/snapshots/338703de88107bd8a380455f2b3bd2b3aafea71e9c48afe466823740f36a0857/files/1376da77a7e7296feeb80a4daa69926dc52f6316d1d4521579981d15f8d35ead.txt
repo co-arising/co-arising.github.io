@@ -1,0 +1,9 @@
+package example.bankwealth.application.api
+
+final case class BankSipCreate(
+  clientRequestId: String,
+  fundCode: String,
+  amount: MoneyWire,
+  effectiveSlot: Long,
+  dueSlots: Vector[Long]
+)

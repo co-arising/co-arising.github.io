@@ -1,0 +1,5 @@
+package example.bankwealth.application.integration
+
+import example.bankwealth.domain.values.{OccurrenceId, SipOccurrence}
+
+final case class BankSipDispatchRequest(occurrenceId: OccurrenceId, occurrence: SipOccurrence)

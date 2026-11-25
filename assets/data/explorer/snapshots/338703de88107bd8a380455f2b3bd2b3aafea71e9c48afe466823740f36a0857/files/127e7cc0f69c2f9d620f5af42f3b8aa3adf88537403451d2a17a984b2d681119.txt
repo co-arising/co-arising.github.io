@@ -1,0 +1,5 @@
+package example.bankwealth.application.api
+
+import example.bankwealth.domain.values.PlanId
+
+final case class BankPlanKey(planId: PlanId)

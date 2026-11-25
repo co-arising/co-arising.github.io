@@ -1,0 +1,10 @@
+package example.bankwealth.application.process
+
+import example.bankwealth.domain.values.{AccountId, FundOrderId, Money}
+
+final case class BankPaymentArgs(
+  investorAccountId: AccountId,
+  fundOrderId: FundOrderId,
+  fundCollectionAccountId: AccountId,
+  amount: Money
+)
