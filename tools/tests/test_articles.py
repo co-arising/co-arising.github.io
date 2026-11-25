@@ -41,6 +41,8 @@ HASHES = {
     "aws-kiro-smt-spec-analyzer-20261119.en.md": "b58a15c73e0895a588eaaa84e3649df094b5b912230a070a91b302771ab0b5f2",
     "co-arising-ears-spec-20261123.md": "f18d1151bcae40b924699169a9a9d0c6e0f03dd87fdabe0c289b7eee2ec87cfd",
     "co-arising-ears-spec-20261123.en.md": "98118f3333285cc54a8667a06a4e1cd023a2f25435d9b81e702a21e09a42fa51",
+    "bank-wealth-quickstart-architecture-extensibility-20261125.md": "fa58d25f7a356b4f8fa1f9f7aa2e3f7ea4d28add8fb7cf99d42f2c3dffacf22c",
+    "bank-wealth-quickstart-architecture-extensibility-20261125.en.md": "65bec908a3f97b30d2e074d4b4fbce76552f11db7043e5ebc76f76730119fd7d",
 }
 
 

@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>bank-wealth-demo Complete Guide: Quick Start, Onion Architecture Deep Dive, and Extending New Code Generators — co-arising</title>
+  <meta name="description" content="An end-to-end Quick Start for bank-wealth-demo (truth tree, code generation, bidirectional anchoring, and 5 live Docker playbooks), a deep dive into the generated Onion Architecture and DDD/DIP mechanics, and a contract plus AI-Agent material pack for extending new code generators." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="bank-wealth-demo Complete Guide: Quick Start, Onion Architecture Deep Dive, and Extending New Code Generators" />
+  <meta property="og:description" content="An end-to-end Quick Start for bank-wealth-demo (truth tree, code generation, bidirectional anchoring, and 5 live Docker playbooks), a deep dive into the generated Onion Architecture and DDD/DIP mechanics, and a contract plus AI-Agent material pack for extending new code generators." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Engineering practice</span></nav>
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-25">2026-11-25</time> · English translation</p>
+      <h1>bank-wealth-demo Complete Guide: Quick Start, Onion Architecture Deep Dive, and Extending New Code Generators</h1>
+      <p class="article-deck">An end-to-end Quick Start for bank-wealth-demo (truth tree, code generation, bidirectional anchoring, and 5 live Docker playbooks), a deep dive into the generated Onion Architecture and DDD/DIP mechanics, and a contract plus AI-Agent material pack for extending new code generators.</p>
+      <div class="article-actions"><a href="/content/articles/bank-wealth-quickstart-architecture-extensibility-20261125.en.md" download="bank-wealth-quickstart-architecture-extensibility-20261125.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">中文原文</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p>This article is an end-to-end hands-on guide, Onion Architecture source breakdown, and code-generator extension specification for the bank-wealth-demo reference project; commands, artifact types, and architectural boundaries reflect the current repositories, while formal acceptance records remain tracked on the status page.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. Why Start with bank-wealth-demo: One Complete Verifiable Engineering Loop</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. Quick Start: From Truth Tree to Generated Code, Line-Back Anchors, and Live Docker Walkthroughs</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. Inside the Generated Onion Architecture: Layers, Artifact Types, and Dependency Inversion</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. Extending New Code Generators: Integration Seam, Contract Obligations, and AI Agent Specification</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. The Next Big Story: Advancing to Controlled EARS 1.0 and Single-Hop SMT Verification</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. Reference Repositories and Key Source Entrypoints</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+      </aside>
+      <article id="article-body" class="article-body"><p>This end-to-end engineering handbook connects four core threads across <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> and <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> for architects, domain engineers, and AI Agent teams:</p>
+<ol>
+<li><strong>Full-Loop Quick Start</strong>: Validate the truth tree, compile 14 formal semantic products with auto-derived technical bindings, generate the Play/Akka CQRS Scala project, run 12-gate anchor verification, and launch Docker (MongoDB 4.4 + MySQL 8.0) to play through five real financial scenarios in your browser.</li>
+<li><strong>Generated Onion Architecture Deep Dive</strong>: Walk through every Artifact Type across <code>domain</code>, <code>application</code>, <code>interfaces</code>, <code>infrastructure</code>, and <code>modules</code>, showing how outer layers depend strictly inward, how handwritten and infrastructure implementations are injected behind inner interfaces, and the DDD principles grounding each boundary.</li>
+<li><strong>Extending New Code Generators</strong>: Pinpoint the exact seam in the truth pipeline to hook a new target language/framework, list the seven mandatory contract obligations, and specify <strong>the six-piece material pack that enables an AI Agent to infer and deliver a new code generator reliably</strong>.</li>
+<li><strong>Bridging to the Next Big Story</strong>: Show how this deterministic downstream architecture connects cleanly with the upstream <a href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 Technical Specification</a> to form a complete "mathematically verified upstream + deterministic onion-architecture downstream" loop.</li>
+</ol>
+<blockquote>
+<p><strong>Honest Scope Notice</strong>: <code>bank-wealth-demo</code> is a <strong>local teaching and architectural verification demo</strong> using an embedded Mock TA simulator and fixed local demo credentials. It moves no real money and makes no production banking claim. For dated acceptance records and open public-delivery items, always consult the <a href="https://co-arising.github.io/status/">status ledger</a>.</p>
+</blockquote>
+<h2 id="section-1">1. Why Start with bank-wealth-demo: One Complete Verifiable Engineering Loop</h2>
+<p>In conventional software delivery, requirements docs, domain models, service code, distributed transaction scripts, and test suites evolve independently and inevitably drift apart. The <code>co-arising</code> loop pulls them into a single deterministic pipeline:</p>
+<pre class="code"><code class="language-text">  [1. Truth Tree truth/bank-wealth/]     161 readable YAML atoms (3 aggregates · 2 sagas · 4 pipelines · 149 @rules)
+                │
+                ▼  truthsrc validate + roundtrip (structural + byte-identical roundtrip gate)
+  [2. Canonical Model &amp; Knowledge Graph] canonical.json + SQLite graph (392 nodes / 413 edges, blast-radius ready)
+                │
+                ▼  deriveProjectRequest (auto-derives Saga/Runtime/Execution bindings) + compileProductSet
+  [3. 14 Typed Semantic Products]        reference-layout / domain-decision / domain-folds / saga-runtime / execution ...
+                │
+                ▼  scala-cqrs-play-service (16 unified Emitter Families + ReadSide derivation)
+  [4. 161 Generated Onion-Arch Files]    + 36 handwritten isolation-zone files (unmanagedSourceDirectories, never overwritten)
+                │
+                ▼  truthsrc verify-project (12 consistency checks + 5,090 anchor locations / 629 exact byte spans)
+  [5. Build, Unit Tests &amp; Docker Demo]   sbt Compile/compile test (370 sources 0 errors · 24/24 tests) + 5 live playbooks
+</code></pre>
+<p>A key recent milestone is <strong>automatic derivation of technical bindings</strong>: authors no longer hand-write verbose low-level JSON binding boilerplate. The former 8 files (2,100+ lines) under <code>bindings/implementation/*.json</code> are now derived automatically in memory by <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive-bindings.mjs"><code>lib/project/derive-bindings.mjs</code></a> inside <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> — leaving <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/truthsrc.project.json"><code>bank-wealth-demo/truthsrc.project.json</code></a> focused solely on the truth tree, exact decimal types, runtime pins, and external handwritten roots.</p>
+<h2 id="section-2">2. Quick Start: From Truth Tree to Generated Code, Line-Back Anchors, and Live Docker Walkthroughs</h2>
+<h3 id="section-2-1">2.1 Prerequisites and Paired Checkouts</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Component / Requirement / Role"><table>
+<thead>
+<tr>
+<th scope="col">Component</th>
+<th scope="col">Requirement</th>
+<th scope="col">Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Node.js</strong></td>
+<td><strong>Node ≥ 22.13.0</strong> (built-in <code>node:sqlite</code>)</td>
+<td>Truth validation, graph export, code generation, anchor verification, and demo launcher</td>
+</tr>
+<tr>
+<td><strong>JDK</strong></td>
+<td><strong>JDK 11</strong> (e.g., Eclipse Temurin / AdoptOpenJDK 11)</td>
+<td>Compiling and running Play 2.8 / Scala 2.13</td>
+</tr>
+<tr>
+<td><strong>sbt</strong></td>
+<td><strong>sbt 1.x</strong></td>
+<td>Compiling ScalaPB <code>.proto</code> schemas, Scala sources, and building the <code>stage</code> distribution</td>
+</tr>
+<tr>
+<td><strong>Docker</strong></td>
+<td>Docker Desktop / Engine (<code>docker compose</code>)</td>
+<td>Running isolated <code>mongo:4.4</code> (event journal) and <code>mysql:8.0</code> (read-side projection) containers</td>
+</tr>
+<tr>
+<td><strong>Paired Repos</strong></td>
+<td>Adjacent <code>metarch-truthsrc</code> and <code>bank-wealth-demo</code> checkouts</td>
+<td>Keeps toolchain and demo project versions aligned</td>
+</tr>
+</tbody>
+</table></div>
+<p>Clone both repositories into a shared parent workspace:</p>
+<pre class="code"><code class="language-bash">export CO_ARISING_WS="$PWD"
+git clone https://github.com/co-arising/metarch-truthsrc.git
+git clone https://github.com/co-arising/bank-wealth-demo.git
+export TRUTHSRC_CLI="$CO_ARISING_WS/metarch-truthsrc/bin/truthsrc.js"
+cd "$CO_ARISING_WS/bank-wealth-demo"
+</code></pre>
+<blockquote>
+<p><strong>Why is MongoDB pinned to 4.4?</strong> The event journal driver <code>akka-persistence-mongo-rxmongo 3.0.8</code> (ReactiveMongo 1.0.10) depends on the MongoDB 4.4 wire protocol. <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/docker-compose.demo.yml"><code>docker-compose.demo.yml</code></a> maps the containers to <code>127.0.0.1:19001</code> (MongoDB) and <code>127.0.0.1:19002</code> (MySQL), avoiding any collision with local <code>27017</code>/<code>3306</code> ports.</p>
+</blockquote>
+<h3 id="section-2-2">2.2 Step 1: Validate the Truth Tree and Build the Knowledge Graph</h3>
+<p>Before generating a single line of Scala or starting a JVM, Node.js alone verifies syntax, semantic integrity, and lossless roundtrip fidelity across the entire truth tree:</p>
+<pre class="code"><code class="language-bash"># 1. Truth validation (0 hard findings) + roundtrip check (160 business atoms byte-identical)
+npm run validate
+
+# 2. Compile all 14 formal semantic products (Saga / Runtime / Execution bindings auto-derived)
+npm run compile
+
+# 3. Export the local SQLite knowledge graph (queryable via CLI, MCP, or browser Explorer)
+node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out bank.graph.sqlite
+</code></pre>
+<p>You can also explore the same verified snapshot in your browser with zero installation using the <a href="https://co-arising.github.io/explorer/">Explorer Graph view</a> (blast radius for <code>SipInstallmentFailed</code>, lineage, orphans, and invariant queries).</p>
+<h3 id="section-2-3">2.3 Step 2: Auto-Derive Bindings, Generate Code, and Compile/Test</h3>
+<pre class="code"><code class="language-bash"># 1. Prepare pinned 0.3.0 runtime engines (saga-core / monarch-persistence / common-core) and generate into generated/current/
+npm run project
+
+# 2. Compile all 12 .proto files + 370 Scala sources, run 5 suites / 24 unit tests, and package stage binary
+(cd generated/current &amp;&amp; sbt --batch "Compile/compile" test stage)
+</code></pre>
+<p>Two architectural properties are immediately visible:</p>
+<ul>
+<li><strong>Physical isolation between generated and handwritten code</strong>: <code>generated/current/</code> receives <strong>161 generated files</strong>; the 36 handwritten implementation files remain in <a href="https://github.com/co-arising/bank-wealth-demo/tree/main/handwritten/scala"><code>handwritten/scala/</code></a> and are mounted via <code>unmanagedSourceDirectories</code> in <code>build.sbt</code>. Re-running <code>npm run project</code> never overwrites handwritten code.</li>
+<li><strong>Full green unit verification</strong>: <code>UnitTestMain</code> asserts isolated test configuration (<code>journal=testkit</code>, <code>snapshot=testkit</code>, <code>network=denied</code>), followed by 5 ScalaTest suites (<code>GeneratedActorStateSpec</code>, <code>GeneratedDomainRoundtripSpec</code>, <code>GeneratedFiniteHostSpec</code>, <code>GeneratedServiceConfigurationSpec</code>, <code>GeneratedUnitStorageSpec</code>) passing <strong>24/24 tests</strong>.</li>
+</ul>
+<h3 id="section-2-4">2.4 Step 3: Verify Bidirectional Lineage and Source Anchors</h3>
+<p>How do you prove that every generated rule, event handler, and port contract genuinely originated from a specific truth declaration and has not drifted? Run the 12-gate verification check:</p>
+<pre class="code"><code class="language-bash"># 1. Full 12-check verification (input fingerprints, graph parity, ownership, 1,310 knowledge keys, 629 exact spans, 0 unresolved)
+node "$TRUTHSRC_CLI" verify-project \
+  --project truthsrc.project.json \
+  --out generated/current
+
+# 2. Forward query: trace ReserveFunds from business truth to every generated location and byte span
+node "$TRUTHSRC_CLI" query-project \
+  --project truthsrc.project.json \
+  --out generated/current \
+  --knowledge ReserveFunds \
+  --format human
+
+# 3. Reverse query: map a concrete generated file and line back to its originating truth atom
+node "$TRUTHSRC_CLI" query-project \
+  --project truthsrc.project.json \
+  --out generated/current \
+  --file app/example/bankwealth/domain/invariants/CreditBalanceRules.scala \
+  --line 18 \
+  --format human
+</code></pre>
+<p>To try bidirectional navigation right now without local setup, open the <a href="https://co-arising.github.io/explorer/?view=code#code">Explorer Code view</a>. The published snapshot contains <strong>358 files</strong> (161 pure business YAML truth files + 161 generated files + 36 handwritten files, 0 withheld), where every <code>@knowledge</code> annotation is verified against both content digests and exact UTF-8 byte spans.</p>
+<h3 id="section-2-5">2.5 Step 4: Start Docker Databases and Run Automated Smoke Verification</h3>
+<pre class="code"><code class="language-bash"># 1. Start MongoDB 4.4 + MySQL 8.0 (wait ~10–15s until both report healthy)
+docker compose -f docker-compose.demo.yml up -d
+docker compose -f docker-compose.demo.yml ps
+
+# 2. Run the one-command end-to-end smoke check (allocates an isolated namespace and cleans up automatically)
+npm run demo:smoke
+</code></pre>
+<p><code>npm run demo:smoke</code> boots the real Play HTTP service backed by MongoDB, MySQL, and the embedded Mock TA worker, then verifies:</p>
+<ul>
+<li>Browser entry <code>/bank/v1</code> and client script <code>/bank/v1/client-script</code>;</li>
+<li><strong>21 negative security checks</strong> (unauthenticated access, wrong role, missing/bad CSRF, disallowed Origin, and client field-injection rejection);</li>
+<li><strong>51 business HTTP requests</strong> (100.00 CNY cash purchase + idempotent replay on identical <code>clientRequestId</code> + <code>409 Conflict</code> on conflicting payload + business-clock tick confirming <code>80.0000</code> shares from Mock TA + SIP create/pause/resume/2-installment dispatch + strict ledger conservation: <code>customer=88000</code> minor units + <code>collection=12000</code> minor units = <code>100000</code>).</li>
+</ul>
+<h3 id="section-2-6">2.6 Step 5: Interactive Browser Walkthrough — Five Core Playbooks</h3>
+<pre class="code"><code class="language-bash"># Start the interactive local demo (default confirmed scenario at http://127.0.0.1:19000/bank/v1)
+npm run demo:start
+</code></pre>
+<p>Open <strong><code>http://127.0.0.1:19000/bank/v1</code></strong> (open two tabs to operate Customer and Operator side by side):</p>
+<ul>
+<li><strong>Customer credentials</strong>: Bearer <code>demo-customer-token</code> / CSRF <code>demo-customer-csrf</code> (seeded with <code>100000</code> minor units = <code>1,000.00 CNY</code>)</li>
+<li><strong>Operator credentials</strong>: Bearer <code>demo-operator-token</code> / CSRF <code>demo-operator-csrf</code> (drives the manual business clock and inspects pending operations)</li>
+</ul>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Playbook / Launch Command &amp; Actions / What You Prove Against the Truth Tree"><table>
+<thead>
+<tr>
+<th scope="col">Playbook</th>
+<th scope="col">Launch Command &amp; Actions</th>
+<th scope="col">What You Prove Against the Truth Tree</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Playbook A · Cash Purchase &amp; TA Share Confirmation</strong></td>
+<td>Default <code>npm run demo:start</code> → Customer submits <code>clientRequestId=demo-cash-001</code>, <code>fundCode=fund</code>, <code>minorUnits=10000</code> → Inspect <strong>Fund order</strong> → Operator ticks <code>slot=1</code> → Re-inspect <strong>Fund order</strong></td>
+<td><strong>Payment succeeded ≠ investment succeeded</strong>: before the clock tick, <code>paymentStatus=succeeded</code> while <code>taStatus=accepted</code> (debited 100.00 CNY, zero shares yet); after ticking, <code>taStatus=confirmed</code> with <code>shares="80.0000"</code>, <code>nav="1.2345"</code>.</td>
+</tr>
+<tr>
+<td><strong>Playbook B · TA Rejection &amp; Independent Refund Saga</strong></td>
+<td>Stop with <code>Ctrl+C</code>, restart with <code>node tools/demo-start.mjs --scenario rejected --namespace demo_refund</code> → Customer submits <code>10000</code> minor units → Operator ticks <code>slot=1</code> → Inspect order &amp; balance</td>
+<td><strong>Independent refund ≠ compensating a committed payment</strong>: <code>paymentStatus=succeeded</code>, <code>taStatus=rejected</code>, <code>refundStatus=succeeded</code>, carrying a distinct <code>refundOperationId</code> while restoring customer balance to <code>100000</code>.</td>
+</tr>
+<tr>
+<td><strong>Playbook C · Bounded Installment Plan (SIP)</strong></td>
+<td>Under <code>confirmed</code>, Customer calls <strong>Create SIP plan</strong> (<code>minorUnits=1000</code>, <code>effectiveSlot=0</code>, <code>dueSlots=10, 20</code>) → exercise <strong>Pause / Resume</strong> → Operator ticks <code>slot=10, 20, 21</code></td>
+<td><strong>Every installment reuses the exact cash rules</strong>: no duplicate money path; slots hit while paused are explicitly classified as skipped; active slots trigger payment + TA confirmation (<code>successTotal=2</code>).</td>
+</tr>
+<tr>
+<td><strong>Playbook D · Unknown Outcomes &amp; Duplicate Adversaries</strong></td>
+<td>Launch <code>--scenario unknown</code> or <code>--scenario duplicate-conflicting</code>; or resubmit the same <code>clientRequestId</code> with a different amount</td>
+<td><strong>Unknown stays unknown</strong>: never rewritten into failure or success and never implicitly re-debited; identical replay is idempotent while conflicting payloads return <code>409 Conflict</code>.</td>
+</tr>
+<tr>
+<td><strong>Playbook E · Isolated Namespaces &amp; Cleanup</strong></td>
+<td>Pass <code>--namespace exp_a</code> / <code>--namespace exp_b</code> for fresh experiments without wiping DBs; clean up with <code>docker compose -f docker-compose.demo.yml down -v</code></td>
+<td>Full flag reference and troubleshooting live in <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/docs/DEMO-QUICK-START.md"><code>DEMO-QUICK-START.md</code></a>.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-3">3. Inside the Generated Onion Architecture: Layers, Artifact Types, and Dependency Inversion</h2>
+<p>The <code>scala-cqrs-play-service</code> generator does not dump flat files into one package. It emits a disciplined <strong>Onion Architecture (Hexagonal Ports &amp; Adapters) + Classic CQRS/ES</strong> topology guarded by four static conformance gates in <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/audit.mjs"><code>lib/conformance/audit.mjs</code></a>.</p>
+<h3 id="section-3-1">3.1 The Four Concentric Layers and the Composition Root</h3>
+<pre class="code"><code class="language-text">  ┌───────────────────────────────────────────────────────────────────────────────────┐
+  │  Layer 5 · modules (Composition Root — sole place wiring interfaces to impls)     │
+  │    • BootstrapModule (generated): binds generated repos + discovers handwritten   │
+  │    • HandwrittenBindingsModule (handwritten): binds domain services, JDBC, auth   │
+  │  ┌─────────────────────────────────────────────────────────────────────────────┐  │
+  │  │  Layer 4 · infrastructure (Adapters)         │  Layer 3 · interfaces (Edge) │  │
+  │  │    • repositories.{aggregate,projection}     │    • interfaces.api (gen)    │  │
+  │  │    • persistence / converters / protobuf     │      ApiCommands/Wire/Keys   │  │
+  │  │    • process (Host/HostIO) &amp; connectors      │    • interfaces.web (manual) │  │
+  │  │    • bootstrap (Sharding/Daemon/PlayLoader)  │      Controllers/Pages/Json  │  │
+  │  │  ┌───────────────────────────────────────────────────────────────────────┐  │  │
+  │  │  │  Layer 2 · application (Orchestration &amp; Ports — zero infra/protobuf)  │  │  │
+  │  │  │    • aggregates.{Protocol,Aggregate,Behaviors,CommandHelpers,Repo}    │  │  │
+  │  │  │    • process.&lt;flow&gt;.{SagaDefinition,Execution,Ports} &amp; protocol       │  │  │
+  │  │  │    • connectors.{Gateway port,EffectProtocol}                         │  │  │
+  │  │  │    • readmodels.{Views,Projection,ProjectionHandler,ReadsideRepo}     │  │  │
+  │  │  │  ┌─────────────────────────────────────────────────────────────────┐  │  │  │
+  │  │  │  │  Layer 1 · domain (Pure Core — zero Akka/Play/IO · zero throw)  │  │  │  │
+  │  │  │  │    • domain.values (nominal VOs + exact decimal Money/Amount)   │  │  │  │
+  │  │  │  │    • domain.entities &amp; behaviors (State/Event ADT + pure Fold)  │  │  │  │
+  │  │  │  │    • domain.invariants &amp; params (InvariantRule + @knowledge)    │  │  │  │
+  │  │  │  │    • domain.services (pure computation port trait *Computations)│  │  │  │
+  │  │  │  └─────────────────────────────────────────────────────────────────┘  │  │  │
+  │  │  └───────────────────────────────────────────────────────────────────────┘  │  │
+  │  └─────────────────────────────────────────────────────────────────────────────┘  │
+  └───────────────────────────────────────────────────────────────────────────────────┘
+      Strict inward dependencies: modules ──▶ infrastructure &amp; interfaces ──▶ application ──▶ domain
+</code></pre>
+<p>Logical package topology and physical module layout are orthogonal via <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/layout/layout-strategy.mjs"><code>lib/layout/layout-strategy.mjs</code></a>: the exact same logical onion packages can emit either a single-module Play tree (<code>app/example/&lt;ctx&gt;/...</code>) or a five-module SBT workspace (<code>domain/</code>, <code>application/</code>, <code>interfaces/</code>, <code>infrastructure/</code>, <code>bootstrap/</code>) without altering a single <code>package</code> or <code>import</code> statement.</p>
+<h3 id="section-3-2">3.2 Complete Layer-by-Layer Artifact Type Catalog</h3>
+<p>Mapped directly from the 161 generated files and 36 handwritten files in <code>bank-wealth-demo</code>:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Layer / Package / Artifact Type / Representative Files / Ownership / Responsibility"><table>
+<thead>
+<tr>
+<th scope="col">Layer</th>
+<th scope="col">Package</th>
+<th scope="col">Artifact Type</th>
+<th scope="col">Representative Files</th>
+<th scope="col">Ownership</th>
+<th scope="col">Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Domain (Core)</strong></td>
+<td><code>domain.values</code></td>
+<td><code>value-object</code></td>
+<td><code>Money.scala</code>, <code>AccountId.scala</code>, <code>FundOrderId.scala</code></td>
+<td>Generated</td>
+<td>Immutable nominal value objects; exact decimal types carry <code>scale/precision/SupportedUnits</code> and safe arithmetic returning <code>Either[iMadzError, T]</code></td>
+</tr>
+<tr>
+<td><strong>Domain (Core)</strong></td>
+<td><code>domain.entities</code></td>
+<td><code>domain-entity</code></td>
+<td><code>CreditBalanceEntity.scala</code>, <code>FundOrderEntity.scala</code>, <code>SipPlanEntity.scala</code></td>
+<td>Generated</td>
+<td>Pure <code>State</code> case class, <code>Event</code> sealed trait (extending <code>CborSerializable</code>), and <code>empty</code> initial state</td>
+</tr>
+<tr>
+<td><strong>Domain (Core)</strong></td>
+<td><code>domain.entities.behaviors</code></td>
+<td><code>event-handler</code></td>
+<td><code>*EventHandler.scala</code></td>
+<td>Generated</td>
+<td>Pure event fold <code>applyEvent(state, event): State</code> reading only event fields with zero IO or clock access</td>
+</tr>
+<tr>
+<td><strong>Domain (Core)</strong></td>
+<td><code>domain.invariants</code> &amp; <code>.params</code></td>
+<td><code>invariant-rule</code>, <code>rule-params</code></td>
+<td><code>*Rules.scala</code>, <code>*RuleParams.scala</code></td>
+<td>Generated</td>
+<td><code>InvariantRule</code> command pre-guards and event post-invariants carrying exact <code>@knowledge</code> anchors</td>
+</tr>
+<tr>
+<td><strong>Domain (Core)</strong></td>
+<td><code>domain.services</code></td>
+<td><code>domain-service</code> (port)</td>
+<td><code>CreditBalanceComputations.scala</code>, <code>FundOrderComputations.scala</code></td>
+<td>Generated trait / Handwritten impl</td>
+<td>Pure <code>DomainService</code> port trait declaring <code>Either[iMadzError, T]</code> signatures only; implementations stay in the handwritten zone</td>
+</tr>
+<tr>
+<td><strong>Application</strong></td>
+<td><code>application.aggregates</code></td>
+<td><code>aggregate-protocol</code>, <code>aggregate-root</code>, <code>aggregate-factory</code></td>
+<td><code>*Protocol.scala</code>, <code>*Aggregate.scala</code>, <code>*AggregateFactory.scala</code></td>
+<td>Generated</td>
+<td>Command/Reply ADTs, Akka Typed <code>EntityTypeKey</code>, sharded event <code>tags</code>, and aggregate factories</td>
+</tr>
+<tr>
+<td><strong>Application</strong></td>
+<td><code>application.aggregates.behaviors</code></td>
+<td><code>command-helper</code>, <code>aggregate-behavior</code>, <code>external-event-bridge</code></td>
+<td><code>*CommandHelpers.scala</code>, <code>*Behaviors.scala</code>, <code>FundOrderExternalEvents.scala</code></td>
+<td>Generated</td>
+<td><code>CommandHelper</code> + <code>runReplyingPolicy</code> orchestrating guard → emit → fold → reply; external event authority validation</td>
+</tr>
+<tr>
+<td><strong>Application</strong></td>
+<td><code>application.aggregates.repository</code></td>
+<td><code>aggregate-repository-port</code></td>
+<td><code>CreditBalanceRepository.scala</code>, <code>FundOrderRepository.scala</code></td>
+<td>Generated trait</td>
+<td>Aggregate repository <strong>port trait</strong> (<code>find(id): EntityRef[Command]</code>) consumed by application orchestration</td>
+</tr>
+<tr>
+<td><strong>Application</strong></td>
+<td><code>application.process.&lt;flow&gt;</code> &amp; <code>.protocol</code></td>
+<td><code>saga-definition</code>, <code>execution-plan</code>, <code>process-ports</code>, <code>process-messages</code></td>
+<td><code>BankPaymentSagaDefinition.scala</code>, <code>BankCashPaymentExecution.scala</code>, <code>BankPaymentPorts.scala</code>, <code>BankPaymentMessages.scala</code>, <code>*Step.scala</code></td>
+<td>Generated</td>
+<td>Cross-aggregate TCC Saga definition (version + digest), Monarch finite execution plan, phase port traits, and grouped message modules</td>
+</tr>
+<tr>
+<td><strong>Application</strong></td>
+<td><code>application.connectors</code></td>
+<td><code>connector-gateway-port</code>, <code>connector-protocol</code></td>
+<td><code>BankTaGateway.scala</code>, <code>BankTaEffectProtocol.scala</code>, <code>BankSipDispatchGateway.scala</code></td>
+<td>Generated trait</td>
+<td>Pure application gateway ports and observation/reconciliation DTOs for external effects (TA, SIP dispatch)</td>
+</tr>
+<tr>
+<td><strong>Application</strong></td>
+<td><code>application.readmodels</code></td>
+<td><code>readmodel-views</code>, <code>projection</code>, <code>projection-handler</code>, <code>readside-repo-port</code></td>
+<td><code>ReadModelViews.scala</code>, <code>BankJournalReadsideProjection.scala</code>, <code>*ProjectionHandler.scala</code>, <code>*Repository.scala</code></td>
+<td>Generated</td>
+<td>Read-side view DTOs, Akka <code>JdbcProjection.exactlyOnce</code> projection wiring, and read-side repository <strong>port trait</strong></td>
+</tr>
+<tr>
+<td><strong>Interfaces</strong></td>
+<td><code>interfaces.api</code></td>
+<td><code>api-dto-modules</code></td>
+<td><code>ApiCommands.scala</code>, <code>ApiWire.scala</code>, <code>ApiResponses.scala</code>, <code>ApiAcknowledgements.scala</code>, <code>ApiKeys.scala</code></td>
+<td>Generated</td>
+<td>Role-grouped companion-object DTO modules preventing flat file explosion</td>
+</tr>
+<tr>
+<td><strong>Interfaces</strong></td>
+<td><code>interfaces.web</code></td>
+<td><code>http-controller</code>, <code>page-renderer</code>, <code>http-json</code></td>
+<td><code>BankPagesController.scala</code>, <code>BankQueryController.scala</code>, <code>BankServiceEndpoints.scala</code>, <code>BankBrowserPages.scala</code></td>
+<td>Handwritten</td>
+<td>Play HTTP controllers, auth/CSRF guards, JSON codecs, and interactive browser pages</td>
+</tr>
+<tr>
+<td><strong>Infrastructure</strong></td>
+<td><code>infrastructure.repositories.*</code></td>
+<td><code>aggregate-repository-impl</code>, <code>readside-repository-impl</code></td>
+<td><code>*RepositoryImpl.scala</code>, <code>BankJournalReadsideRepositoryImpl.scala</code>, <code>*Schema.scala</code>, <code>*Domain.scala</code></td>
+<td>Generated</td>
+<td>Concrete repository adapters: <code>ClusterSharding.entityRefFor</code> on the write side, ScalikeJDBC/MySQL on the read side</td>
+</tr>
+<tr>
+<td><strong>Infrastructure</strong></td>
+<td><code>infrastructure.persistence</code> &amp; <code>app/protobuf/</code></td>
+<td><code>proto-schema</code>, <code>proto-converter</code>, <code>event-adapter</code>, <code>snapshot-adapter</code>, <code>serializer</code>, <code>state-codec</code></td>
+<td><code>shared_value_objects.proto</code>, <code>fund_order.proto</code>, <code>*ProtoConverters.scala</code>, <code>*EventAdapter.scala</code>, <code>DomainProtoSerializer.scala</code>, <code>*StateCodec.scala</code></td>
+<td>Generated</td>
+<td>ScalaPB wire schemas, domain ↔ proto converters, Akka Persistence event/snapshot adapters, and Monarch/Saga state codecs</td>
+</tr>
+<tr>
+<td><strong>Infrastructure</strong></td>
+<td><code>infrastructure.process</code> &amp; <code>.connectors</code></td>
+<td><code>saga-host</code>, <code>effect-host</code>, <code>connector-impl</code></td>
+<td><code>BankPaymentHost.scala</code>, <code>BankTaEffectHost.scala</code> (gen); <code>MockTAClient.scala</code>, <code>BankPaymentBindings.scala</code> (manual)</td>
+<td>Generated host + Handwritten adapter</td>
+<td>Event-sourced host actors (retry, coalescing, crash recovery) plus handwritten adapters to external/mock systems</td>
+</tr>
+<tr>
+<td><strong>Infrastructure</strong></td>
+<td><code>infrastructure.bootstrap</code></td>
+<td><code>application-bootstrap</code>, <code>aggregate-bootstrap</code>, <code>projection-bootstrap</code>, <code>service-loader</code></td>
+<td><code>ApplicationBootstrap.scala</code>, <code>*Bootstrap.scala</code>, <code>BankServiceContract.scala</code>, <code>BankServiceLoader.scala</code></td>
+<td>Generated</td>
+<td>ClusterSharding initialization, ShardedDaemonProcess setup, persistence retention/backoff, and Play service loader</td>
+</tr>
+<tr>
+<td><strong>Modules (Root)</strong></td>
+<td><code>modules</code></td>
+<td><code>bootstrap-module</code>, <code>handwritten-bindings-module</code></td>
+<td><code>BootstrapModule.scala</code> (gen), <code>HandwrittenBindingsModule.scala</code> (manual)</td>
+<td>Generated + Handwritten</td>
+<td>Guice DI composition root wiring every outer/handwritten implementation to its inner port trait</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-3-3">3.3 Dependency Direction and Automated Architectural Gates</h3>
+<p>Onion architecture here is not slideware — it is mechanically audited by <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/audit.mjs"><code>lib/conformance/audit.mjs</code></a>:</p>
+<ul>
+<li><strong>Strict inward direction</strong>: <code>modules</code> → <code>infrastructure</code> &amp; <code>interfaces</code> → <code>application</code> → <code>domain</code>.</li>
+<li><strong>Domain purity gate (Gate 1 <code>domain-dip</code> &amp; <code>domain-purity</code>)</strong>: Scans every file under <code>domain/**</code> and flags a P0 violation if any <code>akka.</code>, <code>play.</code>, <code>.application.</code>, <code>.infrastructure.</code>, or <code>.interfaces.</code> reference appears, or if imperative escapes (<code>throw</code>, <code>require(</code>, <code>return</code>, <code>null</code>, <code>Future.failed</code>, <code>new *Exception</code>) leak into domain logic.</li>
+<li><strong>Application persistence-isolation gate (Gate 1 <code>application-dip</code>)</strong>: Scans <code>application/**</code> and rejects any import of <code>.infrastructure.</code> or <code>com.google.protobuf.*</code>, keeping use cases, sagas, and projections completely decoupled from SQL tables and Protobuf wire types.</li>
+<li><strong>Anti-file-explosion modularization</strong>: DTOs in <code>interfaces.api</code>, <code>application.process.protocol</code>, <code>application.readmodels</code>, and <code>application.connectors</code> are grouped into role companion-object modules via <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/derivation/value-object-package.mjs"><code>value-object-package.mjs</code></a> using purely structural suffix rules with zero business-name hardcoding.</li>
+</ul>
+<h3 id="section-3-4">3.4 How Implementations Become Interfaces Injected into the Core</h3>
+<p>Dependency Inversion (DIP) works across <strong>three concrete injection paths</strong> — without global mutable singletons and without fragile <code>BEGIN MANUAL</code> comment markers:</p>
+<ol>
+<li><strong>Path 1 · Domain Computation Ports (<code>domain.services</code> ← <code>handwritten/scala/.../domain/services/impl/</code>)</strong>:<ul>
+<li>The generator emits <code>trait CreditBalanceComputations extends DomainService</code> in <code>domain.services</code>.</li>
+<li><code>CreditBalanceRules</code> and <code>CreditBalanceBehaviors</code> depend strictly on that trait.</li>
+<li>Handwritten <code>BankBalanceComputations</code> implements the trait in the isolation zone, and <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/handwritten/scala/example/bankwealth/modules/HandwrittenBindingsModule.scala"><code>HandwrittenBindingsModule.scala</code></a> binds <code>bind(classOf[CreditBalanceComputations]).toInstance(BankBalanceComputations)</code>.</li>
+</ul>
+</li>
+<li><strong>Path 2 · Aggregate &amp; Read-Side Repository Ports (<code>application.*.repository</code> ← <code>infrastructure.repositories.*</code>)</strong>:<ul>
+<li>Application code depends only on <code>trait CreditBalanceRepository</code> and <code>trait BankJournalReadsideRepository</code>.</li>
+<li>Infrastructure provides <code>CreditBalanceRepositoryImpl</code> (wrapping <code>ClusterSharding</code>) and <code>BankJournalReadsideRepositoryImpl</code> (wrapping <code>DataSource</code>).</li>
+<li>Generated <code>BootstrapModule</code> wires the generated repositories and calls <code>installOptionalModule("example.bankwealth.modules.HandwrittenBindingsModule")</code> to discover and install handwritten bindings automatically.</li>
+</ul>
+</li>
+<li><strong>Path 3 · Cross-Aggregate Saga &amp; External Effect Ports (<code>application.process</code> / <code>application.connectors</code> ← <code>infrastructure.bootstrap.*PortBindings</code>)</strong>:<ul>
+<li>Generated <code>BankPaymentPorts</code> and <code>BankTaGateway</code> define typed phase and effect contracts (<code>OperationBinding[Input, Receipt]</code>, <code>CompletionBinding[Original, Result]</code>).</li>
+<li>Generated <code>BankPaymentPortBindings</code> verifies every obligation's <code>implementation.id</code> and <code>version</code> at startup (preventing silent mis-wiring).</li>
+<li>Handwritten <code>BankPaymentBindings</code> and <code>BankTaEffectBindings</code> supply the live actor/TA bindings and are injected into the event-sourced hosts without leaking into orchestration logic.</li>
+</ul>
+</li>
+</ol>
+<h3 id="section-3-5">3.5 DDD and Clean Architecture Principles Behind Every Choice</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Architectural Choice / DDD / Clean Architecture Principle / Engineering Failure Mode Prevented"><table>
+<thead>
+<tr>
+<th scope="col">Architectural Choice</th>
+<th scope="col">DDD / Clean Architecture Principle</th>
+<th scope="col">Engineering Failure Mode Prevented</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nominal VOs &amp; exact decimal <code>Money</code> in <code>domain.values</code></td>
+<td><strong>Ubiquitous Language &amp; Value Object Immutability</strong></td>
+<td>Eliminates primitive obsession (<code>String</code>/<code>Double</code>); prevents swapping <code>AccountId</code> with <code>FundOrderId</code> at compile time and bans floating-point rounding drift.</td>
+</tr>
+<tr>
+<td>Pure <code>Entity</code> + <code>EventHandler</code> + <code>InvariantRule</code> core</td>
+<td><strong>Aggregate as Consistency Boundary</strong></td>
+<td>Every aggregate invariant is deterministically unit-testable with zero cluster or DB; event replay and live commands execute the exact same pure fold.</td>
+</tr>
+<tr>
+<td>Strict separation of <code>Saga</code> (<a href="https://github.com/MadPolaris/saga-core"><code>saga-core</code></a>) and <code>Pipeline</code> (<a href="https://github.com/MadPolaris/monarch-core"><code>monarch-core</code></a> + <a href="https://github.com/MadPolaris/monarch-persistence"><code>monarch-persistence</code></a>)</td>
+<td><strong>Eventual Consistency &amp; Explicit Process Boundaries</strong></td>
+<td><strong>Sagas own transaction boundaries; pipelines own flow order</strong> — preventing ad-hoc distributed transactions hidden inside HTTP handlers or callbacks.</td>
+</tr>
+<tr>
+<td>Inner port traits + <code>modules</code> Composition Root</td>
+<td><strong>Dependency Inversion Principle (DIP) &amp; Hexagonal Architecture</strong></td>
+<td>Swapping DB drivers, serializers, or external TA clients touches only outer adapters while leaving domain rules untouched.</td>
+</tr>
+<tr>
+<td>Event-sourced write side + <code>Akka Projection</code> read side</td>
+<td><strong>CQRS &amp; Event Sourcing</strong></td>
+<td>Write side enforces strict invariants on append-only facts; read side serves pagination and queries independently.</td>
+</tr>
+<tr>
+<td>Physical handwritten isolation (<code>unmanagedSourceDirectories</code>)</td>
+<td><strong>Open/Closed Principle &amp; Explicit Ownership</strong></td>
+<td>Eliminates brittle manual-block merging; truth edits regenerate all 161 files cleanly while preserving all 36 handwritten files and catching contract breaks at compile time.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-4">4. Extending New Code Generators: Integration Seam, Contract Obligations, and AI Agent Specification</h2>
+<p>If you want to build a new generator targeting <strong>Java Spring Boot</strong>, <strong>Kotlin/Ktor</strong>, <strong>Go</strong>, <strong>Rust</strong>, or <strong>TypeScript/NestJS</strong> from the same truth tree, where do you hook in and what must you provide?</p>
+<h3 id="section-4-1">4.1 The Exact Seam: Consume the 14 Compiled Semantic Products, Never Raw YAML</h3>
+<p><strong>Never parse raw YAML files under <code>truth/</code> in a new generator.</strong> Raw YAML includes macro-expansion syntax, split file ownership, and cross-file references. <code>metarch-truthsrc</code> exposes a language-agnostic, statically verified seam: the <strong>14 Compiled Semantic Products</strong> produced by <code>compileProductSet</code>:</p>
+<pre class="code"><code class="language-text">  truth/ (YAML truth tree)
+     │  [Shared Frontend — reuse as-is]  validateTree → roundtrip → compileTreeWithSources
+     ▼
+  canonical.json + sourceIndex
+     │  [Shared Contract Compiler — reuse as-is]  deriveProjectRequest (auto-bindings) → compileProductSet
+     ▼
+  ══════════════ Stable Extension Seam: 14 Compiled Semantic Products (JSON) ══════════════
+  • reference-layout@1        Qualified symbol table for all types, aggregates, commands, events, ports
+  • exact-value-types@1       Exact decimal precision / scale / supported unit constraints
+  • exact-value-codecs@1      Lossless wire &amp; persistence minor-unit codec specs
+  • domain-decision@4         Ordered command pre-guards AST, error codes, event bindings, computation calls
+  • domain-dependencies@6     Complete dependency graph across state, commands, events, and domain services
+  • domain-folds@6            Deterministic event-to-state fold statement ASTs
+  • domain-external-events@2  External event producer &amp; authority contracts
+  • saga-contract@1           Cross-aggregate TCC participants, steps, phases, and compensation static IR
+  • saga-runtime-contract@1   Runtime versions, digests, args &amp; receipt codec pins
+  • execution-contract@1      Monarch finite pipeline plans, input/output slots, and recovery policies
+  • saga-host-contract@2      Saga host entry, association keys, result kinds, and port obligations
+  • effect-host-contract@2    External effect idempotency keys, observation FSM, and reconciliation obligations
+  • artifact-contract@3       Service deployment boundary, HTTP endpoints, projection stores, impl pins
+  • product-design@1          Five-plane product design projections
+  ═════════════════════════════════════════════════════════════════════════════════════════
+     │  [Your new generator implements ONLY these two layers]
+     ├──▶ Layer A · Derivation (lib/derivation/&lt;target&gt;/): Semantic Products → Family Input Contracts
+     └──▶ Layer B · Emitter Families (emitter/families/ &amp; generators/&lt;target&gt;/): Pure Deterministic Renderers
+</code></pre>
+<p>By entering at this seam, every new target generator inherits YAML parsing, lossless roundtrip verification, static type/guard/fold checking, automatic technical binding derivation, SQLite knowledge graph generation, MCP querying, and the 12-check anchor verifier for free.</p>
+<h3 id="section-4-2">4.2 Seven Mandatory Obligations for Any New Code Generator</h3>
+<p>Under <code>metarch-truthsrc</code>'s fail-closed discipline, any new generator under <code>generators/&lt;target-name&gt;/</code> must satisfy seven explicit obligations:</p>
+<ol>
+<li><strong>Manifest &amp; Minimal Footprint Obligation (<code>generator.json</code>)</strong>: Follow <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/generators/scala-cqrs-play-service/generator.json"><code>generators/scala-cqrs-play-service/generator.json</code></a> to declare exact consumed <code>products</code>, versions, <code>producers</code>, <code>artifactKinds</code>, and <code>options</code>. The runtime strict Proxy immediately rejects any undeclared product access (<code>PRODUCT_UNDECLARED</code>).</li>
+<li><strong>Pure Derivation &amp; Fail-Closed Validation Obligation</strong>: Every emitter family must provide <code>checkInput(input)</code> and throw coded diagnostics for invalid identifiers, unbound contexts, or unsupported semantic constructs — <strong>never silently skip a guard or emit <code>// TODO</code> stubs</strong>.</li>
+<li><strong>Byte-Exact Determinism &amp; Golden Parity Obligation</strong>: Register each family via <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/emitter/registry.mjs"><code>emitter/registry.mjs</code></a> with <code>id</code>, <code>familyNumber</code>, <code>inputSchema</code>, <code>goldenRoot</code>, <code>fixtureDir</code>, <code>checkInput</code>, <code>renderAll</code>, and <code>runNegatives</code>. Double-run output must be byte-identical and match the golden spec tree with zero drift.</li>
+<li><strong>Full Provenance, Code Mapping &amp; Dependency Obligation</strong>: Every emitted entry must carry real <code>knowledgeIds</code> (<code>source:&lt;doc&gt;#&lt;pointer&gt;</code>), exact UTF-8 byte-span <code>codeMappings</code>, and file-level <code>deps</code> so <code>truthsrc verify-project</code> (12/12) and Explorer bidirectional navigation stay unbroken.</li>
+<li><strong>Orthogonal Layout &amp; Parameterized Runtime Obligation</strong>: Resolve paths through <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/layout/layout-strategy.mjs"><code>lib/layout/layout-strategy.mjs</code></a> and runtime coordinates through <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/runtime-profile.mjs"><code>lib/runtime-profile.mjs</code></a>; zero business identifiers or hardcoded runtime organization literals are permitted.</li>
+<li><strong>Physical Handwritten Boundary &amp; Composition Root Obligation</strong>: Separate generated outputs from handwritten adapters at the filesystem/module level (never via brittle comment blocks), wiring handwritten implementations back via interfaces and a DI composition root.</li>
+<li><strong>Four-Layer Anti-Hardcoding Gate Obligation</strong>: Pass <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a>, broad lexical audit, non-bank unit generation (<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/test/non-bank-unified-generation.test.mjs"><code>non-bank-unified-generation.test.mjs</code></a>), and full end-to-end compilation &amp; test execution on a zero-bank-vocabulary domain.</li>
+</ol>
+<h3 id="section-4-3">4.3 The Six-Piece Material Pack Required for AI Agent Generator Inference</h3>
+<p>When delegating a new code generator to an AI Agent (Claude Code, Antigravity, Codex), failure rarely comes from template syntax — it comes from <strong>underspecified target architecture and missing compilation oracles</strong>. Assemble these <strong>six concrete materials</strong> before handing off to an AI Agent:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：# / Material / Contents / Why Agents Drift Without It"><table>
+<thead>
+<tr>
+<th scope="col">#</th>
+<th scope="col">Material</th>
+<th scope="col">Contents</th>
+<th scope="col">Why Agents Drift Without It</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>01</strong></td>
+<td><strong>Golden Reference Application</strong></td>
+<td>A minimal, compiling target-stack app authored in a <strong>non-bank domain</strong> (e.g., <code>order</code> or <code>inventory</code>) covering 1 aggregate, VOs, exact decimals, invariant rules, event fold, repository port/impl, read-side projection, DI composition root, and 1 passing test.</td>
+<td>Without a compiling golden tree, Agents oscillate across idioms and library versions. The golden tree IS the executable family spec (F3).</td>
+</tr>
+<tr>
+<td><strong>02</strong></td>
+<td><strong>Machine-Readable Conformance Contract</strong></td>
+<td>Modeled on <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/classic-cqrs-contract.json"><code>classic-cqrs-contract.json</code></a>: allowed top-level layers, forbidden cross-layer import regexes (DIP), per-artifact filename suffixes, required base types, and forbidden constructs.</td>
+<td>Converts architectural review into an instant automated gate the Agent can run after every single family.</td>
+</tr>
+<tr>
+<td><strong>03</strong></td>
+<td><strong>Semantic-to-Target Mapping Spec</strong></td>
+<td>Exact mappings for <code>primitive / exact / record / optional / sequence / map</code>, <code>domain-decision@4</code> guard ASTs, <code>domain-folds@6</code> fold statements, <code>exact-value-codecs</code>, plus an <strong>explicit unsupported-feature rejection list</strong>.</td>
+<td>Eliminates guesswork and defines exact <code>fail-closed</code> boundaries instead of approximate codegen.</td>
+</tr>
+<tr>
+<td><strong>04</strong></td>
+<td><strong>Target Runtime Profile Spec</strong></td>
+<td>Target base traits/interfaces, error container (<code>Result&lt;T, E&gt;</code>, <code>(T, error)</code>, <code>Either</code>), serializer library, DI container conventions, and parameterizable runtime coordinates (<code>organization</code> / <code>packagePrefix</code> / <code>version</code>).</td>
+<td>Prevents scattering hardcoded internal package prefixes or versions across dozens of templates.</td>
+</tr>
+<tr>
+<td><strong>05</strong></td>
+<td><strong>Dual-Domain Compiled Fixtures + Local Compiler Sandbox</strong></td>
+<td>Compiled product JSON fixtures from at least two distinct domains (e.g., <code>bank</code> + <code>commerce</code>) plus local offline access to the target compiler and test runner (<code>mvn test</code> / <code>go test ./...</code> / <code>cargo test</code> / <code>tsc --noEmit</code>).</td>
+<td>A single domain hides hardcoded routing and formatting assumptions; dual domains + a real compiler expose every implicit coupling immediately.</td>
+</tr>
+<tr>
+<td><strong>06</strong></td>
+<td><strong>Agent Harness Rules &amp; Redlines</strong></td>
+<td>Family rollout order, per-family Definition of Done, minimum negative-test battery expectations, redlines against editing tests to pass, and exact verification commands.</td>
+<td>Keeps the Agent in tight, deterministic verification loops instead of declaring premature completion.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-4-4">4.4 Engineering Standards and Four-Layer Verification Gates for AI Agents</h3>
+<p>Once the six-piece material pack is ready, guide the AI Agent with three non-negotiable practices:</p>
+<ol>
+<li><strong>Inside-Out Incremental Family Rollout</strong>:<ul>
+<li><strong>Wave 1 (Pure Domain Core, 0 framework imports)</strong>: <code>value-object</code> → <code>domain-entity</code> → <code>event-handler</code> → <code>aggregate-invariant-rules</code>, immediately verified with pure unit tests.</li>
+<li><strong>Wave 2 (Application Protocols &amp; Ports)</strong>: <code>protocol-layer</code> → <code>aggregate-layer</code> → <code>aggregate-repository</code> → <code>external-event-bridge</code>.</li>
+<li><strong>Wave 3 (Infrastructure Persistence &amp; Assembly)</strong>: <code>proto-schema</code> / <code>persistence-schema</code> → <code>proto-converter</code> → <code>serialization-adapter</code> → <code>aggregate-bootstrap</code> → <code>service-runtime</code> → <code>project-scaffold</code>.</li>
+<li><strong>Wave 4 (Distributed Coordination, when needed)</strong>: <code>effect-face</code> → <code>pipeline-invocation-face</code>.</li>
+</ul>
+</li>
+<li><strong>Per-Family Definition of Done (DoD)</strong>:<ul>
+<li>Registered in <code>emitter/registry.mjs</code> with <code>node emitter/parity.mjs</code> green;</li>
+<li>Includes a directed <code>runNegatives</code> rejection battery (missing fields, unsafe identifiers, unbound contexts, unsupported shapes);</li>
+<li>Passes <code>npm run lint</code> (<code>arch/no-business-names</code>, <code>arch/no-hardcoded-runtime</code>, <code>arch/no-hardcoded-app-path</code>) with 0 issues;</li>
+<li>Passes dual-domain rendering (<code>commerce</code> + custom <code>runtimeProfile</code>) and compiles cleanly under the real target compiler.</li>
+</ul>
+</li>
+<li><strong>Four-Layer Anti-Hardcoding Verification</strong>:<ul>
+<li><strong>Layer 1</strong>: Static lint gates blocking known business terms and hardcoded runtime coordinates;</li>
+<li><strong>Layer 2</strong>: Broad adversarial lexical audit catching implicit semantic routing regexes and escaped literals;</li>
+<li><strong>Layer 3</strong>: Cross-domain black-box unit generation with custom <code>runtimeProfile</code>;</li>
+<li><strong>Layer 4 (Gold Standard)</strong>: End-to-end <code>truthsrc generate-project</code> → <code>truthsrc verify-project</code> (12/12) → full target compiler &amp; test suite pass on a brand-new non-bank domain.</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-5">5. The Next Big Story: Advancing to Controlled EARS 1.0 and Single-Hop SMT Verification</h2>
+<p>Everything above closes the <strong>downstream deterministic engineering loop</strong>: from a structured truth tree, the compiler auto-derives technical bindings, emits a compiling DDD Onion Architecture service, proves byte-level bidirectional lineage, runs live Docker verification of cross-aggregate transactions, and provides a clean contract for extending new target generators.</p>
+<p>Yet one deeper upstream question remains: <strong>what if the business rules written into the truth tree themselves contain hidden logical contradictions, overlapping conditions, or uncovered edge cases?</strong> A faithful deterministic compiler will faithfully compile a flawed rule into flawed code.</p>
+<p>That is the exact problem tackled by <code>co-arising</code>'s next big story — the <a href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)</a>:</p>
+<pre class="code"><code class="language-text">  [Upstream: Mathematically Verified Truth]          [Downstream: Deterministic Onion Architecture Loop]
+  ─────────────────────────────────────────          ───────────────────────────────────────────────────
+  Controlled EARS 1.0 Single Truth Source            14 Compiled Semantic Products (Auto-Derived Bindings)
+     ├──▶ Style E (PM-friendly prose AC)                    │
+     ├──▶ Style B (DMN decision table view)                 ├──▶ 16+ Unified Emitter Families (Onion Code)
+     ├──▶ SMT-LIB 2 (.smt2) ──▶ Z3/cvc5 solver              ├──▶ 12-Gate Bidirectional Anchors &amp; Explorer
+     │      ├── Conflict/Gap ──▶ A/B Clarification Card     ├──▶ Handwritten Isolation Zone + DI Root
+     │      └── All-Green    ──▶ Boundary Witnesses         └──▶ Live Docker Demo + Multi-Stack Extension
+     └──▶ TestIR ──▶ Locked BDD / ScalaTest ──▶ @cloze TDD
+</code></pre>
+<p>When upstream <strong>Controlled EARS 1.0 + single-hop SMT verification</strong> meets downstream <strong>deterministic Onion Architecture generation + bidirectional anchoring + multi-stack generator extension</strong>, human-and-Agent software engineering reaches a clean division of labor: humans author concise, reviewable domain truth; SMT solvers prove rule consistency before code exists; deterministic emitters build zero-drift onion skeletons; and AI Agents implement and evolve bounded adapters inside locked interfaces and BDD guardrails.</p>
+<h2 id="section-6">6. Reference Repositories and Key Source Entrypoints</h2>
+<ul>
+<li><strong>Bank Wealth Teaching &amp; Verification Repo</strong>: <a href="https://github.com/co-arising/bank-wealth-demo"><code>co-arising/bank-wealth-demo</code></a> (Docker quick-start script &amp; playbooks in <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/docs/DEMO-QUICK-START.md"><code>docs/DEMO-QUICK-START.md</code></a>)</li>
+<li><strong>Truth Compiler, Knowledge Graph &amp; Unified Code Generator</strong>: <a href="https://github.com/co-arising/metarch-truthsrc"><code>co-arising/metarch-truthsrc</code></a><ul>
+<li>Automatic technical binding derivation: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive-bindings.mjs"><code>lib/project/derive-bindings.mjs</code></a></li>
+<li>Orthogonal layout strategy (single-module / multi-module): <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/layout/layout-strategy.mjs"><code>lib/layout/layout-strategy.mjs</code></a></li>
+<li>Onion Architecture &amp; DIP static auditor: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/audit.mjs"><code>lib/conformance/audit.mjs</code></a> &amp; <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/classic-cqrs-contract.json"><code>classic-cqrs-contract.json</code></a></li>
+<li>Unified emitter registry &amp; anti-hardcoding lint gate: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/emitter/registry.mjs"><code>emitter/registry.mjs</code></a> &amp; <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a></li>
+</ul>
+</li>
+<li><strong>Open-Source Runtime Engines</strong>: <a href="https://github.com/MadPolaris/saga-core"><code>MadPolaris/saga-core</code></a>, <a href="https://github.com/MadPolaris/monarch-core"><code>MadPolaris/monarch-core</code></a>, <a href="https://github.com/MadPolaris/monarch-persistence"><code>MadPolaris/monarch-persistence</code></a></li>
+<li><strong>Interactive Explorer &amp; Status Ledger</strong>: <a href="https://co-arising.github.io/explorer/?view=code#code">Explorer Graph &amp; Code View</a> · <a href="https://co-arising.github.io/guide/">Hands-On Guide</a> · <a href="https://co-arising.github.io/status/">Facts &amp; Status Ledger</a></li>
+<li><strong>Next Big Story (Design Specification)</strong>: <a href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)</a></li>
+</ul></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Design specification</span> · <time datetime="2026-11-23">2026-11-23</time></p>
+      <h3><a href="/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)</a></h3>
+      <p class="article-deck">The complete language specification for the controlled-EARS single truth source with single-hop deterministic SMT-LIB 2 verification: bilingual isomorphic grammar, four bank-wealth-demo worked examples, read-only projections and locked BDD tests — the design baseline pending implementation.</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

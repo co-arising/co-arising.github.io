@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>bank-wealth-demo 实战全景指南：从真源到运行时试玩、洋葱架构拆解与 AI 时代代码生成器扩展规范 — co-arising</title>
+  <meta name="description" content="面向 bank-wealth-demo 的端到端 Quick Start（真源、生成、回锚与 5 套 Docker 运行时玩法）、生成代码的洋葱架构与 DDD/DIP 原理深拆，以及基于编译语义产物的多栈代码生成器扩展与 AI Agent 物料规范。" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="bank-wealth-demo 实战全景指南：从真源到运行时试玩、洋葱架构拆解与 AI 时代代码生成器扩展规范" />
+  <meta property="og:description" content="面向 bank-wealth-demo 的端到端 Quick Start（真源、生成、回锚与 5 套 Docker 运行时玩法）、生成代码的洋葱架构与 DDD/DIP 原理深拆，以及基于编译语义产物的多栈代码生成器扩展与 AI Agent 物料规范。" />
+  <meta property="og:url" content="https://co-arising.github.io/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a> · <a href="/zh/articles/" aria-current="page">技术观察</a> · <a class="nav-link" href="/articles/bank-wealth-quickstart-architecture-extensibility-20261125/" lang="en" rel="alternate" hreflang="en">EN</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript 已关闭——正文、目录、链接与下载仍可使用。</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="面包屑"><a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a> / <span aria-current="page">工程实践</span></nav>
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-25">2026-11-25</time> · 中文原文</p>
+      <h1>bank-wealth-demo 实战全景指南：从真源到运行时试玩、洋葱架构拆解与 AI 时代代码生成器扩展规范</h1>
+      <p class="article-deck">面向 bank-wealth-demo 的端到端 Quick Start（真源、生成、回锚与 5 套 Docker 运行时玩法）、生成代码的洋葱架构与 DDD/DIP 原理深拆，以及基于编译语义产物的多栈代码生成器扩展与 AI Agent 物料规范。</p>
+      <div class="article-actions"><a href="/content/articles/bank-wealth-quickstart-architecture-extensibility-20261125.md" download="bank-wealth-quickstart-architecture-extensibility-20261125.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">Read in English</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是面向 bank-wealth-demo 参考项目的端到端实战指南、洋葱架构源码拆解与代码生成器扩展规范；文中命令、产物类型与架构边界对照当前仓库版本整理，正式验收记录请以状态页为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. 为什么从 bank-wealth-demo 入手：一条完整可验证的工程闭环</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. Quick Start：从真源、生成代码、回锚到 Docker 运行时试玩</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. 生成代码的洋葱架构全景：分层、Artifact Type 与依赖倒置</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. 扩展新代码生成器指南：切入点、契约义务与 AI Agent 物料规范</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. 下一个大故事：向受控 EARS 1.0 与 SMT 单跳验证演进</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. 参考仓库与核心源码入口</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">阅读全文</p>
+      </aside>
+      <article id="article-body" class="article-body"><p>本文是一份面向架构师、领域工程师与 AI Agent 协作团队的端到端实战手册，完整串起 <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> 与 <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> 的四条核心主线：</p>
+<ol>
+<li><strong>Quick Start 全链路试玩</strong>：从真源树校验、形式化产物编译、自动推导技术绑定、生成 Play/Akka CQRS 工程、12 项回锚核验，到 Docker 拉起 MongoDB 4.4 + MySQL 8.0 亲手演练五大金融协作剧本。</li>
+<li><strong>生成代码洋葱架构深度拆解</strong>：逐层列出 <code>domain</code>、<code>application</code>、<code>interfaces</code>、<code>infrastructure</code>、<code>modules</code> 中的全部 Artifact Type，阐明外层如何单向依赖内层、手写与基础设施实现如何通过接口依赖注入进内层，以及每一处设计背后的 DDD 原则依据。</li>
+<li><strong>扩展其他代码生成器规范</strong>：指明从真源流水线哪一步的编译产物切入、扩展者必须履行的七项契约义务，以及<strong>凑齐哪六类物料后即可交给 AI Agent 完成新语言/新框架代码生成器的高质量推理与落地</strong>。</li>
+<li><strong>衔接下一个大故事</strong>：说明这套下游确定性生成体系如何与上游的<a href="https://co-arising.github.io/zh/articles/co-arising-ears-spec-20261123/">《co-arising EARS 1.0 技术规格说明书》</a>拼装成“数学验证上游 + 确定性洋葱架构下游”的完整闭环。</li>
+</ol>
+<blockquote>
+<p><strong>诚实边界说明</strong>：<code>bank-wealth-demo</code> 是一个<strong>本地教学与架构验证示例</strong>，使用内置 Mock TA 模拟器与固定本地演示凭据，不移动真实资金，不代表生产级银行认证；关于历史采集、移址技术验收与尚未关闭的公开交付事项，请始终以<a href="https://co-arising.github.io/zh/status/">状态台账</a>为准。</p>
+</blockquote>
+<h2 id="section-1">1. 为什么从 bank-wealth-demo 入手：一条完整可验证的工程闭环</h2>
+<p>在常规开发中，“需求文档”、“领域模型”、“服务代码”、“分布式事务脚本”和“测试用例”往往各自演进、彼此漂移。<code>co-arising</code> 采用的工程闭环把它们收敛到一条确定性流水线中：</p>
+<pre class="code"><code class="language-text">  [1. 业务真源树 truth/bank-wealth/]     161 个可读 YAML 原子（3 聚合 · 2 Saga · 4 Pipeline · 149 条 @rule）
+                │
+                ▼  truthsrc validate + roundtrip（结构与往返零损耗闸门）
+  [2. 规范模型 &amp; 知识图谱]               canonical.json + SQLite 知识图谱（392 节点 / 413 边，可查影响半径）
+                │
+                ▼  deriveProjectRequest（含 Saga / Runtime / Execution 技术绑定自动推导）+ compileProductSet
+  [3. 14 个强类型形式化语义产物]         reference-layout / domain-decision / domain-folds / saga-runtime / execution ...
+                │
+                ▼  scala-cqrs-play-service（16 个统一 Emitter Family + ReadSide 推导）
+  [4. 161 个洋葱架构生成文件]            + 36 个手写隔离区文件（unmanagedSourceDirectories，重生成绝不覆盖）
+                │
+                ▼  truthsrc verify-project（12 项一致性检查 + 5,090 个回锚位置 / 629 个精确字节 Span）
+  [5. 编译、单测与 Docker 运行时试玩]    sbt Compile/compile test（370 源文件 0 错误 · 24/24 单测）+ 浏览器五大剧本
+</code></pre>
+<p>值得特别注意的是最新一次架构收敛：<strong>作者不再需要手写冗长的低层 JSON 绑定文件</strong>。早期的 <code>bindings/implementation/*.json</code>（8 个文件、超 2,100 行样板配置）已由 <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> 中的 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive-bindings.mjs"><code>lib/project/derive-bindings.mjs</code></a> 实现全自动推导——如今 <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/truthsrc.project.json"><code>bank-wealth-demo/truthsrc.project.json</code></a> 只需声明真源路径、精确十进制类型、运行时坐标与手写源码根目录即可。</p>
+<h2 id="section-2">2. Quick Start：从真源、生成代码、回锚到 Docker 运行时试玩</h2>
+<h3 id="section-2-1">2.1 环境准备与仓库就位</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：组件 / 要求 / 作用"><table>
+<thead>
+<tr>
+<th scope="col">组件</th>
+<th scope="col">要求</th>
+<th scope="col">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Node.js</strong></td>
+<td><strong>Node ≥ 22.13.0</strong>（内置 <code>node:sqlite</code>）</td>
+<td>真源校验、图谱构建、代码生成、回锚验证与一键启动器</td>
+</tr>
+<tr>
+<td><strong>JDK</strong></td>
+<td><strong>JDK 11</strong>（如 Eclipse Temurin / AdoptOpenJDK 11）</td>
+<td>Play 2.8 / Scala 2.13 编译与运行</td>
+</tr>
+<tr>
+<td><strong>sbt</strong></td>
+<td><strong>sbt 1.x</strong></td>
+<td>编译 ScalaPB <code>.proto</code>、Scala 源码并打包 <code>stage</code> 可执行分发</td>
+</tr>
+<tr>
+<td><strong>Docker</strong></td>
+<td>Docker Desktop / Engine（支持 <code>docker compose</code>）</td>
+<td>拉起隔离的 <code>mongo:4.4</code>（事件库）与 <code>mysql:8.0</code>（读侧投影库）</td>
+</tr>
+<tr>
+<td><strong>配对仓库</strong></td>
+<td>同级目录下存在 <code>metarch-truthsrc</code> 与 <code>bank-wealth-demo</code></td>
+<td>保持工具链与示例项目版本配对</td>
+</tr>
+</tbody>
+</table></div>
+<p>在同一工作区父目录检出两个仓库：</p>
+<pre class="code"><code class="language-bash">export CO_ARISING_WS="$PWD"
+git clone https://github.com/co-arising/metarch-truthsrc.git
+git clone https://github.com/co-arising/bank-wealth-demo.git
+export TRUTHSRC_CLI="$CO_ARISING_WS/metarch-truthsrc/bin/truthsrc.js"
+cd "$CO_ARISING_WS/bank-wealth-demo"
+</code></pre>
+<blockquote>
+<p><strong>为何 MongoDB 固定为 4.4？</strong> 事件库驱动 <code>akka-persistence-mongo-rxmongo 3.0.8</code>（ReactiveMongo 1.0.10）依赖 MongoDB 4.4 线协议。仓库根目录的 <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/docker-compose.demo.yml"><code>docker-compose.demo.yml</code></a> 已将容器端口隔离映射到 <code>127.0.0.1:19001</code>（MongoDB）与 <code>127.0.0.1:19002</code>（MySQL），不会与本机默认 <code>27017</code>/<code>3306</code> 冲突。</p>
+</blockquote>
+<h3 id="section-2-2">2.2 第一步：校验真源树并构建知识图谱</h3>
+<p>在进入任何代码生成或 JVM 构建之前，仅需 Node.js 即可验证整个业务真源树的语法、语义约束与往返无损性：</p>
+<pre class="code"><code class="language-bash"># 1. 真源校验（0 hard findings）+ 往返测试（160 个业务原子逐字节一致）
+npm run validate
+
+# 2. 编译全部 14 个形式化语义产物（Saga / Runtime / Execution 绑定自动推导）
+npm run compile
+
+# 3. 导出本地 SQLite 知识图谱（可在 CLI、MCP 或浏览器 Explorer 中查询）
+node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out bank.graph.sqlite
+</code></pre>
+<p>你也可以免安装直接在在线 <a href="https://co-arising.github.io/zh/explorer/">Explorer 图谱视图</a> 中探索同一份真源快照的影响半径（如 <code>SipInstallmentFailed</code>）、数据血缘与不变量清单。</p>
+<h3 id="section-2-3">2.3 第二步：自动推导绑定、生成代码并编译测试</h3>
+<pre class="code"><code class="language-bash"># 1. 准备固定 0.3.0 运行时引擎（saga-core / monarch-persistence / common-core）并生成到 generated/current/
+npm run project
+
+# 2. 编译全部 12 份 .proto + 370 份 Scala 源码，执行 5 套件 / 24 项生成单元测试，并打 stage 分发包
+(cd generated/current &amp;&amp; sbt --batch "Compile/compile" test stage)
+</code></pre>
+<p>执行完成后，你可以观察到两个关键事实：</p>
+<ul>
+<li><strong>生成区与手写区物理隔离</strong>：<code>generated/current/</code> 下共生成 <strong>161 个文件</strong>；36 个手写实现文件位于仓库根 <a href="https://github.com/co-arising/bank-wealth-demo/tree/main/handwritten/scala"><code>handwritten/scala/</code></a>，通过 <code>build.sbt</code> 的 <code>unmanagedSourceDirectories</code> 挂载参与编译，重新执行 <code>npm run project</code> 绝不会覆盖手写代码。</li>
+<li><strong>测试套件全绿</strong>：<code>UnitTestMain</code> 验证测试隔离配置（<code>journal=testkit</code>, <code>snapshot=testkit</code>, <code>network=denied</code>），随后 5 个 ScalaTest 套件（<code>GeneratedActorStateSpec</code>、<code>GeneratedDomainRoundtripSpec</code>、<code>GeneratedFiniteHostSpec</code>、<code>GeneratedServiceConfigurationSpec</code>、<code>GeneratedUnitStorageSpec</code>）共 <strong>24/24 项测试全部通过</strong>。</li>
+</ul>
+<h3 id="section-2-4">2.4 第三步：验证双向回锚与源码血缘</h3>
+<p>代码生成之后，如何证明“每一段生成的规则/事件/端口代码确实来自某条真源声明，且未被悄悄篡改”？运行 12 项门禁回锚验证：</p>
+<pre class="code"><code class="language-bash"># 1. 全量 12 项项目回锚校验（检查输入指纹、图谱一致性、文件归属、1310 条知识键、629 个精确 Span、0 未解析键）
+node "$TRUTHSRC_CLI" verify-project \
+  --project truthsrc.project.json \
+  --out generated/current
+
+# 2. 正向查询：从业务命令 ReserveFunds 定位所有生成代码位置与精确字节区间
+node "$TRUTHSRC_CLI" query-project \
+  --project truthsrc.project.json \
+  --out generated/current \
+  --knowledge ReserveFunds \
+  --format human
+
+# 3. 反向查询：从真实生成文件行号反查对应的业务真源声明与原子路径
+node "$TRUTHSRC_CLI" query-project \
+  --project truthsrc.project.json \
+  --out generated/current \
+  --file app/example/bankwealth/domain/invariants/CreditBalanceRules.scala \
+  --line 18 \
+  --format human
+</code></pre>
+<p>若想在浏览器里直观体验“点击真源 → 高亮生成 Scala 代码 → 点击任意代码行反查真源”，直接打开 <a href="https://co-arising.github.io/zh/explorer/?view=code#code">Explorer 代码视图</a>。当前已发布的公开快照包含 <strong>358 个文件</strong>（161 个纯业务 YAML 真源 + 161 个生成文件 + 36 个手写实现，0 隐藏文件），每一处 <code>@knowledge</code> 注释都带着确定性内容哈希与精确字节区间的双重核验。</p>
+<h3 id="section-2-5">2.5 第四步：Docker 拉起运行时并执行一键 Smoke 自检</h3>
+<pre class="code"><code class="language-bash"># 1. 拉起 MongoDB 4.4 + MySQL 8.0 容器（等待约 10–15 秒至两者均为 healthy）
+docker compose -f docker-compose.demo.yml up -d
+docker compose -f docker-compose.demo.yml ps
+
+# 2. 一键全链路端到端 Smoke 自检（自动分配隔离 namespace，完成后自动清理）
+npm run demo:smoke
+</code></pre>
+<p><code>npm run demo:smoke</code> 会在真实的 Play HTTP 服务 + MongoDB + MySQL + 内置 Mock TA 子进程上执行：</p>
+<ul>
+<li>浏览器入口 <code>/bank/v1</code> 与客户端脚本 <code>/bank/v1/client-script</code> 健康校验；</li>
+<li><strong>21 项安全负例检查</strong>（未登录、越权角色、缺失/错误 CSRF、非法 Origin、防客户端注入内部字段）；</li>
+<li><strong>51 次完整业务流 HTTP 请求</strong>（100 元现金申购 + 相同 <code>clientRequestId</code> 幂等重放 + 同 ID 异参数 <code>409 Conflict</code> + 业务时钟推进后 TA 确认 <code>80.0000</code> 份 + SIP 定投创建/暂停/恢复/2 期触发 + 最终账户资金守恒核对：<code>customer=88000</code> 分、<code>collection=12000</code> 分，总和恒等于 <code>100000</code> 分）。</li>
+</ul>
+<h3 id="section-2-6">2.6 第五步：浏览器交互式试玩——五大核心业务剧本</h3>
+<pre class="code"><code class="language-bash"># 启动交互式演示服务（默认 confirmed 场景，监听 http://127.0.0.1:19000/bank/v1）
+npm run demo:start
+</code></pre>
+<p>打开 <strong><code>http://127.0.0.1:19000/bank/v1</code></strong>（建议开两个标签页分别登录客户与运营角色）：</p>
+<ul>
+<li><strong>Customer 凭据</strong>：Bearer <code>demo-customer-token</code> / CSRF <code>demo-customer-csrf</code>（初始种子资金 <code>100000</code> 分 = <code>1,000.00 CNY</code>）</li>
+<li><strong>Operator 凭据</strong>：Bearer <code>demo-operator-token</code> / CSRF <code>demo-operator-csrf</code>（负责推进业务时钟与查看待处理操作）</li>
+</ul>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：玩法剧本 / 启动命令与操作路径 / 核心观察点（验证哪条业务真源）"><table>
+<thead>
+<tr>
+<th scope="col">玩法剧本</th>
+<th scope="col">启动命令与操作路径</th>
+<th scope="col">核心观察点（验证哪条业务真源）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>剧本 A · 现金申购与 TA 份额确认</strong></td>
+<td>默认 <code>npm run demo:start</code> → 客户提交 <code>clientRequestId=demo-cash-001</code>, <code>fundCode=fund</code>, <code>minorUnits=10000</code> → 查询 <strong>Fund order</strong> → 运营推进 <code>slot=1</code> → 再次查询 <strong>Fund order</strong></td>
+<td><strong>付款成功 ≠ 投资成功</strong>：推进时钟前 <code>paymentStatus=succeeded</code>、<code>taStatus=accepted</code>（已扣 100 元但未得份额）；推进后 <code>taStatus=confirmed</code>，获得 <code>shares="80.0000"</code>, <code>nav="1.2345"</code>。</td>
+</tr>
+<tr>
+<td><strong>剧本 B · TA 拒绝与独立退款 Saga</strong></td>
+<td><code>Ctrl+C</code> 停止后执行 <code>node tools/demo-start.mjs --scenario rejected --namespace demo_refund</code> → 客户申购 <code>10000</code> 分 → 运营推进 <code>slot=1</code> → 查询订单与余额</td>
+<td><strong>独立退款 ≠ 补偿已提交付款</strong>：<code>paymentStatus=succeeded</code>、<code>taStatus=rejected</code>、<code>refundStatus=succeeded</code>，且生成全新的 <code>refundOperationId</code>（独立事务），客户余额完整退回 <code>100000</code> 分。</td>
+</tr>
+<tr>
+<td><strong>剧本 C · 有限定投计划（SIP）</strong></td>
+<td><code>confirmed</code> 场景下客户 <strong>Create SIP plan</strong>（<code>minorUnits=1000</code>, <code>effectiveSlot=0</code>, <code>dueSlots=10, 20</code>）→ 尝试 <strong>Pause / Resume</strong> → 运营依次推进 <code>slot=10, 20, 21</code></td>
+<td><strong>复用同一条现金规则</strong>：SIP 绝不另起第二套扣款路径；暂停期间命中的时隙按显式规则分类跳过；恢复后两期均成功扣款并获得 TA 确认（<code>successTotal=2</code>）。</td>
+</tr>
+<tr>
+<td><strong>剧本 D · 未知结果与重复提交对抗</strong></td>
+<td>启动 <code>--scenario unknown</code> 或 <code>--scenario duplicate-conflicting</code>；或在页面用同一个 <code>clientRequestId</code> 改金额再次提交</td>
+<td><strong>绝不把 Unknown 改写成失败或成功</strong>：未知态保持显式待人工核对，绝不隐式重试扣款；相同 <code>clientRequestId</code> + 相同参数幂等重放，改参数直接 <code>409 Conflict</code> 拒绝。</td>
+</tr>
+<tr>
+<td><strong>剧本 E · 多命名空间并行实验与清理</strong></td>
+<td>追加 <code>--namespace exp_a</code> / <code>--namespace exp_b</code> 随时开全新实验空间；完成后 <code>docker compose -f docker-compose.demo.yml down -v</code></td>
+<td>隔离实验互不污染；更多命令行选项详见仓库内的 <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/docs/DEMO-QUICK-START.md"><code>DEMO-QUICK-START.md</code></a>。</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-3">3. 生成代码的洋葱架构全景：分层、Artifact Type 与依赖倒置</h2>
+<p><code>metarch-truthsrc</code> 当前的 <code>scala-cqrs-play-service</code> 生成器不是把所有类平铺在一个包里，而是严格按照 <strong>洋葱架构（Onion Architecture / Hexagonal Ports &amp; Adapters）+ 经典 CQRS/ES</strong> 拓扑生成代码，并由 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/audit.mjs"><code>lib/conformance/audit.mjs</code></a> 中的四道静态一致性闸门守护。</p>
+<h3 id="section-3-1">3.1 四层洋葱同心圆与组合根全景</h3>
+<pre class="code"><code class="language-text">  ┌───────────────────────────────────────────────────────────────────────────────────┐
+  │  第 5 层 · modules（组合根 Composition Root — 唯一把接口与实现连线的装配层）       │
+  │    • BootstrapModule (生成)：绑定生成仓储实现 + 反射加载可选 HandwrittenBindings  │
+  │    • HandwrittenBindingsModule (手写)：注入领域计算、读侧仓储、DataSource、外部权 │
+  │  ┌─────────────────────────────────────────────────────────────────────────────┐  │
+  │  │  第 4 层 · infrastructure（基础设施适配层）   │  第 3 层 · interfaces（入口）│  │
+  │  │    • repositories.{aggregate,projection}      │    • interfaces.api (生成)  │  │
+  │  │    • persistence / converters / protobuf      │      ApiCommands/Wire/Keys  │  │
+  │  │    • process (Host/HostIO) &amp; connectors       │    • interfaces.web (手写)  │  │
+  │  │    • bootstrap (Sharding/Daemon/PlayLoader)   │      Controllers/Pages/Json │  │
+  │  │  ┌───────────────────────────────────────────────────────────────────────┐  │  │
+  │  │  │  第 2 层 · application（应用编排与端口层 — 零 infrastructure/protobuf）│  │  │
+  │  │  │    • aggregates.{Protocol,Aggregate,Behaviors,CommandHelpers,Repo端口} │  │  │
+  │  │  │    • process.&lt;flow&gt;.{SagaDefinition,Execution,Ports端口} &amp; protocol    │  │  │
+  │  │  │    • connectors.{Gateway端口,EffectProtocol}                           │  │  │
+  │  │  │    • readmodels.{Views,Projection,ProjectionHandler,ReadsideRepo端口}  │  │  │
+  │  │  │  ┌─────────────────────────────────────────────────────────────────┐  │  │  │
+  │  │  │  │  第 1 层 · domain（领域内核 — 零 Akka/Play/IO · 纯函数无异常）   │  │  │  │
+  │  │  │  │    • domain.values（名义值对象 + 精确十进制 Money / Amount）    │  │  │  │
+  │  │  │  │    • domain.entities &amp; behaviors（State/Event ADT + 纯 Fold）   │  │  │  │
+  │  │  │  │    • domain.invariants &amp; params（InvariantRule + @knowledge）   │  │  │  │
+  │  │  │  │    • domain.services（纯计算端口 trait *Computations）          │  │  │  │
+  │  │  │  └─────────────────────────────────────────────────────────────────┘  │  │  │
+  │  │  └───────────────────────────────────────────────────────────────────────┘  │  │
+  │  └─────────────────────────────────────────────────────────────────────────────┘  │
+  └───────────────────────────────────────────────────────────────────────────────────┘
+      依赖箭头严格向内：modules ──▶ infrastructure &amp; interfaces ──▶ application ──▶ domain
+</code></pre>
+<p>同时，物理目录布局与逻辑包布局通过 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/layout/layout-strategy.mjs"><code>lib/layout/layout-strategy.mjs</code></a> 正交解耦：同一套逻辑洋葱包结构既可以落盘为单模块 Play 目录（<code>app/example/&lt;ctx&gt;/...</code>），也可以切换为五模块 SBT 目录（<code>domain/</code>、<code>application/</code>、<code>interfaces/</code>、<code>infrastructure/</code>、<code>bootstrap/</code>）而保持每一行 <code>package</code> 与 <code>import</code> 不变。</p>
+<h3 id="section-3-2">3.2 逐层 Artifact Type 清单与职责边界</h3>
+<p>以 <code>bank-wealth-demo/generated/current</code> 实际产出的 161 个文件与 36 个手写文件为例，每一层的 Artifact Type 及其归属如下：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：层次 / 包路径 / Artifact Type / 示例文件 / 来源 / 核心职责"><table>
+<thead>
+<tr>
+<th scope="col">层次</th>
+<th scope="col">包路径</th>
+<th scope="col">Artifact Type</th>
+<th scope="col">示例文件</th>
+<th scope="col">来源</th>
+<th scope="col">核心职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Domain（内核）</strong></td>
+<td><code>domain.values</code></td>
+<td><code>value-object</code></td>
+<td><code>Money.scala</code>, <code>AccountId.scala</code>, <code>FundOrderId.scala</code></td>
+<td>生成</td>
+<td>不可变名义值对象；精确十进制类型携带 <code>scale/precision/SupportedUnits</code> 与无损算术，返回 <code>Either[iMadzError, T]</code></td>
+</tr>
+<tr>
+<td><strong>Domain（内核）</strong></td>
+<td><code>domain.entities</code></td>
+<td><code>domain-entity</code></td>
+<td><code>CreditBalanceEntity.scala</code>, <code>FundOrderEntity.scala</code>, <code>SipPlanEntity.scala</code></td>
+<td>生成</td>
+<td>聚合的纯 <code>State</code> case class、<code>Event</code> sealed trait（继承 <code>CborSerializable</code>）与 <code>empty</code> 初始态</td>
+</tr>
+<tr>
+<td><strong>Domain（内核）</strong></td>
+<td><code>domain.entities.behaviors</code></td>
+<td><code>event-handler</code></td>
+<td><code>*EventHandler.scala</code></td>
+<td>生成</td>
+<td>纯事件折叠函数 <code>applyEvent(state, event): State</code>，只读事件字段，绝不访问外部时钟或 IO</td>
+</tr>
+<tr>
+<td><strong>Domain（内核）</strong></td>
+<td><code>domain.invariants</code> &amp; <code>.params</code></td>
+<td><code>invariant-rule</code>, <code>rule-params</code></td>
+<td><code>*Rules.scala</code>, <code>*RuleParams.scala</code></td>
+<td>生成</td>
+<td>继承 <code>InvariantRule</code> 的命令前置守卫与事件后置不变量，每条规则携带精确 <code>@knowledge</code> 锚点</td>
+</tr>
+<tr>
+<td><strong>Domain（内核）</strong></td>
+<td><code>domain.services</code></td>
+<td><code>domain-service</code>（端口）</td>
+<td><code>CreditBalanceComputations.scala</code>, <code>FundOrderComputations.scala</code></td>
+<td>生成接口 / 手写实现</td>
+<td>继承 <code>DomainService</code> 的纯领域计算端口 trait，只声明 <code>Either[iMadzError, T]</code> 契约，具体实现放在手写隔离区</td>
+</tr>
+<tr>
+<td><strong>Application（用例）</strong></td>
+<td><code>application.aggregates</code></td>
+<td><code>aggregate-protocol</code>, <code>aggregate-root</code>, <code>aggregate-factory</code></td>
+<td><code>*Protocol.scala</code>, <code>*Aggregate.scala</code>, <code>*AggregateFactory.scala</code></td>
+<td>生成</td>
+<td>命令/回复协议 ADT、Akka Typed <code>EntityTypeKey</code> 与分片事件标签（<code>tags</code>）、聚合工厂</td>
+</tr>
+<tr>
+<td><strong>Application（用例）</strong></td>
+<td><code>application.aggregates.behaviors</code></td>
+<td><code>command-helper</code>, <code>aggregate-behavior</code>, <code>external-event-bridge</code></td>
+<td><code>*CommandHelpers.scala</code>, <code>*Behaviors.scala</code>, <code>FundOrderExternalEvents.scala</code></td>
+<td>生成</td>
+<td>通过 <code>CommandHelper</code> + <code>runReplyingPolicy</code> 编排“校验不变量 → 产出事件 → 折叠回复”；外部事件桥接校验权威来源</td>
+</tr>
+<tr>
+<td><strong>Application（用例）</strong></td>
+<td><code>application.aggregates.repository</code></td>
+<td><code>aggregate-repository-port</code></td>
+<td><code>CreditBalanceRepository.scala</code>, <code>FundOrderRepository.scala</code></td>
+<td>生成接口</td>
+<td>聚合仓储<strong>端口 trait</strong>（<code>find(id): EntityRef[Command]</code>），应用层只面向该接口编程</td>
+</tr>
+<tr>
+<td><strong>Application（用例）</strong></td>
+<td><code>application.process.&lt;flow&gt;</code> &amp; <code>.protocol</code></td>
+<td><code>saga-definition</code>, <code>execution-plan</code>, <code>process-ports</code>, <code>process-messages</code></td>
+<td><code>BankPaymentSagaDefinition.scala</code>, <code>BankCashPaymentExecution.scala</code>, <code>BankPaymentPorts.scala</code>, <code>BankPaymentMessages.scala</code>, <code>*Step.scala</code></td>
+<td>生成</td>
+<td>跨聚合 TCC Saga 定义（固定版本与摘要）、Monarch 有限状态机执行计划、阶段端口接口及协议消息伴生模块</td>
+</tr>
+<tr>
+<td><strong>Application（用例）</strong></td>
+<td><code>application.connectors</code></td>
+<td><code>connector-gateway-port</code>, <code>connector-protocol</code></td>
+<td><code>BankTaGateway.scala</code>, <code>BankTaEffectProtocol.scala</code>, <code>BankSipDispatchGateway.scala</code></td>
+<td>生成接口</td>
+<td>外部副作用（TA 提交、SIP 派发）的纯应用端口与观察/对账协议 DTO</td>
+</tr>
+<tr>
+<td><strong>Application（用例）</strong></td>
+<td><code>application.readmodels</code></td>
+<td><code>readmodel-views</code>, <code>projection</code>, <code>projection-handler</code>, <code>readside-repo-port</code></td>
+<td><code>ReadModelViews.scala</code>, <code>BankJournalReadsideProjection.scala</code>, <code>*ProjectionHandler.scala</code>, <code>*Repository.scala</code></td>
+<td>生成</td>
+<td>读侧视图 DTO、Akka <code>JdbcProjection.exactlyOnce</code> 事件投影编排与读侧仓储<strong>端口 trait</strong></td>
+</tr>
+<tr>
+<td><strong>Interfaces（接口）</strong></td>
+<td><code>interfaces.api</code></td>
+<td><code>api-dto-modules</code></td>
+<td><code>ApiCommands.scala</code>, <code>ApiWire.scala</code>, <code>ApiResponses.scala</code>, <code>ApiAcknowledgements.scala</code>, <code>ApiKeys.scala</code></td>
+<td>生成</td>
+<td>按角色聚合的伴生对象 DTO 模块，避免几十个零散 DTO 文件造成目录膨胀</td>
+</tr>
+<tr>
+<td><strong>Interfaces（接口）</strong></td>
+<td><code>interfaces.web</code></td>
+<td><code>http-controller</code>, <code>page-renderer</code>, <code>http-json</code></td>
+<td><code>BankPagesController.scala</code>, <code>BankQueryController.scala</code>, <code>BankServiceEndpoints.scala</code>, <code>BankBrowserPages.scala</code></td>
+<td>手写</td>
+<td>Play HTTP 控制器、认证/CSRF 守卫、JSON 编解码与交互式浏览器页面</td>
+</tr>
+<tr>
+<td><strong>Infrastructure（设施）</strong></td>
+<td><code>infrastructure.repositories.*</code></td>
+<td><code>aggregate-repository-impl</code>, <code>readside-repository-impl</code></td>
+<td><code>*RepositoryImpl.scala</code>, <code>BankJournalReadsideRepositoryImpl.scala</code>, <code>*Schema.scala</code>, <code>*Domain.scala</code></td>
+<td>生成</td>
+<td>仓储端口的具体实现：聚合侧委托 <code>ClusterSharding.entityRefFor</code>，读侧委托 ScalikeJDBC/MySQL 读写</td>
+</tr>
+<tr>
+<td><strong>Infrastructure（设施）</strong></td>
+<td><code>infrastructure.persistence</code> &amp; <code>app/protobuf/</code></td>
+<td><code>proto-schema</code>, <code>proto-converter</code>, <code>event-adapter</code>, <code>snapshot-adapter</code>, <code>serializer</code>, <code>state-codec</code></td>
+<td><code>shared_value_objects.proto</code>, <code>fund_order.proto</code>, <code>*ProtoConverters.scala</code>, <code>*EventAdapter.scala</code>, <code>DomainProtoSerializer.scala</code>, <code>*StateCodec.scala</code></td>
+<td>生成</td>
+<td>ScalaPB 持久化线协议、领域对象 ↔ Proto 双向转换、Akka Persistence 事件/快照适配器与 Monarch/Saga 状态编解码</td>
+</tr>
+<tr>
+<td><strong>Infrastructure（设施）</strong></td>
+<td><code>infrastructure.process</code> &amp; <code>.connectors</code></td>
+<td><code>saga-host</code>, <code>effect-host</code>, <code>connector-impl</code></td>
+<td><code>BankPaymentHost.scala</code>, <code>BankTaEffectHost.scala</code>（生成）；<code>MockTAClient.scala</code>, <code>BankPaymentBindings.scala</code>（手写）</td>
+<td>生成宿主 + 手写适配器</td>
+<td>持久化事件溯源宿主 Actor（驱动重试、coalescing、恢复）以及连接真实/模拟外部系统的手写适配器</td>
+</tr>
+<tr>
+<td><strong>Infrastructure（设施）</strong></td>
+<td><code>infrastructure.bootstrap</code></td>
+<td><code>application-bootstrap</code>, <code>aggregate-bootstrap</code>, <code>projection-bootstrap</code>, <code>service-loader</code></td>
+<td><code>ApplicationBootstrap.scala</code>, <code>*Bootstrap.scala</code>, <code>BankServiceContract.scala</code>, <code>BankServiceLoader.scala</code></td>
+<td>生成</td>
+<td>初始化 ClusterSharding、ShardedDaemonProcess、持久化策略（tagger/retention/backoff）与 Play 服务装载器</td>
+</tr>
+<tr>
+<td><strong>Modules（组合根）</strong></td>
+<td><code>modules</code></td>
+<td><code>bootstrap-module</code>, <code>handwritten-bindings-module</code></td>
+<td><code>BootstrapModule.scala</code>（生成）、<code>HandwrittenBindingsModule.scala</code>（手写）</td>
+<td>生成 + 手写</td>
+<td>Guice DI 装配根：将所有外层与手写实现类绑定到内层 trait 接口</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-3-3">3.3 依赖方向与静态门禁：外层如何依赖内层</h3>
+<p>洋葱架构不是画在 PPT 里的口号，而是由 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/audit.mjs"><code>lib/conformance/audit.mjs</code></a> 在每次构建中做静态代码审计的硬门禁：</p>
+<ul>
+<li><strong>向内唯一依赖</strong>：<code>modules</code> → <code>infrastructure</code> &amp; <code>interfaces</code> → <code>application</code> → <code>domain</code>。</li>
+<li><strong>Domain 层零污染闸门（Gate 1 <code>domain-dip</code> &amp; <code>domain-purity</code>）</strong>：扫描 <code>domain/**</code> 下全部 Scala 文件，只要出现 <code>akka.</code>、<code>play.</code>、<code>.application.</code>、<code>.infrastructure.</code>、<code>.interfaces.</code> 任一引用，或出现 <code>throw</code>、<code>require(</code>、<code>return</code>、<code>null</code>、<code>Future.failed</code>、<code>new *Exception</code>，审计直接报 P0 违规。</li>
+<li><strong>Application 层持久化隔离闸门（Gate 1 <code>application-dip</code>）</strong>：扫描 <code>application/**</code>，严禁 import <code>.infrastructure.</code> 或 <code>com.google.protobuf.*</code>，确保业务用例和 Saga/ReadSide 定义绝不耦合数据库表结构或 Protobuf 线格式。</li>
+<li><strong>包内聚与防文件爆炸闸门</strong>：<code>interfaces.api</code>、<code>application.process.protocol</code>、<code>application.readmodels</code>、<code>application.connectors</code> 中的 DTO 统一收拢到角色伴生对象模块（由 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/derivation/value-object-package.mjs"><code>value-object-package.mjs</code></a> 基于结构后缀自动路由，零业务词硬编码）。</li>
+</ul>
+<h3 id="section-3-4">3.4 实现如何变成接口并依赖注入进内层</h3>
+<p>很多团队落地 DDD/洋葱架构时最容易困惑：“外层实现怎么反向给内层用？”在 <code>bank-wealth-demo</code> 生成的工程里，依赖倒置（DIP）通过<strong>三条标准注入链路</strong>完成，全过程不靠全局静态单例，也不靠在生成文件里写 <code>BEGIN MANUAL</code> 注释块：</p>
+<ol>
+<li><strong>链路一 · 领域纯计算端口（<code>domain.services</code> ← <code>handwritten/scala/.../domain/services/impl/</code>）</strong>：<ul>
+<li>生成器在 <code>domain.services</code> 生成纯接口 <code>trait CreditBalanceComputations extends DomainService</code>。</li>
+<li>领域规则 <code>CreditBalanceRules</code> 与应用行为 <code>CreditBalanceBehaviors</code> <strong>只依赖该 trait 接口</strong>。</li>
+<li>开发者在手写隔离区编写 <code>BankBalanceComputations extends CreditBalanceComputations</code>，并在手写 <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/handwritten/scala/example/bankwealth/modules/HandwrittenBindingsModule.scala"><code>HandwrittenBindingsModule.scala</code></a> 中用 Guice 绑定：<code>bind(classOf[CreditBalanceComputations]).toInstance(BankBalanceComputations)</code>。</li>
+</ul>
+</li>
+<li><strong>链路二 · 聚合与读侧仓储端口（<code>application.*.repository</code> ← <code>infrastructure.repositories.*</code>）</strong>：<ul>
+<li>应用层声明端口 <code>trait CreditBalanceRepository</code> 与 <code>trait BankJournalReadsideRepository</code>。</li>
+<li>基础设施层实现 <code>CreditBalanceRepositoryImpl</code>（注入 <code>ClusterSharding</code>）与 <code>BankJournalReadsideRepositoryImpl</code>（注入 <code>DataSource</code>）。</li>
+<li>生成的组合根 <code>BootstrapModule</code> 自动完成 <code>bind(classOf[CreditBalanceRepository]).to(classOf[CreditBalanceRepositoryImpl])</code>，并通过 <code>installOptionalModule("example.bankwealth.modules.HandwrittenBindingsModule")</code> 自动发现并装载手写模块中的读侧仓储、JDBC <code>DataSource</code> 与外部权威绑定。</li>
+</ul>
+</li>
+<li><strong>链路三 · 跨聚合 Saga 与外部效应端口（<code>application.process</code> / <code>application.connectors</code> ← <code>infrastructure.bootstrap.*PortBindings</code>）</strong>：<ul>
+<li>生成的 <code>BankPaymentPorts</code> 与 <code>BankTaGateway</code> 定义了强类型的阶段执行/查询/对账接口（如 <code>OperationBinding[Input, Receipt]</code>、<code>CompletionBinding[Original, Result]</code>）。</li>
+<li>生成的 <code>BankPaymentPortBindings</code> 强制校验每一个义务端口都携带匹配的 <code>implementation.id</code> 与 <code>version</code>（防漏绑、防错绑）。</li>
+<li>手写层在 <code>BankPaymentBindings</code> / <code>BankTaEffectBindings</code> 中提供具体实现（调用聚合 <code>EntityRef</code> 或 <code>MockTAClient</code>），由组合根注入进事件溯源宿主 Actor，业务流程编排层全程无感知。</li>
+</ul>
+</li>
+</ol>
+<h3 id="section-3-5">3.5 背后的 DDD 与整洁架构原则依据</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：架构设计选择 / 对应的 DDD / 整洁架构原则 / 解决的实际工程痛点"><table>
+<thead>
+<tr>
+<th scope="col">架构设计选择</th>
+<th scope="col">对应的 DDD / 整洁架构原则</th>
+<th scope="col">解决的实际工程痛点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>domain.values</code> 强制名义值对象与精确十进制 <code>Money</code></td>
+<td><strong>统一语言（Ubiquitous Language）与值对象不变性</strong></td>
+<td>消灭 <code>String</code>/<code>Double</code> 原始类型偏执；编译期阻止把 <code>AccountId</code> 错传给 <code>FundOrderId</code>，杜绝浮点金额精度丢失。</td>
+</tr>
+<tr>
+<td><code>Entity</code> + <code>EventHandler</code> + <code>InvariantRule</code> 纯函数内核</td>
+<td><strong>聚合作为一致性边界（Aggregate as Consistency Boundary）</strong></td>
+<td>单聚合所有业务规则无需启动 JVM 集群或数据库即可确定性单测；事件回放与在线命令共享同一套纯折叠逻辑。</td>
+</tr>
+<tr>
+<td><code>Saga</code>（<a href="https://github.com/MadPolaris/saga-core"><code>saga-core</code></a>）与 <code>Pipeline</code>（<a href="https://github.com/MadPolaris/monarch-core"><code>monarch-core</code></a> + <a href="https://github.com/MadPolaris/monarch-persistence"><code>monarch-persistence</code></a>）严格分离</td>
+<td><strong>最终一致性与显式流程边界</strong></td>
+<td><strong>Saga 管事务边界，Pipeline 管步骤顺序</strong>；避免把分布式事务写死在 HTTP Controller 或隐式事件回调里导致资金双扣。</td>
+</tr>
+<tr>
+<td>内层声明端口 trait + <code>modules</code> 组合根注入外层实现</td>
+<td><strong>依赖倒置原则（DIP）与六边形架构（Ports &amp; Adapters）</strong></td>
+<td>更换数据库、消息序列化或外部 TA 客户端只需替换外层适配器，领域规则与生成代码一行不动。</td>
+</tr>
+<tr>
+<td>写侧事件溯源 + 读侧 <code>Akka Projection</code> 物化视图</td>
+<td><strong>CQRS 读写分离</strong></td>
+<td>写侧专注强不变量与高吞吐追加日志，读侧专注分页、聚合统计与客户/运营查询视图，互不拖累。</td>
+</tr>
+<tr>
+<td>手写代码物理目录隔离（<code>unmanagedSourceDirectories</code>）</td>
+<td><strong>开闭原则与清晰所有权边界</strong></td>
+<td>告别脆弱的“代码合并标记”；真源变更随时全量重新生成 161 个文件，36 个手写实现零冲突保留，且由编译器立即检查接口兼容性。</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-4">4. 扩展新代码生成器指南：切入点、契约义务与 AI Agent 物料规范</h2>
+<p>如果你想基于 <code>co-arising</code> 的同一套业务真源，扩展出 <strong>Java Spring Boot</strong>、<strong>Kotlin/Ktor</strong>、<strong>Go</strong>、<strong>Rust</strong> 或 <strong>TypeScript/NestJS</strong> 的代码生成器，应该从哪里下手？</p>
+<h3 id="section-4-1">4.1 精确切入点：从 14 个编译语义产物切入，而非解析原始 YAML</h3>
+<p><strong>切忌直接解析 <code>truth/</code> 目录下的原始 YAML 文件！</strong> 原始 YAML 包含结构展开微语法、多文件归属与跨文件引用。<code>metarch-truthsrc</code> 已经把前端编译做成了语言无关的稳定契约层——新代码生成器的<strong>唯一正确切入点</strong>是 <code>compileProductSet</code> 产出的 <strong>14 个强类型、已通过静态语义校验的编译产物（Compiled Semantic Product Set）</strong>：</p>
+<pre class="code"><code class="language-text">  truth/ (YAML 真源)
+     │  [共享前端：无需重写]  validateTree → roundtrip → compileTreeWithSources
+     ▼
+  canonical.json + sourceIndex
+     │  [共享契约编译：无需重写]  deriveProjectRequest (含自动绑定推导) → compileProductSet
+     ▼
+  ═══════════════════ 稳定切入面：14 个编译语义产物（JSON）═══════════════════
+  • reference-layout@1        全部名义类型、聚合、命令、事件、端口的限定符号表与依赖
+  • exact-value-types@1       精确十进制的 precision / scale / unit 约束
+  • exact-value-codecs@1      Wire / 持久化最小单位无损编解码规范
+  • domain-decision@4         每个命令的有序前置守卫 AST、拒绝码、事件载荷绑定与计算调用
+  • domain-dependencies@6     聚合状态、命令、事件与纯计算端口的完整依赖图
+  • domain-folds@6            每个事件到状态字段的确定性折叠语句 AST
+  • domain-external-events@2  外部事件生产者与权威校验契约
+  • saga-contract@1           跨聚合 TCC 参与者、步骤、阶段与补偿静态 IR
+  • saga-runtime-contract@1   运行时版本、摘要、参数与回执编解码 pin
+  • execution-contract@1      Monarch 有限流程计划、输入输出槽与恢复策略
+  • saga-host-contract@2      Saga 宿主入口、关联键、结果分类与技术端口义务
+  • effect-host-contract@2    外部副作用的幂等键、观察状态机与人工对账义务
+  • artifact-contract@3       服务部署边界、HTTP 端点、投影存储与实现版本 pin
+  • product-design@1          五平面产品设计视图
+  ═════════════════════════════════════════════════════════════════════════════
+     │  [你的新生成器只写这两层]
+     ├──▶ Layer A · Derivation（lib/derivation/&lt;target&gt;/）：把语义产物映射为目标家族输入契约
+     └──▶ Layer B · Emitter Families（emitter/families/ &amp; generators/&lt;target&gt;/）：纯函数确定性渲染
+</code></pre>
+<p>从这个切入面开始扩展，你的新生成器自动免费获得：<strong>YAML 解析、往返检验、类型解析、守卫与折叠 AST 校验、自动技术绑定推导、SQLite 知识图谱、MCP 查询以及 12 项回锚验证框架</strong>。</p>
+<h3 id="section-4-2">4.2 新代码生成器必须履行的七项工程义务</h3>
+<p>在 <code>metarch-truthsrc</code> 的工程纪律下，任何新注册的代码生成器（<code>generators/&lt;target-name&gt;/</code>）都不是随意的字符串模板脚本，而必须履行以下七项硬性义务：</p>
+<ol>
+<li><strong>显式 Manifest 与最小产物声明义务（<code>generator.json</code>）</strong>：参考 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/generators/scala-cqrs-play-service/generator.json"><code>generators/scala-cqrs-play-service/generator.json</code></a>，声明每个子 Producer 消费的精确 <code>products</code> 列表与版本、产出的 <code>artifactKinds</code> 及允许的 <code>options</code>。运行时严格 Proxy 会<strong>当场拦截</strong>任何未声明产品的越权读取（<code>PRODUCT_UNDECLARED</code>）。</li>
+<li><strong>纯函数推导与 Fail-Closed 校验义务</strong>：每个 Emitter Family 必须实现 <code>checkInput(input)</code>，对不合法标识符、未知类型、未绑定上下文或目标语言尚未支持的语义特性抛出带错误码的诊断，<strong>严禁静默降级、跳过规则或生成 <code>// TODO</code> 占位实现</strong>。</li>
+<li><strong>字节级双跑确定性与黄金对账义务</strong>：通过 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/emitter/registry.mjs"><code>emitter/registry.mjs</code></a> 注册 <code>id</code>、<code>familyNumber</code>、<code>inputSchema</code>、<code>goldenRoot</code>、<code>fixtureDir</code>、<code>checkInput</code>、<code>renderAll</code> 及 <code>runNegatives</code>（负例拒绝电池）。连跑两次必须逐字节完全一致，且与 <code>goldenRoot</code> 黄金样本零差异。</li>
+<li><strong>全链路回锚与依赖边义务</strong>：每个生成条目必须携带真实 <code>knowledgeIds</code>（<code>source:&lt;doc&gt;#&lt;pointer&gt;</code>）、精确 UTF-8 字节区间 <code>codeMappings</code> 与模块间文件依赖 <code>deps</code>，确保 <code>truthsrc verify-project</code> 12 项检查与 Explorer 双向点击 100% 通过。</li>
+<li><strong>布局正交与运行时参数化义务</strong>：目录与包路径必须通过 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/layout/layout-strategy.mjs"><code>lib/layout/layout-strategy.mjs</code></a> 解析；目标框架坐标与包前缀必须通过 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/runtime-profile.mjs"><code>lib/runtime-profile.mjs</code></a> 参数化，严禁在生成器中写死任何业务词（如 <code>bankwealth</code>/<code>FundOrder</code>）或单一公司包名。</li>
+<li><strong>清晰手写隔离边界与组合根义务</strong>：明确生成代码与手写实现的物理目录隔离机制（如 Java/Maven 的 <code>target/generated-sources</code> 或独立模块、Go 的 <code>gen/</code> 包与 <code>internal/</code> 实现），严禁让手写逻辑混入生成文件。</li>
+<li><strong>反硬编码四层门禁义务</strong>：必须接入 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a> 静态扫描 + 异域双盲单测（如 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/test/non-bank-unified-generation.test.mjs"><code>non-bank-unified-generation.test.mjs</code></a>）+ 真实非银行领域项目全链路生成并过目标编译器与单测。</li>
+</ol>
+<h3 id="section-4-3">4.3 交给 AI Agent 推理新生成器的“六件套物料包”</h3>
+<p>在 AI Agent 时代，写一个新语言/新框架代码生成器最容易翻车的原因，不是 Agent 不会写模板，而是<strong>架构风格与语义边界没有事先钉死</strong>，导致 Agent 自由发挥、漂移和暗藏业务硬编码。</p>
+<p>只要团队提前凑齐下面这份 <strong>“六件套物料包”</strong>，就可以直接交给 AI Agent（如 Claude Code / Antigravity / Codex）高质量推理并逐族交付一个新的生产级代码生成器：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：序号 / 物料名称 / 具体内容 / 为什么缺少它 Agent 会漂移"><table>
+<thead>
+<tr>
+<th scope="col">序号</th>
+<th scope="col">物料名称</th>
+<th scope="col">具体内容</th>
+<th scope="col">为什么缺少它 Agent 会漂移</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>01</strong></td>
+<td><strong>黄金参考样板工程（Golden Reference App）</strong></td>
+<td>一个用<strong>非银行域</strong>（如 <code>order</code>/<code>inventory</code>）手写好的最小可编译目标栈项目：含 1 个聚合、值对象、精确金额、守卫规则、事件折叠、仓储端口与实现、读侧投影、DI 组合根及 1 个通过的单测。</td>
+<td>没有可编译黄金样本，Agent 会不断在惯用法、命名风格、依赖版本上摇摆；黄金样本就是最精确的 Family Spec（F3）。</td>
+</tr>
+<tr>
+<td><strong>02</strong></td>
+<td><strong>洋葱架构一致性契约（Conformance Contract JSON）</strong></td>
+<td>参照 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/classic-cqrs-contract.json"><code>classic-cqrs-contract.json</code></a>，机读声明允许的顶层包、禁止的跨层依赖正则（DIP）、每种 artifact 的文件后缀、必选基类与禁用语法（如禁用 <code>throw</code>/反射）。</td>
+<td>把“架构审阅”变成秒级自动门禁，Agent 每写完一族就能自测拓扑与纯净度，不靠人工逐行 Code Review。</td>
+</tr>
+<tr>
+<td><strong>03</strong></td>
+<td><strong>语义到目标语言映射表（Semantic Mapping Spec）</strong></td>
+<td>逐项定义 <code>primitive / exact / record / optional / sequence / map</code>、<code>domain-decision@4</code> 守卫表达式、<code>domain-folds@6</code> 折叠语句、<code>exact-value-codecs</code> 精度规则的目标语言写法，以及<strong>显式不支持特性列表</strong>。</td>
+<td>消除语义猜测，明确哪些特性必须 <code>fail-closed</code> 拒绝而不是胡乱生成近似代码。</td>
+</tr>
+<tr>
+<td><strong>04</strong></td>
+<td><strong>目标运行时抽象档案（Runtime Profile Spec）</strong></td>
+<td>定义目标技术栈的通用基类、错误容器（如 Java <code>Result&lt;T, E&gt;</code> / Go <code>(T, error)</code> / Rust <code>Result</code>）、序列化方案、DI 容器及可参数化坐标（<code>organization</code> / <code>packagePrefix</code> / <code>version</code>）。</td>
+<td>避免把某个内部私有库包名或特定版本硬编码散落在几十个模板文件中。</td>
+</tr>
+<tr>
+<td><strong>05</strong></td>
+<td><strong>双领域编译产物 Fixture + 本地编译沙箱</strong></td>
+<td>至少准备两套不同业务域的 <code>compiled-products</code> JSON（如 <code>bank</code> 与 <code>commerce</code>），并确保 Agent 沙箱内可直接运行目标构建命令（<code>mvn test</code> / <code>go test ./...</code> / <code>cargo test</code> / <code>tsc --noEmit</code>）。</td>
+<td>单一领域测试藏不住硬编码；双领域 + 真实编译器是唯一能把长类名换行、隐式包路由、泛型边界全逼出来的试金石。</td>
+</tr>
+<tr>
+<td><strong>06</strong></td>
+<td><strong>Agent Harness 规范与红线清单</strong></td>
+<td>明确逐族推进顺序、每族的完成定义（DoD）、负例电池最低覆盖要求、禁改测试红线与回锚核验命令。</td>
+<td>给 Agent 建立确定性的工作节拍与客观完成标准，防止“跳过校验直接报完成”。</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-4-4">4.4 面向 AI Agent 的开发规范与四层验收门禁</h3>
+<p>将上述六件套物料交给 AI Agent 后，建议严格按以下工程规范与验收节奏推进：</p>
+<ol>
+<li><strong>逐族切分、由内向外实现（Inside-Out Family Rollout）</strong>：<ul>
+<li><strong>第一批（纯领域内核，0 外部依赖）</strong>：<code>value-object</code> → <code>domain-entity</code> → <code>event-handler</code> → <code>aggregate-invariant-rules</code>；立刻用目标语言单测验证纯函数行为。</li>
+<li><strong>第二批（应用协议与仓储端口）</strong>：<code>protocol-layer</code> → <code>aggregate-layer</code> → <code>aggregate-repository</code> → <code>external-event-bridge</code>。</li>
+<li><strong>第三批（基础设施持久化与装配）</strong>：<code>proto-schema</code> / <code>persistence-schema</code> → <code>proto-converter</code> → <code>serialization-adapter</code> → <code>aggregate-bootstrap</code> → <code>service-runtime</code> → <code>project-scaffold</code>。</li>
+<li><strong>第四批（分布式协作面，按需）</strong>：<code>effect-face</code> → <code>pipeline-invocation-face</code>。</li>
+</ul>
+</li>
+<li><strong>单族交付的硬性完成定义（Definition of Done）</strong>：<ul>
+<li>注册到 <code>emitter/registry.mjs</code> 且 <code>node emitter/parity.mjs</code> 全绿；</li>
+<li>包含定向负例测试 <code>runNegatives</code>（至少覆盖缺失字段、非法标识符、未知上下文、非法包名与未支持类型）；</li>
+<li><code>npm run lint</code>（含 <code>arch/no-business-names</code>、<code>arch/no-hardcoded-runtime</code>、<code>arch/no-hardcoded-app-path</code>）0 违规；</li>
+<li>异域双盲测试（<code>commerce</code> + 自定义 <code>runtimeProfile</code>）0 泄漏且能通过目标语言真实编译器与单元测试。</li>
+</ul>
+</li>
+<li><strong>四层反硬编码闭环验证</strong>：<ul>
+<li><strong>第 1 层</strong>：静态词法与架构 lint 门禁（防已知词回流）；</li>
+<li><strong>第 2 层</strong>：宽词表对抗扫描（排查隐式语义路由假设与正则转义绕过）；</li>
+<li><strong>第 3 层</strong>：异域双盲家族渲染与自定义 <code>runtimeProfile</code> 单测；</li>
+<li><strong>第 4 层（终极标准）</strong>：构造零样板词汇的全新业务域项目，端到端跑通 <code>truthsrc generate-project</code> → <code>truthsrc verify-project</code>（12/12）→ 目标语言全量编译与单测通过。</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-5">5. 下一个大故事：向受控 EARS 1.0 与 SMT 单跳验证演进</h2>
+<p>到这里，我们已经把<strong>下游的确定性工程闭环</strong>彻底打通了：给定一份结构化的业务真源，编译器可以自动推导技术绑定、生成符合 DDD 洋葱架构的可编译代码、完成字节级双向回锚，并通过 Docker 运行时验证真实的跨聚合交易、退款与定投行为；且这套下游架构可以按标准契约扩展到任意新语言与新框架。</p>
+<p>但还有一个更根本的问题留在上游：<strong>如果业务需求本身在写进真源之前就存在逻辑冲突、边界遗漏或条件重叠怎么办？</strong> 编译器只能忠实地把“写错了的规则”确定性地编译成“同样错的代码”。</p>
+<p>这正是 <code>co-arising</code> 的下一个大故事——<a href="https://co-arising.github.io/zh/articles/co-arising-ears-spec-20261123/">《co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）》</a> 要解决的核心命题：</p>
+<pre class="code"><code class="language-text">  [上游：数学验证的唯一真源]                          [下游：本文已打通的确定性洋葱工程闭环]
+  ───────────────────────────                        ─────────────────────────────────────────
+  受控 EARS 1.0 唯一真源                              14 个编译语义产物（自动推导技术绑定）
+     ├──▶ 风格 E（PM 白话 AC 只读投影）                      │
+     ├──▶ 风格 B（DMN 决策表只读投影）                       ├──▶ 16+ 统一 Emitter Families（洋葱架构代码）
+     ├──▶ SMT-LIB 2 (.smt2) ──▶ Z3/cvc5 求解                ├──▶ 12 项双向回锚验证 + Explorer 代码导航
+     │      ├── 冲突/缺口 ──▶ A/B 需求澄清卡                 ├──▶ 手写隔离区 + 组合根 DI 装配
+     │      └── 全绿通过  ──▶ 边界证人样本                   └──▶ Docker 运行时试玩 + 多技术栈生成器扩展
+     └──▶ TestIR ──▶ 锁定 BDD / ScalaTest ──▶ @cloze TDD
+</code></pre>
+<p>当上游的 <strong>受控 EARS 1.0 + SMT 单跳数学验证</strong> 与下游的 <strong>确定性洋葱架构生成 + 双向回锚 + 多技术栈扩展规范</strong> 拼接在一起时，人与 AI Agent 协作软件工程的边界将真正变得清晰：人用自然而严谨的真源定义业务契约，数学求解器在编码前证明规则自洽，确定性生成器产出零漂移的洋葱骨架，AI Agent 在锁定的接口与 BDD 护栏内完成高质量实现与演进。</p>
+<h2 id="section-6">6. 参考仓库与核心源码入口</h2>
+<ul>
+<li><strong>银行财富教学与架构验证仓库</strong>：<a href="https://github.com/co-arising/bank-wealth-demo"><code>co-arising/bank-wealth-demo</code></a>（Docker 快速启动脚本与剧本见 <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/docs/DEMO-QUICK-START.md"><code>docs/DEMO-QUICK-START.md</code></a>）</li>
+<li><strong>真源编译器、知识图谱与统一代码生成器</strong>：<a href="https://github.com/co-arising/metarch-truthsrc"><code>co-arising/metarch-truthsrc</code></a><ul>
+<li>自动技术绑定推导：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive-bindings.mjs"><code>lib/project/derive-bindings.mjs</code></a></li>
+<li>正交布局策略（单模块 / 多模块）：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/layout/layout-strategy.mjs"><code>lib/layout/layout-strategy.mjs</code></a></li>
+<li>洋葱架构与 DIP 静态审计器：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/audit.mjs"><code>lib/conformance/audit.mjs</code></a> &amp; <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/conformance/classic-cqrs-contract.json"><code>classic-cqrs-contract.json</code></a></li>
+<li>统一 Emitter 注册表与反硬编码门禁：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/emitter/registry.mjs"><code>emitter/registry.mjs</code></a> &amp; <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a></li>
+</ul>
+</li>
+<li><strong>开源运行时引擎家族</strong>：<a href="https://github.com/MadPolaris/saga-core"><code>MadPolaris/saga-core</code></a>、<a href="https://github.com/MadPolaris/monarch-core"><code>MadPolaris/monarch-core</code></a>、<a href="https://github.com/MadPolaris/monarch-persistence"><code>MadPolaris/monarch-persistence</code></a></li>
+<li><strong>在线交互式探索器与状态台账</strong>：<a href="https://co-arising.github.io/zh/explorer/?view=code#code">Explorer 知识图谱与代码视图</a> · <a href="https://co-arising.github.io/zh/guide/">项目实战指南</a> · <a href="https://co-arising.github.io/zh/status/">事实与状态台账</a></li>
+<li><strong>下一个大故事（设计规范）</strong>：<a href="https://co-arising.github.io/zh/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）</a></li>
+</ul></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">继续阅读</h2>
+      <div class="article-card" lang="zh-CN">
+      <p class="article-meta"><span>设计规范</span> · <time datetime="2026-11-23">2026-11-23</time></p>
+      <h3><a href="/zh/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）</a></h3>
+      <p class="article-deck">受控 EARS 唯一真源 + SMT-LIB 2 单跳确定性验证的完整语言规范：双语同构文法、bank-wealth-demo 四类实战样例、只读投影与 BDD 测试锁定，作为待落地的设计基准。</p>
+      <p class="small">中文原文</p>
+    </div>
+      <p><a href="/zh/articles/">返回文章索引</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>
