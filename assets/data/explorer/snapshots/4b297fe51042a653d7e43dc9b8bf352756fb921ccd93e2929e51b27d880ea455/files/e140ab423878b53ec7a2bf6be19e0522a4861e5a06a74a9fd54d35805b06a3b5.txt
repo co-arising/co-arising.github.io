@@ -1,0 +1,6 @@
+package example.bankwealth.interfaces.api
+
+object ApiWire {
+  final case class AmountDecimalWire(value: String)
+  final case class MoneyWire(minorUnits: String, currency: String)
+}
