@@ -1,3 +1,0 @@
-package example.bankwealth.application.saga
-
-final case class BankTaEffectOperation(operation: String, request: BankTaEffectRequest)

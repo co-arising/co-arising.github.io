@@ -1,9 +1,0 @@
-package example.bankwealth.application.api
-
-final case class BankCashOriginal(
-  principalId: String,
-  clientRequestId: String,
-  authorityVersion: String,
-  request: BankCashSubmit,
-  payment: BankPaymentOriginal
-)

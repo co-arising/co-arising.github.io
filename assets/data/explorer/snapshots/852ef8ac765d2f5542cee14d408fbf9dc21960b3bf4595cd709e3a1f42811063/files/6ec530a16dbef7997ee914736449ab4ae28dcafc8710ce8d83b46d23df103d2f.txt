@@ -1,9 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class BankSipDispatchObservation(
-  operation: String,
-  request: BankSipDispatchRequest,
-  status: String,
-  evidence: String,
-  result: Option[BankSipDispatchResult]
-)

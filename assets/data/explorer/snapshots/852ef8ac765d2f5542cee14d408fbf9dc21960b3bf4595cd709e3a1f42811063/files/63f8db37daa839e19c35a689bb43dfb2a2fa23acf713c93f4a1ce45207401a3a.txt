@@ -1,7 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class BankRefundArgs(
-  fundCollectionAccountId: AccountId,
-  investorAccountId: AccountId,
-  amount: Money
-)

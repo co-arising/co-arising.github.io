@@ -1,5 +1,0 @@
-package example.bankwealth.application.projection
-
-import example.bankwealth.domain.values.SipRevisionConfig
-
-final case class BankSipRevisionView(config: SipRevisionConfig, endSlot: Option[Long])

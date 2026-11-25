@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>技术观察 — co-arising</title>
-  <meta name="description" content="持续整理值得阅读的技术文章：连接行业新动向、架构方法与工程实践。本期从 AI Coding 的范式演进出发，再思考它对 co-arising 的启发。" />
+  <meta name="description" content="持续整理值得阅读的技术文章、工程实战手册与语言设计规范：覆盖 bank-wealth-demo 端到端实战与洋葱架构、受控 EARS + SMT 规约验证，以及 AI Coding 范式演进。" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="技术观察" />
-  <meta property="og:description" content="持续整理值得阅读的技术文章：连接行业新动向、架构方法与工程实践。本期从 AI Coding 的范式演进出发，再思考它对 co-arising 的启发。" />
+  <meta property="og:description" content="持续整理值得阅读的技术文章、工程实战手册与语言设计规范：覆盖 bank-wealth-demo 端到端实战与洋葱架构、受控 EARS + SMT 规约验证，以及 AI Coding 范式演进。" />
   <meta property="og:url" content="https://co-arising.github.io/zh/articles/" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -30,9 +30,9 @@
   <noscript><div class="wrap"><p class="small">JavaScript 已关闭——正文、目录、链接与下载仍可使用。</p></div></noscript>
   <main id="main-content" class="wrap">
     <header class="insights-hero">
-      <p class="over">行业演进 · 工程思考</p>
+      <p class="over">工程实践 · 设计规范 · 行业演进</p>
       <h1 id="insights-title" class="insights-title">技术观察</h1>
-      <p class="insights-deck">持续整理值得阅读的技术文章：连接行业新动向、架构方法与工程实践。本期从 AI Coding 的范式演进出发，再思考它对 co-arising 的启发。</p>
+      <p class="insights-deck">持续整理值得阅读的技术文章、工程实战手册与语言设计规范：覆盖 bank-wealth-demo 端到端实战与洋葱架构、受控 EARS + SMT 规约验证，以及 AI Coding 范式演进。</p>
       <p class="page-outline"><a href="#articles">阅读文章</a> · <a href="#editorial-context">发布说明</a></p>
     </header>
     <figure class="insights-cover">
@@ -55,41 +55,41 @@
       <figcaption>从直觉式编码，到智能体协作，再到显式边界与验证闭环。</figcaption>
     </figure>
     <section id="articles" aria-labelledby="articles-heading">
-      <h2 id="articles-heading">本期专题 · AI Coding 的范式转移</h2>
-      <div class="insights-grid"><div class="article-card" id="article-ai-coding-evolution-20261116" lang="zh-CN">
-      <p class="article-meta"><span>行业综述</span> · <time datetime="2026-11-16">2026-11-16</time></p>
-      <h3><a href="/zh/articles/ai-coding-evolution-20261116/">AI Coding 发展全景：从 Vibe Coding 到 Agentic Engineering</a></h3>
-      <p class="article-deck">从模型漂移、Vibe Coding 的争议到 Agentic 与 Harness Engineering：一份保留引文和参考链接的行业演进综述。</p>
-      <p class="small">中文原文</p>
-    </div><div class="article-card" id="article-co-arising-implications-20261116" lang="zh-CN">
-      <p class="article-meta"><span>战略思考</span> · <time datetime="2026-11-16">2026-11-16</time></p>
-      <h3><a href="/zh/articles/co-arising-implications-20261116/">对 co-arising 的启发：AI Coding 范式转移下的战略印证与工程路线</a></h3>
-      <p class="article-deck">把行业演进放回 co-arising 的语境，讨论确定性编译、业务切片、代码锚定与拟议工程路线；不是已交付能力清单。</p>
-      <p class="small">中文原文</p>
-    </div><div class="article-card" id="article-lauren-tan-trust-pyramid-20261118" lang="zh-CN">
-      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-18">2026-11-18</time></p>
-      <h3><a href="/zh/articles/lauren-tan-trust-pyramid-20261118/">从「AI 垃圾」到月合并 11,000 PR：SpaceXSI 主任工程师 Lauren Tan 的 AI Coding 工程体系深度评估与落地指南</a></h3>
-      <p class="article-deck">以两场一手演讲与开源 pstack 为信源，对照 2024–2026 学术与工业实证检验「信任倒金字塔」与「验证优先」的适用边界，并给出四阶段落地路线。</p>
-      <p class="small">中文原文</p>
-    </div><div class="article-card" id="article-ai-engineer-code-2026-50-talks-20261119" lang="zh-CN">
-      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-19">2026-11-19</time></p>
-      <h3><a href="/zh/articles/ai-engineer-code-2026-50-talks-20261119/">AI Engineer CODE 2026 全部 50 场演讲相关性排序与全景拆解</a></h3>
-      <p class="article-deck">基于 50 份完整演讲字幕的零截断精读，按与确定性验证、Agent 工程治理等研究主航道的相关性排定 #01–#50 顺位，逐场拆解解决的问题、核心理论、验证成果与工具栈。</p>
-      <p class="small">中文原文</p>
-    </div><div class="article-card" id="article-aws-kiro-smt-spec-analyzer-20261119" lang="zh-CN">
-      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-19">2026-11-19</time></p>
-      <h3><a href="/zh/articles/aws-kiro-smt-spec-analyzer-20261119/">规约本身就有 Bug：深度拆解 AWS Kiro 如何用 SMT 求解器在写代码前消灭 Spec 歧义与逻辑冲突</a></h3>
-      <p class="article-deck">深度解析 AWS Automated Reasoning Group 工程师 Rajath Kotyal 在 AI Engineer CODE 2026 的高分演讲《Specs have bugs too》：完整溯源 Slides 与学术引用，对比引入 SMT 前后的 Spec 写法与工作流，剖析 SAT/SMT 与多采样逻辑等价聚类原理，提供可直接运行的 SMT-LIB2 / Python Z3 样例与开源生态清单，并提出对 co-arising（truthsrc）实践的四大工程补充。</p>
+      <h2 id="articles-heading">全部文章 · 按发布时间倒序</h2>
+      <div class="insights-grid"><div class="article-card" id="article-bank-wealth-quickstart-architecture-extensibility-20261125" lang="zh-CN">
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-25">2026-11-25</time></p>
+      <h3><a href="/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo 实战全景指南：从真源到运行时试玩、洋葱架构拆解与 AI 时代代码生成器扩展规范</a></h3>
+      <p class="article-deck">面向 bank-wealth-demo 的端到端 Quick Start（真源、生成、回锚与 5 套 Docker 运行时玩法）、生成代码的洋葱架构与 DDD/DIP 原理深拆，以及基于编译语义产物的多栈代码生成器扩展与 AI Agent 物料规范。</p>
       <p class="small">中文原文</p>
     </div><div class="article-card" id="article-co-arising-ears-spec-20261123" lang="zh-CN">
       <p class="article-meta"><span>设计规范</span> · <time datetime="2026-11-23">2026-11-23</time></p>
       <h3><a href="/zh/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）</a></h3>
       <p class="article-deck">受控 EARS 唯一真源 + SMT-LIB 2 单跳确定性验证的完整语言规范：双语同构文法、bank-wealth-demo 四类实战样例、只读投影与 BDD 测试锁定，作为待落地的设计基准。</p>
       <p class="small">中文原文</p>
-    </div><div class="article-card" id="article-bank-wealth-quickstart-architecture-extensibility-20261125" lang="zh-CN">
-      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-25">2026-11-25</time></p>
-      <h3><a href="/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo 实战全景指南：从真源到运行时试玩、洋葱架构拆解与 AI 时代代码生成器扩展规范</a></h3>
-      <p class="article-deck">面向 bank-wealth-demo 的端到端 Quick Start（真源、生成、回锚与 5 套 Docker 运行时玩法）、生成代码的洋葱架构与 DDD/DIP 原理深拆，以及基于编译语义产物的多栈代码生成器扩展与 AI Agent 物料规范。</p>
+    </div><div class="article-card" id="article-aws-kiro-smt-spec-analyzer-20261119" lang="zh-CN">
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-19">2026-11-19</time></p>
+      <h3><a href="/zh/articles/aws-kiro-smt-spec-analyzer-20261119/">规约本身就有 Bug：深度拆解 AWS Kiro 如何用 SMT 求解器在写代码前消灭 Spec 歧义与逻辑冲突</a></h3>
+      <p class="article-deck">深度解析 AWS Automated Reasoning Group 工程师 Rajath Kotyal 在 AI Engineer CODE 2026 的高分演讲《Specs have bugs too》：完整溯源 Slides 与学术引用，对比引入 SMT 前后的 Spec 写法与工作流，剖析 SAT/SMT 与多采样逻辑等价聚类原理，提供可直接运行的 SMT-LIB2 / Python Z3 样例与开源生态清单，并提出对 co-arising（truthsrc）实践的四大工程补充。</p>
+      <p class="small">中文原文</p>
+    </div><div class="article-card" id="article-ai-engineer-code-2026-50-talks-20261119" lang="zh-CN">
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-19">2026-11-19</time></p>
+      <h3><a href="/zh/articles/ai-engineer-code-2026-50-talks-20261119/">AI Engineer CODE 2026 全部 50 场演讲相关性排序与全景拆解</a></h3>
+      <p class="article-deck">基于 50 份完整演讲字幕的零截断精读，按与确定性验证、Agent 工程治理等研究主航道的相关性排定 #01–#50 顺位，逐场拆解解决的问题、核心理论、验证成果与工具栈。</p>
+      <p class="small">中文原文</p>
+    </div><div class="article-card" id="article-lauren-tan-trust-pyramid-20261118" lang="zh-CN">
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-18">2026-11-18</time></p>
+      <h3><a href="/zh/articles/lauren-tan-trust-pyramid-20261118/">从「AI 垃圾」到月合并 11,000 PR：SpaceXSI 主任工程师 Lauren Tan 的 AI Coding 工程体系深度评估与落地指南</a></h3>
+      <p class="article-deck">以两场一手演讲与开源 pstack 为信源，对照 2024–2026 学术与工业实证检验「信任倒金字塔」与「验证优先」的适用边界，并给出四阶段落地路线。</p>
+      <p class="small">中文原文</p>
+    </div><div class="article-card" id="article-co-arising-implications-20261116" lang="zh-CN">
+      <p class="article-meta"><span>战略思考</span> · <time datetime="2026-11-16">2026-11-16</time></p>
+      <h3><a href="/zh/articles/co-arising-implications-20261116/">对 co-arising 的启发：AI Coding 范式转移下的战略印证与工程路线</a></h3>
+      <p class="article-deck">把行业演进放回 co-arising 的语境，讨论确定性编译、业务切片、代码锚定与拟议工程路线；不是已交付能力清单。</p>
+      <p class="small">中文原文</p>
+    </div><div class="article-card" id="article-ai-coding-evolution-20261116" lang="zh-CN">
+      <p class="article-meta"><span>行业综述</span> · <time datetime="2026-11-16">2026-11-16</time></p>
+      <h3><a href="/zh/articles/ai-coding-evolution-20261116/">AI Coding 发展全景：从 Vibe Coding 到 Agentic Engineering</a></h3>
+      <p class="article-deck">从模型漂移、Vibe Coding 的争议到 Agentic 与 Harness Engineering：一份保留引文和参考链接的行业演进综述。</p>
       <p class="small">中文原文</p>
     </div></div>
     </section>

@@ -1,3 +1,0 @@
-package example.bankwealth.application.api
-
-final case class BankServiceBootstrapAcknowledgement(namespace: String, status: String)

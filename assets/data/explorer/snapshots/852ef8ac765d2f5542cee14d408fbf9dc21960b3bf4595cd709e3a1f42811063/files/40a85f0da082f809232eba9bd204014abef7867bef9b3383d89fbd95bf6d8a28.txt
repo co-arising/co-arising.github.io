@@ -1,9 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class BankTaEffectReconcile(
-  operation: String,
-  request: BankTaEffectRequest,
-  decision: String,
-  evidence: Option[BankTaEffectObservation],
-  authorization: String
-)

@@ -1,8 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class BankProjectionWatermark(
-  persistenceId: String,
-  lastSequence: Long,
-  observedSequence: Option[Long],
-  disposition: String
-)

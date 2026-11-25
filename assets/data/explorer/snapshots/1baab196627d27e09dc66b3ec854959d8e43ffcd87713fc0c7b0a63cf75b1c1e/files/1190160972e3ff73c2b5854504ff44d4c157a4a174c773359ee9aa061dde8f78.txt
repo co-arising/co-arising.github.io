@@ -1,7 +1,0 @@
-package example.bankwealth.application.projection
-
-final case class BankReadMetadata(
-  schemaVersion: String,
-  disposition: String,
-  watermarks: Vector[BankProjectionWatermark]
-)

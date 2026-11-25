@@ -78,7 +78,7 @@ node "$TRUTHSRC_CLI" status-project --project truthsrc.project.json --out genera
 node "$TRUTHSRC_CLI" query-project --project truthsrc.project.json --out generated --knowledge SetCount --format human</code></pre>
       <p>预览只列操作计划，不是文本 diff。生成后应见 <code>inputs=current</code>、<code>evidence=verified</code>、<code>synchronized=true</code>。它们证明来源与字节状态，不证明 Scala 或银行业务已经执行。</p>
       <h3 id="counter-reverse-query">从真实位置反查，而不是猜文件或行号</h3>
-      <p class="small"><a href="/zh/explorer/?view=code#code">Explorer 代码视图</a>用于免安装浏览已发布的配对快照。银行来源/回锚快照已通过完整验证（<a href="/zh/status/#F-30">F-30</a>）；下方本地步骤用于核验你自己的当前文件。</p>
+      <p class="small"><a href="/zh/explorer/?view=code#code">Explorer 代码视图</a>用于免安装浏览已发布的配对快照。当前银行快照已通过完整来源/回锚核验与本地编译/单测（<a href="/zh/status/#F-31">F-31</a>；历史快照 <a href="/zh/status/#F-30">F-30</a>）；下方本地步骤用于核验你自己的当前文件。</p>
       <p>span 是半开 UTF-8 字节区间，不是行号。下面从当前已验证源码换算行号并反查；没有精确命中就停止，不补造位置。</p>
       <pre class="code" data-example="counter-reverse"><code>node --input-type=module &lt;&lt;'NODE'
 import { execFileSync } from 'node:child_process';

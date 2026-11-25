@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>知识图谱 Explorer — co-arising</title>
-  <meta name="description" content="银行财富知识图谱（389 节点 / 413 边）经 sql.js 在你的浏览器中加载。影响半径、血缘、孤儿、普查——预设查询加自由 SQL 控制台。无服务器，无追踪。" />
+  <meta name="description" content="银行财富知识图谱（当前快照 392 节点 / 413 边）与 358 份生成/手写/作者源码在浏览器中经 sql.js 加载。影响半径、血缘、双向代码回锚与自由 SQL 控制台。无服务器，无追踪。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -30,7 +30,7 @@
       <p class="over">Explorer · 完全在你的浏览器中运行</p>
       <h1>浏览知识，<br><span class="accent">追溯代码。</span></h1>
       <p class="thesis">在同一份配对快照中浏览真实银行财富知识与生成代码。从知识节点进入作者声明和代码，再点击代码行反查知识。所有查询都在浏览器执行，不把查询文本或结果发给服务器。</p>
-      <p class="small"><a class="badge verified" href="/zh/status/#F-30" data-fact="F-30">2026-11-15 来源 / 回锚已核验 · F-30</a> · <a href="/docs/bank-explorer-20261115.md">快照范围</a> · <a href="/downloads/bank-source-LICENSE.txt">银行源码许可</a></p>
+      <p class="small"><a class="badge verified" href="/zh/status/#F-31" data-fact="F-31">2026-11-25 来源 / 回锚与编译单测已核验 · F-31</a> · <a href="/docs/bank-explorer-20261125.md">当前快照范围</a> · <a href="/docs/bank-explorer-20261115.md">历史快照 (F-30)</a> · <a href="/downloads/bank-source-LICENSE.txt">银行源码许可</a></p>
     </header>
 
     <div class="xp-workbench-bar">
@@ -48,8 +48,8 @@
         <summary>快照与证据</summary>
         <p class="small" id="xp-snapshot-status" role="status">正在核对银行配对快照与下载字节…</p>
         <p class="small" id="xp-code-scope">保留原始文件字节；文件候选与精确区间是不同精度。</p>
-        <p id="xp-source-origin" class="small">浏览器读取打包后的固定快照，不读取你本机银行仓库的 <code>generated/</code> 或 <code>generated/current/</code>。页面路径均相对这份快照。<a href="/docs/bank-explorer-20261115.md#which-generated-directory">这份代码是从哪个生成目录来的？</a></p>
-        <p><a href="/docs/bank-explorer-20261115.md">快照范围</a> · <a href="/downloads/bank-source-LICENSE.txt">源码许可</a></p>
+        <p id="xp-source-origin" class="small">浏览器读取打包后的固定快照，不读取你本机银行仓库的 <code>generated/</code> 或 <code>generated/current/</code>。页面路径均相对这份快照。<a href="/docs/bank-explorer-20261125.md#which-generated-directory--这份代码是从哪个目录来的">这份代码是从哪个生成目录来的？</a></p>
+        <p><a href="/docs/bank-explorer-20261125.md">当前快照范围 (F-31)</a> · <a href="/docs/bank-explorer-20261115.md">历史快照 (F-30)</a> · <a href="/downloads/bank-source-LICENSE.txt">源码许可</a></p>
       </details>
     </div>
 
@@ -65,7 +65,7 @@
         <div class="xp-code-main">
           <div class="xp-file-header">
             <h2 id="xp-code-heading">选择一个文件</h2><p id="xp-code-path" class="small"></p>
-            <p id="xp-code-quality-notice" class="xp-code-quality-notice" role="note"><strong>实验样例。</strong>业务逻辑与代码生成器仍在升级，当前生成代码质量较低；仅演示双向追溯，不用于生产或作为最佳实践参考。</p>
+            <p id="xp-code-quality-notice" class="xp-code-quality-notice" role="note"><strong>教学参考实现。</strong>采用洋葱架构五层治理与自动绑定推导，并已通过本地编译与 24 项单元测试（<a href="/zh/status/#F-31">F-31</a>）；本快照用于展示架构分层与知识—代码双向追溯，不用于生产环境。架构与扩展说明见<a href="/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/#section-3">洋葱架构拆解</a>。</p>
           </div>
           <div class="xp-file-tools">
             <label for="xp-code-find" class="xp-find-label">文件内查找<input id="xp-code-find" type="search" maxlength="256" autocomplete="off"></label>

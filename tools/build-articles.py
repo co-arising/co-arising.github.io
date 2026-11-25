@@ -431,18 +431,19 @@ def cover(locale):
 def list_page(items, locale):
     zh = locale == "zh"
     title = "技术观察" if zh else "Insights"
-    deck = ("持续整理值得阅读的技术文章：连接行业新动向、架构方法与工程实践。本期从 AI Coding 的范式演进出发，再思考它对 co-arising 的启发。" if zh else
-            "A growing collection of technical readings connecting emerging ideas, architecture and engineering practice. This edition explores AI coding and its implications for co-arising.")
+    deck = ("持续整理值得阅读的技术文章、工程实战手册与语言设计规范：覆盖 bank-wealth-demo 端到端实战与洋葱架构、受控 EARS + SMT 规约验证，以及 AI Coding 范式演进。" if zh else
+            "A growing bilingual collection of hands-on handbooks, design specifications and technical surveys — covering the bank-wealth-demo Quick Start and Onion Architecture, controlled EARS + SMT verification, and the AI coding paradigm shift.")
+    ordered = list(reversed(items))
     content = f'''    <header class="insights-hero">
-      <p class="over">{"行业演进 · 工程思考" if zh else "Industry evolution · engineering perspectives"}</p>
+      <p class="over">{"工程实践 · 设计规范 · 行业演进" if zh else "Engineering practice · design specs · industry evolution"}</p>
       <h1 id="insights-title" class="insights-title">{esc(title)}</h1>
       <p class="insights-deck">{esc(deck)}</p>
       <p class="page-outline"><a href="#articles">{"阅读文章" if zh else "Read the articles"}</a> · <a href="#editorial-context">{"发布说明" if zh else "Editorial context"}</a></p>
     </header>
     {cover(locale)}
     <section id="articles" aria-labelledby="articles-heading">
-      <h2 id="articles-heading">{"本期专题 · AI Coding 的范式转移" if zh else "This edition · the AI coding paradigm shift"}</h2>
-      <div class="insights-grid">{''.join(card(item, locale, stable_id=True) for item in items)}</div>
+      <h2 id="articles-heading">{"全部文章 · 按发布时间倒序" if zh else "All articles · newest first"}</h2>
+      <div class="insights-grid">{''.join(card(item, locale, stable_id=True) for item in ordered)}</div>
     </section>
     <section id="editorial-context" aria-labelledby="editorial-context-heading">
       <h2 id="editorial-context-heading">{"正文与发布说明各有边界" if zh else "Original views, explicit editorial boundaries"}</h2>

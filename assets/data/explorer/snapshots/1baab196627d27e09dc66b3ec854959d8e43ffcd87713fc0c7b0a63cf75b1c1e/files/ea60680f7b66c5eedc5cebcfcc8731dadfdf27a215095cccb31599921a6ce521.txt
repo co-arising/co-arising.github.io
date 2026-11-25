@@ -1,7 +1,0 @@
-package example.bankwealth.application.projection
-
-final case class BankSipPlanPage(
-  metadata: BankReadMetadata,
-  plans: Vector[BankSipPlanView],
-  nextAfter: Option[Long]
-)

@@ -1,3 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class BankCashSubmit(clientRequestId: String, fundCode: String, amount: MoneyWire)

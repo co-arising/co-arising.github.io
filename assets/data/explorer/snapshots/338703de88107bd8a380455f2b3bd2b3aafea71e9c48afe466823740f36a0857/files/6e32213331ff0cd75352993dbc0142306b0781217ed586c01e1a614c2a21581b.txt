@@ -1,3 +1,0 @@
-package example.bankwealth.application.api
-
-final case class BankCashAcknowledgement(original: BankCashOriginal, status: String)

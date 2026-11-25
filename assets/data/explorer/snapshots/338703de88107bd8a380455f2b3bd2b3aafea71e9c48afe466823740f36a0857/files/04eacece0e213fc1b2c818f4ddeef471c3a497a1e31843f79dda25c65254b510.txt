@@ -1,9 +1,0 @@
-package example.bankwealth.application.integration
-
-final case class BankTaEffectObservation(
-  operation: String,
-  request: BankTaEffectRequest,
-  status: String,
-  evidence: String,
-  result: Option[BankTaEffectResult]
-)

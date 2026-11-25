@@ -299,6 +299,15 @@
     }
     knowledgeBox.innerHTML = html;
   }
+  function verificationLabel() {
+    const ev = snapshot?.manifest?.evidence;
+    if (ev?.runtime === "compile-and-test-passed" && ev.runtimeEvidence) {
+      return zh
+        ? "导出时整体验证通过 · 下载字节逐项核对 · 编译与单测通过（" + ev.runtimeEvidence.suitesPassed + " 套件 / " + ev.runtimeEvidence.testsPassed + " 用例）"
+        : "Verified at export · downloaded bytes checked · compile & tests passed (" + ev.runtimeEvidence.suitesPassed + " suites / " + ev.runtimeEvidence.testsPassed + " tests)";
+    }
+    return t.verified;
+  }
   function describeFile(file) {
     header.textContent = file ? basename(file.path) : t.choose;
     header.title = file?.path || "";
@@ -309,7 +318,7 @@
       [zh ? "文件类别" : "Source set", file.role === "generated" ? t.generated : file.role === "handwritten" ? t.handwritten : t.author],
       [zh ? "实际读取位置" : "Read from", file.resource ? "/assets/data/explorer/snapshots/" + snapshot.manifest.id + "/" + file.resource.path : t.withheld],
       ["SHA-256", file.sha256], ["Snapshot", snapshot.manifest.id],
-      [zh ? "验证范围" : "Verification scope", t.verified],
+      [zh ? "验证范围" : "Verification scope", verificationLabel()],
     ] : [];
     fileEvidence.innerHTML = rows.map(([key, value]) => "<dt>" + esc(key) + "</dt><dd>" + esc(value) + "</dd>").join("");
   }
@@ -428,13 +437,7 @@
       for (const key of [...pinned.searchParams.keys()]) if (key.toLowerCase() === "sql") pinned.searchParams.delete(key);
       history.replaceState(null, "", pinned.pathname + pinned.search + pinned.hash);
       window.dispatchEvent(new Event("site:locationchange"));
-      const ev = snapshot.manifest.evidence;
-      const verifiedLabel = ev.runtime === "compile-and-test-passed" && ev.runtimeEvidence
-        ? (zh
-          ? "导出时整体验证通过 · 下载字节逐项核对 · 编译与单测通过（" + ev.runtimeEvidence.suitesPassed + " 套件 / " + ev.runtimeEvidence.testsPassed + " 用例）"
-          : "Verified at export · downloaded bytes checked · compile & tests passed (" + ev.runtimeEvidence.suitesPassed + " suites / " + ev.runtimeEvidence.testsPassed + " tests)")
-        : t.verified;
-      badge.textContent = snapshot.manifest.project.name + " · " + snapshot.manifest.verifiedAt + " · " + verifiedLabel;
+      badge.textContent = snapshot.manifest.project.name + " · " + snapshot.manifest.verifiedAt + " · " + verificationLabel();
       const thesis = document.querySelector(".page-hero .thesis");
       if (thesis) thesis.textContent = zh ? "从同一份公开快照浏览知识与代码：" + snapshot.manifest.graph.nodeCount + " 个图节点、" + snapshot.manifest.graph.edgeCount + " 条声明关系。所有查询在浏览器执行，不发送给服务器；导出验证不等于运行验收。" : "Explore knowledge and code from one published snapshot: " + snapshot.manifest.graph.nodeCount + " graph nodes and " + snapshot.manifest.graph.edgeCount + " declared relationships. Queries execute in your browser, not on a server. Export verification is not runtime acceptance.";
       const graphIntro = document.querySelector("#nodes > .sec-sub");
@@ -454,5 +457,5 @@
     }
   })();
   root.ExplorerCode = Object.freeze({ ready, renderAnchors, nodeURL: (id) => url({ view: "graph", node: id, file: null, line: null, end: null, knowledge: null }),
-    scope: () => snapshot ? t.verified + " · " + snapshot.manifest.id : null });
+    scope: () => snapshot ? verificationLabel() + " · " + snapshot.manifest.id : null });
 })(globalThis);

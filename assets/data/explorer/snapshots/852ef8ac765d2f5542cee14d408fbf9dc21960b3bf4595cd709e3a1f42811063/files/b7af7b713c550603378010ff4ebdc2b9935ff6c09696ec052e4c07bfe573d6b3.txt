@@ -1,7 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class CreditOriginalInvestorCompensateInput(
-  txid: TxId,
-  resource: AccountId,
-  amount: Money
-)

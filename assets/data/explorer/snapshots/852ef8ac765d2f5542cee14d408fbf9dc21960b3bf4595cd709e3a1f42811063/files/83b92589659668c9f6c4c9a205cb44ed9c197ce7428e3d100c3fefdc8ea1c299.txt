@@ -1,3 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class ReserveCashFundOrderPrepareInput(txid: TxId, resource: FundOrderId, amount: Money)

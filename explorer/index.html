@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Knowledge-graph explorer — co-arising</title>
-  <meta name="description" content="The bank wealth knowledge graph (389 nodes / 413 edges) loaded in your browser via sql.js. Blast radius, lineage, orphans, census — as preset queries and a free SQL console. No server, no tracking." />
+  <meta name="description" content="The bank wealth knowledge graph (current snapshot: 392 nodes / 413 edges) and 358 generated, handwritten and author files loaded in your browser via sql.js. Blast radius, lineage, bidirectional code anchors and a free SQL console. No server, no tracking." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -30,7 +30,7 @@
       <p class="over">Explorer · runs entirely in your browser</p>
       <h1>Explore the knowledge.<br><span class="accent">Trace the code.</span></h1>
       <p class="thesis">Browse the real bank wealth knowledge and generated code in one matched snapshot. Follow a knowledge node to its author declaration and code, then click a code line to trace back. Everything runs in your browser; query text and results are not sent to a server.</p>
-      <p class="small"><a class="badge verified" href="/status/#F-30" data-fact="F-30">Source / anchors verified 2026-11-15 · F-30</a> · <a href="/docs/bank-explorer-20261115.md">Snapshot scope</a> · <a href="/downloads/bank-source-LICENSE.txt">Bank source license</a></p>
+      <p class="small"><a class="badge verified" href="/status/#F-31" data-fact="F-31">Source / anchors &amp; compile/test verified 2026-11-25 · F-31</a> · <a href="/docs/bank-explorer-20261125.md">Current snapshot scope</a> · <a href="/docs/bank-explorer-20261115.md">Historical snapshot (F-30)</a> · <a href="/downloads/bank-source-LICENSE.txt">Bank source license</a></p>
     </header>
 
     <div class="xp-workbench-bar">
@@ -48,8 +48,8 @@
         <summary>Snapshot & evidence</summary>
         <p class="small" id="xp-snapshot-status" role="status">Checking the matching bank snapshot and downloaded bytes…</p>
         <p class="small" id="xp-code-scope">Original file bytes; file candidates and exact spans are different precision levels.</p>
-        <p id="xp-source-origin" class="small">This browser reads a packaged, fixed snapshot—not your local bank <code>generated/</code> or <code>generated/current/</code>. Displayed paths are relative to that snapshot. <a href="/docs/bank-explorer-20261115.md#which-generated-directory">Which generated directory supplied it?</a></p>
-        <p><a href="/docs/bank-explorer-20261115.md">Snapshot scope</a> · <a href="/downloads/bank-source-LICENSE.txt">Source license</a></p>
+        <p id="xp-source-origin" class="small">This browser reads a packaged, fixed snapshot—not your local bank <code>generated/</code> or <code>generated/current/</code>. Displayed paths are relative to that snapshot. <a href="/docs/bank-explorer-20261125.md#which-generated-directory--这份代码是从哪个目录来的">Which generated directory supplied it?</a></p>
+        <p><a href="/docs/bank-explorer-20261125.md">Current snapshot scope (F-31)</a> · <a href="/docs/bank-explorer-20261115.md">Historical snapshot (F-30)</a> · <a href="/downloads/bank-source-LICENSE.txt">Source license</a></p>
       </details>
     </div>
 
@@ -65,7 +65,7 @@
         <div class="xp-code-main">
           <div class="xp-file-header">
             <h2 id="xp-code-heading">Choose a file</h2><p id="xp-code-path" class="small"></p>
-            <p id="xp-code-quality-notice" class="xp-code-quality-notice" role="note"><strong>Experimental sample.</strong> Business logic and generator are still evolving; generated code quality is poor. Traceability demo only—not for production or best-practice reference.</p>
+            <p id="xp-code-quality-notice" class="xp-code-quality-notice" role="note"><strong>Teaching reference implementation.</strong> Structured in a five-layer Onion Architecture with auto-derived bindings and passing local compile &amp; 24 unit tests (<a href="/status/#F-31">F-31</a>). Demonstrates architecture layering and bidirectional knowledge–code traceability; not for production use. See the <a href="/articles/bank-wealth-quickstart-architecture-extensibility-20261125/#section-3">Onion Architecture deep dive</a>.</p>
           </div>
           <div class="xp-file-tools">
             <label for="xp-code-find" class="xp-find-label">Find in file<input id="xp-code-find" type="search" maxlength="256" autocomplete="off"></label>

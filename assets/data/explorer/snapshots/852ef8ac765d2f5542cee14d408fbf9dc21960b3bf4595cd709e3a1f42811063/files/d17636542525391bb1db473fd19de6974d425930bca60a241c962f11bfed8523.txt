@@ -1,6 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class BankCashRequestResponse(
-  metadata: BankReadMetadata,
-  request: Option[BankCashRequestView]
-)

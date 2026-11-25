@@ -1,5 +1,0 @@
-package example.bankwealth.application.saga
-
-import example.bankwealth.domain.values.{AccountId, Money, TxId}
-
-final case class CreditFundCollectionCommitInput(txid: TxId, resource: AccountId, amount: Money)

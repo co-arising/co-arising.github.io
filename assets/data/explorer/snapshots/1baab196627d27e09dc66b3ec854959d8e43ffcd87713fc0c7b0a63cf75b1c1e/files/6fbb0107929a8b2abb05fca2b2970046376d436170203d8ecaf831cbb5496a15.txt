@@ -1,3 +1,0 @@
-package example.bankwealth.infrastructure.persistence
-
-final case class AmountDecimalPO(value: String)

@@ -145,8 +145,8 @@ test('both languages provide the native directory/inspector contract and truthfu
 
 test('sample quality notice is outside collapsible evidence and present in both languages', () => {
   for (const [path, expected] of [
-    ['explorer/index.html', /Business logic and generator are still evolving; generated code quality is poor/],
-    ['zh/explorer/index.html', /业务逻辑与代码生成器仍在升级，当前生成代码质量较低/],
+    ['explorer/index.html', /Teaching reference implementation\.[\s\S]*five-layer Onion Architecture/],
+    ['zh/explorer/index.html', /教学参考实现。[\s\S]*洋葱架构五层治理/],
   ]) {
     const html = readFileSync(new URL(path, root), 'utf8');
     const fileHeader = html.match(/<div class="xp-file-header">([\s\S]*?)<\/div>/)?.[1];

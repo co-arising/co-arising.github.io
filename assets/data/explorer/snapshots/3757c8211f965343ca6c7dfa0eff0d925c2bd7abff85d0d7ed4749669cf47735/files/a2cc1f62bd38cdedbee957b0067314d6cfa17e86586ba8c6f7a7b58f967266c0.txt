@@ -1,9 +1,0 @@
-package example.bankwealth.application.saga
-
-import example.bankwealth.domain.values.{FundOrderId, Money, TxId}
-
-final case class ReserveCashFundOrderCompensateInput(
-  txid: TxId,
-  resource: FundOrderId,
-  amount: Money
-)

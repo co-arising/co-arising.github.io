@@ -152,7 +152,7 @@ python3 -B tools/article-browser-checks.py --browser chromium
 python3 -B tools/article-browser-checks.py --browser webkit
 ```
 
-The generator produces the EN/ZH indices and Chinese detail HTML from the manifest
+The generator produces the EN/ZH indices and paired EN/ZH detail HTML from the manifest
 and Markdown. Review and commit those outputs with their source/metadata changes;
 do not hand-edit generated article HTML. `--check` checks freshness without writing
 outputs. Run it after shared navigation or generator changes too. The live site

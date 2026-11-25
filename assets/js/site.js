@@ -39,7 +39,7 @@ const SITE = {
     },
   ],
   audited: "2026-11-11",
-  contentUpdated: "2026-11-17",
+  contentUpdated: "2026-11-25",
 };
 
 const STR = {

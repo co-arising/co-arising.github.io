@@ -1,8 +1,0 @@
-package example.bankwealth.domain.values
-
-final case class BankAccountView(
-  accountId: AccountId,
-  initialized: Boolean,
-  available: MoneyWire,
-  reserved: MoneyWire
-)
