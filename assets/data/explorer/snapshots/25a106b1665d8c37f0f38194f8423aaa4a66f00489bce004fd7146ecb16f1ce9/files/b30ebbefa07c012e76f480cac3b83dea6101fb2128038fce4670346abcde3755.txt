@@ -1,0 +1,39 @@
+package example.bankwealth.application.readmodels.bank_journal
+
+import akka.actor.typed.ActorSystem
+import akka.persistence.query.Offset
+import akka.projection.ProjectionId
+import akka.projection.eventsourced.EventEnvelope
+import akka.projection.eventsourced.scaladsl.EventSourcedProvider
+import akka.projection.jdbc.scaladsl.JdbcProjection
+import akka.projection.scaladsl.{ExactlyOnceProjection, SourceProvider}
+import example.bankwealth.application.readmodels.bank_journal.repository.BankJournalReadsideRepository
+import net.imadz.common.application.projection.ScalikeJdbcSession
+import scalapb.GeneratedMessage
+
+object BankJournalReadsideProjection {
+  val projectionName: String = "BankJournalReadside"
+
+  def createProjection(
+    system: ActorSystem[_],
+    readJournalPluginId: String,
+    tag: String,
+    repository: BankJournalReadsideRepository,
+    bindings: BankJournalReadsideProjectionHandler.Bindings,
+    sessionFactory: () => ScalikeJdbcSession = () => new ScalikeJdbcSession()
+  ): ExactlyOnceProjection[Offset, EventEnvelope[GeneratedMessage]] = {
+    val sourceProvider: SourceProvider[Offset, EventEnvelope[GeneratedMessage]] =
+      EventSourcedProvider.eventsByTag[GeneratedMessage](
+        system = system,
+        readJournalPluginId = readJournalPluginId,
+        tag = tag
+      )
+
+    JdbcProjection.exactlyOnce(
+      projectionId = ProjectionId(projectionName, tag),
+      sourceProvider = sourceProvider,
+      sessionFactory = sessionFactory,
+      handler = () => new BankJournalReadsideProjectionHandler(system, repository, bindings)
+    )(system)
+  }
+}

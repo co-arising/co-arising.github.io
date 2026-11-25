@@ -1,0 +1,59 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: ReviseSipPlan
+payload:
+  {
+    "name": "ReviseSipPlan",
+    "parameters": [
+      "config: SipRevisionConfig @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_REVISION_REPLAY_CONFLICT/SIP_REVISION_REPLAY_CONFLICT: \"!state.revisions.contains(param.config.revision) || state.revisions(param.config.revision) == param.config\")",
+      "@guard[invariantRef](succeed-empty SIP_REVISION_ONCE/SIP_REVISION_ONCE: \"!state.revisions.contains(param.config.revision)\")",
+      "@guard[invariantRef](reject SIP_REVISION_ID/SIP_REVISION_ID: param.config.revision.value.nonEmpty)",
+      "@guard[invariantRef](reject SIP_EFFECTIVE_SLOT/SIP_EFFECTIVE_SLOT: \"param.config.effectiveSlot >= 0\")",
+      "@guard[invariantRef](reject SIP_CONFIG_ACCOUNTS/SIP_CONFIG_ACCOUNTS: \"param.config.investorAccountId.value.nonEmpty && param.config.fundCollectionAccountId.value.nonEmpty && param.config.investorAccountId != param.config.fundCollectionAccountId\")",
+      "@guard[invariantRef](reject SIP_CONFIG_FUND/SIP_CONFIG_FUND: param.config.fundCode.nonEmpty)",
+      "@guard[invariantRef](reject SIP_CONFIG_AMOUNT/SIP_CONFIG_AMOUNT: \"param.config.amount.currency == \\\"CNY\\\" && param.config.amount.amount > 0.00\")",
+      "@guard[invariantRef](reject SIP_REVISION_FUTURE/SIP_REVISION_FUTURE: \"param.config.effectiveSlot > state.currentTick && param.config.effectiveSlot > state.latestEffectiveSlot\")"
+    ],
+    "produces": [
+      "SipPlanRevised"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipPlanRevised": {
+      "name": "SipPlanRevised",
+      "payloads": [
+        "config: SipRevisionConfig @PROPAGATED",
+        "previousRevision: RevisionId @PROPAGATED"
+      ],
+      "bindings": [
+        "config <- param.config",
+        "previousRevision <- state.latestRevision"
+      ],
+      "foldAssignments": [
+        "revisions := @fold[put](key=event.config.revision, value=event.config)",
+        "revisionEnds := @fold[put](key=event.previousRevision, value=event.config.effectiveSlot)",
+        "latestRevision := event.config.revision",
+        "latestEffectiveSlot := event.config.effectiveSlot"
+      ]
+    }
+  }

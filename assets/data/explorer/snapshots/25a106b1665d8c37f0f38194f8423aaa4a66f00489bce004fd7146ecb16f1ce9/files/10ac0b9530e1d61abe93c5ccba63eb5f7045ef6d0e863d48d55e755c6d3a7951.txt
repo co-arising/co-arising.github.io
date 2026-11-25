@@ -1,0 +1,21 @@
+package example.bankwealth.application.process.protocol
+
+import example.bankwealth.domain.values.{AccountId, FundOrderId, Money, OperationId, TxId}
+
+object BankPaymentMessages {
+  final case class BankPaymentOriginal(
+    operationId: OperationId,
+    fundOrderId: FundOrderId,
+    investorAccountId: AccountId,
+    fundCollectionAccountId: AccountId,
+    fundCode: String,
+    amount: Money
+  )
+  final case class BankPaymentArgs(
+    investorAccountId: AccountId,
+    fundOrderId: FundOrderId,
+    fundCollectionAccountId: AccountId,
+    amount: Money
+  )
+  final case class BankPaymentResult(txid: TxId)
+}

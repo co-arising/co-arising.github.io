@@ -31,7 +31,7 @@ export async function loadTool(tool) {
  * authorFiles are explicitly allowlisted, already captured original buffers.
  */
 export function buildSnapshot({ inspected, libs, graph, graphBytes, graphMeta, authorFiles = [],
-  exporterFingerprint, verifiedAt = new Date().toISOString(), privateRoots = [] }) {
+  exporterFingerprint, verifiedAt = new Date().toISOString(), privateRoots = [], runtimeEvidence = null }) {
   assertInspected(inspected);
   const { result, captured, anchors, query, buffers } = inspected;
   libs.validateSourceIndex(captured.sourceIndex);
@@ -149,10 +149,12 @@ export function buildSnapshot({ inspected, libs, graph, graphBytes, graphMeta, a
   }
   const index = { schemaVersion: INDEX_SCHEMA, snapshot: '', nodes, files: sortById(files),
     identities: sortById([...identities.values()]), locations: sortById(locations) };
+  const evidence = { state: 'verified-at-export', runtime: runtimeEvidence ? 'compile-and-test-passed' : 'not-run',
+    ...(runtimeEvidence ? { runtimeEvidence } : {}),
+    sourceSnapshot: result.snapshot, knowledgeSnapshot: result.graph.snapshot, generation: result.graph.generation,
+    codeDigest: result.codeDigest, toolFingerprint: tools[0].sha256, exporterFingerprint };
   const manifest = { schemaVersion: SCHEMA, id: '', project: { name: String(captured.canonical.workshop || captured.config.context) }, verifiedAt,
-    evidence: { state: 'verified-at-export', runtime: 'not-run', sourceSnapshot: result.snapshot,
-      knowledgeSnapshot: result.graph.snapshot, generation: result.graph.generation, codeDigest: result.codeDigest,
-      toolFingerprint: tools[0].sha256, exporterFingerprint },
+    evidence,
     graph: { ...descriptor('graph.sqlite', graphBytes), nodeCount: graph.nodes.size, edgeCount: graph.edges.length,
       canonicalDigest: graphMeta.canonicalSha256 },
     index: {}, counts: { files: files.length, publishedFiles: files.filter(f => f.state === 'published').length,
@@ -181,8 +183,8 @@ export function parseArgs(args) {
   const flags = new Map(), required = ['tool', 'project', 'out', 'dest', 'authors'];
   for (let i = 0; i < args.length; i += 2) {
     const name = args[i]?.slice(2), value = args[i + 1];
-    assert.ok(args[i]?.startsWith('--') && [...required, 'requirements'].includes(name) && !flags.has(name) && value && !value.startsWith('--'),
-      'accepts unique --tool --project --out --dest --authors [--requirements] only');
+    assert.ok(args[i]?.startsWith('--') && [...required, 'requirements', 'runtime-evidence'].includes(name) && !flags.has(name) && value && !value.startsWith('--'),
+      'accepts unique --tool --project --out --dest --authors [--requirements] [--runtime-evidence] only');
     assert.ok(isAbsolute(value), 'every CLI path must be absolute'); flags.set(name, value);
   }
   assert.ok(required.every(key => flags.has(key)), 'explicit tool/project/out/dest/authors required');
@@ -204,9 +206,10 @@ export function assertPublicCoverage(bundle, query, required) {
 }
 
 export async function exportSnapshot(options) {
-  const { tool, project, out, dest, authors, requirements } = options;
+  const { tool, project, out, dest, authors, requirements, 'runtime-evidence': runtimeEvidencePath } = options;
   plainPath(tool, { directory: true }); plainPath(project); plainPath(out, { directory: true }); plainPath(authors);
   if (requirements) plainPath(requirements);
+  if (runtimeEvidencePath) plainPath(runtimeEvidencePath);
   const root = repoRoot(project), forbidden = [root, tool, out, ...bankRoots(tool)];
   assertDestination(dest, forbidden);
   const authorsBytes = readPlain(authors), whitelist = JSON.parse(text(authorsBytes));
@@ -215,6 +218,13 @@ export async function exportSnapshot(options) {
   const coverage = requirements ? JSON.parse(text(requirementsBytes)) : { schemaVersion: 'truthsrc.project-requirements/v1', required: [] };
   assert.equal(coverage.schemaVersion, 'truthsrc.project-requirements/v1');
   assert.deepEqual(Object.keys(coverage).sort(), ['required', 'schemaVersion']);
+  const runtimeEvidenceBytes = runtimeEvidencePath ? readPlain(runtimeEvidencePath) : undefined;
+  const runtimeEvidence = runtimeEvidencePath ? JSON.parse(text(runtimeEvidenceBytes)) : null;
+  if (runtimeEvidence) {
+    assertPublic(runtimeEvidence, forbidden);
+    assert.deepEqual(Object.keys(runtimeEvidence).sort(), ['command', 'compiledSources', 'suitesPassed', 'testsPassed', 'verifiedAt'],
+      'runtimeEvidence must contain exact {command, compiledSources, suitesPassed, testsPassed, verifiedAt}');
+  }
   const outputMembership = (directory = out, prefix = '') => readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)).flatMap(entry => {
     const file = prefix + entry.name, full = join(directory, entry.name);
     assert.ok(safePath(file) && !entry.isSymbolicLink(), 'unsafe output membership');
@@ -256,6 +266,7 @@ export async function exportSnapshot(options) {
     for (const author of authorFiles) assert.ok(readPlain(author.absoluteFile).equals(author.buffer), 'author capture changed during export');
     assert.ok(readPlain(authors).equals(authorsBytes), 'author whitelist changed during export');
     if (requirements) assert.ok(readPlain(requirements).equals(requirementsBytes), 'requirements changed during export');
+    if (runtimeEvidencePath) assert.ok(readPlain(runtimeEvidencePath).equals(runtimeEvidenceBytes), 'runtime evidence changed during export');
     assert.equal(fingerprintExporter(), fingerprint, 'exporter changed during export');
   };
   assertPublic(captured.canonical, forbidden);
@@ -267,7 +278,7 @@ export async function exportSnapshot(options) {
     const graphFile = join(scratch, 'graph.sqlite');
     const graphMeta = libs.buildGraphStore(captured.canonical, { file: graphFile });
     const bundle = buildSnapshot({ inspected, libs, graph, graphBytes: readPlain(graphFile), graphMeta, authorFiles,
-      exporterFingerprint: fingerprint, privateRoots: forbidden });
+      exporterFingerprint: fingerprint, privateRoots: forbidden, runtimeEvidence });
     assertPublicCoverage(bundle, inspected.query, coverage.required);
     closed(); assertDestination(dest, forbidden);
     // mkdir is exclusive; unlike rename-to-directory this cannot overwrite an
@@ -283,7 +294,8 @@ export async function exportSnapshot(options) {
     closed();
     const manifestBytes = jsonBytes(bundle.manifest);
     write('manifest.json', manifestBytes);
-    return { id: bundle.manifest.id, destination: dest, counts: bundle.manifest.counts, runtime: 'not-run',
+    return { id: bundle.manifest.id, destination: dest, counts: bundle.manifest.counts, runtime: bundle.manifest.evidence.runtime,
+      ...(runtimeEvidence ? { runtimeEvidence } : {}),
       manifest: descriptor(`snapshots/${bundle.manifest.id}/manifest.json`, manifestBytes) };
   } catch (error) {
     if (created) rmSync(dest, { recursive: true, force: true });

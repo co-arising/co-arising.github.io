@@ -1,0 +1,27 @@
+package example.bankwealth.application.connectors
+
+import example.bankwealth.domain.values.{FundOrderId, TaRequestId, TxId}
+
+object BankTaEffectProtocol {
+  final case class BankTaEffectRequest(
+    taRequestId: TaRequestId,
+    fundOrderId: FundOrderId,
+    paymentTxId: TxId
+  )
+  final case class BankTaEffectResult(taRequestId: TaRequestId)
+  final case class BankTaEffectOperation(operation: String, request: BankTaEffectRequest)
+  final case class BankTaEffectObservation(
+    operation: String,
+    request: BankTaEffectRequest,
+    status: String,
+    evidence: String,
+    result: Option[BankTaEffectResult]
+  )
+  final case class BankTaEffectReconcile(
+    operation: String,
+    request: BankTaEffectRequest,
+    decision: String,
+    evidence: Option[BankTaEffectObservation],
+    authorization: String
+  )
+}

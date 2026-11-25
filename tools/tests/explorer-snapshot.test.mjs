@@ -225,6 +225,19 @@ test('filesystem rejects symlinks, traversal, existing and overlapping destinati
   for (const p of ['../a', '/a', 'a/../b', 'a\\b', 'a%2fb', 'a?b', 'a#b', 'a//b']) assert.equal(safePath(p), false);
 });
 
+test('runtimeEvidence marks snapshot compile-and-test-passed and rejects malformed evidence', t => {
+  const f = fixture(t);
+  const re = { command: 'sbt --batch "Compile/compile" test', compiledSources: 368, suitesPassed: 5, testsPassed: 24, verifiedAt: '2026-11-25T08:00:00Z' };
+  const bundle = buildSnapshot({ ...f, runtimeEvidence: re });
+  assert.equal(bundle.manifest.evidence.runtime, 'compile-and-test-passed');
+  assert.deepEqual(bundle.manifest.evidence.runtimeEvidence, re);
+  assert.deepEqual(validateSnapshotBundle(bundle), bundle.manifest.counts);
+  const bad = buildSnapshot({ ...f, runtimeEvidence: re });
+  delete bad.manifest.evidence.runtimeEvidence;
+  reseal(bad);
+  assert.throws(() => validateSnapshotBundle(bad), /runtimeEvidence/);
+});
+
 test('strict CLI offers no inspected-json or bypass flag', () => {
   assert.throws(() => parseArgs(['--inspected', '/success.json'])); assert.throws(() => parseArgs(['--tool', 'relative']));
   assert.throws(() => parseArgs(['--tool', '/tool', '--tool', '/other']));

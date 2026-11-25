@@ -32,7 +32,15 @@ export function publicSnapshotId(manifest, index) {
 export function validateSnapshotBundle({ manifest: m, index, graphBytes, fileBuffers }, roots = []) {
   assert.ok(m.schemaVersion === SCHEMA && HASH.test(m.id), 'manifest schema/id');
   assert.ok(string(m.project?.name) && Number.isFinite(Date.parse(m.verifiedAt)), 'manifest project/date');
-  assert.ok(m.evidence?.state === 'verified-at-export' && m.evidence.runtime === 'not-run', 'verification scope');
+  assert.ok(m.evidence?.state === 'verified-at-export' && ['not-run', 'compile-and-test-passed'].includes(m.evidence.runtime), 'verification scope');
+  if (m.evidence.runtime === 'compile-and-test-passed') {
+    const re = m.evidence.runtimeEvidence;
+    assert.ok(re && typeof re === 'object' && !Array.isArray(re), 'missing runtimeEvidence');
+    assert.ok(string(re.command) && integer(re.compiledSources) && integer(re.suitesPassed) &&
+      integer(re.testsPassed) && Number.isFinite(Date.parse(re.verifiedAt)), 'invalid runtimeEvidence');
+  } else {
+    assert.equal(m.evidence.runtimeEvidence, undefined, 'unexpected runtimeEvidence for not-run');
+  }
   for (const key of ['sourceSnapshot', 'knowledgeSnapshot', 'generation', 'codeDigest', 'toolFingerprint', 'exporterFingerprint'])
     assert.ok(string(m.evidence[key]), 'missing evidence');
   assert.ok(jsonBytes(m).length <= MAX_BYTES, 'manifest exceeds resource limit');

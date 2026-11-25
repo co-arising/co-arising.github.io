@@ -24,10 +24,22 @@
         "evidence": {
           "type": "object", "required": ["state", "runtime", "sourceSnapshot", "knowledgeSnapshot", "generation", "codeDigest", "toolFingerprint", "exporterFingerprint"],
           "properties": {
-            "state": { "const": "verified-at-export" }, "runtime": { "const": "not-run" },
+            "state": { "const": "verified-at-export" }, "runtime": { "enum": ["not-run", "compile-and-test-passed"] },
+            "runtimeEvidence": {
+              "type": "object", "required": ["command", "compiledSources", "suitesPassed", "testsPassed", "verifiedAt"],
+              "properties": {
+                "command": { "$ref": "#/$defs/text" },
+                "compiledSources": { "$ref": "#/$defs/uint" },
+                "suitesPassed": { "$ref": "#/$defs/uint" },
+                "testsPassed": { "$ref": "#/$defs/uint" },
+                "verifiedAt": { "type": "string", "format": "date-time" }
+              }
+            },
             "sourceSnapshot": { "$ref": "#/$defs/text" }, "knowledgeSnapshot": { "$ref": "#/$defs/text" }, "generation": { "$ref": "#/$defs/text" },
             "codeDigest": { "$ref": "#/$defs/text" }, "toolFingerprint": { "$ref": "#/$defs/text" }, "exporterFingerprint": { "$ref": "#/$defs/text" }
-          }
+          },
+          "allOf": [{ "if": { "properties": { "runtime": { "const": "compile-and-test-passed" } } }, "then": { "required": ["runtimeEvidence"] },
+            "else": { "not": { "required": ["runtimeEvidence"] } } }]
         },
         "graph": { "allOf": [{ "$ref": "#/$defs/resource" }, {
           "required": ["nodeCount", "edgeCount", "canonicalDigest"], "properties": {

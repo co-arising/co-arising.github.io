@@ -1,0 +1,41 @@
+package example.bankwealth.infrastructure.persistence
+
+import example.bankwealth.application.process.independent_refund.BankIndependentRefundExecution
+import example.bankwealth.infrastructure.persistence.converters.DomainConverters
+import net.imadz.monarch.persistence.StateCodec
+
+/** Exact finite plan state codec: owns protobuf slot encoding/decoding for
+  * `BankIndependentRefundExecution.State` in the persistence layer. */
+object BankIndependentRefundStateCodec {
+
+  val codec: StateCodec[BankIndependentRefundExecution.State] = StateCodec[BankIndependentRefundExecution.State](
+    state =>
+      example.bankwealth.infrastructure.executionproto.bankindependentrefundv1ExecutionStatePB(
+        planversion = BankIndependentRefundExecution.PlanVersion,
+        input0 = Some(DomainConverters.encodeFundOrderIdPO(state.inputs.fundOrderId)),
+        input1 = Some(DomainConverters.encodeTxIdPO(state.inputs.paymentTxId)),
+        input2 = Some(DomainConverters.encodeAccountIdPO(state.inputs.investorAccountId)),
+        input3 = Some(DomainConverters.encodeAccountIdPO(state.inputs.fundCollectionAccountId)),
+        input4 = Some(DomainConverters.encodeMoneyPO(state.inputs.amount)),
+        input5 = Some(DomainConverters.encodeOperationIdPO(state.inputs.refundOperationId)),
+        output0 = state.refundTxid.map(DomainConverters.encodeTxIdPO),
+      ).toByteArray,
+    bytes => {
+      val pb = example.bankwealth.infrastructure.executionproto.bankindependentrefundv1ExecutionStatePB.parseFrom(bytes)
+      require(pb.planversion == BankIndependentRefundExecution.PlanVersion, "exact finite plan version required")
+      def durable[A](slot: Option[A], name: String): A =
+        slot.getOrElse(throw new IllegalArgumentException(s"missing durable input $name"))
+      BankIndependentRefundExecution.State(
+        BankIndependentRefundExecution.Inputs(
+          fundOrderId = DomainConverters.decodeFundOrderIdPO(durable(pb.input0, "input0")),
+          paymentTxId = DomainConverters.decodeTxIdPO(durable(pb.input1, "input1")),
+          investorAccountId = DomainConverters.decodeAccountIdPO(durable(pb.input2, "input2")),
+          fundCollectionAccountId = DomainConverters.decodeAccountIdPO(durable(pb.input3, "input3")),
+          amount = DomainConverters.decodeMoneyPO(durable(pb.input4, "input4")),
+          refundOperationId = DomainConverters.decodeOperationIdPO(durable(pb.input5, "input5")),
+        ),
+        pb.output0.map(DomainConverters.decodeTxIdPO),
+      )
+    },
+  )
+}
