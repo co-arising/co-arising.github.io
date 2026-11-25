@@ -1,0 +1,52 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: FundOrder
+command: RecordCashRequestSource
+payload:
+  {
+    "name": "RecordCashRequestSource",
+    "parameters": [
+      "original: CashPurchaseSource @BUSINESS_INPUT",
+      "source: \"Option[CashPurchaseSource]\" @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject CASH_SOURCE_OPTION/CASH_SOURCE_OPTION: \"param.source.contains(param.original)\")",
+      "@guard[invariantRef](reject CASH_SOURCE_RESOURCE/CASH_SOURCE_RESOURCE: \"param.original.fundOrderId == state.id\")",
+      "@guard[invariantRef](reject CASH_SOURCE_BODY/CASH_SOURCE_BODY: \"param.original.principalId.nonEmpty && param.original.clientRequestId.nonEmpty && param.original.authorityVersion.nonEmpty && param.original.operationId.value.nonEmpty && param.original.fundCode.nonEmpty && param.original.amount.currency == \\\"CNY\\\" && param.original.amount.amount > 0.00\")",
+      "@guard[invariantRef](reject CASH_SOURCE_CONFLICT/CASH_SOURCE_CONFLICT: \"state.cashRequestSource.isEmpty || state.cashRequestSource.contains(param.original)\")",
+      "@guard[invariantRef](reject CASH_SOURCE_PAYMENT/CASH_SOURCE_PAYMENT: \"state.status == \\\"new\\\" || (param.original.operationId == state.operationId && param.original.investorAccountId == state.investorAccountId && param.original.fundCollectionAccountId == state.fundCollectionAccountId && param.original.fundCode == state.fundCode && param.original.amount == state.amount)\")",
+      "@guard[invariantRef](succeed-empty CASH_SOURCE_ONCE/CASH_SOURCE_ONCE: state.cashRequestSource.isEmpty)",
+      "@guard[invariantRef](reject CASH_SOURCE_BEFORE_SETTLEMENT/CASH_SOURCE_BEFORE_SETTLEMENT: \"state.status == \\\"new\\\"\")"
+    ],
+    "produces": [
+      "CashRequestSourceRecorded"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1-service-integration",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-service-integration-619",
+      "sourceFlow": "P26-P32",
+      "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+    }
+  }
+events:
+  {
+    "CashRequestSourceRecorded": {
+      "name": "CashRequestSourceRecorded",
+      "payloads": [
+        "original: CashPurchaseSource @PROPAGATED",
+        "source: \"Option[CashPurchaseSource]\" @PROPAGATED",
+        "tenantId: TenantId @PROPAGATED"
+      ],
+      "bindings": [
+        "original <- param.original",
+        "source <- param.source",
+        "tenantId <- state.tenantId"
+      ],
+      "foldAssignments": [
+        "cashRequestSource := event.source",
+        "cashRequestOriginals := @fold[put](key=\"literal:original\", value=event.original)"
+      ]
+    }
+  }
