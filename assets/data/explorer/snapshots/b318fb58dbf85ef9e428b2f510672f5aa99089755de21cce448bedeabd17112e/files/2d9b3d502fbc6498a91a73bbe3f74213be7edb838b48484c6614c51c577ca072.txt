@@ -1,0 +1,261 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: aggregate
+name: FundOrder
+context: bankwealth
+order:
+  commands: ["RequestFundPurchaseSettlement","ReserveFundSubscription","ConfirmFundSubscriptionPayment","CancelCashFundSubscription","RecordFundCashPaymentSucceeded","RecordFundCashPaymentRejectedBeforeEffects","RecordFundCashPaymentCompensated","RecordFundCashPaymentRecoveryRequired","RecordFundCashPaymentOutcomeUnknown","RegisterFundTASubmission","RecordFundTAAccepted","RecordFundTAConfirmed","RecordFundTARejected","RecordFundTAUnknown","RequestFundPurchaseRefund","RecordFundRefundSucceeded","RecordFundRefundRejectedBeforeEffects","RecordFundRefundCompensated","RecordFundRefundRecoveryRequired","RecordFundRefundOutcomeUnknown","RecordCashRequestSource"]
+  events: ["FundPurchaseSettlementRequested","ReserveFundSubscriptionConfirmed","FundSubscriptionPaymentConfirmed","CashFundSubscriptionCanceled","FundCashPaymentSucceeded","FundCashPaymentRejectedBeforeEffects","FundCashPaymentCompensated","FundCashPaymentRecoveryRequired","FundCashPaymentOutcomeUnknown","FundTASubmissionRegistered","FundTAAccepted","FundTASharesConfirmed","FundTARejected","FundTAUnknown","FundPurchaseRefundRequested","FundRefundSucceeded","FundRefundRejectedBeforeEffects","FundRefundCompensated","FundRefundRecoveryRequired","FundRefundOutcomeUnknown","FundTAReceiptObserved","BankPaymentResultSucceeded","BankPaymentResultRejectedBeforeEffects","BankPaymentResultCompensated","BankPaymentResultRecoveryRequired","BankPaymentResultOutcomeUnknown","BankRefundResultSucceeded","BankRefundResultRejectedBeforeEffects","BankRefundResultCompensated","BankRefundResultRecoveryRequired","BankRefundResultOutcomeUnknown","CashRequestSourceRecorded"]
+payload:
+  {
+    "name": "FundOrder",
+    "entity": "FundOrderEntity",
+    "identifier": "id: FundOrderId @BUSINESS_INPUT",
+    "stateFields": [
+      "id: FundOrderId = \"\"",
+      "tenantId: TenantId = \"\"",
+      "status: String = \"new\"",
+      "operationId: OperationId = \"\"",
+      "investorAccountId: AccountId = \"\"",
+      "fundCollectionAccountId: AccountId = \"\"",
+      "fundCode: String = \"\"",
+      "amount: Money = {\"amount\":\"0.00\",\"currency\":\"CNY\"}",
+      "reservedSubscriptions: \"Map[TxId, Money]\" = []",
+      "committedSubscriptions: \"Map[TxId, Money]\" = []",
+      "compensatedSubscriptions: \"Map[TxId, Money]\" = []",
+      "selectedPaymentTxId: TxId = \"\"",
+      "paymentOutcome: String = \"\"",
+      "cashPaymentResults: \"Map[TxId, String]\" = []",
+      "cashPaymentFinalResults: \"Map[TxId, String]\" = []",
+      "taRequestId: TaRequestId = \"\"",
+      "taReference: String = \"\"",
+      "taStatus: String = \"\"",
+      "taReceipts: \"Map[String, String]\" = []",
+      "taReceiptOutcomes: \"Map[String, String]\" = []",
+      "taConfirmedShares: FundShare = {\"fundCode\":\"\",\"shares\":\"\",\"nav\":\"\"}",
+      "taRejectionReason: String = \"\"",
+      "refundOperationId: OperationId = \"\"",
+      "refundOutcome: String = \"\"",
+      "refundResultReceipts: \"Map[String, String]\" = []",
+      "refundFinalResults: \"Map[TxId, String]\" = []",
+      "taObservedReceipts: \"Map[String, String]\" = []",
+      "paymentObservedResults: \"Map[TxId, String]\" = []",
+      "refundObservedResults: \"Map[TxId, String]\" = []",
+      "cashRequestSource: \"Option[CashPurchaseSource]\" = {\"present\":false,\"value\":null}",
+      "cashRequestOriginals: \"Map[String, CashPurchaseSource]\" = []"
+    ],
+    "aggregateRuleRefs": [
+      "@rule(ORDER_RESOURCE/ORDER_RESOURCE | \"基金订单标识必须与当前聚合一致\")",
+      "@rule(ORDER_TENANT/ORDER_TENANT | \"基金订单所属租户标识不能为空\")",
+      "@rule(ORDER_REPLAY_CONFLICT/ORDER_REPLAY_CONFLICT | \"重放结算请求的参数与已登记订单不一致\")",
+      "@rule(ORDER_REQUEST_ONCE/ORDER_REQUEST_ONCE | \"结算请求已登记，幂等忽略重复提交\")",
+      "@rule(ORDER_ACCOUNTS/ORDER_ACCOUNTS | \"投资人资金账户与基金募集账户不能相同\")",
+      "@rule(ORDER_AMOUNT/ORDER_AMOUNT | \"申购金额币种必须为 CNY 且金额必须大于 0\")",
+      "@rule(ORDER_OPERATION/ORDER_OPERATION | \"操作流水号与基金代码均不能为空\")",
+      "@rule(ORDER_PHASE_RESOURCE/ORDER_PHASE_RESOURCE | \"阶段操作目标订单标识必须与当前聚合一致\")",
+      "@rule(ORDER_PHASE_POSITIVE/ORDER_PHASE_POSITIVE | \"阶段操作金额币种必须为 CNY 且必须大于 0\")",
+      "@rule(ORDER_COMMITTEDSUBSCRIPTIONS_MATCH/ORDER_COMMITTEDSUBSCRIPTIONS_MATCH | \"已确认支付的交易金额与重放请求不一致\")",
+      "@rule(ORDER_COMPENSATEDSUBSCRIPTIONS_MATCH/ORDER_COMPENSATEDSUBSCRIPTIONS_MATCH | \"已取消补偿的交易金额与重放请求不一致\")",
+      "@rule(ORDER_RESERVEDSUBSCRIPTIONS_MATCH/ORDER_RESERVEDSUBSCRIPTIONS_MATCH | \"已预占申购的交易金额与重放请求不一致\")",
+      "@rule(ORDER_PREPARE_COMMITTED/ORDER_PREPARE_COMMITTED | \"该笔申购支付已确认，幂等忽略重复预占\")",
+      "@rule(ORDER_PREPARE_COMPENSATED/ORDER_PREPARE_COMPENSATED | \"该笔申购支付已取消，幂等忽略重复预占\")",
+      "@rule(ORDER_PREPARE_ONCE/ORDER_PREPARE_ONCE | \"该笔申购已预占，幂等忽略重复预占\")",
+      "@rule(ORDER_REQUEST_AMOUNT/ORDER_REQUEST_AMOUNT | \"订单须处于待支付状态且预占金额必须与订单金额一致\")",
+      "@rule(ORDER_COMMIT_ONCE/ORDER_COMMIT_ONCE | \"该笔申购支付已确认，幂等忽略重复确认\")",
+      "@rule(ORDER_NOT_CANCELED/ORDER_NOT_CANCELED | \"该笔申购交易已补偿取消，禁止确认支付\")",
+      "@rule(ORDER_PREPARED/ORDER_PREPARED | \"未找到该笔交易的申购预占记录，无法确认支付\")",
+      "@rule(ORDER_COMMIT_AMOUNT/ORDER_COMMIT_AMOUNT | \"确认支付金额必须与订单金额一致\")",
+      "@rule(ORDER_CANCEL_ONCE/ORDER_CANCEL_ONCE | \"该笔申购已取消补偿，幂等忽略重复取消\")",
+      "@rule(ORDER_CANCEL_NOT_COMMITTED/ORDER_CANCEL_NOT_COMMITTED | \"该笔申购支付已确认，禁止再补偿取消\")",
+      "@rule(PAYMENT_TERMINAL_CONFLICT/PAYMENT_TERMINAL_CONFLICT | \"支付终态结果已落账且与新上报结果冲突\")",
+      "@rule(PAYMENT_TERMINAL_ONCE/PAYMENT_TERMINAL_ONCE | \"支付终态结果已记录，幂等忽略重复上报\")",
+      "@rule(PAYMENT_COMMIT_PROOF/PAYMENT_COMMIT_PROOF | \"缺少对应交易的确认支付凭证，无法标记支付成功\")",
+      "@rule(PAYMENT_LATE_PROGRESS/PAYMENT_LATE_PROGRESS | \"支付已进入终态，幂等忽略迟到的过程状态\")",
+      "@rule(PAYMENT_PROGRESS_ONCE/PAYMENT_PROGRESS_ONCE | \"该支付过程状态已记录，幂等忽略重复上报\")",
+      "@rule(TA_SUBMIT_RESOURCE/TA_SUBMIT_RESOURCE | \"TA 报送目标订单标识必须与当前聚合一致\")",
+      "@rule(TA_PAID/TA_PAID | \"仅支付成功且匹配选定交易号的订单允许报送 TA\")",
+      "@rule(TA_SUBMIT_ONCE/TA_SUBMIT_ONCE | \"该订单已完成 TA 报送登记，幂等忽略重复登记\")",
+      "@rule(TA_ORDER/TA_ORDER | \"TA 回执目标订单标识必须与当前聚合一致\")",
+      "@rule(TA_PAYMENT/TA_PAYMENT | \"TA 回执对应的支付交易号必须与已成功支付交易一致\")",
+      "@rule(TA_REQUEST/TA_REQUEST | \"TA 请求单号不能为空且必须与订单已登记单号一致\")",
+      "@rule(TA_REFERENCE/TA_REFERENCE | \"TA 参考号不能为空且不能与已记录参考号冲突\")",
+      "@rule(TA_FUND/TA_FUND | \"TA 回执的基金代码与币种必须与订单一致\")",
+      "@rule(TA_RECEIPT_PRESENT/TA_RECEIPT_PRESENT | \"TA 回执编号与回执原文均不能为空\")",
+      "@rule(TA_RECEIPT_CONFLICT/TA_RECEIPT_CONFLICT | \"同一 TA 回执编号对应的原文或结果与历史记录冲突\")",
+      "@rule(TA_RECEIPT_ONCE/TA_RECEIPT_ONCE | \"该 TA 回执已处理，幂等忽略重复回执\")",
+      "@rule(TA_LATE_PROGRESS/TA_LATE_PROGRESS | \"订单 TA 状态已达终态，幂等忽略迟到的中间状态\")",
+      "@rule(TA_TERMINAL_CONFLICT/TA_TERMINAL_CONFLICT | \"订单 TA 状态已达终态，禁止写入冲突终态结果\")",
+      "@rule(TA_SHARE_FUND/TA_SHARE_FUND | \"确认份额的基金代码须匹配订单且份额与净值均不能为空\")",
+      "@rule(TA_REJECTION_REASON/TA_REJECTION_REASON | \"TA 拒绝原因不能为空\")",
+      "@rule(REFUND_RESOURCE/REFUND_RESOURCE | \"退款申请目标订单标识必须与当前聚合一致\")",
+      "@rule(REFUND_PAYMENT/REFUND_PAYMENT | \"退款申请关联的支付交易必须已成功完成\")",
+      "@rule(REFUND_TA_REJECTED/REFUND_TA_REJECTED | \"仅 TA 确认拒绝的订单允许发起申购退款\")",
+      "@rule(REFUND_INTENT_ONCE/REFUND_INTENT_ONCE | \"该订单退款意向已登记，幂等忽略重复发起\")",
+      "@rule(REFUND_RESULT_ASSOCIATION/REFUND_RESULT_ASSOCIATION | \"退款结果关联的退款操作号不能为空且须与订单一致\")",
+      "@rule(REFUND_RECEIPT_PRESENT/REFUND_RECEIPT_PRESENT | \"退款交易号、回执编号及回执原文均不能为空\")",
+      "@rule(REFUND_RECEIPT_CONFLICT/REFUND_RECEIPT_CONFLICT | \"同一退款回执编号对应的回执原文与历史记录冲突\")",
+      "@rule(REFUND_RECEIPT_ONCE/REFUND_RECEIPT_ONCE | \"该退款回执已处理，幂等忽略重复回执\")",
+      "@rule(REFUND_TERMINAL_CONFLICT/REFUND_TERMINAL_CONFLICT | \"退款终态结果已落账且与新上报结果冲突\")",
+      "@rule(REFUND_TERMINAL_ONCE/REFUND_TERMINAL_ONCE | \"退款终态结果已记录，幂等忽略重复上报\")",
+      "@rule(REFUND_LATE_PROGRESS/REFUND_LATE_PROGRESS | \"退款已进入终态，幂等忽略迟到的过程状态\")",
+      "@rule(CASH_SOURCE_OPTION/CASH_SOURCE_OPTION | \"现金申购来源包装项必须与原始来源记录一致\")",
+      "@rule(CASH_SOURCE_RESOURCE/CASH_SOURCE_RESOURCE | \"现金申购来源中的订单标识必须与当前聚合一致\")",
+      "@rule(CASH_SOURCE_BODY/CASH_SOURCE_BODY | \"现金申购来源的主体、请求号、版本、操作号、基金代码与 CNY 正金额均须有效\")",
+      "@rule(CASH_SOURCE_CONFLICT/CASH_SOURCE_CONFLICT | \"该订单已登记不同的现金申购原始来源记录\")",
+      "@rule(CASH_SOURCE_PAYMENT/CASH_SOURCE_PAYMENT | \"现金申购来源内容必须与已登记结算请求保持一致\")",
+      "@rule(CASH_SOURCE_ONCE/CASH_SOURCE_ONCE | \"现金申购原始来源已登记，幂等忽略重复提交\")",
+      "@rule(CASH_SOURCE_BEFORE_SETTLEMENT/CASH_SOURCE_BEFORE_SETTLEMENT | \"现金申购来源必须在发起结算请求之前登记\")",
+      "@rule(CASH_ADMITTED_PAYMENT_MATCH/CASH_ADMITTED_PAYMENT_MATCH | \"结算请求参数必须与已准入的现金申购原始来源一致\")"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "payment/ta/refund",
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
+    }
+  }
+extraEvents:
+  [
+    {
+      "name": "FundTAReceiptObserved",
+      "description": "Technical raw receipt observation only; trusted bridge validation and guarded business commands are required before any business outcome.",
+      "payloads": [
+        "fundOrderId: FundOrderId @PROPAGATED",
+        "paymentTxId: TxId @PROPAGATED",
+        "taRequestId: TaRequestId @PROPAGATED",
+        "investorAccountId: AccountId @PROPAGATED",
+        "fundCollectionAccountId: AccountId @PROPAGATED",
+        "fundCode: String @PROPAGATED",
+        "amount: Money @PROPAGATED",
+        "principal: AmountDecimal @PROPAGATED",
+        "receiptId: String @PROPAGATED",
+        "receiptBody: String @PROPAGATED",
+        "taReference: String @PROPAGATED",
+        "status: String @PROPAGATED",
+        "shares: TaExactText @PROPAGATED",
+        "nav: TaExactText @PROPAGATED",
+        "reason: String @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "taObservedReceipts := @fold[put](key=event.receiptId, value=event.receiptBody)"
+      ]
+    },
+    {
+      "name": "BankPaymentResultSucceeded",
+      "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:succeeded\")"
+      ]
+    },
+    {
+      "name": "BankPaymentResultRejectedBeforeEffects",
+      "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:rejected-before-effects\")"
+      ]
+    },
+    {
+      "name": "BankPaymentResultCompensated",
+      "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:compensated\")"
+      ]
+    },
+    {
+      "name": "BankPaymentResultRecoveryRequired",
+      "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:recovery-required\")"
+      ]
+    },
+    {
+      "name": "BankPaymentResultOutcomeUnknown",
+      "description": "Technical Saga result observation; only trusted delivery to the guarded FundOrder command advances business payment outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "paymentObservedResults := @fold[put](key=event.txid, value=\"literal:outcome-unknown\")"
+      ]
+    },
+    {
+      "name": "BankRefundResultSucceeded",
+      "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:succeeded\")"
+      ]
+    },
+    {
+      "name": "BankRefundResultRejectedBeforeEffects",
+      "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:rejected-before-effects\")"
+      ]
+    },
+    {
+      "name": "BankRefundResultCompensated",
+      "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:compensated\")"
+      ]
+    },
+    {
+      "name": "BankRefundResultRecoveryRequired",
+      "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:recovery-required\")"
+      ]
+    },
+    {
+      "name": "BankRefundResultOutcomeUnknown",
+      "description": "Technical independent refund result; trusted delivery separately records guarded business refund outcome.",
+      "payloads": [
+        "txid: TxId @PROPAGATED"
+      ],
+      "bindings": [],
+      "foldAssignments": [
+        "refundObservedResults := @fold[put](key=event.txid, value=\"literal:outcome-unknown\")"
+      ]
+    }
+  ]

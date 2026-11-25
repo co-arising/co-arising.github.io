@@ -1,0 +1,52 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: PauseSipPlan
+payload:
+  {
+    "name": "PauseSipPlan",
+    "parameters": [
+      "tick: Long @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject SIP_INITIALIZED/SIP_INITIALIZED: state.initialized)",
+      "@guard[invariantRef](reject SIP_SCHEDULE_SEALED/SIP_SCHEDULE_SEALED: state.scheduleSealed)",
+      "@guard[invariantRef](reject SIP_PAUSE_REPLAY_CONFLICT/SIP_PAUSE_REPLAY_CONFLICT: \"!state.paused || param.tick == state.pauseTick\")",
+      "@guard[invariantRef](succeed-empty SIP_PAUSE_ONCE/SIP_PAUSE_ONCE: \"!state.paused\")",
+      "@guard[invariantRef](reject SIP_PAUSE_CLOCK/SIP_PAUSE_CLOCK: \"param.tick == state.currentTick && param.tick >= 0\")",
+      "@guard[invariantRef](reject SIP_PAUSE_INTERVAL_ONCE/SIP_PAUSE_INTERVAL_ONCE: \"!state.pauseIntervals.contains(param.tick)\")"
+    ],
+    "produces": [
+      "SipPlanPaused"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ]
+    }
+  }
+events:
+  {
+    "SipPlanPaused": {
+      "name": "SipPlanPaused",
+      "payloads": [
+        "tick: Long @PROPAGATED"
+      ],
+      "bindings": [
+        "tick <- param.tick"
+      ],
+      "foldAssignments": [
+        "paused := \"literal:true\"",
+        "pauseTick := event.tick"
+      ]
+    }
+  }

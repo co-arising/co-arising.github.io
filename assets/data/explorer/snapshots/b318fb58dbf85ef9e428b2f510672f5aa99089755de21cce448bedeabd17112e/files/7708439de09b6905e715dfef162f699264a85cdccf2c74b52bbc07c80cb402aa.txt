@@ -1,0 +1,68 @@
+# ═══ truthsrc atom — hand-editable; contract: SCHEMA.md ═══
+
+kind: slice
+aggregate: SipPlan
+command: CreateSipPlan
+payload:
+  {
+    "name": "CreateSipPlan",
+    "parameters": [
+      "planId: PlanId @BUSINESS_INPUT",
+      "config: SipRevisionConfig @BUSINESS_INPUT"
+    ],
+    "guards": [
+      "@guard[invariantRef](reject SIP_ADMITTED_CREATE_MATCH/SIP_ADMITTED_CREATE_MATCH: \"state.createIntent.isEmpty || (state.sipCreateIntents.contains(\\\"original\\\") && param.planId == state.sipCreateIntents(\\\"original\\\").planId && param.config == state.sipCreateIntents(\\\"original\\\").config)\")",
+      "@guard[invariantRef](reject SIP_PLAN_ID/SIP_PLAN_ID: param.planId.value.nonEmpty)",
+      "@guard[invariantRef](reject SIP_CREATE_CONFLICT/SIP_CREATE_CONFLICT: \"!state.initialized || (param.planId == state.id && state.revisions.contains(param.config.revision) && state.revisions(param.config.revision) == param.config)\")",
+      "@guard[invariantRef](succeed-empty SIP_CREATE_ONCE/SIP_CREATE_ONCE: \"!state.initialized\")",
+      "@guard[invariantRef](reject SIP_REVISION_ID/SIP_REVISION_ID: param.config.revision.value.nonEmpty)",
+      "@guard[invariantRef](reject SIP_EFFECTIVE_SLOT/SIP_EFFECTIVE_SLOT: \"param.config.effectiveSlot >= 0\")",
+      "@guard[invariantRef](reject SIP_CONFIG_ACCOUNTS/SIP_CONFIG_ACCOUNTS: \"param.config.investorAccountId.value.nonEmpty && param.config.fundCollectionAccountId.value.nonEmpty && param.config.investorAccountId != param.config.fundCollectionAccountId\")",
+      "@guard[invariantRef](reject SIP_CONFIG_FUND/SIP_CONFIG_FUND: param.config.fundCode.nonEmpty)",
+      "@guard[invariantRef](reject SIP_CONFIG_AMOUNT/SIP_CONFIG_AMOUNT: \"param.config.amount.currency == \\\"CNY\\\" && param.config.amount.amount > 0.00\")"
+    ],
+    "produces": [
+      "SipPlanCreated"
+    ],
+    "provenance": {
+      "author": "agent-assisted-bank-v1",
+      "workshopHeld": false,
+      "sourceVersion": "bank-v1-p23-design-2",
+      "sourceFlow": "sip",
+      "sourceArtifact": "decision.p23-bank-v1-handoff",
+      "sourcePointers": [
+        "/payload/info/artifact/body/resolutions/2",
+        "/payload/info/artifact/body/resolutions/3",
+        "/payload/info/artifact/body/resolutions/4",
+        "/payload/info/artifact/body/flows/3"
+      ],
+      "serviceIntegration": {
+        "author": "agent-assisted-bank-v1-service-integration",
+        "workshopHeld": false,
+        "sourceVersion": "bank-v1-service-integration-619",
+        "sourceFlow": "P26-P32",
+        "approval": "approved P26-P32 plan and bank-service-integration/v1; not a historical workshop"
+      }
+    }
+  }
+events:
+  {
+    "SipPlanCreated": {
+      "name": "SipPlanCreated",
+      "payloads": [
+        "planId: PlanId @PROPAGATED",
+        "config: SipRevisionConfig @PROPAGATED"
+      ],
+      "bindings": [
+        "planId <- param.planId",
+        "config <- param.config"
+      ],
+      "foldAssignments": [
+        "id := event.planId",
+        "initialized := \"literal:true\"",
+        "revisions := @fold[put](key=event.config.revision, value=event.config)",
+        "latestRevision := event.config.revision",
+        "latestEffectiveSlot := event.config.effectiveSlot"
+      ]
+    }
+  }
