@@ -276,6 +276,27 @@ test('real v2 representation mappings preserve distinct canonical objects sharin
     assert.equal(b.index.locations.length, 18);
   });
 
+test('dotted HOCON placeholders are not misclassified as secret values', () => {
+  assert.equal(sensitiveReason('password = ${db.default.password}\n', [], { sourcePath: 'conf/projection.conf' }), null);
+  assert.equal(sensitiveReason('password = ${?db.default.password}\n', [], { sourcePath: 'conf/projection.conf' }), null);
+});
+
+test('handwritten files publish with distinct role and validate against contract and consumer', t => {
+  const f = fixture(t);
+  const hwBytes = Buffer.from('package example\nobject StableOrderIdentity {}\n');
+  const hwFile = join(dirname(f.authorFiles[0].absoluteFile), 'handwritten/StableOrderIdentity.scala');
+  const b = buildSnapshot({ ...f, handwrittenFiles: [{ absoluteFile: hwFile, path: 'handwritten/StableOrderIdentity.scala', buffer: hwBytes }] });
+  const hw = b.index.files.find(row => row.role === 'handwritten');
+  assert.ok(hw && hw.state === 'published' && hw.path === 'handwritten/StableOrderIdentity.scala');
+  assert.deepEqual(validateSnapshotBundle(b), b.manifest.counts);
+  if (consumer) {
+    const context = { TextDecoder };
+    runInNewContext(readFileSync(consumer, 'utf8'), context);
+    context.ExplorerSnapshot.validateManifest(b.manifest);
+    context.ExplorerSnapshot.validateIndex(b.index, b.manifest);
+  }
+});
+
 test('large source remains whole and no allowlist means no invented author file references', t => {
   const f = fixture(t), path = 'app/Large.scala', bytes = Buffer.from('val message = "unicode αβ"\r\n'.repeat(4000));
   f.inspected.buffers.set(path, bytes); f.inspected.result.files.push({ file: path, bytes: bytes.length, sha256: sha256(bytes) });

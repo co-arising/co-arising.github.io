@@ -8,19 +8,19 @@
   const t = zh ? {
     loading: "正在核对公开快照…", unavailable: "代码快照尚未发布：需要通过完整验证的配对项目。现有 Graph 仍可查询，但不能据此推断代码位置。",
     failed: "快照不可用", choose: "选择一个文件，或从 Graph 的代码位置进入。", verified: "导出时整体验证通过 · 下载字节逐项核对 · 未执行运行时验收",
-    generated: "生成代码", author: "作者文件", withheld: "未公开", noFiles: "没有匹配的文件。", noLocation: "没有直接生成代码位置；不等于业务不存在。",
+    generated: "生成代码", handwritten: "手写实现", author: "作者文件", withheld: "未公开", noFiles: "没有匹配的文件。", noLocation: "没有直接生成代码位置；不等于业务不存在。",
     noBridge: "此 Graph 节点尚无经过核对的身份桥接，不猜测代码位置。", span: "精确字节区间", file: "文件级候选", indirect: "显式关联（非直接生成）",
     source: "实际作者位置", knowledge: "关联知识", noGraph: "此身份没有对应的 canonical Graph 节点。", graph: "返回 Graph", noMatch: "这一行没有精确区间命中；下方仅为该文件的关联候选。",
-    selectLine: "点击行号反查知识。", authorNote: "作者文件及 pointer 已核对；行位置用于导航，不是生成代码回锚。", location: "代码位置", all: "全部位置", copy: "复制固定快照链接", copied: "链接已复制", copyFailed: "复制失败；可使用旁边的固定链接。", share: "固定链接", line: "行",
+    selectLine: "点击行号反查知识。", authorNote: "作者文件及 pointer 已核对；行位置用于导航，不是生成代码回锚。", handwrittenNote: "手写隔离区实现代码（与生成代码分层解耦，重生成时不覆盖）。", location: "代码位置", all: "全部位置", copy: "复制固定快照链接", copied: "链接已复制", copyFailed: "复制失败；可使用旁边的固定链接。", share: "固定链接", line: "行",
     noIdentity: "此快照没有该知识身份。", loadingFile: "正在核对文件字节…", matched: "匹配行", noText: "文件内没有匹配文本。", count: "发布 / 文件总数", unverified: "未发布代码快照", ambiguous: "保留多个候选身份，不自动合并。",
     publication: "公开范围", sources: "来源", bytes: "UTF-8 字节", reveal: "显示所有关联", none: "没有记录的关联。",
   } : {
     loading: "Checking the public snapshot…", unavailable: "Code snapshot not published: a fully verified matching project is required. The existing Graph remains queryable, but code locations cannot be inferred from it.",
     failed: "Snapshot unavailable", choose: "Choose a file, or follow a code location from Graph.", verified: "Verified at export · downloaded bytes checked · runtime acceptance not run",
-    generated: "Generated", author: "Author", withheld: "Withheld", noFiles: "No matching files.", noLocation: "No directly generated code location. This does not imply missing business behavior.",
+    generated: "Generated", handwritten: "Handwritten", author: "Author", withheld: "Withheld", noFiles: "No matching files.", noLocation: "No directly generated code location. This does not imply missing business behavior.",
     noBridge: "No verified identity bridge for this Graph node. Code locations are not guessed.", span: "Exact byte span", file: "File candidate", indirect: "Declared relation (not directly generated)",
     source: "Actual author location", knowledge: "Related knowledge", noGraph: "This identity has no corresponding canonical Graph node.", graph: "Back to Graph", noMatch: "No exact span overlaps this line; below are file-level association candidates only.",
-    selectLine: "Click a line number to query its knowledge.", authorNote: "Author file and pointer checked; line navigation is not a generated code anchor.", location: "Code locations", all: "All locations", copy: "Copy snapshot link", copied: "Link copied", copyFailed: "Copy failed; use the fixed link beside this button.", share: "Fixed link", line: "Line",
+    selectLine: "Click a line number to query its knowledge.", authorNote: "Author file and pointer checked; line navigation is not a generated code anchor.", handwrittenNote: "Handwritten isolation-zone implementation (decoupled from generated code and preserved across regeneration).", location: "Code locations", all: "All locations", copy: "Copy snapshot link", copied: "Link copied", copyFailed: "Copy failed; use the fixed link beside this button.", share: "Fixed link", line: "Line",
     noIdentity: "No such knowledge identity in this snapshot.", loadingFile: "Checking file bytes…", matched: "Matching lines", noText: "No matching text in this file.", count: "published / total files", unverified: "Code snapshot not published", ambiguous: "Multiple candidate identities are retained, not merged.",
     publication: "Publication scope", sources: "Sources", bytes: "UTF-8 bytes", reveal: "Show all associations", none: "No recorded associations.",
   };
@@ -267,12 +267,14 @@
       current.set(parts.at(-1), file);
     }
     const collator = new Intl.Collator(zh ? "zh-CN" : "en", { numeric: true, sensitivity: "base" });
+    const roleOrder = { generated: 0, handwritten: 1, author: 2 };
+    const roleLabel = r => r === "generated" ? t.generated : r === "handwritten" ? t.handwritten : t.author;
     const draw = (branch, prefix = "") => "<ul>" + [...branch].sort(([a, av], [b, bv]) => {
-      if (!prefix) return (a === "generated" ? 0 : 1) - (b === "generated" ? 0 : 1);
+      if (!prefix) return (roleOrder[a] ?? 9) - (roleOrder[b] ?? 9);
       return Number(bv instanceof Map) - Number(av instanceof Map) || collator.compare(a, b);
     }).map(([name, entry]) => {
       const key = prefix ? prefix + "/" + name : name;
-      if (entry instanceof Map) return "<li><details data-directory='" + esc(key) + "'" + (search || (openDirectories.get(key) ?? !prefix) ? " open" : "") + "><summary title='" + esc(key) + "'><span class='xp-tree-label'>" + esc(prefix ? name : name === "generated" ? t.generated : t.author) + "</span></summary>" + draw(entry, key) + "</details></li>";
+      if (entry instanceof Map) return "<li><details data-directory='" + esc(key) + "'" + (search || (openDirectories.get(key) ?? !prefix) ? " open" : "") + "><summary title='" + esc(key) + "'><span class='xp-tree-label'>" + esc(prefix ? name : roleLabel(name)) + "</span></summary>" + draw(entry, key) + "</details></li>";
       const link = anchor(name, codeRoute(entry.id, undefined), "xp-file-link");
       return "<li>" + link.replace("<a ", () => "<a data-file-id='" + esc(entry.id) + "' title='" + esc(entry.path) + "' aria-label='" + esc(entry.path + (entry.state === "withheld" ? " · " + t.withheld : "")) + "' ").replace(">" + esc(name) + "</a>", () => "><span class='xp-tree-label'>" + esc(name) + "</span>" + (entry.state === "withheld" ? "<span class='xp-tree-withheld'>" + esc(t.withheld) + "</span>" : "") + "</a>") + "</li>";
     }).join("") + "</ul>";
@@ -289,7 +291,9 @@
       html += identities.length ? "<details open><summary>" + esc(t.reveal) + " (" + identities.length + ")</summary>" + identities.map((id) => identityHTML(id, false, true)).join("") + "</details>" : "<p>" + esc(t.none) + "</p>";
       if (state.knowledge && !identities.includes(state.knowledge)) html += "<details><summary>" + esc(zh ? "导航来源（不匹配此行）" : "Navigation origin (not a match for this line)") + "</summary>" + identityHTML(state.knowledge, true, true) + "</details>";
     } else if (state.knowledge) html += identityHTML(state.knowledge, true, true);
-    else if (loadedFile) {
+    else if (loadedFile && loadedFile.file.role === "handwritten") {
+      html += "<p class='small'>" + esc(t.handwrittenNote) + "</p>";
+    } else if (loadedFile) {
       const identities = snapshot.index.identities.filter((identity) => identity.sources.some((source) => source.fileId === loadedFile.file.id));
       html += "<p class='small'>" + esc(t.authorNote) + "</p>" + identities.map((identity) => identityHTML(identity.id, false, true)).join("");
     }
@@ -302,7 +306,7 @@
     filePath.title = file?.path || "";
     const rows = file ? [
       [zh ? "快照内路径（不是本机路径）" : "Path within snapshot (not a local path)", file.path],
-      [zh ? "文件类别" : "Source set", file.role === "generated" ? t.generated : t.author],
+      [zh ? "文件类别" : "Source set", file.role === "generated" ? t.generated : file.role === "handwritten" ? t.handwritten : t.author],
       [zh ? "实际读取位置" : "Read from", file.resource ? "/assets/data/explorer/snapshots/" + snapshot.manifest.id + "/" + file.resource.path : t.withheld],
       ["SHA-256", file.sha256], ["Snapshot", snapshot.manifest.id],
       [zh ? "验证范围" : "Verification scope", t.verified],
@@ -318,7 +322,7 @@
       const n = i + 1, selected = state.line && n >= state.line && n <= end;
       return "<div class='xp-source-line" + (selected ? " selected" : "") + "' id='xp-line-" + n + "'><a data-xp-route class='xp-line-number' href='" + esc(url(codeRoute(loadedFile.file.id, state.knowledge, n))) + "' aria-label='" + esc(t.line + " " + n) + "'>" + n + "</a><code>" + esc(line.endsWith("\r") ? line.slice(0, -1) : line) + "</code></div>";
     }).join("") + "</div>";
-    message.textContent = loadedFile.file.role === "author" ? t.authorNote : t.selectLine;
+    message.textContent = loadedFile.file.role === "author" ? t.authorNote : loadedFile.file.role === "handwritten" ? t.handwrittenNote : t.selectLine;
     if (state.line) scrollWithin(viewer, el("xp-line-" + state.line), true);
     showKnowledge(state);
     el("xp-code-find-result").textContent = "";

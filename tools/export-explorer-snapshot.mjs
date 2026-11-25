@@ -31,7 +31,7 @@ export async function loadTool(tool) {
  * authorFiles are explicitly allowlisted, already captured original buffers.
  */
 export function buildSnapshot({ inspected, libs, graph, graphBytes, graphMeta, authorFiles = [],
-  exporterFingerprint, verifiedAt = new Date().toISOString(), privateRoots = [], runtimeEvidence = null }) {
+  handwrittenFiles = [], exporterFingerprint, verifiedAt = new Date().toISOString(), privateRoots = [], runtimeEvidence = null }) {
   assertInspected(inspected);
   const { result, captured, anchors, query, buffers } = inspected;
   libs.validateSourceIndex(captured.sourceIndex);
@@ -67,6 +67,13 @@ export function buildSnapshot({ inspected, libs, graph, graphBytes, graphMeta, a
     verifyBuffer(author.buffer, source);
     assert.ok(!authors.has(author.absoluteFile), 'duplicate author whitelist');
     authors.set(author.absoluteFile, fileRow(author.path, 'author', author.buffer, source));
+  }
+  const handwrittens = new Set();
+  for (const hw of handwrittenFiles) {
+    assert.ok(safePath(hw.path) && Buffer.isBuffer(hw.buffer), 'invalid handwritten file');
+    assert.ok(!handwrittens.has(hw.absoluteFile), 'duplicate handwritten whitelist');
+    handwrittens.add(hw.absoluteFile);
+    fileRow(hw.path, 'handwritten', hw.buffer, { sha256: sha256(hw.buffer), bytes: hw.buffer.length });
   }
   const identities = new Map();
   const addOrigin = row => {
@@ -183,8 +190,8 @@ export function parseArgs(args) {
   const flags = new Map(), required = ['tool', 'project', 'out', 'dest', 'authors'];
   for (let i = 0; i < args.length; i += 2) {
     const name = args[i]?.slice(2), value = args[i + 1];
-    assert.ok(args[i]?.startsWith('--') && [...required, 'requirements', 'runtime-evidence'].includes(name) && !flags.has(name) && value && !value.startsWith('--'),
-      'accepts unique --tool --project --out --dest --authors [--requirements] [--runtime-evidence] only');
+    assert.ok(args[i]?.startsWith('--') && [...required, 'handwritten', 'requirements', 'runtime-evidence'].includes(name) && !flags.has(name) && value && !value.startsWith('--'),
+      'accepts unique --tool --project --out --dest --authors [--handwritten] [--requirements] [--runtime-evidence] only');
     assert.ok(isAbsolute(value), 'every CLI path must be absolute'); flags.set(name, value);
   }
   assert.ok(required.every(key => flags.has(key)), 'explicit tool/project/out/dest/authors required');
@@ -206,14 +213,19 @@ export function assertPublicCoverage(bundle, query, required) {
 }
 
 export async function exportSnapshot(options) {
-  const { tool, project, out, dest, authors, requirements, 'runtime-evidence': runtimeEvidencePath } = options;
+  const { tool, project, out, dest, authors, handwritten, requirements, 'runtime-evidence': runtimeEvidencePath } = options;
   plainPath(tool, { directory: true }); plainPath(project); plainPath(out, { directory: true }); plainPath(authors);
+  if (handwritten) plainPath(handwritten);
   if (requirements) plainPath(requirements);
   if (runtimeEvidencePath) plainPath(runtimeEvidencePath);
   const root = repoRoot(project), forbidden = [root, tool, out, ...bankRoots(tool)];
   assertDestination(dest, forbidden);
   const authorsBytes = readPlain(authors), whitelist = JSON.parse(text(authorsBytes));
   assert.ok(Array.isArray(whitelist) && whitelist.every(safePath) && new Set(whitelist).size === whitelist.length, 'authors must be unique real repo-relative paths');
+  const handwrittenBytes = handwritten ? readPlain(handwritten) : undefined;
+  const handwrittenList = handwritten ? JSON.parse(text(handwrittenBytes)) : [];
+  assert.ok(Array.isArray(handwrittenList) && handwrittenList.every(safePath) && new Set(handwrittenList).size === handwrittenList.length,
+    'handwritten must be unique real repo-relative paths');
   const requirementsBytes = requirements ? readPlain(requirements) : undefined;
   const coverage = requirements ? JSON.parse(text(requirementsBytes)) : { schemaVersion: 'truthsrc.project-requirements/v1', required: [] };
   assert.equal(coverage.schemaVersion, 'truthsrc.project-requirements/v1');
@@ -255,6 +267,10 @@ export async function exportSnapshot(options) {
     const absoluteFile = join(root, path); assert.ok(contains(root, absoluteFile));
     return { path, absoluteFile, buffer: readPlain(absoluteFile) };
   });
+  const handwrittenFiles = handwrittenList.map(path => {
+    const absoluteFile = join(root, path); assert.ok(contains(root, absoluteFile));
+    return { path, absoluteFile, buffer: readPlain(absoluteFile) };
+  });
   const closed = () => {
     libs.assertUnchanged(captured);
     assert.deepEqual(outputMembership(), membership, 'output membership changed during export');
@@ -264,7 +280,9 @@ export async function exportSnapshot(options) {
       assert.ok(readPlain(join(out, file)).equals(buffer), 'generated/evidence capture changed during export');
     }
     for (const author of authorFiles) assert.ok(readPlain(author.absoluteFile).equals(author.buffer), 'author capture changed during export');
+    for (const hw of handwrittenFiles) assert.ok(readPlain(hw.absoluteFile).equals(hw.buffer), 'handwritten capture changed during export');
     assert.ok(readPlain(authors).equals(authorsBytes), 'author whitelist changed during export');
+    if (handwritten) assert.ok(readPlain(handwritten).equals(handwrittenBytes), 'handwritten whitelist changed during export');
     if (requirements) assert.ok(readPlain(requirements).equals(requirementsBytes), 'requirements changed during export');
     if (runtimeEvidencePath) assert.ok(readPlain(runtimeEvidencePath).equals(runtimeEvidenceBytes), 'runtime evidence changed during export');
     assert.equal(fingerprintExporter(), fingerprint, 'exporter changed during export');
@@ -278,7 +296,7 @@ export async function exportSnapshot(options) {
     const graphFile = join(scratch, 'graph.sqlite');
     const graphMeta = libs.buildGraphStore(captured.canonical, { file: graphFile });
     const bundle = buildSnapshot({ inspected, libs, graph, graphBytes: readPlain(graphFile), graphMeta, authorFiles,
-      exporterFingerprint: fingerprint, privateRoots: forbidden, runtimeEvidence });
+      handwrittenFiles, exporterFingerprint: fingerprint, privateRoots: forbidden, runtimeEvidence });
     assertPublicCoverage(bundle, inspected.query, coverage.required);
     closed(); assertDestination(dest, forbidden);
     // mkdir is exclusive; unlike rename-to-directory this cannot overwrite an

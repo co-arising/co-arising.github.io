@@ -59,7 +59,7 @@ export function assertDestination(dest, roots) {
 }
 
 const secretKey = /^(?:(?:[\w-]+\.)*secret\.key|password|passwd|passphrase|secret|secret[-_]?value|client[-_]?secret|api[-_]?key|private[-_]?key|access[-_]?token|refresh[-_]?token|auth[-_]?token|token|authorization|credential[s]?)$/i;
-const placeholder = value => /^(?:\$\{\??[A-Za-z_][A-Za-z_0-9]*\}|\$[A-Z_][A-Z_0-9]*|process\.env\.[A-Z_][A-Z_0-9]*|<[^>]+>)$/.test(value);
+const placeholder = value => /^(?:\$\{\??[A-Za-z_][A-Za-z_0-9.-]*\}|\$[A-Z_][A-Z_0-9]*|process\.env\.[A-Z_][A-Z_0-9]*|<[^>]+>)$/.test(value);
 export function sensitiveReason(value, roots = [], { sourcePath = '' } = {}) {
   const scanText = input => {
     const s = input.replaceAll('\\/', '/');
@@ -73,6 +73,10 @@ export function sensitiveReason(value, roots = [], { sourcePath = '' } = {}) {
     for (const match of s.matchAll(assignments)) {
       const v = (match[2] ?? match[3] ?? '').trim();
       const suffix = s.slice(match.index);
+      if (sourcePath.endsWith('.scala')) {
+        if (/^'Authorization':\s*'Bearer '\s*\+\s*[\w.]+/.test(suffix)) continue;
+        if (/^credentials:\s*'(?:omit|same-origin|include)'/.test(suffix)) continue;
+      }
       if (sourcePath.endsWith('.scala') && match[2] === undefined) {
         // Scala type annotations and identifier expressions carry no literal secret.
         // Equality tests are not assignments. Quoted/default literals still fail.
@@ -83,7 +87,7 @@ export function sensitiveReason(value, roots = [], { sourcePath = '' } = {}) {
         if (/^credentials\s*=\s*\w+\s*(?:<|>|<=|>=)\s*\d+\s*(?:\|\||&&)/.test(suffix)) continue;
       }
       if (sourcePath.endsWith('.proto') && match[2] === undefined && /^["']?[\w.-]+["']?\s*=\s*\d+\s*;/.test(suffix)) continue;
-      if (v && !placeholder(v) && !/^(?:null|undefined|false|\$\{\??[A-Z_][A-Z_0-9]*\}?)$/.test(v)) return 'secret-value';
+      if (v && !placeholder(v) && !/^(?:null|undefined|false|\$\{\??[A-Za-z_][A-Za-z_0-9.-]*\}?)$/.test(v)) return 'secret-value';
     }
     // Some carriers contain serialized JSON, including escaped key names.
     if (/^\s*[\[{]/.test(s)) { try { return visit(JSON.parse(s)); } catch { /* ordinary source text */ } }

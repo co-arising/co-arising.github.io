@@ -63,7 +63,7 @@ export function validateSnapshotBundle({ manifest: m, index, graphBytes, fileBuf
   const refs = (rows, target) => { array(rows, 100000); assert.ok(new Set(rows).size === rows.length && rows.every(id => target.has(id)), 'dangling/duplicate reference'); };
   const paths = new Set();
   for (const f of files.values()) {
-    assert.ok(safePath(f.path) && ['generated', 'author'].includes(f.role), 'invalid file path/role');
+    assert.ok(safePath(f.path) && ['generated', 'handwritten', 'author'].includes(f.role), 'invalid file path/role');
     const key = f.role + ':' + f.path; assert.ok(!paths.has(key), 'duplicate file path'); paths.add(key);
     const bytes = fileBuffers.get(f.id); verifyBuffer(bytes, f);
     assert.ok(['published', 'withheld'].includes(f.state), 'publication state');
