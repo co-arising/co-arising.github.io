@@ -35,13 +35,18 @@
       <p class="article-meta"><span>Design specification</span> · <time datetime="2026-11-23">2026-11-23</time> · English translation</p>
       <h1>co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)</h1>
       <p class="article-deck">The complete language specification for the controlled-EARS single truth source with single-hop deterministic SMT-LIB 2 verification: bilingual isomorphic grammar, four bank-wealth-demo worked examples, read-only projections and locked BDD tests — the design baseline pending implementation.</p>
-      <div class="article-actions"><a href="/content/articles/co-arising-ears-spec-20261123.en.md" download="co-arising-ears-spec-20261123.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/co-arising-ears-spec-20261123/">中文原文</a></div>
+      <div class="article-actions"><a href="/content/articles/co-arising-ears-spec-20261123.en.md" download="co-arising-ears-spec-20261123.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/co-arising-ears-spec-20261123/">中文原文</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p>This article is a forward-looking technical design specification (v1.2.1). It describes the target language design and acceptance criteria, not delivered capabilities; commands, tools and artifacts named here are subject to the actually shipped versions, and landing progress is tracked on the status page.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. Architecture Overview: Single Truth Source + Single-Hop Verification + Read-Only Projections</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. co-arising EARS 1.0 Language Specification</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. Four Complete Practical Examples from bank-wealth-demo (Bilingual Comparison)</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. Read-Only Projections Automatically Derived from the Truth Source (Style E + Style B)</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. Single-Hop Deterministic Compilation from Controlled EARS 1.0 to SMT-LIB 2</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. Mathematical Verification Artifacts: Clarification Cards + BDD Breakdown 1:1 Aligned with the Four Examples</a></li><li><a href="#section-7"><span class="toc-number">07</span> 7. Isolated BDD Test Locking and AI Agent Cloze-Completion Loop</a></li><li><a href="#section-8"><span class="toc-number">08</span> 8. References and Standards</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">Read the full article</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">Community</p>
+          <p>Have questions or feedback on this article? Join the discussion on Discord.</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       <article id="article-body" class="article-body"><p><strong>Document Version</strong>: <code>1.2.1</code></p>
 <p><strong>Scope</strong>: <code>metarch-truthsrc</code> / <code>truthsrc-smt</code> / <code>co-arising</code> compiler and AI Agent Harness toolchain</p>
@@ -1175,6 +1180,14 @@ final class SipPlanStreamBatchEarsSpec extends AnyFunSuite {
 <li><a href="https://github.com/co-arising/bank-wealth-demo">co-arising/bank-wealth-demo</a> — the reference benchmark project behind the four worked examples in Section 3</li>
 </ul></article>
     </div>
+    <aside class="article-community" aria-label="Join the Discord community">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord Community</p>
+        <p class="article-community-title">Want to discuss this further or share feedback?</p>
+        <p>Join the co-arising Discord community to talk DDD, EARS/SMT verification, and deterministic code generation with the maintainers and peers.</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">Join the Discord community <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">Continue reading</h2>
       <div class="article-card" lang="en">

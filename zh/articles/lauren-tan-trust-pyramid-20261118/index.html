@@ -35,13 +35,18 @@
       <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-18">2026-11-18</time> · 中文原文</p>
       <h1>从「AI 垃圾」到月合并 11,000 PR：SpaceXSI 主任工程师 Lauren Tan 的 AI Coding 工程体系深度评估与落地指南</h1>
       <p class="article-deck">以两场一手演讲与开源 pstack 为信源，对照 2024–2026 学术与工业实证检验「信任倒金字塔」与「验证优先」的适用边界，并给出四阶段落地路线。</p>
-      <div class="article-actions"><a href="/content/articles/lauren-tan-trust-pyramid-20261118.md" download="lauren-tan-trust-pyramid-20261118.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/lauren-tan-trust-pyramid-20261118/">Read in English</a></div>
+      <div class="article-actions"><a href="/content/articles/lauren-tan-trust-pyramid-20261118.md" download="lauren-tan-trust-pyramid-20261118.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/lauren-tan-trust-pyramid-20261118/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 第一部分：Lauren Tan 的理论体系、工程实践与已验证效果</a></li><li><a href="#section-2"><span class="toc-number">02</span> 第二部分：深度评估——学术论文与工业界实证是否足以支撑这些实践？</a></li><li><a href="#section-3"><span class="toc-number">03</span> 第三部分：与《AI Coding 演进调研（2026-11-16）》的理论对比</a></li><li><a href="#section-4"><span class="toc-number">04</span> 第四部分：项目落地实战指南（架构路线、工具链与可直接复用样例）</a></li><li><a href="#section-5"><span class="toc-number">05</span> 第五部分：本质之问——AI Coding 是一道理论数学题，还是一道“堵漏洞”的工程题？</a></li><li><a href="#section-6"><span class="toc-number">06</span> 第六部分：2026 年工业界同类标杆案例横向对比</a></li><li><a href="#section-7"><span class="toc-number">07</span> 第七部分：一手资料索引——演讲视频、官方逐字稿与幻灯片图形出处</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">阅读全文</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">社区讨论</p>
+          <p>对本文观点、EARS 规约或工程落地有疑问？欢迎来 Discord 一起交流。</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       <article id="article-body" class="article-body"><blockquote>
 <p><strong>人物与信源勘误说明</strong>：中文技术圈传播的视频<a href="https://www.youtube.com/watch?v=OPAdcgNb4ts">《SpaceX 主任工程師教你：讓 AI 少寫垃圾》</a>（频道 Agent 煉金術士，2026-11-18）取材自 <strong>SpaceX Superintelligence（SpaceXSI）</strong> 主任工程师 <strong>Lauren Tan（网名 <code>@poteto</code>）</strong> 的公开演讲。Lauren Tan 曾任 Meta React Compiler 核心团队成员（详见 <a href="https://ai.engineer/speakers/lauren-tan">AI Engineer 讲者档案</a>），后负责 Cursor 与 SpaceXSI 旗下多智能体桌面端产品 <strong>GrokBot</strong> 的架构演进。本文整合了她的两场一手英文原始资料——AI Engineer CODE 2026 主题演讲 <a href="https://www.youtube.com/watch?v=O_zcc6Xl12g">《All Code Is Slop (Except Mine)》</a>（2026-11-14，<a href="https://ai.engineer/code/2026/talks/lauren-tan">官方文字整理页</a>）以及 55 分钟深度访谈 <a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">《SpaceX AI Engineer: Stop Using AI Agents Like This》</a>（2026-09-26）——并结合其开源技能库 <a href="https://github.com/cursor/plugins/blob/main/pstack/README.md"><code>pstack</code></a> 进行全景拆解与实证校验。</p>
@@ -642,6 +647,14 @@ export const noDuplicateMessages: Property = always((state) =&gt; {
 </table></div>
 <p><strong>引用说明</strong>：以上截图版权归 AI Engineer 与演讲者所有，本文以引用评注方式用于技术评论；截图下方保留演讲标题与讲者署名的原始横幅以维持出处信息，正文观点仍以上方链接的一手资料为准。</p></article>
     </div>
+    <aside class="article-community" aria-label="加入 Discord 社区">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord 社区</p>
+        <p class="article-community-title">读完这篇，想进一步交流或提出质疑？</p>
+        <p>加入 co-arising Discord 社区，直接与作者及同行探讨 DDD、EARS/SMT 验证与 AI 时代代码生成实践。</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">继续阅读</h2>
       <div class="article-card" lang="zh-CN">

@@ -45,6 +45,8 @@ HASHES = {
     "bank-wealth-quickstart-architecture-extensibility-20261125.en.md": "65bec908a3f97b30d2e074d4b4fbce76552f11db7043e5ebc76f76730119fd7d",
     "metarch-truthsrc-extending-code-generator-20261126.md": "521dc2d34e4862d8a68ccc0c00b840eafbd630cb966b0428097d71c4dcf5d362",
     "metarch-truthsrc-extending-code-generator-20261126.en.md": "5e26eddfdf65297b7d03db15395329fd97b40b031ed9c0d5cbeb646a393edfc1",
+    "co-arising-v2-ears-native-architecture-20261126.md": "77afc90c67ee91fa58c9ecb7402033fe78ec6a5a5275d16b2c3dbce3ab4b2cca",
+    "co-arising-v2-ears-native-architecture-20261126.en.md": "682aaaaea9e5b76937bc6e4fb057396f1794b6b0de50cea8d276dbf0c8e903d9",
 }
 
 

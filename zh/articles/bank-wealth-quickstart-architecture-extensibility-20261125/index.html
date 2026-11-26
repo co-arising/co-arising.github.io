@@ -35,13 +35,18 @@
       <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-25">2026-11-25</time> · 中文原文</p>
       <h1>bank-wealth-demo 实战全景指南：从真源到运行时试玩、洋葱架构拆解与 AI 时代代码生成器扩展规范</h1>
       <p class="article-deck">面向 bank-wealth-demo 的端到端 Quick Start（真源、生成、回锚与 5 套 Docker 运行时玩法）、生成代码的洋葱架构与 DDD/DIP 原理深拆，以及基于编译语义产物的多栈代码生成器扩展与 AI Agent 物料规范。</p>
-      <div class="article-actions"><a href="/content/articles/bank-wealth-quickstart-architecture-extensibility-20261125.md" download="bank-wealth-quickstart-architecture-extensibility-20261125.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">Read in English</a></div>
+      <div class="article-actions"><a href="/content/articles/bank-wealth-quickstart-architecture-extensibility-20261125.md" download="bank-wealth-quickstart-architecture-extensibility-20261125.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是面向 bank-wealth-demo 参考项目的端到端实战指南、洋葱架构源码拆解与代码生成器扩展规范；文中命令、产物类型与架构边界对照当前仓库版本整理，正式验收记录请以状态页为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. 为什么从 bank-wealth-demo 入手：一条完整可验证的工程闭环</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. Quick Start：从真源、生成代码、回锚到 Docker 运行时试玩</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. 生成代码的洋葱架构全景：分层、Artifact Type 与依赖倒置</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. 扩展新代码生成器指南：切入点、契约义务与 AI Agent 物料规范</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. 下一个大故事：向受控 EARS 1.0 与 SMT 单跳验证演进</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. 参考仓库与核心源码入口</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">阅读全文</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">社区讨论</p>
+          <p>对本文观点、EARS 规约或工程落地有疑问？欢迎来 Discord 一起交流。</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       <article id="article-body" class="article-body"><p>本文是一份面向架构师、领域工程师与 AI Agent 协作团队的端到端实战手册，完整串起 <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> 与 <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> 的四条核心主线：</p>
 <ol>
@@ -636,6 +641,14 @@ npm run demo:start
 <li><strong>下一个大故事（设计规范）</strong>：<a href="https://co-arising.github.io/zh/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）</a></li>
 </ul></article>
     </div>
+    <aside class="article-community" aria-label="加入 Discord 社区">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord 社区</p>
+        <p class="article-community-title">读完这篇，想进一步交流或提出质疑？</p>
+        <p>加入 co-arising Discord 社区，直接与作者及同行探讨 DDD、EARS/SMT 验证与 AI 时代代码生成实践。</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">继续阅读</h2>
       <div class="article-card" lang="zh-CN">

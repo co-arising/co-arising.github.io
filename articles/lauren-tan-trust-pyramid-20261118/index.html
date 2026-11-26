@@ -35,13 +35,18 @@
       <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-18">2026-11-18</time> · English translation</p>
       <h1>From &quot;AI Slop&quot; to 11,000 Merged PRs a Month: A Deep Evaluation and Adoption Guide of Lauren Tan&#x27;s AI Coding Engineering System (Staff Engineer, SpaceXSI)</h1>
       <p class="article-deck">Grounded in two first-party talks and the open-source pstack, this evaluation tests the inverted trust pyramid and verification-first practice against 2024–2026 academic and industrial evidence, distilling a four-stage adoption route.</p>
-      <div class="article-actions"><a href="/content/articles/lauren-tan-trust-pyramid-20261118.en.md" download="lauren-tan-trust-pyramid-20261118.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/lauren-tan-trust-pyramid-20261118/">中文原文</a></div>
+      <div class="article-actions"><a href="/content/articles/lauren-tan-trust-pyramid-20261118.en.md" download="lauren-tan-trust-pyramid-20261118.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/lauren-tan-trust-pyramid-20261118/">中文原文</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> Part 1: Lauren Tan's theory, engineering practice, and verified results</a></li><li><a href="#section-2"><span class="toc-number">02</span> Part 2: The deep evaluation — do academic papers and industry evidence actually support these practices?</a></li><li><a href="#section-3"><span class="toc-number">03</span> Part 3: Comparison with the "AI Coding Evolution Survey (2026-11-16)"</a></li><li><a href="#section-4"><span class="toc-number">04</span> Part 4: The project adoption field guide (architecture route, toolchain, and ready-to-reuse samples)</a></li><li><a href="#section-5"><span class="toc-number">05</span> Part 5: The essential question — is AI coding a theoretical math problem or an engineering problem of plugging leaks?</a></li><li><a href="#section-6"><span class="toc-number">06</span> Part 6: Horizontal comparison with 2026's industry benchmarks</a></li><li><a href="#section-7"><span class="toc-number">07</span> Part 7: First-party source index — talk videos, official transcripts, and slide-figure provenance</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">Read the full article</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">Community</p>
+          <p>Have questions or feedback on this article? Join the discussion on Discord.</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       <article id="article-body" class="article-body"><blockquote>
 <p><strong>A note on the subject and sources</strong>: the video <a href="https://www.youtube.com/watch?v=OPAdcgNb4ts">《SpaceX 主任工程師教你：讓 AI 少寫垃圾》</a> circulating in the Chinese-speaking tech community (channel Agent 煉金術士, 2026-11-18) is derived from the public talks of <strong>Lauren Tan (online handle <code>@poteto</code>)</strong>, Staff Engineer at <strong>SpaceX Superintelligence (SpaceXSI)</strong>. Lauren Tan previously served on the core team of Meta's React Compiler (see her <a href="https://ai.engineer/speakers/lauren-tan">AI Engineer speaker profile</a>) and later led the architecture evolution of GrokBot, the multi-agent desktop product under Cursor and SpaceXSI. This article integrates her two first-party English sources — the AI Engineer CODE 2026 keynote <a href="https://www.youtube.com/watch?v=O_zcc6Xl12g">All Code Is Slop (Except Mine)</a> (2026-11-14, <a href="https://ai.engineer/code/2026/talks/lauren-tan">official transcript page</a>) and the 55-minute deep interview <a href="https://www.youtube.com/watch?v=u1hqfjrMhwQ">SpaceX AI Engineer: Stop Using AI Agents Like This</a> (2026-09-26) — and cross-examines them against her open-source skill library <a href="https://github.com/cursor/plugins/blob/main/pstack/README.md"><code>pstack</code></a>.</p>
@@ -646,6 +651,14 @@ export const noDuplicateMessages: Property = always((state) =&gt; {
 </table></div>
 <p><strong>Citation note</strong>: the screenshots above are copyrighted by AI Engineer and the speaker; this article uses them as quotation for technical commentary. The original banner carrying the talk title and speaker attribution is preserved beneath each screenshot to maintain provenance; the article's claims defer to the first-party sources linked above.</p></article>
     </div>
+    <aside class="article-community" aria-label="Join the Discord community">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord Community</p>
+        <p class="article-community-title">Want to discuss this further or share feedback?</p>
+        <p>Join the co-arising Discord community to talk DDD, EARS/SMT verification, and deterministic code generation with the maintainers and peers.</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">Join the Discord community <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">Continue reading</h2>
       <div class="article-card" lang="en">

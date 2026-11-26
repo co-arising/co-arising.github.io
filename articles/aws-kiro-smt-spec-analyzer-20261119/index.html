@@ -35,13 +35,18 @@
       <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-19">2026-11-19</time> · English translation</p>
       <h1>Specs Have Bugs Too: How AWS Kiro Uses SMT Solvers to Eliminate Ambiguity and Logic Conflicts Before Writing Code</h1>
       <p class="article-deck">A technical deep dive into AWS Automated Reasoning Group engineer Rajath Kotyal&#x27;s AI Engineer CODE 2026 talk &#x27;Specs have bugs too&#x27;: tracing slides and empirical citations, contrasting Before vs. After SMT specifications, demystifying SAT/SMT and multi-sample logical-equivalence clustering, sharing runnable SMT-LIB2 and Python Z3 snippets alongside open-source repositories, and proposing four architectural supplements for co-arising (truthsrc).</p>
-      <div class="article-actions"><a href="/content/articles/aws-kiro-smt-spec-analyzer-20261119.en.md" download="aws-kiro-smt-spec-analyzer-20261119.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/aws-kiro-smt-spec-analyzer-20261119/">中文原文</a></div>
+      <div class="article-actions"><a href="/content/articles/aws-kiro-smt-spec-analyzer-20261119.en.md" download="aws-kiro-smt-spec-analyzer-20261119.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/aws-kiro-smt-spec-analyzer-20261119/">中文原文</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. Talk Overview, Slides Availability &amp; Citation Audit</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. Before SMT vs. After SMT: How Specifications and Workflows Change</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. Under the Hood: How SMT Solvers Actually Work</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. Open-Source Ecosystem &amp; Runnable SMT-LIB2 / Python Z3 Examples</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. Four Architectural Supplements for co-arising (truthsrc)</a></li><li><a href="#section-6"><span class="toc-number">06</span> Closing Thought: From Architecture Compiler to Neuro-Symbolic Domain Verification Engine</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">Read the full article</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">Community</p>
+          <p>Have questions or feedback on this article? Join the discussion on Discord.</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       <article id="article-body" class="article-body"><p>In 2026, Spec-Driven Development (SDD) has become the prevailing consensus in AI-assisted engineering: write a clear <code>spec.md</code> or <code>requirements.md</code> first, then hand it to a coding agent. Yet in his <strong>AI Engineer CODE 2026</strong> talk (November 11, 2026), <a href="https://ai.engineer/code/2026/talks/online-aws-specification-analyzer"><em>Specs have bugs too</em></a>, <strong>Rajath Mahendrappa Kotyal</strong> (<a href="https://ai.engineer/speakers/rajath-mahendrappa-kotyal">AI Engineer Speaker Profile</a> · <a href="https://github.com/rajathkotyal">GitHub <code>@rajathkotyal</code></a>) of the <strong>AWS Automated Reasoning Group</strong> exposed the blind spot at the heart of SDD:</p>
 <blockquote>
@@ -476,6 +481,14 @@ if len(clusters) &gt;= 2:
 <p>AWS Automated Reasoning Group's core lesson for AI Coding in 2026 is clear: <strong>you cannot patch probabilistic natural-language ambiguity with yet more natural-language prompts—you have to put a deterministic mathematical reasoning engine at the very front of the pipeline.</strong></p>
 <p>For <code>co-arising</code>, this fits like a missing keystone rather than a rewrite: <code>truthsrc</code> has already distilled domain behavior into a compact, structured micro-grammar. Pairing that deterministic AST with a Z3/SMT-LIB2 compiler pass—and upgrading <code>domain-interview</code> with semantic-entropy A/B clarification—elevates <code>co-arising</code> from an <strong>architecture and cognitive compiler</strong> into a <strong>neuro-symbolic domain verification engine</strong> that proves business rules are unambiguous, conflict-free, and complete before a single line of code is generated.</p></article>
     </div>
+    <aside class="article-community" aria-label="Join the Discord community">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord Community</p>
+        <p class="article-community-title">Want to discuss this further or share feedback?</p>
+        <p>Join the co-arising Discord community to talk DDD, EARS/SMT verification, and deterministic code generation with the maintainers and peers.</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">Join the Discord community <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">Continue reading</h2>
       <div class="article-card" lang="en">

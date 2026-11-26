@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content" / "articles"
 MANIFEST = CONTENT / "manifest.json"
 SITE = "https://co-arising.github.io"
+DISCORD_URL = "https://discord.gg/PwYrRpJu75"
 SURVEY_SLUG = "ai-coding-evolution-20261116"
 STRATEGY_SLUG = "co-arising-implications-20261116"
 PRACTICE_SLUG = "lauren-tan-trust-pyramid-20261118"
@@ -41,6 +42,7 @@ KIRO_SLUG = "aws-kiro-smt-spec-analyzer-20261119"
 SPEC_SLUG = "co-arising-ears-spec-20261123"
 GUIDE_SLUG = "bank-wealth-quickstart-architecture-extensibility-20261125"
 CODEGEN_EXT_SLUG = "metarch-truthsrc-extending-code-generator-20261126"
+V2_ARCH_SLUG = "co-arising-v2-ears-native-architecture-20261126"
 # Initial publication fixture; future valid manifest slugs stay in /zh/articles/.
 OWNED_OUTPUTS = (
     "articles/index.html",
@@ -61,6 +63,8 @@ OWNED_OUTPUTS = (
     f"articles/{GUIDE_SLUG}/index.html",
     f"zh/articles/{CODEGEN_EXT_SLUG}/index.html",
     f"articles/{CODEGEN_EXT_SLUG}/index.html",
+    f"zh/articles/{V2_ARCH_SLUG}/index.html",
+    f"articles/{V2_ARCH_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"
@@ -70,6 +74,8 @@ GUIDE_NOTE = "本文是面向 bank-wealth-demo 参考项目的端到端实战指
 GUIDE_NOTE_EN = "This article is an end-to-end hands-on guide, Onion Architecture source breakdown, and code-generator extension specification for the bank-wealth-demo reference project; commands, artifact types, and architectural boundaries reflect the current repositories, while formal acceptance records remain tracked on the status page."
 CODEGEN_EXT_NOTE = "本文是面向 metarch-truthsrc 0.5.0 的代码生成器扩展工程指南：管线中间产物、产品注册表与核心接线点均对照当前仓库源码核实；文中 Rust 洋葱架构示例为扩展蓝图而非已内置发货的生成器，正式验收边界请以状态页为准。"
 CODEGEN_EXT_NOTE_EN = "This article is an engineering guide for extending metarch-truthsrc 0.5.0 with a new code generator: pipeline artifacts, product registry entries, and core wiring seams reflect the current repository source; the Rust Onion Architecture example is an extension blueprint rather than a shipped built-in generator, and formal acceptance records remain on the status page."
+V2_ARCH_NOTE = "本文是 co-arising 2.0 的长期架构设计蓝图（ADR）：除第 7 节标注的 v1 基线与 EARS 1.0/Z3/Hooks 原型外，Canonical Model v2、直连 EARS IR 的多语言代码生成与可执行预言机 TDD 闭环均属于规划中的目标架构，非当前已发货能力，正式进度以状态页为准。"
+V2_ARCH_NOTE_EN = "This article is a long-term architecture design blueprint (ADR) for co-arising 2.0: apart from the v1 baseline and EARS 1.0/Z3/Hooks prototype noted in Section 7, Canonical Model v2, direct EARS-IR multi-language codegen, and executable oracle Cloze TDD remain planned target capabilities rather than shipped features; formal status is tracked on the status page."
 NAV = (
     ("/", "Home", "首页"),
     ("/why-co-arising/", "Why co-arising", "为何 co-arising"),
@@ -446,6 +452,14 @@ def list_page(items, locale):
       <p class="page-outline"><a href="#articles">{"阅读文章" if zh else "Read the articles"}</a> · <a href="#editorial-context">{"发布说明" if zh else "Editorial context"}</a></p>
     </header>
     {cover(locale)}
+    <aside class="insights-community" aria-label="{"加入 Discord 社区" if zh else "Join the Discord community"}">
+      <div class="insights-community-copy">
+        <p class="article-community-kicker">{"Co-arising Discord 社区" if zh else "Co-arising Discord Community"}</p>
+        <p class="article-community-title">{"对文章内容、EARS 规约或真源建模有想法？" if zh else "Questions on these articles, EARS specs, or truth-source modeling?"}</p>
+        <p>{"加入 Discord 社区，与作者和开发者一起讨论 DDD、SMT 形式化验证与 AI Agent 工程实践。" if zh else "Join the Discord community to discuss DDD, SMT formal verification, and agentic engineering with the authors and peers."}</p>
+      </div>
+      <a class="article-community-cta" href="{DISCORD_URL}">{"加入 Discord 社区" if zh else "Join the Discord community"} <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="articles" aria-labelledby="articles-heading">
       <h2 id="articles-heading">{"全部文章 · 按发布时间倒序" if zh else "All articles · newest first"}</h2>
       <div class="insights-grid">{''.join(card(item, locale, stable_id=True) for item in ordered)}</div>
@@ -488,6 +502,8 @@ def detail_page(item, related, source, locale="zh"):
         note += f"<p>{GUIDE_NOTE if zh else GUIDE_NOTE_EN}</p>"
     if item["slug"] == CODEGEN_EXT_SLUG:
         note += f"<p>{CODEGEN_EXT_NOTE if zh else CODEGEN_EXT_NOTE_EN}</p>"
+    if item["slug"] == V2_ARCH_SLUG:
+        note += f"<p>{V2_ARCH_NOTE if zh else V2_ARCH_NOTE_EN}</p>"
     category = item["category"] if zh else CATEGORY_EN[item["category"]]
     counterpart_route = detail_route(item["slug"], "en" if zh else "zh")
     switch_label = "Read in English" if zh else "中文原文"
@@ -497,16 +513,29 @@ def detail_page(item, related, source, locale="zh"):
       <p class="article-meta"><span>{esc(category)}</span> · <time datetime="{esc(item["date"])}">{esc(item["date"])}</time> · {labels["meta"]}</p>
       <h1>{esc(meta["title"])}</h1>
       <p class="article-deck">{esc(meta["deck"])}</p>
-      <div class="article-actions"><a href="/content/articles/{esc(meta["source"])}" download="{esc(meta["source"])}">{labels["download"]}</a> · <a href="#article-body">{labels["read"]}</a>{"" if not paired else f' · <a href="{counterpart_route}">{switch_label}</a>'}</div>
+      <div class="article-actions"><a href="/content/articles/{esc(meta["source"])}" download="{esc(meta["source"])}">{labels["download"]}</a> · <a href="#article-body">{labels["read"]}</a>{"" if not paired else f' · <a href="{counterpart_route}">{switch_label}</a>'} · <a class="action-discord" href="{DISCORD_URL}">{"加入 Discord 社区" if zh else "Join Discord"} <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction">{note}<p><a href="{status_href}">{"当前已交付能力与证据请以状态页为准" if zh else "Delivered capabilities and evidence live on the status page"}</a>{"。发布说明不改写下方原文观点。" if zh else ". The publication notes below do not rewrite the original views."}</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>{labels["toc_summary"]}</summary><nav aria-label="{labels["toc_nav"]}">{serialize(toc)}</nav></details>
         <p id="reading-position" class="reading-position">{labels["position"]}</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">{"社区讨论" if zh else "Community"}</p>
+          <p>{"对本文观点、EARS 规约或工程落地有疑问？欢迎来 Discord 一起交流。" if zh else "Have questions or feedback on this article? Join the discussion on Discord."}</p>
+          <a class="sidebar-community-btn" href="{DISCORD_URL}">{"加入 Discord 社区" if zh else "Join Discord"} <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       {serialize(body)}
     </div>
+    <aside class="article-community" aria-label="{"加入 Discord 社区" if zh else "Join the Discord community"}">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">{"Co-arising Discord 社区" if zh else "Co-arising Discord Community"}</p>
+        <p class="article-community-title">{"读完这篇，想进一步交流或提出质疑？" if zh else "Want to discuss this further or share feedback?"}</p>
+        <p>{"加入 co-arising Discord 社区，直接与作者及同行探讨 DDD、EARS/SMT 验证与 AI 时代代码生成实践。" if zh else "Join the co-arising Discord community to talk DDD, EARS/SMT verification, and deterministic code generation with the maintainers and peers."}</p>
+      </div>
+      <a class="article-community-cta" href="{DISCORD_URL}">{"加入 Discord 社区" if zh else "Join the Discord community"} <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">{labels["related"]}</h2>
       {card(related, locale)}

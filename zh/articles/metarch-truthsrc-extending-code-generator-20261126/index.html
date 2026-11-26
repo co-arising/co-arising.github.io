@@ -35,13 +35,18 @@
       <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-26">2026-11-26</time> · 中文原文</p>
       <h1>如何在 metarch-truthsrc 中扩展一个全新的代码生成器：管线中间产物、契约边界与 Rust 实战蓝图</h1>
       <p class="article-deck">对照 metarch-truthsrc 0.5.0 源码，逐层拆解从 YAML 真源、canonical.json、21 种产品注册表到 knowledge.sqlite 的落盘中间产物，详解正式产品生成器契约、唯一静态接线点、Rust 洋葱架构实战步骤与五条源码避坑红线。</p>
-      <div class="article-actions"><a href="/content/articles/metarch-truthsrc-extending-code-generator-20261126.md" download="metarch-truthsrc-extending-code-generator-20261126.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/metarch-truthsrc-extending-code-generator-20261126/">Read in English</a></div>
+      <div class="article-actions"><a href="/content/articles/metarch-truthsrc-extending-code-generator-20261126.md" download="metarch-truthsrc-extending-code-generator-20261126.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/metarch-truthsrc-extending-code-generator-20261126/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是面向 metarch-truthsrc 0.5.0 的代码生成器扩展工程指南：管线中间产物、产品注册表与核心接线点均对照当前仓库源码核实；文中 Rust 洋葱架构示例为扩展蓝图而非已内置发货的生成器，正式验收边界请以状态页为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 全链路产物地图：新代码生成器究竟在哪一步分叉？</a></li><li><a href="#section-2"><span class="toc-number">02</span> 两类生成器契约对比：为什么正式扩展必须走 Formal Product Generator？</a></li><li><a href="#section-3"><span class="toc-number">03</span> 输入总表与 21 种产品注册表：哪些直接复用，哪些需要扩展？</a></li><li><a href="#section-4"><span class="toc-number">04</span> 目录布局与唯一核心接线点：严守 lib/ 语言无关边界</a></li><li><a href="#section-5"><span class="toc-number">05</span> 手把手实战蓝图：从零扩展一个 Rust 洋葱架构生成器</a></li><li><a href="#section-6"><span class="toc-number">06</span> 五条源码级避坑红线与 AI Agent 协作物料清单</a></li><li><a href="#section-7"><span class="toc-number">07</span> 参考源码与延伸阅读</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">阅读全文</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">社区讨论</p>
+          <p>对本文观点、EARS 规约或工程落地有疑问？欢迎来 Discord 一起交流。</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       <article id="article-body" class="article-body"><blockquote>
 <p><strong>适用版本与口径说明</strong>：本文基于 <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> <strong>0.5.0</strong>（Node ≥ 22.13.0，零 npm 运行时依赖，内置 <code>node:sqlite</code>）源码与 <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> 参考仓核对撰写。站上 <a href="https://co-arising.github.io/zh/pipeline/">流水线页面</a> 介绍的是六阶段职责分工，<a href="https://co-arising.github.io/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo 实战全景指南</a> 拆解了参考生成的 Scala 洋葱架构与 AI Agent 物料规范；<strong>本文聚焦于落盘产物级的管线剖析与源码级接入步骤</strong>——当你决定把同一份领域真源编译到 Rust、Go、TypeScript 或 Java 等全新目标技术栈时，究竟在哪一步分叉、要写哪些文件、接哪一行代码、避开哪些源码里的隐藏坑。</p>
@@ -450,6 +455,14 @@ function supportsSlashHeader(filePath) {
 </li>
 </ul></article>
     </div>
+    <aside class="article-community" aria-label="加入 Discord 社区">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord 社区</p>
+        <p class="article-community-title">读完这篇，想进一步交流或提出质疑？</p>
+        <p>加入 co-arising Discord 社区，直接与作者及同行探讨 DDD、EARS/SMT 验证与 AI 时代代码生成实践。</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">继续阅读</h2>
       <div class="article-card" lang="zh-CN">

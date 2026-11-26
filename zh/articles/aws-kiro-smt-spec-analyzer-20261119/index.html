@@ -35,13 +35,18 @@
       <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-19">2026-11-19</time> · 中文原文</p>
       <h1>规约本身就有 Bug：深度拆解 AWS Kiro 如何用 SMT 求解器在写代码前消灭 Spec 歧义与逻辑冲突</h1>
       <p class="article-deck">深度解析 AWS Automated Reasoning Group 工程师 Rajath Kotyal 在 AI Engineer CODE 2026 的高分演讲《Specs have bugs too》：完整溯源 Slides 与学术引用，对比引入 SMT 前后的 Spec 写法与工作流，剖析 SAT/SMT 与多采样逻辑等价聚类原理，提供可直接运行的 SMT-LIB2 / Python Z3 样例与开源生态清单，并提出对 co-arising（truthsrc）实践的四大工程补充。</p>
-      <div class="article-actions"><a href="/content/articles/aws-kiro-smt-spec-analyzer-20261119.md" download="aws-kiro-smt-spec-analyzer-20261119.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/aws-kiro-smt-spec-analyzer-20261119/">Read in English</a></div>
+      <div class="article-actions"><a href="/content/articles/aws-kiro-smt-spec-analyzer-20261119.md" download="aws-kiro-smt-spec-analyzer-20261119.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/aws-kiro-smt-spec-analyzer-20261119/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 演讲全景、Slides 核实与核心理论/实证引用溯源</a></li><li><a href="#section-2"><span class="toc-number">02</span> Before SMT vs. After SMT：规约写法与工作流的本质跃迁</a></li><li><a href="#section-3"><span class="toc-number">03</span> 架构师视角彻底搞懂：SMT 是怎么工作的？</a></li><li><a href="#section-4"><span class="toc-number">04</span> 开源生态清单与可直接运行的 SMT-LIB2 / Python Z3 样例</a></li><li><a href="#section-5"><span class="toc-number">05</span> 对 co-arising（truthsrc）整个实践的四大深度补充</a></li><li><a href="#section-6"><span class="toc-number">06</span> 结语：从“静态架构编译器”走向“神经符号领域验证引擎”</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">阅读全文</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">社区讨论</p>
+          <p>对本文观点、EARS 规约或工程落地有疑问？欢迎来 Discord 一起交流。</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       <article id="article-body" class="article-body"><p>2026 年，规约驱动开发（Spec-Driven Development，SDD）已成为 AI Coding 工程化的主流共识——几乎所有团队都在强调“先写 <code>spec.md</code> / <code>requirements.md</code>，再让 Coding Agent 动手写代码”。然而，在 <strong>AI Engineer CODE 2026</strong>（2026 年 11 月 11 日）的演讲 <a href="https://ai.engineer/code/2026/talks/online-aws-specification-analyzer">《Specs have bugs too》</a> 中，来自 <strong>AWS Automated Reasoning Group（自动推理组）</strong> 的软件工程师 <strong>Rajath Mahendrappa Kotyal</strong>（<a href="https://ai.engineer/speakers/rajath-mahendrappa-kotyal">AI Engineer 讲者档案</a> · <a href="https://github.com/rajathkotyal">GitHub <code>@rajathkotyal</code></a>）一针见血地戳破了 SDD 的核心盲区：</p>
 <blockquote>
@@ -485,6 +490,14 @@ if len(clusters) &gt;= 2:
 <li>只需要在确定性 Toolchain 里接上 Z3/SMT-LIB2 的逻辑求解器，在 <code>domain-interview</code> Skill 里接上多采样等价聚类与 A/B 澄清机制，就能把 <code>co-arising</code> 从 <strong>“防止架构漂移的认知编译器”</strong> 进一步升级为 <strong>“在写第一行代码前就能数学自证业务逻辑无冲突、无歧义、无缺口的领域行为验证引擎”</strong>。</li>
 </ul></article>
     </div>
+    <aside class="article-community" aria-label="加入 Discord 社区">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord 社区</p>
+        <p class="article-community-title">读完这篇，想进一步交流或提出质疑？</p>
+        <p>加入 co-arising Discord 社区，直接与作者及同行探讨 DDD、EARS/SMT 验证与 AI 时代代码生成实践。</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">继续阅读</h2>
       <div class="article-card" lang="zh-CN">

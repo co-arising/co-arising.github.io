@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>co-arising 2.0 Long-Term Architecture Blueprint: An EARS-Native Compilation Trunk and Locked Cloze TDD Loop — co-arising</title>
+  <meta name="description" content="A first-principles v2 architecture retiring dual expression engines and lossy lowering bridges: orthogonal YAML structure plus EARS 1.0 behavior truth, an SMT/Z3 hard compilation gate, EARS-Native Canonical Model v2, and dual-channel delivery uniting L1 zero-token codegen with locked-oracle AI @cloze TDD." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="co-arising 2.0 Long-Term Architecture Blueprint: An EARS-Native Compilation Trunk and Locked Cloze TDD Loop" />
+  <meta property="og:description" content="A first-principles v2 architecture retiring dual expression engines and lossy lowering bridges: orthogonal YAML structure plus EARS 1.0 behavior truth, an SMT/Z3 hard compilation gate, EARS-Native Canonical Model v2, and dual-channel delivery uniting L1 zero-token codegen with locked-oracle AI @cloze TDD." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/co-arising-v2-ears-native-architecture-20261126/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/co-arising-v2-ears-native-architecture-20261126/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/co-arising-v2-ears-native-architecture-20261126/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Design specification</span></nav>
+      <p class="article-meta"><span>Design specification</span> · <time datetime="2026-11-26">2026-11-26</time> · English translation</p>
+      <h1>co-arising 2.0 Long-Term Architecture Blueprint: An EARS-Native Compilation Trunk and Locked Cloze TDD Loop</h1>
+      <p class="article-deck">A first-principles v2 architecture retiring dual expression engines and lossy lowering bridges: orthogonal YAML structure plus EARS 1.0 behavior truth, an SMT/Z3 hard compilation gate, EARS-Native Canonical Model v2, and dual-channel delivery uniting L1 zero-token codegen with locked-oracle AI @cloze TDD.</p>
+      <div class="article-actions"><a href="/content/articles/co-arising-v2-ears-native-architecture-20261126.en.md" download="co-arising-v2-ears-native-architecture-20261126.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/co-arising-v2-ears-native-architecture-20261126/">中文原文</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p>This article is a long-term architecture design blueprint (ADR) for co-arising 2.0: apart from the v1 baseline and EARS 1.0/Z3/Hooks prototype noted in Section 7, Canonical Model v2, direct EARS-IR multi-language codegen, and executable oracle Cloze TDD remain planned target capabilities rather than shipped features; formal status is tracked on the status page.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. Why v2 Retires Dual Expression Engines and Any Lowering Bridge</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. End-to-End co-arising 2.0 Architecture Flowchart</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. Orthogonal Single Truth Source: Structure in YAML, Behavior in EARS</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. The Mathematical Proof Gate: No Canonical Model v2 Without Proof</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. Native Canonical Model v2: Freezing Three Core Semantic Contracts</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. Dual-Channel Delivery: Zero-Token Scaffolds (4A) vs Locked AI Cloze TDD (4B)</a></li><li><a href="#section-7"><span class="toc-number">07</span> 7. Honest Boundary vs v1 Baseline and Phased Roadmap</a></li><li><a href="#section-8"><span class="toc-number">08</span> 8. Standards, Citations, and Related Articles</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">Community</p>
+          <p>Have questions or feedback on this article? Join the discussion on Discord.</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a>
+        </div>
+      </aside>
+      <article id="article-body" class="article-body"><blockquote>
+<p><strong>Scope and Evolution Notice</strong>: This document is a forward-looking <strong>v2 target architecture blueprint (ADR)</strong> designed from first principles. The current public <a href="https://co-arising.github.io/"><code>co-arising</code></a> v1 baseline and <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> remain stable and runnable; for v2, we eliminate the historical burden of maintaining dual expression engines plus a lossy lowering bridge, making controlled EARS 1.0 the <strong>single behavioral trunk</strong> from specification and SMT proof through <code>Canonical Model v2</code>, deterministic scaffolding, and locked AI <code>@cloze</code> TDD in the isolated zone.</p>
+</blockquote>
+<div class="co-kpi-strip" role="region" aria-label="co-arising 2.0 core architecture metrics">
+<div><div class="kpi-num">1 AST</div><div class="kpi-label">One native behavioral IR (EARS IR) end-to-end; retires legacy dual expressions and lowering</div></div>
+<div><div class="kpi-num">5 + k</div><div class="kpi-label">5-check SMT gate plus k-step BMC; unproved specs never emit a Canonical Model</div></div>
+<div><div class="kpi-num">80 / 20</div><div class="kpi-label">L1 rules compile zero-token into scaffolds; L2/L3 &amp; app zones run locked oracle TDD</div></div>
+<div><div class="kpi-num red">exit 2</div><div class="kpi-label">PreToolUse + Stop Hooks physically lock scaffolds, oracles, and @cloze bounds</div></div>
+</div>
+
+<h2 id="section-1">1. Why v2 Retires Dual Expression Engines and Any Lowering Bridge</h2>
+<p>Across <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> v1 (<code>0.5.0</code>), the project validated that a git-native Event Storming tree can deterministically compile into typed semantic products, Onion Architecture scaffolds, and bidirectional code anchors. Meanwhile, the <a href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 Technical Specification</a> established controlled EARS paired with single-hop <code>SMT-LIB 2</code> formal verification.</p>
+<p>However, binding EARS against real v1 projects exposed an unmistakable structural mismatch: <strong>v1's legacy slice-guard expression language (<code>expressions.mjs</code> v4 + escaped <code>@guard</code> strings in <code>.slice.yaml</code>) does not live on the same expressive plane as EARS 1.0</strong>:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Dimension / v1 Legacy Expressions (domain-decision@4 / @guard) / co-arising 2.0 EARS-Native Trunk"><table>
+<thead>
+<tr>
+<th scope="col">Dimension</th>
+<th scope="col">v1 Legacy Expressions (<code>domain-decision@4</code> / <code>@guard</code>)</th>
+<th scope="col"><code>co-arising 2.0</code> EARS-Native Trunk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Authoring signal-to-noise</strong></td>
+<td>Escaped single-line JSON strings (often 400+ chars), no named predicate reuse, opaque to domain experts</td>
+<td>Bilingual isomorphic syntax (Canonical EN + CN Profile), positive <code>where:</code> predicate reuse, deterministic Style E AC &amp; Style B DMN table projections</td>
+</tr>
+<tr>
+<td><strong>Global &amp; temporal invariants</strong></td>
+<td>Per-command short-circuit guards only; no global <code>ALWAYS</code> axioms, <code>SHALL NOT</code> prohibitions, or cross-command safety properties</td>
+<td>First-class <code>axioms: ALWAYS</code>, <code>SHALL / SHALL NOT</code> conflict detection, and <code>k</code>-step bounded model checking (BMC)</td>
+</tr>
+<tr>
+<td><strong>Mathematical expressiveness</strong></td>
+<td>Linear addition/subtraction and comparisons only; no multiplication <code>*</code> (<code>shares * nav &lt;= netAmount</code>) and no FEEL intervals <code>[min..max]</code></td>
+<td>Follows <a href="https://www.cedarpolicy.com/">AWS Cedar</a> decidability partitioning: <code>L1 (QF_AUFLIA)</code> / <code>L2 (QF_NIA + BMC)</code> / <code>L3 (extern)</code></td>
+</tr>
+<tr>
+<td><strong>Isolated zone (<code>handwritten/</code>) coverage</strong></td>
+<td><strong>Blind spot</strong>: trusted admission, replay dedup, cross-aggregate orchestration, and read-model isolation live only in prose</td>
+<td>Native <code>layer: application</code> contracts (<code>pin</code>, <code>dispatch</code>, <code>respond</code>, <code>expose</code>) compiled into locked executable BDD oracles for AI TDD</td>
+</tr>
+</tbody>
+</table></div>
+<p>Inserting an <strong><code>EARS → legacy @guard</code> lowering compiler</strong> merely to preserve v1 generators would lock the codebase into permanent double maintenance: <strong>two expression ASTs, two type checkers, and a leaky translation seam</strong> that breaks whenever EARS adds nonlinear math, intervals, prohibitions, or application-layer contracts.</p>
+<p>Because the existing public showcase remains runnable as-is, <strong>the cleanest long-term decision is to keep v1 stable and build v2 natively around EARS from start to finish</strong>.</p>
+<figure class="co-arch-fig">
+<div class="arch-caption-head">FIGURE 01 · v1 TRANSITIONAL BRIDGE VS v2 EARS-NATIVE SINGLE TRUNK</div>
+<svg viewBox="0 0 820 278" width="100%" role="img" aria-label="Comparison between v1 dual-expression lowering architecture and v2 EARS-Native single-trunk architecture">
+  <defs>
+    <marker id="v1v2-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
+    </marker>
+    <marker id="v1v2-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"></path>
+    </marker>
+    <marker id="v1v2-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+  </defs>
+  <rect x="12" y="10" width="796" height="114" rx="4" class="arch-band-amber"></rect>
+  <text x="26" y="31" class="arch-t-amber">v1 TRANSITIONAL SHAPE (Cost of backward lowering: dual ASTs + lossy bridge + unverified handwritten zone)</text>
+  <rect x="26" y="44" width="150" height="64" rx="4" class="arch-card-amber"></rect>
+  <text x="101" y="68" text-anchor="middle" class="arch-t-title">.slice.yaml @guard</text>
+  <text x="101" y="88" text-anchor="middle" class="arch-t-sub">Legacy AST #1</text>
+  <rect x="206" y="44" width="144" height="64" rx="4" class="arch-card-amber arch-dash"></rect>
+  <text x="278" y="68" text-anchor="middle" class="arch-t-title">Lossy Lowering</text>
+  <text x="278" y="88" text-anchor="middle" class="arch-t-sub">EARS → guards v4</text>
+  <rect x="380" y="44" width="156" height="64" rx="4" class="arch-card-amber"></rect>
+  <text x="458" y="68" text-anchor="middle" class="arch-t-title">Canonical v1</text>
+  <text x="458" y="88" text-anchor="middle" class="arch-t-sub">Aggregate L1 only</text>
+  <rect x="566" y="44" width="226" height="64" rx="4" class="arch-card-red arch-dash"></rect>
+  <text x="679" y="68" text-anchor="middle" class="arch-t-red">handwritten/ left outside compiler</text>
+  <text x="679" y="88" text-anchor="middle" class="arch-t-sub">Prose specs · no SMT · drift risk</text>
+  <line x1="176" y1="76" x2="203" y2="76" class="arch-edge-amber" marker-end="url(#v1v2-arr-amber)"></line>
+  <line x1="350" y1="76" x2="377" y2="76" class="arch-edge-amber" marker-end="url(#v1v2-arr-amber)"></line>
+  <line x1="536" y1="76" x2="563" y2="76" class="arch-edge-amber" marker-end="url(#v1v2-arr-amber)"></line>
+  <rect x="12" y="142" width="796" height="124" rx="4" class="arch-band-teal"></rect>
+  <text x="26" y="164" class="arch-t-band-teal">v2 EARS-NATIVE SINGLE TRUNK (Zero lowering loss · pre-codegen SMT gate · unified domain &amp; isolated-zone loop)</text>
+  <rect x="26" y="178" width="154" height="72" rx="4" class="arch-card-teal"></rect>
+  <text x="103" y="203" text-anchor="middle" class="arch-t-title">Orthogonal Truth</text>
+  <text x="103" y="222" text-anchor="middle" class="arch-t-sub">YAML Struct + EARS</text>
+  <text x="103" y="238" text-anchor="middle" class="arch-t-mono">Single behavioral AST</text>
+  <rect x="206" y="178" width="158" height="72" rx="4" class="arch-card-teal"></rect>
+  <text x="285" y="203" text-anchor="middle" class="arch-t-title">SMT Hard Gate</text>
+  <text x="285" y="222" text-anchor="middle" class="arch-t-sub">Z3 / cvc5 5-check + BMC</text>
+  <text x="285" y="238" text-anchor="middle" class="arch-t-teal">Blocks unproved specs</text>
+  <rect x="390" y="178" width="176" height="72" rx="4" class="arch-card-dark"></rect>
+  <text x="478" y="203" text-anchor="middle" class="arch-t-title-dark">Canonical Model v2</text>
+  <text x="478" y="222" text-anchor="middle" class="arch-t-sub-dark">Native EARS IR + TestIR</text>
+  <text x="478" y="238" text-anchor="middle" class="arch-t-sub-dark">+ SQLite Dep Graph</text>
+  <rect x="592" y="178" width="200" height="72" rx="4" class="arch-card-teal"></rect>
+  <text x="692" y="201" text-anchor="middle" class="arch-t-title">Dual-Channel Delivery</text>
+  <text x="692" y="220" text-anchor="middle" class="arch-t-teal">4A: L1 Zero-Token Scaffold</text>
+  <text x="692" y="238" text-anchor="middle" class="arch-t-red">4B: Locked Oracle Cloze TDD</text>
+  <line x1="180" y1="214" x2="203" y2="214" class="arch-edge-teal" marker-end="url(#v1v2-arr-teal)"></line>
+  <line x1="364" y1="214" x2="387" y2="214" class="arch-edge-teal" marker-end="url(#v1v2-arr-teal)"></line>
+  <line x1="566" y1="214" x2="589" y2="214" class="arch-edge-teal" marker-end="url(#v1v2-arr-teal)"></line>
+</svg>
+<figcaption>Figure 1: By retiring legacy @guard lowering, v2 carries a single proved EARS IR straight into Canonical Model v2, deterministic code generation, and locked AI Cloze TDD.</figcaption>
+</figure>
+
+<h2 id="section-2">2. End-to-End <code>co-arising 2.0</code> Architecture Flowchart</h2>
+<p>The full four-layer architecture below maps every asset, verification gate, and physical anti-cheat feedback loop from git-native truth to verified runtime code:</p>
+<figure class="co-arch-fig">
+<div class="arch-caption-head">FIGURE 02 · CO-ARISING 2.0 END-TO-END ARCHITECTURE &amp; CONTROL FLOW</div>
+<svg viewBox="0 0 820 970" width="100%" role="img" aria-label="co-arising 2.0 four-layer end-to-end architecture flowchart covering orthogonal truth, SMT gate, Canonical Model v2, zero-token codegen, and locked AI Cloze TDD">
+  <defs>
+    <marker id="arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
+    </marker>
+    <marker id="arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"></path>
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"></path>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+  </defs>
+  <rect x="14" y="12" width="792" height="148" rx="4" class="arch-band"></rect>
+  <text x="28" y="34" class="arch-t-band">LAYER 1 · GIT SINGLE AUTHORING TRUTH (Orthogonal: Structure in YAML, Behavior in EARS)</text>
+  <rect x="28" y="48" width="234" height="96" rx="4" class="arch-card"></rect>
+  <text x="145" y="72" text-anchor="middle" class="arch-t-title">Structure Truth (truth/*.yaml)</text>
+  <text x="145" y="92" text-anchor="middle" class="arch-t-sub">VOs &amp; exact decimals (Money, scale)</text>
+  <text x="145" y="110" text-anchor="middle" class="arch-t-sub">State defaults · Cmd/Event schemas</text>
+  <text x="145" y="128" text-anchor="middle" class="arch-t-mono">Saga topology · ReadModel · No @guard</text>
+  <rect x="284" y="48" width="320" height="96" rx="4" class="arch-card-teal"></rect>
+  <text x="444" y="72" text-anchor="middle" class="arch-t-title">Behavior Truth (truth/**/*.ears · EN/CN)</text>
+  <text x="444" y="92" text-anchor="middle" class="arch-t-sub">• layer: domain — axioms · rules · post folds</text>
+  <text x="444" y="110" text-anchor="middle" class="arch-t-sub">• layer: application — admission · flows · views</text>
+  <text x="444" y="128" text-anchor="middle" class="arch-t-teal">Single behavioral surface · Style A &amp; Style C</text>
+  <rect x="630" y="58" width="162" height="76" rx="4" class="arch-card-amber arch-dash"></rect>
+  <text x="711" y="81" text-anchor="middle" class="arch-t-amber">Drafting Aid (Unchecked-in)</text>
+  <text x="711" y="100" text-anchor="middle" class="arch-t-sub">Plain notes / Event Storming</text>
+  <text x="711" y="118" text-anchor="middle" class="arch-t-mono">LLM drafting · Human merge</text>
+  <line x1="630" y1="96" x2="608" y2="96" class="arch-edge-amber" marker-end="url(#arr-amber)"></line>
+  <path d="M 145 144 L 145 182 L 315 182 L 315 204" class="arch-edge" marker-end="url(#arr-ink)"></path>
+  <line x1="444" y1="144" x2="444" y2="204" class="arch-edge-teal" marker-end="url(#arr-teal)"></line>
+  <rect x="14" y="190" width="792" height="222" rx="4" class="arch-band"></rect>
+  <text x="28" y="212" class="arch-t-band">LAYER 2 · SINGLE FRONTEND, READ-ONLY PROJECTIONS &amp; SMT PROOF GATE</text>
+  <rect x="206" y="224" width="356" height="58" rx="4" class="arch-card-teal"></rect>
+  <text x="384" y="246" text-anchor="middle" class="arch-t-title">Single EARS Parser + Unified Type &amp; Symbol Checker</text>
+  <text x="384" y="266" text-anchor="middle" class="arch-t-sub">Positive naming lint · L1/L2/L3 auto-routing · retires expressions.mjs</text>
+  <rect x="596" y="224" width="196" height="74" rx="4" class="arch-card arch-dash"></rect>
+  <text x="694" y="245" text-anchor="middle" class="arch-t-title">Read-Only Projections</text>
+  <text x="694" y="264" text-anchor="middle" class="arch-t-sub">• Style E: Plain-text AC (.md)</text>
+  <text x="694" y="282" text-anchor="middle" class="arch-t-sub">• Style B: DMN Table (.md)</text>
+  <line x1="562" y1="253" x2="592" y2="253" class="arch-edge" marker-end="url(#arr-ink)"></line>
+  <rect x="206" y="302" width="356" height="58" rx="4" class="arch-card"></rect>
+  <text x="384" y="324" text-anchor="middle" class="arch-t-title">Single-Hop SMT-LIB 2 Compiler → Z3 / cvc5</text>
+  <text x="384" y="344" text-anchor="middle" class="arch-t-sub">1.Conflicts · 2.Gaps · 3.Invariants · 4.Dead rules · 5.Witnesses + k-step BMC</text>
+  <line x1="384" y1="282" x2="384" y2="298" class="arch-edge-teal" marker-end="url(#arr-teal)"></line>
+  <rect x="292" y="374" width="184" height="28" rx="14" class="arch-band-teal"></rect>
+  <text x="384" y="392" text-anchor="middle" class="arch-t-teal">All SMT Proofs Green?</text>
+  <line x1="384" y1="360" x2="384" y2="371" class="arch-edge-teal" marker-end="url(#arr-teal)"></line>
+  <rect x="28" y="302" width="152" height="96" rx="4" class="arch-card-red"></rect>
+  <text x="104" y="325" text-anchor="middle" class="arch-t-red">Fail → Hard Block</text>
+  <text x="104" y="345" text-anchor="middle" class="arch-t-title">A/B Clarification Card</text>
+  <text x="104" y="364" text-anchor="middle" class="arch-t-sub">Z3 model + :named IDs</text>
+  <text x="104" y="382" text-anchor="middle" class="arch-t-mono">No codegen emitted</text>
+  <path d="M 292 388 L 184 388" class="arch-edge-red" marker-end="url(#arr-red)"></path>
+  <path d="M 104 302 L 104 170 L 345 170 L 345 148" class="arch-edge-red" marker-end="url(#arr-red)"></path>
+  <text x="238" y="382" text-anchor="middle" class="arch-t-red">No (SAT defect)</text>
+  <line x1="384" y1="402" x2="384" y2="438" class="arch-edge-teal" marker-end="url(#arr-teal)"></line>
+  <text x="466" y="424" text-anchor="middle" class="arch-t-teal">Yes (Proved + Witnesses)</text>
+  <rect x="14" y="442" width="792" height="106" rx="4" class="arch-card-dark"></rect>
+  <text x="30" y="466" class="arch-t-title-dark">LAYER 3 · CANONICAL MODEL v2 (EARS-NATIVE SINGLE IR · ZERO LOWERING LOSS)</text>
+  <rect x="30" y="480" width="176" height="52" rx="4" class="arch-pill-dark"></rect>
+  <text x="118" y="502" text-anchor="middle" class="arch-t-title-dark">Structure Meta</text>
+  <text x="118" y="520" text-anchor="middle" class="arch-t-sub-dark">Types · State · Saga</text>
+  <rect x="218" y="480" width="206" height="52" rx="4" class="arch-pill-dark"></rect>
+  <text x="321" y="502" text-anchor="middle" class="arch-t-title-dark">Native EARS IR v2</text>
+  <text x="321" y="520" text-anchor="middle" class="arch-t-sub-dark">First-Hit · emit/post folds</text>
+  <rect x="436" y="480" width="172" height="52" rx="4" class="arch-pill-dark"></rect>
+  <text x="522" y="502" text-anchor="middle" class="arch-t-title-dark">Proved TestIR</text>
+  <text x="522" y="520" text-anchor="middle" class="arch-t-sub-dark">Z3 witnesses + BMC</text>
+  <rect x="620" y="480" width="172" height="52" rx="4" class="arch-pill-dark"></rect>
+  <text x="706" y="502" text-anchor="middle" class="arch-t-title-dark">Dependency Graph</text>
+  <text x="706" y="520" text-anchor="middle" class="arch-t-sub-dark">knowledge.sqlite cache</text>
+  <path d="M 220 548 L 220 572 L 195 572 L 195 596" class="arch-edge-teal" marker-end="url(#arr-teal)"></path>
+  <text x="114" y="578" text-anchor="middle" class="arch-t-teal">domain L1 + structure</text>
+  <path d="M 560 548 L 560 572 L 585 572 L 585 596" class="arch-edge-red" marker-end="url(#arr-red)"></path>
+  <text x="692" y="578" text-anchor="middle" class="arch-t-red">L2/L3 + app isolated zone</text>
+  <rect x="14" y="600" width="356" height="354" rx="4" class="arch-band-teal"></rect>
+  <text x="28" y="622" class="arch-t-band-teal">CHANNEL 4A · ZERO-TOKEN CODEGEN (~80%)</text>
+  <rect x="30" y="636" width="324" height="78" rx="4" class="arch-card-teal"></rect>
+  <text x="192" y="660" text-anchor="middle" class="arch-t-title">Multi-Language Deterministic Generators</text>
+  <text x="192" y="680" text-anchor="middle" class="arch-t-sub">Scala · TypeScript · Java · Rust · Go</text>
+  <text x="192" y="698" text-anchor="middle" class="arch-t-mono">Consume EARS IR directly · zero LLM</text>
+  <line x1="192" y1="714" x2="192" y2="736" class="arch-edge-teal" marker-end="url(#arr-teal)"></line>
+  <rect x="30" y="740" width="324" height="114" rx="4" class="arch-card"></rect>
+  <text x="192" y="764" text-anchor="middle" class="arch-t-title">generated-scaffold/ (Read-Only Locked)</text>
+  <text x="192" y="785" text-anchor="middle" class="arch-t-sub">• Aggregate Behavior + EventHandler</text>
+  <text x="192" y="804" text-anchor="middle" class="arch-t-sub">• Protobuf / Codec / Saga Host / Pure Oracle</text>
+  <text x="192" y="823" text-anchor="middle" class="arch-t-sub">• Port Traits + empty @cloze slot stubs</text>
+  <text x="192" y="842" text-anchor="middle" class="arch-t-mono">Stamped with @generated &amp; @ProvenanceId</text>
+  <line x1="192" y1="854" x2="192" y2="876" class="arch-edge-teal" marker-end="url(#arr-teal)"></line>
+  <rect x="30" y="880" width="324" height="58" rx="4" class="arch-card-teal"></rect>
+  <text x="192" y="904" text-anchor="middle" class="arch-t-title">Drift-Free L1 Core &amp; Architecture</text>
+  <text x="192" y="924" text-anchor="middle" class="arch-t-teal">Rebuildable on every spec edit · never hand-edited</text>
+  <path d="M 354 796 L 398 796 L 398 675 L 414 675" class="arch-edge-amber" marker-end="url(#arr-amber)"></path>
+  <rect x="394" y="600" width="412" height="354" rx="4" class="arch-band-red"></rect>
+  <text x="408" y="622" class="arch-t-band-red">CHANNEL 4B · ISOLATED AI @CLOZE TDD (~20%)</text>
+  <rect x="410" y="636" width="186" height="72" rx="4" class="arch-card-red"></rect>
+  <text x="503" y="657" text-anchor="middle" class="arch-t-title">Locked Executable Oracles</text>
+  <text x="503" y="675" text-anchor="middle" class="arch-t-sub">.feature + *EarsSpec</text>
+  <text x="503" y="694" text-anchor="middle" class="arch-t-mono">generated-tests/ SHA-256</text>
+  <rect x="608" y="636" width="182" height="72" rx="4" class="arch-card"></rect>
+  <text x="699" y="657" text-anchor="middle" class="arch-t-title">Sandwich Context Pack</text>
+  <text x="699" y="675" text-anchor="middle" class="arch-t-sub">Type sigs + @caller rules</text>
+  <text x="699" y="694" text-anchor="middle" class="arch-t-mono">Graph-sliced · zero-grep</text>
+  <line x1="503" y1="708" x2="548" y2="736" class="arch-edge" marker-end="url(#arr-ink)"></line>
+  <line x1="699" y1="708" x2="650" y2="736" class="arch-edge" marker-end="url(#arr-ink)"></line>
+  <rect x="410" y="740" width="242" height="58" rx="4" class="arch-card-teal"></rect>
+  <text x="531" y="762" text-anchor="middle" class="arch-t-title">AI Agent Single-Slot Cloze TDD</text>
+  <text x="531" y="782" text-anchor="middle" class="arch-t-sub">Edits confined to @cloze:start..end</text>
+  <rect x="664" y="740" width="126" height="58" rx="4" class="arch-card-red"></rect>
+  <text x="727" y="761" text-anchor="middle" class="arch-t-red">PreToolUse Hook</text>
+  <text x="727" y="780" text-anchor="middle" class="arch-t-mono">Out-of-bounds exit 2</text>
+  <line x1="664" y1="769" x2="656" y2="769" class="arch-edge-red" marker-end="url(#arr-red)"></line>
+  <line x1="531" y1="798" x2="531" y2="816" class="arch-edge" marker-end="url(#arr-ink)"></line>
+  <rect x="410" y="820" width="380" height="52" rx="4" class="arch-card-red"></rect>
+  <text x="600" y="841" text-anchor="middle" class="arch-t-title">Stop Hook Triple Gate (exit 2 forces self-heal)</text>
+  <text x="600" y="860" text-anchor="middle" class="arch-t-sub">1. Test SHA-256 integrity · 2. Run *EarsSpec · 3. AST anchor audit</text>
+  <path d="M 410 846 L 402 846 L 402 769 L 408 769" class="arch-edge-red" marker-end="url(#arr-red)"></path>
+  <line x1="600" y1="872" x2="600" y2="888" class="arch-edge-teal" marker-end="url(#arr-teal)"></line>
+  <rect x="410" y="892" width="380" height="48" rx="4" class="arch-card-teal"></rect>
+  <text x="600" y="912" text-anchor="middle" class="arch-t-title">Fresh Blind Subagent (contract-reviewer · skip style)</text>
+  <text x="600" y="930" text-anchor="middle" class="arch-t-teal">Blocks witness hardcoding → persists Provenance &amp; graph anchors</text>
+</svg>
+<figcaption>Figure 2: End-to-end co-arising 2.0 control flow. Solid teal edges carry mathematically verified deterministic data; dashed red edges enforce physical blocking and self-healing feedback (A/B clarification cards, PreToolUse write guard, Stop Hook triple gate).</figcaption>
+</figure>
+
+<h2 id="section-3">3. Orthogonal Single Truth Source: Structure in YAML, Behavior in EARS</h2>
+<p>The first invariant of v2 is <strong>orthogonal separation</strong>: YAML carries zero escaped business predicates, and EARS carries zero serialization or storage boilerplate:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Concern / Sole Authoring Surface / Owns / Explicitly Excluded"><table>
+<thead>
+<tr>
+<th scope="col">Concern</th>
+<th scope="col">Sole Authoring Surface</th>
+<th scope="col">Owns</th>
+<th scope="col">Explicitly Excluded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Structure truth</strong></td>
+<td><code>truth/&lt;sys&gt;/contexts/&lt;ctx&gt;/*.yaml</code></td>
+<td>ValueObject schemas, exact numeric <code>scale</code>/<code>precision</code>/<code>units</code>, Protobuf wire/storage codecs, aggregate <code>stateFields</code> defaults, command/event signatures, Saga &amp; Pipeline topology, read-model schemas</td>
+<td><code>@guard</code> boolean strings, inline business logic</td>
+</tr>
+<tr>
+<td><strong>Behavior truth</strong></td>
+<td><code>truth/&lt;sys&gt;/contexts/&lt;ctx&gt;/specs/**/*.ears</code></td>
+<td><code>where:</code> positive predicates, <code>extern</code> black-box boundaries, <code>axioms:</code> global invariants, <code>rules:</code> domain reject/idempotency/transition rules, <code>post:</code> folds, <code>layer: application</code> admission &amp; view contracts</td>
+<td>Storage types, wire codecs, framework annotations, implementation code</td>
+</tr>
+<tr>
+<td><strong>Review projections</strong></td>
+<td><code>projections/ac/**</code>, <code>projections/tables/**</code></td>
+<td>Zero-LLM deterministic Style E plain-language AC and Style B DMN decision tables</td>
+<td><strong>Never hand-edited</strong> (rebuilt from truth on demand)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-3-1">Orthogonal Pairing Example: Dual-Cap Quota Slice with Zero Duplication</h3>
+<p>Structure declares what fields and exact decimal scales exist; EARS declares the laws governing them:</p>
+<pre class="code"><code class="language-yaml"># truth/bank-wealth/contexts/bankwealth/aggregates/fund-quota/aggregate.yaml (pure structure, zero @guard)
+kind: aggregate
+name: FundQuota
+stateFields:
+  - minPurchase: AmountDecimal = "0.00"
+  - maxSingleLimit: AmountDecimal = "0.00"
+  - fundTotalUsed: AmountDecimal = "0.00"
+  - fundTotalCap: AmountDecimal = "0.00"
+  - perAccountCap: AmountDecimal = "0.00"
+  - accountUsed: Map[AccountId, AmountDecimal] = []
+commands:
+  - name: ReserveSubscriptionQuota
+    parameters: [accountId: AccountId, amount: AmountDecimal]
+    produces: [SubscriptionQuotaReserved]
+</code></pre>
+<pre class="code"><code class="language-text"># truth/bank-wealth/contexts/bankwealth/specs/fund-quota-reserve.ears (sole behavioral truth)
+slice FundQuota.ReserveSubscriptionQuota
+
+where:
+  validAmount   = amount in [quota.minPurchase..quota.maxSingleLimit]          as "Single amount within valid range"
+  withinFundCap = quota.fundTotalUsed + amount &lt;= quota.fundTotalCap           as "Within total fund subscription cap"
+  withinAcctCap = quota.accountUsed[accountId] + amount &lt;= quota.perAccountCap as "Within per-account cap"
+
+axioms:
+  [AX-Q-1] ALWAYS quota.fundTotalUsed &lt;= quota.fundTotalCap
+  [AX-Q-2] ALWAYS quota.accountUsed[accountId] &lt;= quota.perAccountCap
+
+rules:
+  [QUOTA_AMOUNT_RANGE] IF not validAmount   THEN SHALL reject request with QUOTA_AMOUNT_RANGE
+  [QUOTA_FUND_CAP]     IF not withinFundCap THEN SHALL reject request with QUOTA_FUND_CAP
+  [QUOTA_ACCOUNT_CAP]  IF not withinAcctCap THEN SHALL reject request with QUOTA_ACCOUNT_CAP
+
+  [QUOTA_RESERVED]     WHILE validAmount and withinFundCap and withinAcctCap
+                       WHEN ReserveSubscriptionQuota
+                       SHALL emit SubscriptionQuotaReserved
+                       post:
+                         quota.fundTotalUsed'          = quota.fundTotalUsed + amount
+                         quota.accountUsed'[accountId] = quota.accountUsed[accountId] + amount
+</code></pre>
+<p>A single symbol-table binder validates every path, exact decimal scale, command parameter, event name, and rule anchor before SMT compilation starts — catching drift such as referencing <code>occurrenceId</code> instead of <code>occurrence.occurrenceId</code> immediately at compile time.</p>
+<h2 id="section-4">4. The Mathematical Proof Gate: No <code>Canonical Model v2</code> Without Proof</h2>
+<p>In v1, verification ran downstream after code was generated. In v2, <a href="https://smt-lib.org/">SMT-LIB 2</a> proof checking via <a href="https://z3prover.github.io/">Z3</a> / <a href="https://cvc5.github.io/">cvc5</a> becomes a <strong>hard pre-compilation gate</strong> in front of <code>Canonical Model v2</code>.</p>
+<ol>
+<li><strong>Automatic Decidability Routing</strong>:<ul>
+<li><strong>L1 Decidable Core (<code>QF_AUFLIA</code>)</strong>: fixed-point linear arithmetic, enum state machines, monotonic cursors, <code>Map[K, V]</code> encoded as presence bitmap <code>(Array K Bool)</code> + value array <code>(Array K V)</code>, and FEEL intervals <code>[start..end)</code>. Millisecond complete solving.</li>
+<li><strong>L2 Bounded Extension (<code>QF_NIA</code> isolated + <code>k</code>-step BMC)</strong>: local nonlinear multiplication (<code>shares * nav &lt;= netAmount</code>) runs isolated under <code>QF_NIA</code> with a 2-second timeout; multi-command stateful slices unroll <code>k</code>-step BMC to prove cross-step safety (such as a <code>skipped</code> due slot never being resurrected into <code>backlog</code>).</li>
+<li><strong>L3 Black-Box External Layer (<code>extern</code> / <code>@host</code>)</strong>: session auth, CSRF verification, external TA receipt parsing, and deterministic host IDs map to uninterpreted Boolean predicates or symbolic constants — preserving 100% Boolean completeness checks without leaking infrastructure into SMT.</li>
+</ul>
+</li>
+<li><strong>Automatic Fixed-Point Scale Alignment</strong>:<ul>
+<li>Each numeric variable tracks its decimal scale (<code>Money</code> <code>scale = 2</code>, NAV <code>scale = 4</code>, integer shares <code>scale = 0</code>). Comparisons like <code>shares * nav &lt;= order.netAmount</code> automatically align scales (<code>(* shares nav) &lt;= (* netAmount 100)</code>), eliminating floating-point drift.</li>
+</ul>
+</li>
+<li><strong>Five <code>(push 1) ... (pop 1)</code> Checks &amp; A/B Clarification Cards</strong>:<ul>
+<li><strong>Mutual-exclusion conflicts</strong>: <code>SAT(Axioms ∧ G_emit ∧ G_reject)</code> and <code>SHALL</code> vs <code>SHALL NOT</code> must be <code>unsat</code>.</li>
+<li><strong>Logic gaps</strong>: <code>SAT(Axioms ∧ ¬(G_1 ∨ ... ∨ G_n))</code> must be <code>unsat</code>; on <code>sat</code>, the decoded counterexample renders an <strong>A/B Clarification Card</strong> for human decision.</li>
+<li><strong>Invariant induction</strong>: <code>SAT(Inv(s) ∧ G_i ∧ Post(s, s') ∧ Frame(s, s') ∧ ¬Inv(s'))</code> must be <code>unsat</code>.</li>
+<li><strong>Dead-rule detection</strong>: <code>UNSAT(Axioms ∧ G_i)</code> reports blocking axioms via <code>get-unsat-core</code>.</li>
+<li><strong>Boundary witness synthesis</strong>: <code>(get-model)</code> extracts concrete decoded decimals and enum samples directly into <code>TestIR</code>.</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-5">5. Native <code>Canonical Model v2</code>: Freezing Three Core Semantic Contracts</h2>
+<p>To let multi-language generators consume <code>Canonical Model v2</code> directly with zero legacy <code>@guard</code> lowering, v2 freezes three contracts inside <code>co-arising.canonical/v2</code>:</p>
+<h3 id="section-5-1">Contract 1: Single Native Behavioral IR (<code>co-arising.ears-ir/v2</code>)</h3>
+<p>Every proved slice or story embeds its normalized EARS IR, theory tier, solver proof receipt, and synthesized <code>TestIR</code> witnesses directly inside <code>Canonical Model v2</code>:</p>
+<pre class="code"><code class="language-json">{
+  "schemaVersion": "co-arising.canonical/v2",
+  "context": "bankwealth",
+  "structures": { "valueObjects": [], "exactTypes": [], "aggregates": [], "sagas": [], "readModels": [] },
+  "behaviors": [
+    {
+      "kind": "slice",
+      "layer": "domain",
+      "target": "FundQuota.ReserveSubscriptionQuota",
+      "hitPolicy": "FIRST",
+      "theory": { "tier": "L1", "logic": "QF_AUFLIA", "codegenChannel": "deterministic" },
+      "verification": { "solver": "z3", "passed": true, "bmcSteps": 0, "canonicalSha256": "..." },
+      "axioms": [],
+      "rules": [],
+      "testIr": { "schemaVersion": "co-arising.test-ir/v2", "scenarios": [] }
+    }
+  ]
+}
+</code></pre>
+<h3 id="section-5-2">Contract 2: Unifying Declarative SMT with Imperative Codegen via DMN First-Hit</h3>
+<p>In SMT, overlapping <code>IF ... reject</code> guards are not conflicts because both reject the request. Yet imperative codegen (Scala <code>Either</code>, Rust <code>Result</code>, Go <code>error</code>) must choose a deterministic error code when multiple rejections hold simultaneously.</p>
+<p><code>Canonical Model v2</code> adopts <a href="https://www.omg.org/spec/DMN/">OMG DMN</a> <strong>First-Hit</strong> semantics: top-to-bottom declaration order in <code>rules:</code> is the authoritative rejection priority for code generation. Declarative proofs, Style B decision tables, and imperative codegen stay 100% isomorphic.</p>
+<h3 id="section-5-3">Contract 3: Pure Event Sourcing Closure (<code>emit</code> Auto-Propagation + <code>post:</code> Fold Consistency)</h3>
+<p>Event Sourcing forbids mutating aggregate state directly inside <code>handleCommand</code>; state evolves solely in <code>applyEvent(event)</code>. <code>Canonical Model v2</code> closes this loop cleanly:</p>
+<ul>
+<li><strong>Auto-propagated payloads (<code>@PROPAGATED</code>)</strong>: matching command parameter and event payload names/types bind automatically; only derived values and <code>@host(...)</code> computations require explicit mapping.</li>
+<li><strong><code>post:</code> as event-fold contract</strong>: when a rule emits <code>E</code> with <code>post: state.x' = ...</code>, the compiler binds those updates as the deterministic fold of <code>E</code> (and enforces fold equivalence if multiple commands emit <code>E</code>), enabling lossless generation of <code>handleCommand</code>, <code>applyEvent</code>, and the <code>Pure Replay Oracle</code>.</li>
+</ul>
+<h2 id="section-6">6. Dual-Channel Delivery: Zero-Token Scaffolds (4A) vs Locked AI Cloze TDD (4B)</h2>
+<p>Following Ashby's Law of Requisite Variety (<a href="https://martinfowler.com/articles/harness-engineering.html">Harness Engineering</a>), a regulator can govern only what it explicitly models. <code>co-arising 2.0</code> partitions work strictly along decidability boundaries:</p>
+<h3 id="section-6-1">Channel 4A: Deterministic Zero-Token Codegen (L1 + All Structural Scaffolds)</h3>
+<ul>
+<li>Consumes all structural metadata plus <code>tier == L1 &amp;&amp; layer == domain</code> EARS IR directly from <code>Canonical Model v2</code>.</li>
+<li>Independent multi-language generator plugins (<code>Scala</code>, <code>TypeScript</code>, <code>Java</code>, <code>Rust</code>, <code>Go</code>) emit ValueObjects, exact codecs, Aggregate Behaviors, EventHandlers, Protobuf/JSON schemas, Saga hosts, Port traits, and empty <code>// @cloze:start(&lt;id&gt;) .. // @cloze:end(&lt;id&gt;)</code> stubs — zero LLM tokens, zero hallucination.</li>
+<li>Every generated file is stamped with <code>@generated</code> and bidirectional <code>@ProvenanceId</code> anchors inside read-only <code>generated-scaffold/</code>.</li>
+</ul>
+<h3 id="section-6-2">Channel 4B: Isolated-Zone AI <code>@cloze</code> TDD Loop (L2/L3 + <code>layer: application</code>)</h3>
+<p>Complex handwritten orchestration that lived outside v1's compiler (trusted admission, idempotent replay dedup, nonlinear share math, external TA bridges, read-model watermark recovery) now enters the same EARS contract loop:</p>
+<ol>
+<li><strong>Locked Executable BDD Oracles (<code>EarsTestEmitter</code>)</strong>:<ul>
+<li>Emits locked <a href="https://cucumber.io/docs/gherkin/reference/">Gherkin</a> <code>.feature</code> specs and executable target-language suites (<a href="https://www.scalatest.org/">ScalaTest</a> + <a href="https://doc.akka.io/libraries/akka-persistence-testkit/current/index.html">Akka Persistence TestKit</a>, Vitest, JUnit 5, or <code>cargo test</code>).</li>
+<li>Tags every test with <code>@CoArisingSpec(id="&lt;RULE_ID&gt;", witness="&lt;witness-id&gt;")</code> and seals all generated test files under <code>generated-tests/manifest.sha256.json</code>.</li>
+</ul>
+</li>
+<li><strong>Graph-Sliced Sandwich Context Pack</strong>:<ul>
+<li>Exported from <code>knowledge.sqlite</code> with three layers — transitive type/port signatures, caller transaction &amp; retry <code>@caller</code> contracts, and linked <code>@CoArisingSpec</code> failure scenarios — eliminating blind repository grepping.</li>
+</ul>
+</li>
+<li><strong>Physical Anti-Cheat Hooks &amp; Blind Contract Review (<a href="https://code.claude.com/docs/en/best-practices">Claude Code Best Practices</a>)</strong>:<ul>
+<li><strong><code>PreToolUse</code> Hook (<code>exit 2</code>)</strong>: blocks writes to <code>projections/</code>, <code>generated-scaffold/</code>, <code>generated-tests/</code>, or any line outside <code>@cloze:start..end</code> (including marker tampering).</li>
+<li><strong><code>Stop</code> Hook (<code>exit 2</code>)</strong>: enforces a triple gate before the agent may stop — (a) SHA-256 verification against <code>manifest.sha256.json</code> to block shell/sed test tampering; (b) real execution of <code>*EarsSpec</code>; (c) bidirectional AST provenance verification. Any failure injects the failing <code>@CoArisingSpec</code> IDs to <code>stderr</code> and forces in-place self-healing.</li>
+<li><strong>Fresh Blind Subagent (<code>contract-reviewer</code>)</strong>: zero shared reasoning history, hardcoded <code>skip style</code>, auditing only <code>*.ears</code>, <code>TestIR</code>, and the <code>@cloze</code> <code>git diff</code> to reject witness-hardcoding cheats before writing layered provenance records.</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-7">7. Honest Boundary vs v1 Baseline and Phased Roadmap</h2>
+<p>To keep delivered facts distinct from forward-looking design goals:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Phase / Milestone / Current Status / Exit Gate"><table>
+<thead>
+<tr>
+<th scope="col">Phase</th>
+<th scope="col">Milestone</th>
+<th scope="col">Current Status</th>
+<th scope="col">Exit Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>v1 Frozen Baseline</strong></td>
+<td>Public Pages + <code>bank-wealth-demo</code> v1 + EARS 1.0 frontend / Z3 5-check / 4-step BMC / Style E &amp; B projections / Hooks prototype</td>
+<td><strong>Completed (verified green on v1 branches)</strong></td>
+<td>Zero lint issues across <code>metarch-truthsrc</code>, 15/15 EARS unit tests pass; 6 bilingual <code>bank-wealth-demo</code> pairs 100% AST &amp; <code>.smt2</code> identical; Hooks <code>exit 2</code> verified; existing 160-atom roundtrip untouched</td>
+</tr>
+<tr>
+<td><strong>v2 Phase 1</strong></td>
+<td><code>Canonical Model v2</code> schema &amp; single compiler (Structure YAML + native EARS IR + SMT hard gate)</td>
+<td>Planned</td>
+<td>Retires second expression parser; single type/symbol checker serves SMT, projections, and codegen; unproved specs cannot emit <code>canonical-v2.json</code></td>
+</tr>
+<tr>
+<td><strong>v2 Phase 2</strong></td>
+<td>Direct EARS-IR L1 deterministic code generators (first target: Scala or TypeScript/Rust)</td>
+<td>Planned</td>
+<td>Generates <code>Behavior</code>, <code>EventHandler</code>, and <code>Pure Replay Oracle</code> directly from <code>First-Hit</code> rules and <code>emit</code>/<code>post:</code> folds with zero <code>@guard</code> lowering</td>
+</tr>
+<tr>
+<td><strong>v2 Phase 3</strong></td>
+<td>Executable <code>EarsTestEmitter</code> (upgrading witness stubs to real Actor/Port-driving BDD oracles)</td>
+<td>Planned</td>
+<td>Synthesizes real command/value-object constructors and assertions executing under <code>sbt "testOnly *EarsSpec"</code> / <code>vitest</code></td>
+</tr>
+<tr>
+<td><strong>v2 Phase 4</strong></td>
+<td>End-to-end isolated-zone AI <code>@cloze</code> TDD pilot (Context Pack + <code>Stop</code> Hook self-heal + blind review)</td>
+<td>Planned</td>
+<td>Full loop on a real application story and L2 slice: red locked oracle → <code>@cloze</code>-only AI fill → mutation kill check → blind review pass → graph anchor write-back</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-8">8. Standards, Citations, and Related Articles</h2>
+<ul>
+<li><a href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)</a> — Bilingual isomorphic EARS grammar, four <code>bank-wealth-demo</code> benchmarks, and read-only projections</li>
+<li><a href="https://co-arising.github.io/articles/metarch-truthsrc-extending-code-generator-20261126/">How to Extend a New Code Generator in metarch-truthsrc</a> — v1 artifact pipeline map and multi-language generator plugin contracts</li>
+<li><a href="https://co-arising.github.io/articles/aws-kiro-smt-spec-analyzer-20261119/">Specs Have Bugs Too: AWS Kiro &amp; SMT Solvers</a> — Eliminating specification ambiguity and conflicts before writing code</li>
+<li><a href="https://co-arising.github.io/articles/co-arising-implications-20261116/">Implications for co-arising: Strategic Validation &amp; Engineering Route</a> — Ashby's Law, Behaviour Harness, two-speed workflow, and Cloze context packing</li>
+<li><a href="https://z3prover.github.io/">Z3 Prover (Microsoft Research)</a> — Primary SMT-LIB 2 solver for 5-check verification and <code>k</code>-step BMC</li>
+<li><a href="https://cvc5.github.io/">cvc5 SMT Solver</a> — Solver-independent backend supporting <code>QF_SLIA</code> string theories</li>
+<li><a href="https://smt-lib.org/">SMT-LIB 2 Standard</a> — Solver-neutral formal verification interchange language</li>
+<li><a href="https://www.cedarpolicy.com/">AWS Cedar Policy Language</a> — Reference design for trading Turing completeness for 100% decidable analysis</li>
+<li><a href="https://en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax">EARS (Easy Approach to Requirements Syntax)</a> — Foundational controlled requirements syntax</li>
+<li><a href="https://www.omg.org/spec/DMN/">OMG DMN Specification</a> — Reference for Style B decision tables, FEEL intervals, and First-Hit policy</li>
+<li><a href="https://cucumber.io/docs/gherkin/reference/">Cucumber Gherkin Reference</a> — Locked <code>.feature</code> acceptance oracle syntax</li>
+<li><a href="https://www.scalatest.org/">ScalaTest</a> &amp; <a href="https://doc.akka.io/libraries/akka-persistence-testkit/current/index.html">Akka Persistence TestKit</a> — Event-sourced aggregate test oracle reference harness</li>
+<li><a href="https://martinfowler.com/articles/harness-engineering.html">Harness Engineering for Coding Agent Users (Martin Fowler / Birgitta Böckeler)</a> — Variety-reduction topology and Behaviour Harness framing</li>
+<li><a href="https://code.claude.com/docs/en/best-practices">Claude Code Best Practices</a> — Deterministic <code>PreToolUse</code>/<code>Stop</code> Hooks (<code>exit 2</code>) and fresh-context blind review</li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc"><code>co-arising/metarch-truthsrc</code></a> &amp; <a href="https://github.com/co-arising/bank-wealth-demo"><code>co-arising/bank-wealth-demo</code></a> — Current v1 compiler and benchmark repositories</li>
+</ul></article>
+    </div>
+    <aside class="article-community" aria-label="Join the Discord community">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord Community</p>
+        <p class="article-community-title">Want to discuss this further or share feedback?</p>
+        <p>Join the co-arising Discord community to talk DDD, EARS/SMT verification, and deterministic code generation with the maintainers and peers.</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">Join the Discord community <span aria-hidden="true">↗</span></a>
+    </aside>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Design specification</span> · <time datetime="2026-11-23">2026-11-23</time></p>
+      <h3><a href="/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)</a></h3>
+      <p class="article-deck">The complete language specification for the controlled-EARS single truth source with single-hop deterministic SMT-LIB 2 verification: bilingual isomorphic grammar, four bank-wealth-demo worked examples, read-only projections and locked BDD tests — the design baseline pending implementation.</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

@@ -57,6 +57,9 @@ const STR = {
       "Shared domain knowledge, verifiable implementations and traceable changes. Open tooling for people and agents working with DDD and event-sourced systems.",
     siteOnGitHub: "This site on GitHub",
     joinDiscord: "Join the Discord community",
+    communityKicker: "Co-arising Discord Community",
+    communityHeading: "Discuss DDD, EARS specs, SMT verification &amp; real-world architecture",
+    communityDesc: "Landed here from an article or shared link? Ask questions, share experiments, or follow v2 development with the maintainers.",
     colRepos: "Repositories",
     colEngines: "Engines",
     colHonesty: "Honesty",
@@ -78,6 +81,9 @@ const STR = {
       "让业务知识可共识、实现可验证、变更可追溯。面向人和智能体的开放工具链，以 DDD 与事件溯源约束协作开发。",
     siteOnGitHub: "本站在 GitHub 上",
     joinDiscord: "加入 Discord 社区",
+    communityKicker: "Co-arising Discord 社区",
+    communityHeading: "一起交流 DDD、EARS 规约、SMT 验证与工程落地",
+    communityDesc: "从文章或分享链接来到这里？欢迎带着问题、实验案例或架构想法进入社区，与作者及同行持续讨论。",
     colRepos: "仓库",
     colEngines: "引擎",
     colHonesty: "诚实层",
@@ -159,12 +165,20 @@ const STR = {
 
   if (footer) {
     const statusHref = LANG === "zh" ? "/zh/status/" : "/status/";
-    footer.innerHTML = `<div class="site-footer"><div class="cols">
+    footer.innerHTML = `<div class="site-footer">
+      <div class="footer-community">
+        <div class="footer-community-copy">
+          <p class="footer-community-kicker">${T.communityKicker}</p>
+          <p class="footer-community-title">${T.communityHeading}</p>
+          <p class="footer-community-desc">${T.communityDesc}</p>
+        </div>
+        <div class="footer-community-cta"><a href="${SITE.urls.discord}">${T.joinDiscord} <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <div class="cols">
       <div>
         <h4>co-arising</h4>
         <p>${T.footerTagline}</p>
         <p><a href="${SITE.urls.site}">${T.siteOnGitHub}</a></p>
-        <p><a href="${SITE.urls.discord}">${T.joinDiscord} <span aria-hidden="true">↗</span></a></p>
       </div>
       <div>
         <h4>${T.colRepos}</h4>

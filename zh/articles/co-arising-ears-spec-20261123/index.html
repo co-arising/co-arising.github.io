@@ -35,13 +35,18 @@
       <p class="article-meta"><span>设计规范</span> · <time datetime="2026-11-23">2026-11-23</time> · 中文原文</p>
       <h1>co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）</h1>
       <p class="article-deck">受控 EARS 唯一真源 + SMT-LIB 2 单跳确定性验证的完整语言规范：双语同构文法、bank-wealth-demo 四类实战样例、只读投影与 BDD 测试锁定，作为待落地的设计基准。</p>
-      <div class="article-actions"><a href="/content/articles/co-arising-ears-spec-20261123.md" download="co-arising-ears-spec-20261123.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/co-arising-ears-spec-20261123/">Read in English</a></div>
+      <div class="article-actions"><a href="/content/articles/co-arising-ears-spec-20261123.md" download="co-arising-ears-spec-20261123.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/co-arising-ears-spec-20261123/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是前瞻性技术设计规范（v1.2.1），描述目标语言设计与验收标准，不属于已交付能力；文中命令、工具与产物均以实际落地版本为准，落地进度以状态页为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
         <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. 架构总览：唯一真源 + 单跳验证 + 只读投影</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. co-arising EARS 1.0 语言规范</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. bank-wealth-demo 四类完整实战样例（中英文双语对照）</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. 从真源自动派生的只读投影（风格 E + 风格 B）</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. 从受控 EARS 1.0 到 SMT-LIB 2 单跳确定性编译</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. 数学验证产物：澄清卡片 + 与四类样例 1:1 对齐的 BDD 拆解</a></li><li><a href="#section-7"><span class="toc-number">07</span> 7. 隔离区 BDD 测试锁定与 AI Agent 完形填空闭环</a></li><li><a href="#section-8"><span class="toc-number">08</span> 参考链接与标准出处</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">阅读全文</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">社区讨论</p>
+          <p>对本文观点、EARS 规约或工程落地有疑问？欢迎来 Discord 一起交流。</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+        </div>
       </aside>
       <article id="article-body" class="article-body"><p><strong>文档版本</strong>：<code>1.2.1</code></p>
 <p><strong>适用范围</strong>：<code>metarch-truthsrc</code> / <code>truthsrc-smt</code> / <code>co-arising</code> 编译器与 AI Agent Harness 工具链</p>
@@ -1175,6 +1180,14 @@ final class SipPlanStreamBatchEarsSpec extends AnyFunSuite {
 <li><a href="https://github.com/co-arising/bank-wealth-demo">co-arising/bank-wealth-demo</a> —— 第 3 节四类样例的参考基准项目</li>
 </ul></article>
     </div>
+    <aside class="article-community" aria-label="加入 Discord 社区">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord 社区</p>
+        <p class="article-community-title">读完这篇，想进一步交流或提出质疑？</p>
+        <p>加入 co-arising Discord 社区，直接与作者及同行探讨 DDD、EARS/SMT 验证与 AI 时代代码生成实践。</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+    </aside>
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">继续阅读</h2>
       <div class="article-card" lang="zh-CN">
