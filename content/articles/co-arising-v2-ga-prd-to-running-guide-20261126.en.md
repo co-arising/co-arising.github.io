@@ -46,7 +46,7 @@ co-arising 2.0 splits delivery into two orthogonal channels with **TypeScript an
 | Channel | Scope | Generation Strategy | Verification & Locking |
 | :--- | :--- | :--- | :--- |
 | **Channel 4A (L1)** | Deterministic pure domain rules (e.g., balance reserve, quota reserve) | **Zero-token deterministic compilation** emits complete production code + unit tests | Compiler guarantees isomorphism between spec and code; zero AI hand-writing |
-| **Channel 4B (L2 / L3)** | Complex domain calculations (L2) and cross-port application orchestration (L3) | Compiler emits **Port interfaces**, fenced `@coarising:cloze-start/end` skeletons, and **SHA-256 locked test oracles** (Vitest / ScalaTest) | AI agents edit strictly inside `@cloze` fences until all locked oracles pass, followed by independent blind review |
+| **Channel 4B (L2 / L3)** | Complex domain calculations (L2) and cross-port application orchestration (L3) | Compiler emits **Port interfaces**, fenced `@cloze:start(<slot-id>)..@cloze:end(<slot-id>)` skeletons, and **SHA-256 locked test oracles** (Vitest / ScalaTest) | AI agents edit strictly inside `@cloze` fences until all locked oracles pass, followed by independent blind review |
 
 ### 5. 100% Full-Coverage Zero-Gray-Zone Governance & Chaos TCK
 
@@ -204,7 +204,7 @@ cp -r /absolute/path/to/metarch-truthsrc/skills/coarising_cloze_worker .claude/s
 ```
 
 - **`coarising-distill`**: Activated when turning a PRD into truth source. Follows a strict loop—inventory entities & invariants → author orthogonal files → call `v2_compile` to let Z3 surface gaps/conflicts → issue A/B Clarification Cards → export readable signoff projections—never jumping straight into code;
-- **`coarising-cloze-worker`**: Activated when implementing a `@cloze` slot. Fetches the minimal `v2_context_pack`, edits only inside `@coarising:cloze-start` / `@coarising:cloze-end`, proves green via `v2_verify` (strict), and hands off for independent blind review.
+- **`coarising-cloze-worker`**: Activated when implementing a `@cloze` slot. Fetches the minimal `v2_context_pack`, edits only inside `@cloze:start(<slot-id>)` and `@cloze:end(<slot-id>)`, proves green via `v2_verify` (strict), and hands off for independent blind review.
 
 ### 3. One-Command Physical Write-Guard Hooks (Claude Code)
 
@@ -231,6 +231,103 @@ When a spec update opens multiple independent `@cloze` slots (e.g., `cash-fund-p
 
 - Syntax highlighting lives in `metarch-truthsrc/editor/ears-vscode/`, covering `.ears`, `.zh.ears`, `.story.ears`, and `.integration.ears`;
 - Start the zero-dependency stdio language server via `node "$TRUTHSRC_CLI" lsp-ears` for live parse diagnostics, symbol outlines, and hover help.
+
+### 6. Taking Your Own PRD End-to-End: Copy-Paste Playbook for Claude Code
+
+If you have a real PRD on disk (say `docs/prd.md`) and want to take it smoothly from raw prose to Z3-verified truth, running dual-stack tests, and blind-reviewed code in Claude Code, follow these four exact steps:
+
+**Step A · Scaffold the Project, Drop in Your PRD, and Wire MCP + Skills**
+
+```bash
+# 1. Scaffold the project (creates truth/<context>/, governance/, truthsrc.v2.json, and .claude/settings.json hooks)
+node "$TRUTHSRC_CLI" init-v2 my-prd-app --system my-sys --context my-ctx --format human
+cd my-prd-app
+
+# 2. Place your PRD inside the repo (Markdown, plain text, or requirement tables)
+mkdir -p docs
+cp /path/to/your-prd.md docs/prd.md
+
+# 3. Register truthsrc MCP and install both official skills into this project
+claude mcp add truthsrc -- node "$TRUTHSRC_CLI" mcp
+mkdir -p .claude/skills
+cp -r "$COARISING_WS/metarch-truthsrc/skills/coarising_distill" .claude/skills/
+cp -r "$COARISING_WS/metarch-truthsrc/skills/coarising_cloze_worker" .claude/skills/
+```
+
+> Note: `init-v2` automatically writes `.claude/settings.json` (`PreToolUse` `guard-write` + `Stop` `verify-v2 --strict`). In an existing repository, run `node "$TRUTHSRC_CLI" init-hooks --root .` to install them separately.
+
+**Step B · Turn 1 Prompt (PRD → Z3-Verified Orthogonal Truth Source)**
+
+Launch `claude` inside `my-prd-app` and paste this prompt directly:
+
+```text
+Use the coarising-distill skill to distill docs/prd.md into an orthogonal co-arising 2.0 truth source under truth/my-ctx/ (replacing the starter example):
+1. Phase 1: Extract the domain glossary, exactTypes (fixed scale + closed units), status enums, aggregate commands/events, inbound ports, and externContracts into truth/my-ctx/structures/my-ctx.yaml and pause for my confirmation first;
+2. Phase 2: Once confirmed, author behaviors/domain/*.ears, behaviors/application/*.story.ears, behaviors/application/*.integration.ears, and bindings/my-ctx-effects.yaml strictly by layer;
+3. Phase 3: Run truthsrc MCP v2_compile (strict: true) for Z3 SMT proofs. Auto-fix syntax or path-layer diagnostics via file:line:col; whenever Z3 reports a gap, conflict, dead-rule, or invariant failure, NEVER guess—present plain-language A/B Clarification Cards and wait for my decision;
+4. Phase 4: Once Z3 passes, emit read-only business signoff projections (Style E AC and Style B decision tables) for approval before writing any implementation code.
+```
+
+You will walk through four crisp interactive checkpoints:
+
+1. **Glossary & closed-vocabulary signoff**: Verify numeric scales, status enums, and external predicates so typos fail at compile time;
+2. **Layered truth authoring**: Pure domain logic in `behaviors/domain/*.ears`, user-story choreography in `behaviors/application/*.story.ears`, and external settlement/reconciliation in `behaviors/application/*.integration.ears` + `bindings/`;
+3. **Z3 A/B Clarification Cards**: Whenever Z3 exposes an omitted edge case (such as `amount == 0` or external `UNKNOWN` timeouts), simply reply with Option A, Option B, or a custom rule—Claude Code updates `.ears` and re-proves until `[PASS]`;
+4. **Stakeholder signoff projections**: Generate PM-readable acceptance criteria (`projections/ac/*.md`) and DMN decision tables (`projections/tables/*.md`):
+
+```bash
+node "$TRUTHSRC_CLI" compile-v2 \
+  --structures truth/my-ctx/structures \
+  --behaviors truth/my-ctx/behaviors \
+  --out .truthsrc/canonical-v2.json \
+  --db .truthsrc/knowledge.sqlite \
+  --out-ac projections/ac \
+  --out-tables projections/tables \
+  --lang en \
+  --strict \
+  --format human
+```
+
+**Step C · Emit Scaffolds, Locked Oracles, and Derived Task Queue**
+
+After signoff, materialize zero-token L1 code, L2/L3 Ports & `@cloze` skeletons, SHA-256 locked oracles, and the derived task queue:
+
+```bash
+node "$TRUTHSRC_CLI" generate-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
+node "$TRUTHSRC_CLI" emit-tests-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
+node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
+```
+
+Then send Turn 2 Prompt to Claude Code to fill each isolated `@cloze` slot:
+
+```text
+Use the coarising-cloze-worker skill (Mode A):
+1. Call v2_tasks to claim the next actionable @cloze slot;
+2. Load only that slot's minimal context via v2_context_pack, edit strictly inside // @cloze:start(<slot-id>)..// @cloze:end(<slot-id>), never touch generated-tests/, generated-scaffold/, or lines outside the fence, and use exact fixed-point decimal helpers instead of floating point;
+3. Run v2_verify (strict: true) and confirm SHA-256 tamper checks and all locked oracles pass before reporting back.
+```
+
+**Step D · Independent Blind Review & Final Gate**
+
+Open a fresh Claude Code session (or read-only subagent) so review has zero shared implementation bias, and send Turn 3 Prompt:
+
+```text
+Use the coarising-cloze-worker skill (Mode B, independent blind review) on slot <slot-id>:
+Read ONLY the authoritative .ears file, the handwritten @cloze file, and the locked generated-tests spec. Audit all 5 red lines (witness hardcoding, floating-point drift, off-by-one < vs <=, SHALL NOT leakage, edits outside the fence).
+If clean, record the verdict into SQLite:
+truthsrc tasks-v2 --root . --record-review --slot <slot-id> --verdict PASS --reviewer blind-reviewer --notes "Verified First-Hit order, exact decimal math, and SHALL NOT invariants."
+```
+
+Once `tasks-v2` shows zero pending/review items (and new files are registered in `governance/coverage-manifest.json`), run the single final gate:
+
+```bash
+node "$TRUTHSRC_CLI" check-v2 --root . --strict --format human
+```
+
+**Two Practical Tips for a Smooth First Run**
+
+- **Chunk large PRDs by aggregate or subdomain**: For a 20+ page PRD, distill 1 core aggregate or 1–2 main stories at a time so Z3 Clarification Cards stay focused and converge rapidly, then append the next slice.
+- **Warm up with a 5-line mini-PRD first**: On your very first run, try a 5-line wallet-transfer prompt (insufficient balance reject, duplicate `requestId` idempotency, single-transfer cap) to watch Z3 catch zero/negative gaps in under 2 minutes before feeding your full PRD.
 
 ---
 
@@ -263,7 +360,7 @@ The agent presents three concise **A/B Clarification Cards**. Stakeholders decid
 Once updated, `v2_compile` proves **0 conflicts, 0 dead rules, and 0 gaps**, exporting Style E/B read-only signoff tables for product and compliance review. Then:
 
 - **L1 slice `credit-balance-reserve.ears`** compiles via Channel 4A with **zero tokens** into complete TypeScript and Scala implementations plus unit tests;
-- **L3 story `cash-fund-purchase.story.ears`** emits via Channel 4B the `CashFundPurchasePort` interface, fenced `cash-fund-purchase.cloze.ts` and `CashFundPurchaseCloze.scala` skeletons, and SHA-256 locked oracle suites (`locked-tests.sha256.json`) including an explicit adversary test forbidding blind refund on `UNKNOWN`.
+- **L3 story `cash-fund-purchase.story.ears`** emits via Channel 4B the `CashFundPurchasePort` interface, fenced `cash-fund-purchase.cloze.ts` and `CashFundPurchaseCloze.scala` skeletons (`@cloze:start(cash-fund-purchase)..@cloze:end(cash-fund-purchase)`), and SHA-256 locked oracle suites (`locked-tests.sha256.json`) including an explicit adversary test forbidding blind refund on `UNKNOWN`.
 
 ### Step 4: `tasks-v2` Dispatch & Isolated Cloze TDD
 
@@ -277,7 +374,7 @@ Running `coarising-cloze-worker` (or AGY `run_workflow`):
 1. Calls `v2_context_pack(slotId="cash-fund-purchase")` to load only the bounded EARS rules, Port types, and fence lines;
 2. Edits strictly inside the `@cloze` fence under `PreToolUse` `guard-write` protection;
 3. Calls `v2_verify(strict=true)`: locked SHA-256 hashes verify, both TS Vitest and Scala ScalaTest pass, SQLite records provenance, and the slot moves to `GREEN_NEEDS_REVIEW`;
-4. An independent blind reviewer checks the EARS rules against the diff and signs off via `tasks-v2 --record-review --slot cash-fund-purchase --status APPROVED`, transitioning the slot to **`DONE`**.
+4. An independent blind reviewer checks the EARS rules against the diff and signs off via `tasks-v2 --root v2-pilot --record-review --slot cash-fund-purchase --verdict PASS --reviewer blind-reviewer`, transitioning the slot to **`DONE`**.
 
 ### Step 5: Full-Coverage Audit & Adversary Verification
 

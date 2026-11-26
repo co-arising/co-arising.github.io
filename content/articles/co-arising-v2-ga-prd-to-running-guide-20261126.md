@@ -46,7 +46,7 @@ co-arising 2.0 按复杂度把行为分成两条正交交付通道，同时支�
 | 通道 | 适用分层 | 生成方式 | 验证与锁定机制 |
 | :--- | :--- | :--- | :--- |
 | **Channel 4A（L1）** | 纯领域确定性规则（如账户预扣、额度扣减） | **零 Token 确定性编译**直接产出完整业务代码 + 单元测试 | 编译器直接保证源码与规约同构，无需 AI 手写 |
-| **Channel 4B（L2 / L3）** | 复杂域计算（L2）与应用层跨端口编排（L3） | 编译器生成 **Port 接口**、带 `@coarising:cloze-start/end` 围栏的骨架文件、以及 **SHA-256 锁定的测试预言机**（Vitest / ScalaTest） | AI Agent 只能在 `@cloze` 围栏内填槽，通过全部锁定预言机后经独立盲审签核 |
+| **Channel 4B（L2 / L3）** | 复杂域计算（L2）与应用层跨端口编排（L3） | 编译器生成 **Port 接口**、带 `@cloze:start(<slot-id>)..@cloze:end(<slot-id>)` 围栏的骨架文件、以及 **SHA-256 锁定的测试预言机**（Vitest / ScalaTest） | AI Agent 只能在 `@cloze` 围栏内填槽，通过全部锁定预言机后经独立盲审签核 |
 
 ### 5. 100% 全覆盖零灰区治理与混沌 TCK
 
@@ -204,7 +204,7 @@ cp -r /absolute/path/to/metarch-truthsrc/skills/coarising_cloze_worker .claude/s
 ```
 
 - **`coarising-distill`**：当你丢给 Agent 一份 PRD 时触发。它会严格按“盘点实体与不变量 → 切分正交目录 → 调用 `v2_compile` 用 Z3 抓歧义 → 生成带 A/B 选项的业务澄清卡 → 导出可读中文投影供业务签字”的纪律推进，绝不跳过证明直接写业务代码；
-- **`coarising-cloze-worker`**：当你让 Agent 实现某个 `@cloze` 槽位时触发。它会先调 `v2_context_pack` 获取最小上下文，只在 `@coarising:cloze-start` 与 `@coarising:cloze-end` 之间编码，并通过 `v2_verify`（严格模式）自证绿灯，最后请求独立盲审签核。
+- **`coarising-cloze-worker`**：当你让 Agent 实现某个 `@cloze` 槽位时触发。它会先调 `v2_context_pack` 获取最小上下文，只在 `@cloze:start(<slot-id>)` 与 `@cloze:end(<slot-id>)` 之间编码，并通过 `v2_verify`（严格模式）自证绿灯，最后请求独立盲审签核。
 
 ### 3. 一键安装物理防越界 Hooks（Claude Code）
 
@@ -231,6 +231,103 @@ node "$TRUTHSRC_CLI" init-hooks --root . --format human
 
 - 语法高亮扩展位于 `metarch-truthsrc/editor/ears-vscode/`，支持 `.ears` / `.zh.ears` / `.story.ears` / `.integration.ears` 关键字与注释着色；
 - 零依赖 stdio 语言服务器可通过 `node "$TRUTHSRC_CLI" lsp-ears` 启动，在编辑器中实时提供解析诊断、符号跳转与基础悬停提示。
+
+### 6. 带着你自己的 PRD 顺滑跑通：Claude Code 逐句照抄手册
+
+如果你手头正有一份真实 PRD（例如 `docs/prd.md`），想用 Claude Code 从零开始顺滑跑通“PRD → Z3 证明真源 → 双栈代码与测试 → 盲审归档”，直接按下面 4 步照抄即可：
+
+**步骤 A · 初始化项目、放入 PRD 并挂载 MCP + Skills**
+
+```bash
+# 1. 初始化项目骨架（会自动创建 truth/<context>/、governance/、truthsrc.v2.json 与 .claude/settings.json 防越界 Hooks）
+node "$TRUTHSRC_CLI" init-v2 my-prd-app --system my-sys --context my-ctx --format human
+cd my-prd-app
+
+# 2. 放入你的 PRD（Markdown / 纯文本 / 需求表格均可）
+mkdir -p docs
+cp /path/to/your-prd.md docs/prd.md
+
+# 3. 注册 truthsrc MCP 并拷贝两个官方 Skill 到当前项目
+claude mcp add truthsrc -- node "$TRUTHSRC_CLI" mcp
+mkdir -p .claude/skills
+cp -r "$COARISING_WS/metarch-truthsrc/skills/coarising_distill" .claude/skills/
+cp -r "$COARISING_WS/metarch-truthsrc/skills/coarising_cloze_worker" .claude/skills/
+```
+
+> 提示：`init-v2` 已自动生成 `.claude/settings.json`（含 `PreToolUse` `guard-write` 与 `Stop` `verify-v2 --strict`）。如果在已有仓库中单独补装钩子，执行 `node "$TRUTHSRC_CLI" init-hooks --root .` 即可。
+
+**步骤 B · 第一轮对话（PRD → Z3 数学证明的真源）**
+
+在 `my-prd-app` 目录运行 `claude`，直接复制下面这段 Prompt 发送：
+
+```text
+请使用 coarising-distill skill，把 docs/prd.md 蒸馏成 co-arising 2.0 正交真源（放在 truth/my-ctx/ 下，替换掉示例骨架）：
+1. Phase 1：先提取领域名词表、exactTypes（含 scale 与封闭 units）、状态枚举、聚合命令/事件、Inbound Ports 与 externContracts，写入 truth/my-ctx/structures/my-ctx.yaml 并先给我过目确认；
+2. Phase 2：我确认名词后，再按目录分层编写 behaviors/domain/*.ears、behaviors/application/*.story.ears、behaviors/application/*.integration.ears 与 bindings/my-ctx-effects.yaml；
+3. Phase 3：必须调用 truthsrc MCP 的 v2_compile（strict: true）跑 Z3 SMT 严格证明。语法或越层错误请按 file:line:col 自行修复；只要 Z3 报出 gap / conflict / dead-rule / invariant，绝对不要替我猜，直接整理成通俗业务语言的 A/B 澄清卡让我拍板；
+4. Phase 4：Z3 全绿后，导出中文只读业务确认文档（Style E AC 与 Style B 决策表）供我签字，在签字前不要提前写业务实现代码。
+```
+
+在这一轮里，你会经历四次非常清爽的互动：
+
+1. **确认名词表**：核对 Claude Code 提炼的金额精度、状态枚举和外部契约（如防手误拼错状态字符串）；
+2. **审阅分层真源**：纯域规则落在 `behaviors/domain/*.ears`，用户故事编排落在 `behaviors/application/*.story.ears`，外部系统回调/对账策略落在 `behaviors/application/*.integration.ears` 与 `bindings/`；
+3. **回答 Z3 A/B 澄清卡**：例如 Z3 指出“金额等于 0 未定义”或“外部超时 `UNKNOWN` 缺分支”，你只需回复“选 A / 选 B / 自定义规则”，Claude Code 会立刻回写 `.ears` 并复验直至 `[PASS]`；
+4. **中文业务确认书签字**：通过以下命令（或由 Claude Code 自动执行）导出给 PM/业务方可读的只读投影文档 `projections/ac/*.md` 与 `projections/tables/*.md`：
+
+```bash
+node "$TRUTHSRC_CLI" compile-v2 \
+  --structures truth/my-ctx/structures \
+  --behaviors truth/my-ctx/behaviors \
+  --out .truthsrc/canonical-v2.json \
+  --db .truthsrc/knowledge.sqlite \
+  --out-ac projections/ac \
+  --out-tables projections/tables \
+  --lang zh \
+  --strict \
+  --format human
+```
+
+**步骤 C · 签字后生成代码、锁定预言机与派生任务队列**
+
+业务确认无误后，生成 L1 零 Token 实现代码、L2/L3 Port 与 `@cloze` 骨架、SHA-256 锁定测试预言机，并查看待填槽任务清单：
+
+```bash
+node "$TRUTHSRC_CLI" generate-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
+node "$TRUTHSRC_CLI" emit-tests-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
+node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
+```
+
+然后直接把下面这段第二轮 Prompt 发给 Claude Code，让它逐槽位完成隔离区 TDD：
+
+```text
+请使用 coarising-cloze-worker skill 的 Mode A：
+1. 调用 v2_tasks 获取下一个可执行的 @cloze 槽位；
+2. 仅通过 v2_context_pack 读取该槽位的最小上下文，严格只在 // @cloze:start(<slot-id>) 与 // @cloze:end(<slot-id>) 之间编写实现，严禁修改 generated-tests/、generated-scaffold/ 或围栏外代码，金额运算必须使用定点数助手而不能用浮点；
+3. 调用 v2_verify（strict: true）确认 SHA-256 防篡改与全部锁定测试通过后再汇报。
+```
+
+**步骤 D · 独立盲审与最终全量门禁**
+
+为避免“自己审自己”的确认偏差，新开一个干净的 Claude Code 会话（或派发只读子代理），发送第三轮盲审 Prompt：
+
+```text
+请使用 coarising-cloze-worker skill 的 Mode B（独立盲审），对槽位 <slot-id> 做只读审计：
+只阅读对应的 .ears 规约、handwritten 槽位实现与 generated-tests 锁定测试，逐项核查 5 条红线（是否硬编码见证值、是否误用浮点、边界符 < 与 <= 是否错位、SHALL NOT 禁令是否泄露、是否越界修改围栏外代码）。
+审计通过后，运行以下命令写入 SQLite 审签记录：
+truthsrc tasks-v2 --root . --record-review --slot <slot-id> --verdict PASS --reviewer blind-reviewer --notes "核验 First-Hit 顺序、定点精度与 SHALL NOT 禁令通过"
+```
+
+当 `tasks-v2` 显示待办与待审均为 0 时，执行一键终检门禁（同时把新增文件登记进 `governance/coverage-manifest.json` 即可实现 100% 零灰区审计）：
+
+```bash
+node "$TRUTHSRC_CLI" check-v2 --root . --strict --format human
+```
+
+**两条顺滑体验小贴士**
+
+- **几十页的大 PRD 请分块蒸馏**：按“核心聚合 / 子域”切片（每次喂 1 个核心聚合或 1–2 条主用例），Z3 澄清卡最聚焦，收敛最快；每收敛一块再追加下一块。
+- **首次上手先跑 5 行迷你需求热身**：如果第一次接触 EARS 与 Z3，可以先在 `docs/prd.md` 里放一段 5 行需求（如“钱包转账：余额不足拒绝、重复 requestId 幂等、单笔限额 5 万”），2 分钟就能亲眼走通 Z3 抓零金额/负金额缺口、生成 A/B 澄清卡到绿灯实测的完整手感，再切换回你的正式 PRD。
 
 ---
 
@@ -263,7 +360,7 @@ Agent 自动生成三张 **A/B 业务澄清卡**请业务负责人拍板。业�
 补齐规则后再次运行 `v2_compile`，Z3 返回 **0 冲突、0 死规则、0 漏分支**，并可导出 Style E/B 只读业务确认表供产品与合规签字。接着：
 
 - **L1 切片 `credit-balance-reserve.ears`** 经 Channel 4A **零 Token**直接生成完整的 TypeScript 与 Scala 领域规则实现和单元测试；
-- **L3 编排 `cash-fund-purchase.story.ears`** 经 Channel 4B 生成 `CashFundPurchasePort` 接口、带 `@coarising:cloze-start/end` 围栏的 `cash-fund-purchase.cloze.ts` 与 `CashFundPurchaseCloze.scala`，以及写入 `locked-tests.sha256.json` 的锁定预言机测试（包含“禁止在 `UNKNOWN` 态盲目退款”的对抗测试）。
+- **L3 编排 `cash-fund-purchase.story.ears`** 经 Channel 4B 生成 `CashFundPurchasePort` 接口、带 `@cloze:start(cash-fund-purchase)..@cloze:end(cash-fund-purchase)` 围栏的 `cash-fund-purchase.cloze.ts` 与 `CashFundPurchaseCloze.scala`，以及写入 `locked-tests.sha256.json` 的锁定预言机测试（包含“禁止在 `UNKNOWN` 态盲目退款”的对抗测试）。
 
 ### Step 4：`tasks-v2` 派发与隔离区完形填空
 
@@ -277,7 +374,7 @@ Agent 自动生成三张 **A/B 业务澄清卡**请业务负责人拍板。业�
 1. 通过 `v2_context_pack(slotId="cash-fund-purchase")` 仅加载该槽位相关的 EARS 规则、Port 定义与围栏边界；
 2. 在 `PreToolUse` `guard-write` 的物理保护下，只在 `@cloze` 围栏内填写编排代码；
 3. 调用 `v2_verify(strict=true)`：锁定测试 SHA-256 校验通过，TS Vitest 与 Scala ScalaTest 全部绿灯，SQLite 记录溯源，槽位状态自动变为 `GREEN_NEEDS_REVIEW`；
-4. 独立盲审子代理核对 EARS 规则与 Diff 后签核 `tasks-v2 --record-review --slot cash-fund-purchase --status APPROVED`，槽位正式归档为 **`DONE`**。
+4. 独立盲审子代理核对 EARS 规则与 Diff 后签核 `tasks-v2 --root v2-pilot --record-review --slot cash-fund-purchase --verdict PASS --reviewer blind-reviewer`，槽位正式归档为 **`DONE`**。
 
 ### Step 5：全仓审计与对抗回归
 
