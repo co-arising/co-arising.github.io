@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How to Extend a New Code Generator in metarch-truthsrc: Pipeline Artifacts, Contract Boundaries, and a Rust Blueprint — co-arising</title>
+  <meta name="description" content="Verified against metarch-truthsrc 0.5.0 source: an artifact-level pipeline map from the YAML tree and canonical.json through the 21-product registry and knowledge.sqlite, plus the formal generator contract, single static wiring seam, a Rust Onion Architecture blueprint, and five source-level pitfalls." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="How to Extend a New Code Generator in metarch-truthsrc: Pipeline Artifacts, Contract Boundaries, and a Rust Blueprint" />
+  <meta property="og:description" content="Verified against metarch-truthsrc 0.5.0 source: an artifact-level pipeline map from the YAML tree and canonical.json through the 21-product registry and knowledge.sqlite, plus the formal generator contract, single static wiring seam, a Rust Onion Architecture blueprint, and five source-level pitfalls." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/metarch-truthsrc-extending-code-generator-20261126/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/metarch-truthsrc-extending-code-generator-20261126/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Engineering practice</span></nav>
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-26">2026-11-26</time> · English translation</p>
+      <h1>How to Extend a New Code Generator in metarch-truthsrc: Pipeline Artifacts, Contract Boundaries, and a Rust Blueprint</h1>
+      <p class="article-deck">Verified against metarch-truthsrc 0.5.0 source: an artifact-level pipeline map from the YAML tree and canonical.json through the 21-product registry and knowledge.sqlite, plus the formal generator contract, single static wiring seam, a Rust Onion Architecture blueprint, and five source-level pitfalls.</p>
+      <div class="article-actions"><a href="/content/articles/metarch-truthsrc-extending-code-generator-20261126.en.md" download="metarch-truthsrc-extending-code-generator-20261126.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/metarch-truthsrc-extending-code-generator-20261126/">中文原文</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p>This article is an engineering guide for extending metarch-truthsrc 0.5.0 with a new code generator: pipeline artifacts, product registry entries, and core wiring seams reflect the current repository source; the Rust Onion Architecture example is an extension blueprint rather than a shipped built-in generator, and formal acceptance records remain on the status page.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. The Artifact-Level Pipeline Map: Where Does a New Generator Fork?</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. Two Generator Contracts Compared: Why Production Extensions Use Formal Product Generators</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. Project Inputs &amp; the 21-Product Registry: What to Reuse vs. Extend</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. Directory Layout &amp; the Single Core Wiring Seam: Keep lib/ Language-Agnostic</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. Step-by-Step Blueprint: Building a rust-onion-service Generator</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. Five Source-Level Pitfalls &amp; the Minimum AI-Agent Material Pack</a></li><li><a href="#section-7"><span class="toc-number">07</span> 7. Reference Repositories &amp; Further Reading</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+      </aside>
+      <article id="article-body" class="article-body"><blockquote>
+<p><strong>Version &amp; scope note</strong>: Every command, artifact filename, schema version, and source seam in this guide is verified against <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> <strong>0.5.0</strong> (Node ≥ 22.13.0, zero npm runtime dependencies, built-in <code>node:sqlite</code>) and the <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> reference repository. While the <a href="https://co-arising.github.io/pipeline/">Pipeline page</a> explains the six-stage division of responsibilities and the <a href="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo Complete Guide</a> unpacks the generated Scala Onion Architecture and AI-Agent material pack, <strong>this article focuses on the exact on-disk artifacts and source-level extension workflow</strong> — showing precisely where a new target stack (Rust, Go, TypeScript, Java, etc.) forks off, which files to create, the single core wiring seam to touch, and the subtle traps in the codebase to avoid.</p>
+</blockquote>
+<h2 id="section-1">1. The Artifact-Level Pipeline Map: Where Does a New Generator Fork?</h2>
+<p>Before writing a single line of generator code, map out <strong>which exact file lands on disk at each step</strong> from the author YAML truth tree to the target project. One foundational invariant governs everything (see <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/SCHEMA.md"><code>SCHEMA.md</code></a>):</p>
+<blockquote>
+<p>The YAML atom tree is the <strong>only edit surface</strong>. <code>canonical.json</code>, derived semantic products, <code>knowledge.sqlite</code>, and generated code are all disposable, deterministic projections — never hand-edited.</p>
+</blockquote>
+<pre class="code"><code class="language-text">Step 0   Author YAML Tree (truth/&lt;system&gt;/system.yaml + contexts/&lt;id&gt;/*.yaml)  ← Only edit surface
+           │
+Step 1   validate / roundtrip                                                  ← Two gates: verdict only, no writes
+           │  • validate: V* structural + R* relational + ES/CS/AG/RF/SM rules (0 hard to pass)
+           │  • roundtrip: compile ∘ decompose ∘ compile byte-identical inverse
+           ▼
+Step 2   compile ──► canonical.json                                            ← Sole canonical IR
+           │          (stable atom identities + content hashes; shared across Scala/Rust/Go)
+           │
+           ├──────────────────────────────────────────────────┐
+           ▼                                                  ▼
+Step 3   compile-project                             Step 4   graph ──► .truthsrc/knowledge.sqlite
+           │  • captureProject snapshots SHA-256 of all inputs • Pure cache SQLite graph of canonical.json
+           │  • Derives request.json (typed source plan)       • Nodes = atoms, edges = 22 typed relations
+           │  • compileProductSet ──► compilation              • blast_radius / query-project / 26 MCP tools
+           │    (versioned semantic product set)               • Products attach only via compiles-to edges
+           ▼
+       ══════════════ ★ Architectural Fork Point (no truth-tree edits, no Knowledge rewrite) ★ ══════════════
+           │
+Step 5   generate-project --project truthsrc.project.json --out &lt;owned-dir&gt; [--plan | --update]
+           │  • registeredProductProducer() looks up the static registry for the target generator
+           │  • planProductSet() enforces double-run determinism + strict entry contracts
+           │  • annotateProjectEntries() stamps @generated / @knowledge-release / @knowledge headers
+           │  • applyEntries() writes target project + 4 evidence files (.truthsrc/{canonical,request,compiled,inputs}.json)
+           │    + truthsrc.ledger.json + anchors.json, and publishes anchors to SQLite
+           ▼
+Step 6   status-project / query-project / verify-project                       ← Drift, bidirectional trace, byte recheck
+           ▼
+Step 7   Target toolchain build &amp; tests (sbt / cargo / go test / tsc)          ← Outside truthsrc
+</code></pre>
+<p>This artifact map answers the three architectural questions teams most often get wrong when adding a second language stack:</p>
+<ol>
+<li><strong>Does the Knowledge Graph need to be rebuilt for a new target language? No.</strong>
+   <code>.truthsrc/knowledge.sqlite</code> is a pure cache projection of <code>canonical.json</code> (deletable and rebuildable at any time); source node payloads are read directly by JSON Pointer from <code>canonical.json</code>. Compiled semantic products appear in the graph only as <code>semantic-product</code> nodes linked by <code>compiles-to</code> edges for provenance. As long as <code>compilation</code> succeeds cleanly, graph construction, bidirectional anchoring, and Explorer exports work out of the box.</li>
+<li><strong>How do change detection and incremental updates work? Full derivation, incremental write-back.</strong>
+   <code>truthsrc</code> has no background watch daemon. On every <code>compile-project</code> or <code>generate-project</code> run, <code>captureProject()</code> in <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/cli.mjs"><code>lib/project/cli.mjs</code></a> hashes the project manifest, every file in the YAML tree, any explicit technical binding documents, and the tool's own source files, then verifies <code>assertUnchanged()</code> before writing (aborting with <code>PROJECT_CHANGED</code> on any concurrent edit). Derivation always recomputes from the full truth tree; passing <code>--update</code> writes only files whose output bytes changed while leaving unchanged files and the handwritten zone untouched.</li>
+<li><strong>What does a generator actually consume? Never raw YAML — always typed compiled products.</strong>
+   A production generator should never re-parse YAML or guess ad-hoc fields out of <code>canonical.json</code>. It consumes a validated, version-pinned <strong>semantic product set (<code>truthsrc.semantic-product-set/v1</code>)</strong> produced by <code>compileProductSet()</code>.</li>
+</ol>
+<h2 id="section-2">2. Two Generator Contracts Compared: Why Production Extensions Use Formal Product Generators</h2>
+<p>Inspecting <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators"><code>metarch-truthsrc/generators/</code></a> (55 directory entries today), you will encounter two distinct <code>generator.json</code> formats. Picking the wrong starting template is the most common false start:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Dimension / Lightweight / Legacy Plugin (generators/_template/) / Formal Product Generator (truthsrc.product-generator/v1)"><table>
+<thead>
+<tr>
+<th scope="col">Dimension</th>
+<th scope="col">Lightweight / Legacy Plugin (<code>generators/_template/</code>)</th>
+<th scope="col">Formal Product Generator (<code>truthsrc.product-generator/v1</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Reference examples</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/_template"><code>generators/_template/</code></a></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/product-design-review"><code>generators/product-design-review/</code></a> (minimal non-Scala reference), <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/scala-cqrs-play-service"><code>generators/scala-cqrs-play-service/</code></a> (full service reference)</td>
+</tr>
+<tr>
+<td><strong>Manifest schema</strong></td>
+<td><code>inputSchema: "truthsrc/v0.3"</code> + loose <code>products: ["template"]</code></td>
+<td><code>schemaVersion: "truthsrc.product-generator/v1"</code>, pinning exact <code>products[]</code> (<code>id</code>, <code>version</code>, <code>payloadSchemaVersion</code>, <code>capabilities</code>), <code>producers[]</code>, <code>artifactKinds[]</code>, and <code>options[]</code></td>
+</tr>
+<tr>
+<td><strong>Input delivery</strong></td>
+<td>Receives raw <code>canonical</code> directly</td>
+<td>Receives deep-frozen <code>products</code> (wrapped in a <code>Proxy</code> that blocks reading undeclared products) and <code>options</code> via <code>planProductSet()</code> in <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/product-plan.mjs"><code>src/core/product-plan.mjs</code></a></td>
+</tr>
+<tr>
+<td><strong>CLI entry</strong></td>
+<td><code>truthsrc generate --generator &lt;dir&gt;</code></td>
+<td><code>truthsrc generate-project --project truthsrc.project.json --out &lt;dir&gt;</code> (full integration with <code>generate-products</code>, <code>status-project</code>, <code>query-project</code>, <code>verify-project</code>)</td>
+</tr>
+<tr>
+<td><strong>Core gates</strong></td>
+<td>Basic double-run check + <code>artifactKinds</code> check</td>
+<td>Live recompile equality check, per-producer detached double-run determinism gate, <code>???</code> placeholder ban, <code>deps</code> closure check, UTF-8 <code>codeMappings</code> span verification, <code>.truthsrc/*.json</code> evidence bundle, SQLite anchor publication</td>
+</tr>
+<tr>
+<td><strong>Best suited for</strong></td>
+<td>Quick Markdown reports or exploratory prototypes</td>
+<td><strong>Every real target architecture/language generator (Rust, Go, TypeScript, Java, etc.)</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Rule of thumb</strong>: Fork <code>generators/_template/</code> only for quick documentation prototypes. For any real target-stack code generator that plugs into <code>truthsrc.project.json</code>, <code>generate-project</code>, bidirectional anchoring, and <code>verify-project</code>, start from <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/product-design-review"><code>generators/product-design-review/</code></a> (just a 15-line <code>generator.json</code>, 9-line <code>generate.mjs</code>, and 64-line <code>produce.mjs</code>), and scale up into composable <code>producers[]</code> following <code>scala-cqrs-play-service</code>.</p>
+<h2 id="section-3">3. Project Inputs &amp; the 21-Product Registry: What to Reuse vs. Extend</h2>
+<p>At the CLI, <code>generate-project</code> takes a single entry file: <code>--project truthsrc.project.json</code>. In <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive.mjs"><code>lib/project/derive.mjs</code></a>, its schema is split into four input groups (<code>CONFIG_INPUTS</code> and <code>CONFIG_IO</code>):</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Group / Fields / Role"><table>
+<thead>
+<tr>
+<th scope="col">Group</th>
+<th scope="col">Fields</th>
+<th scope="col">Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Knowledge origin</strong></td>
+<td><code>tree</code>, <code>context</code>, <code>canonicalId</code></td>
+<td>Points to the single YAML truth tree, bounded context, and canonical document identifier</td>
+</tr>
+<tr>
+<td><strong>Products &amp; exact values</strong></td>
+<td><code>products</code>, <code>exactTypes</code>, <code>exactCodecs</code></td>
+<td>Selects exact semantic product versions plus exact numeric/value representations (e.g., <code>Money</code>, <code>AmountDecimal</code>) and wire/PO codecs (<code>minor-units-text</code>)</td>
+</tr>
+<tr>
+<td><strong>Technical bindings</strong></td>
+<td><code>documents</code>, <code>assemblies</code>, <code>roles</code></td>
+<td>Supplies technical runtime bindings for technical products. Note: for <code>sagaBinding</code>, <code>runtimeBinding</code>, and <code>executionBinding</code>, <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive-bindings.mjs"><code>lib/project/derive-bindings.mjs</code></a> now performs <strong>convention-over-configuration auto-derivation</strong> (so <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/truthsrc.project.json"><code>bank-wealth-demo/truthsrc.project.json</code></a> leaves these three empty). When targeting a custom runtime (such as a Rust workflow or persistence engine), you can still pass explicit <code>documents</code>/<code>assemblies</code>/<code>roles</code> or add auto-derivation support for your stack</td>
+</tr>
+<tr>
+<td><strong>Generator &amp; options</strong></td>
+<td><code>generator</code>, <code>options</code></td>
+<td><code>generator</code> selects a shipped directory under <code>generators/</code>; <code>options</code> must match the exact keys declared in <code>generator.json</code>'s <code>options[]</code> array (missing or extra keys fail closed during <code>captureProject</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-3-1">The 21 Registered Product Kinds: Reuse Language-Agnostic Semantics First</h3>
+<p><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/registry.mjs"><code>lib/products/registry.mjs</code></a> and <code>lib/project/derive.mjs</code> register <strong>21 product kinds</strong> (14 <code>DERIVED</code> products + 7 <code>TECHNICAL_PRODUCTS</code>, alongside the <code>classic-architecture@1..5</code> scaffold series):</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Category / Product IDs (and current versions) / Cross-language reuse strategy (Rust Onion Architecture example)"><table>
+<thead>
+<tr>
+<th scope="col">Category</th>
+<th scope="col">Product IDs (and current versions)</th>
+<th scope="col">Cross-language reuse strategy (Rust Onion Architecture example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Core domain &amp; exact values (reuse verbatim)</strong></td>
+<td><code>reference-layout@1</code>, <code>exact-value-types@1</code>, <code>exact-value-codecs@1</code>, <code>domain-decision@4</code>, <code>domain-dependencies@6</code>, <code>domain-folds@6</code>, <code>domain-external-events@2</code></td>
+<td><strong>100% language-agnostic — reuse with zero changes.</strong> Aggregates, state fields, commands, ordered guards, event bindings, state folds, exact decimal precision, and codec contracts are already compiled</td>
+</tr>
+<tr>
+<td><strong>Contracts, APIs &amp; design planes (reuse as needed)</strong></td>
+<td><code>artifact-contract@3</code>, <code>api-contract@1</code>, <code>workflow-contract@1</code>, <code>module-seams-contract@1</code>, <code>product-design@1</code></td>
+<td><strong>Language-agnostic contract layer — reuse first.</strong> Service boundaries, HTTP API contracts, module seam signatures, and five-plane designs carry no Scala syntax</td>
+</tr>
+<tr>
+<td><strong>Host &amp; orchestration contracts (reuse or omit by runtime)</strong></td>
+<td><code>saga-host-contract@2/3</code>, <code>effect-host-contract@2</code>, <code>saga-contract@1/2</code>, <code>saga-runtime-contract@1/2</code>, <code>execution-contract@1/2</code>, <code>child-plan-contract@1</code></td>
+<td>Reuse <code>saga-contract</code> / <code>execution-contract</code> semantic models with your target runtime bindings if your stack runs TCC sagas and staged pipelines; omit them if your target service uses a simpler request/event architecture</td>
+</tr>
+<tr>
+<td><strong>Composition &amp; persistence contracts (extend only if needed)</strong></td>
+<td><code>module-seams-composition@1</code>, <code>persistence-readside-contract@1</code>, <code>application-composition@1</code></td>
+<td>If a new target architecture needs its own declarative layout or persistence contract product, register it in <code>registry.mjs</code> and <code>derive.mjs</code> — <strong>hard rule: products express architectural contracts only, never target-language syntax</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-4">4. Directory Layout &amp; the Single Core Wiring Seam: Keep <code>lib/</code> Language-Agnostic</h2>
+<p>The repository layout of <code>metarch-truthsrc</code> enforces one crisp architectural boundary:</p>
+<ul>
+<li><strong><code>lib/</code> is strictly language-agnostic core</strong>: validation (<code>validate.mjs</code>), compilation (<code>compile.mjs</code>), decomposition (<code>decompose.mjs</code>), SQLite graph store (<code>knowledge-sqlite.mjs</code>), product registry and derivation (<code>products/</code>, <code>domain-products/</code>, <code>value-products/</code>, <code>project/</code>, <code>derivation/</code>).</li>
+<li><strong>Historical lesson (<code>lib/scala-target/</code>)</strong>: Earlier Scala naming and profile helpers ended up inside <code>lib/scala-target/</code>. <strong>Do not repeat this mistake for Rust, Go, TypeScript, or Java — never create <code>lib/rust-target/</code>!</strong> All target-language naming (<code>snake_case</code> / <code>PascalCase</code>), type mappings, renderers, and templates belong strictly inside <code>generators/&lt;your-generator&gt;/</code>.</li>
+<li><strong><code>generators/</code> follows "one target architecture, one isolated directory"</strong>:<ul>
+<li>Top-level service generators (like <code>generators/scala-cqrs-play-service/</code>) compose multiple focused <code>producers[]</code>, each declaring the exact subset of <code>products</code> it reads and <code>artifactKinds</code> it emits.</li>
+<li>Retired generators live isolated in <code>generators/_deprecated/</code>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="section-4-1">The Single Required Core Edit: <code>registeredProductProducer</code></h3>
+<p>When <code>truthsrc.project.json</code> specifies <code>"generator": "rust-onion-service"</code>, <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/cli.mjs"><code>lib/project/cli.mjs</code></a> resolves <code>generators/rust-onion-service/</code> and passes it to <code>registeredProductProducer()</code> in <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/generate-cli.mjs"><code>lib/products/generate-cli.mjs</code></a>:</p>
+<pre class="code"><code class="language-javascript">// lib/products/generate-cli.mjs (the single core wiring seam)
+import { generate as generateRustOnion } from '../../generators/rust-onion-service/generate.mjs';
+
+const rustOnion = new URL('../../generators/rust-onion-service/', import.meta.url);
+
+export function registeredProductProducer(generatorDir) {
+  const directory = realpathSync(generatorDir);
+  const generate = [
+    // ... existing shipped generator entries
+    [rustOnion, generateRustOnion],
+  ].find(([path]) =&gt; directory === realpathSync(path))?.[1];
+  if (!generate) fail('PRODUCT_PRODUCER', 'generator must be a shipped registered source producer');
+  return Object.freeze({ directory, generate, ...implementationProducers.get(generate) });
+}
+</code></pre>
+<p>If the directory exists on disk without a matching entry in this static table, <code>truthsrc</code> fails closed with <code>PRODUCT_PRODUCER: generator must be a shipped registered source producer</code>. <strong>This static table is an intentional trust boundary</strong>: the CLI never dynamically <code>import()</code>s arbitrary code paths supplied by untrusted JSON. Adding a brand-new code generator requires <strong>one <code>import</code>, one URL constant, and one table entry in <code>lib/products/generate-cli.mjs</code></strong> (plus an optional <code>implementationProducers</code> entry if you want implementation-source verification).</p>
+<h2 id="section-5">5. Step-by-Step Blueprint: Building a <code>rust-onion-service</code> Generator</h2>
+<p>Here is the end-to-end blueprint for a new Rust Onion Architecture generator under <code>generators/rust-onion-service/</code>, aligned line-for-line with the real core contracts.</p>
+<h3 id="section-5-1">Step 1: Create the Isolated Generator Directory</h3>
+<pre class="code"><code class="language-text">generators/rust-onion-service/
+├── generator.json            # Formal truthsrc.product-generator/v1 manifest
+├── generate.mjs              # Entrypoint: validates targetProfile and calls planProductSet()
+├── naming.mjs                # Rust-specific naming &amp; type mapping (never inside lib/)
+├── producers/
+│   ├── domain-model.mjs      # Consumes reference-layout + exact-value-types + domain-decision + domain-folds → domain crate
+│   ├── ports-adapters.mjs    # Consumes domain-dependencies + domain-external-events + exact-value-codecs → ports &amp; serde codecs
+│   └── workspace-cargo.mjs   # Consumes reference-layout → Cargo.toml workspace scaffold
+└── templates/                # Optional pure rendering helpers
+</code></pre>
+<h3 id="section-5-2">Step 2: Author a Strict, Version-Pinned <code>generator.json</code></h3>
+<p><code>src/core/product-plan.mjs</code> strictly validates every field of <code>generator.json</code> (unknown keys are rejected) and verifies every <code>products[]</code> entry against <code>profileFor()</code> in <code>lib/products/registry.mjs</code>:</p>
+<pre class="code"><code class="language-json">{
+  "schemaVersion": "truthsrc.product-generator/v1",
+  "name": "rust-onion-service",
+  "version": "1",
+  "targetProfile": "rust-onion-service@1",
+  "products": [
+    {
+      "id": "reference-layout",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.reference-layout/v1",
+      "capabilities": [{ "id": "qualified-reference-layout", "version": "1" }]
+    },
+    {
+      "id": "exact-value-types",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.exact-value-types/v1",
+      "capabilities": [{ "id": "exact-value-types", "version": "1" }]
+    },
+    {
+      "id": "exact-value-codecs",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.exact-value-codecs/v1",
+      "capabilities": [{ "id": "exact-value-codecs", "version": "1" }]
+    },
+    {
+      "id": "domain-decision",
+      "version": "4",
+      "payloadSchemaVersion": "truthsrc.domain-decision/v4",
+      "capabilities": [{ "id": "ordered-domain-decision", "version": "4" }]
+    },
+    {
+      "id": "domain-dependencies",
+      "version": "6",
+      "payloadSchemaVersion": "truthsrc.domain-dependencies/v6",
+      "capabilities": [{ "id": "domain-dependencies", "version": "6" }]
+    },
+    {
+      "id": "domain-folds",
+      "version": "6",
+      "payloadSchemaVersion": "truthsrc.domain-folds/v6",
+      "capabilities": [{ "id": "domain-folds", "version": "6" }]
+    }
+  ],
+  "producers": [
+    {
+      "id": "rust-domain-model",
+      "version": "1",
+      "products": ["reference-layout", "exact-value-types", "domain-decision", "domain-folds"],
+      "artifactKinds": ["rust-value-object", "rust-aggregate", "rust-rules"]
+    },
+    {
+      "id": "rust-ports-adapters",
+      "version": "1",
+      "products": ["reference-layout", "exact-value-types", "exact-value-codecs", "domain-dependencies"],
+      "artifactKinds": ["rust-port", "rust-codec"]
+    },
+    {
+      "id": "rust-workspace",
+      "version": "1",
+      "products": ["reference-layout"],
+      "artifactKinds": ["cargo-manifest"]
+    }
+  ],
+  "artifactKinds": [
+    "rust-value-object",
+    "rust-aggregate",
+    "rust-rules",
+    "rust-port",
+    "rust-codec",
+    "cargo-manifest"
+  ],
+  "options": ["cratePrefix", "handwrittenRoots"]
+}
+</code></pre>
+<p>Note how <code>options</code> works: <code>planProductSet()</code> runs <code>object(o, m.options, at('options'))</code>, requiring <code>truthsrc.project.json</code>'s <code>options</code> object to contain <strong>the exact set of keys</strong> declared here.</p>
+<h3 id="section-5-3">Step 3: Implement <code>generate.mjs</code> and the 8-Field Entry Contract</h3>
+<p>The entrypoint delegates all validation, determinism checking, and plan sorting to <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/product-plan.mjs"><code>planProductSet</code></a>:</p>
+<pre class="code"><code class="language-javascript">// generators/rust-onion-service/generate.mjs
+import { planProductSet } from '../../src/core/product-plan.mjs';
+import { fail } from '../../lib/products/request.mjs';
+import * as domainModel from './producers/domain-model.mjs';
+import * as portsAdapters from './producers/ports-adapters.mjs';
+import * as workspaceCargo from './producers/workspace-cargo.mjs';
+
+export const producerRegistry = Object.freeze({
+  'rust-domain-model': Object.freeze({ version: domainModel.version, produce: domainModel.produce }),
+  'rust-ports-adapters': Object.freeze({ version: portsAdapters.version, produce: portsAdapters.produce }),
+  'rust-workspace': Object.freeze({ version: workspaceCargo.version, produce: workspaceCargo.produce }),
+});
+
+export function generate({ compilation, manifest, options }) {
+  if (manifest?.targetProfile !== 'rust-onion-service@1') {
+    fail('RUST_PROFILE', 'explicit rust-onion-service@1 profile required');
+  }
+  return planProductSet({ compilation, manifest, options }, producerRegistry);
+}
+</code></pre>
+<p>Inside each <code>producer.produce({ products, options })</code>, six non-negotiable invariants are enforced by <code>planProductSet()</code>:</p>
+<ol>
+<li><strong>Scoped read-only inputs</strong>: <code>products</code> is wrapped in a <code>Proxy</code>; reading any product ID not declared in that producer's <code>products[]</code> throws <code>PRODUCT_UNDECLARED</code>.</li>
+<li><strong>Byte-identical double-run determinism</strong>: <code>planProductSet()</code> invokes every <code>produce()</code> <strong>twice</strong> on independently cloned frozen inputs. Any clock read, randomness, environment lookup, or unstable iteration order triggers <code>PRODUCT_NONDETERMINISTIC</code>.</li>
+<li><strong>Exact 8-field entry shape</strong> (<code>codeMappings</code> optional; the other 7 required):</li>
+</ol>
+<pre class="code"><code class="language-javascript">{
+  path: 'crates/domain/src/value_objects/money.rs',     // Canonical relative POSIX path; no ../ or receipt collisions
+  content: renderedRustSource,                          // UTF-8 text; must not contain "???" placeholders
+  kind: 'rust-value-object',                            // Declared in this producer's artifactKinds
+  deps: ['crates/domain/Cargo.toml'],                   // Every dep must exist in the same complete plan
+  knowledgeIds: ['source:bank-v1#/valueObjects/0'],     // Non-empty array of file-level provenance keys
+  productFootprint: [                                   // Must exactly match this producer's declared (id, version) list
+    { id: 'reference-layout', version: '1' },
+    { id: 'exact-value-types', version: '1' },
+    { id: 'domain-decision', version: '4' },
+    { id: 'domain-folds', version: '6' },
+  ],
+  merge: null,                                          // Must be explicitly null (default core MANUAL merge policy)
+  codeMappings: [                                       // Optional: exact UTF-8 byte spans for symbol/line tracing
+    {
+      knowledgeKey: 'source:bank-v1#/valueObjects/0',
+      span: { start: 120, end: 215, text: 'pub struct Money { ... }' },
+      scope: { start: 100, end: 240, text: '// Money domain value object\npub struct Money { ... }\n' },
+    },
+  ],
+}
+</code></pre>
+<ol start="4">
+<li><strong>Closed <code>deps</code> graph</strong>: Every path listed in <code>entry.deps</code> must be emitted by some producer in the same plan (<code>PRODUCT_ENTRY_DEPENDENCY</code>).</li>
+<li><strong>Case-fold unique paths</strong>: <code>path.normalize('NFC').toLowerCase()</code> must be unique across all producers (<code>PRODUCT_PATH_ALIAS</code>) to prevent macOS/Windows collisions.</li>
+<li><strong>Zero <code>???</code> placeholders</strong>: Unimplemented <code>???</code> stubs are rejected for all formal product profiles (only the explicit <code>classic-architecture</code> scaffold series is exempted).</li>
+</ol>
+<h3 id="section-5-4">Step 4: Wire the Registry and Mind Two Subtle Source Seams</h3>
+<p>After adding your generator to <code>registeredProductProducer()</code> in <code>lib/products/generate-cli.mjs</code>, check two real codebase seams that affect non-Scala targets:</p>
+<h4>Seam A: File Extension Whitelist in <code>lib/project/provenance-annotations.mjs</code></h4>
+<p>Before <code>applyEntries()</code> writes files to disk, <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/provenance-annotations.mjs"><code>lib/project/provenance-annotations.mjs</code></a> stamps <code>// @generated by truthsrc ...</code>, <code>// @knowledge-release ...</code>, and order-independent <code>// @knowledge &lt;stableId&gt;@&lt;elementHash16&gt;</code> headers while shifting every <code>codeMappings</code> UTF-8 byte offset to stay valid. Look at lines 140–142:</p>
+<pre class="code"><code class="language-javascript">// lib/project/provenance-annotations.mjs:140-142
+function supportsSlashHeader(filePath) {
+  return filePath.endsWith('.scala') || filePath.endsWith('.proto');
+}
+</code></pre>
+<p>Because only <code>.scala</code> and <code>.proto</code> are currently matched, <code>.rs</code>, <code>.go</code>, <code>.ts</code>, or <code>.java</code> outputs will <strong>not</strong> automatically receive the unified provenance headers unless you extend this check into a language-aware comment-prefix map (e.g., <code>//</code> for <code>.rs</code>/<code>.go</code>/<code>.ts</code>/<code>.java</code>/<code>.scala</code>/<code>.proto</code>, <code>#</code> for <code>.py</code>/<code>.toml</code>) and verify that shifted <code>codeMappings</code> still pass <code>validateCodeMappings()</code> in <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/code-mappings.mjs"><code>src/core/code-mappings.mjs</code></a>.</p>
+<h4>Seam B: Handwritten Isolation &amp; Optional <code>implementationProducers</code></h4>
+<ul>
+<li><strong>Recommended baseline (isolated handwritten zone)</strong>: Declare handwritten directories in <code>options</code> (e.g., <code>handwrittenRoots</code>), keep them disjoint from <code>--out</code>, and reference them from the generated workspace manifest (<code>Cargo.toml</code>). Whenever a generated file needs an editable slot, follow the Protected Regions contract in <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/generators/README.md"><code>generators/README.md</code></a> (<code>// ==== BEGIN MANUAL ====</code> / <code>// ==== END MANUAL ====</code> and <code>AI_PROMPT</code> blocks) so <code>--update</code> never overwrites author/agent edits.</li>
+<li><strong>When to register in <code>implementationProducers</code></strong>: Only if your generator must capture and cryptographically verify specific handwritten implementation files during <code>--plan</code> and <code>generate-project</code> (mirroring <code>scala-cqrs-play-application</code>, <code>scala-cqrs-module-seams</code>, and <code>scala-cqrs-saga-monarch</code> in <code>lib/products/generate-cli.mjs</code>).</li>
+</ul>
+<h3 id="section-5-5">Step 5: Tests &amp; Four Quality Gates</h3>
+<p>In <code>metarch-truthsrc</code>, <strong>tests do not live inside <code>generators/&lt;name&gt;/</code></strong> — they live flat under the root <code>test/</code> directory (currently 211 <code>*.test.mjs</code> files, named by domain), alongside doc updates in <code>generators/README.md</code> and <code>MIGRATION.md</code>.</p>
+<p>Every new generator should pass four automated gates before merging:</p>
+<ol>
+<li><strong>Contract &amp; determinism tests (<code>test/rust-onion-service.test.mjs</code>)</strong>:<ul>
+<li>Full lifecycle: <code>compile-project</code> → <code>generate-project --plan</code> → <code>generate-project</code> → <code>generate-project --update</code> → <code>status-project</code> → <code>query-project</code> → <code>verify-project</code>.</li>
+<li>Negative battery: missing required product, wrong version, unknown option key, undeclared product read, residual <code>???</code> placeholder, and overlapping output/handwritten paths must all fail closed.</li>
+</ul>
+</li>
+<li><strong>Anti-hardcoding static gate (<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a>)</strong>:<ul>
+<li>Run <code>node tools/lint.mjs</code> to enforce clean JS syntax, zero <code>console.log</code>/<code>debugger</code>/duplicate imports, and <strong>zero hardcoded business identifiers</strong> (<code>bankwealth</code>, <code>FundOrder</code>, <code>CreditBalance</code>, etc.).</li>
+</ul>
+</li>
+<li><strong>Second unrelated domain smoke proof</strong>:<ul>
+<li>Never validate only on the bank fixture. Run <code>generate-project</code> + <code>verify-project</code> on an independent non-financial tree (e.g., a minimal <code>commerce</code> or <code>Counter</code> domain) to prove domain generality.</li>
+</ul>
+</li>
+<li><strong>Native target toolchain compile &amp; test</strong>:<ul>
+<li>Run the real target build (<code>cargo check --workspace &amp;&amp; cargo test --workspace</code>) on the generated output and record those receipts separately from <code>truthsrc</code>'s own contract suite.</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-6">6. Five Source-Level Pitfalls &amp; the Minimum AI-Agent Material Pack</h2>
+<h3 id="section-6-1">Five Red-Line Pitfalls (Directly from the Codebase)</h3>
+<ol>
+<li><strong>Never put target-language code under <code>lib/&lt;lang&gt;-target/</code></strong>: Do not follow <code>lib/scala-target/</code>; keep all target-language naming, type mapping, and rendering inside <code>generators/&lt;name&gt;/</code>.</li>
+<li><strong>Never add non-JVM generators to <code>planCompiledProducts</code>'s Maven JAR allowlist</strong>: Lines 125–139 of <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/generate-cli.mjs"><code>lib/products/generate-cli.mjs</code></a> hardcode 7 Scala application/service generators that require <code>options.runtimeArtifact.repository</code> (<code>file:///</code>) and verify SHA-256 hashes of <code>saga-core</code> and <code>monarch</code> JARs. A Rust/Go/TS generator must <strong>not</strong> enter that list — validate your own lockfile/crate pins if needed, or omit runtime pinning altogether when emitting zero-dependency domain crates.</li>
+<li><strong>Never bypass compiled products to re-parse <code>canonical.json</code></strong>: Consuming <code>domain-decision@4</code>, <code>domain-folds@6</code>, and <code>exact-value-types@1</code> guarantees identical guard ordering, type resolution, and decimal precision semantics across every target language.</li>
+<li><strong>Never embed plaintext credentials or non-portable absolute paths in templates</strong>: Use environment placeholders for secrets/DB configs, and emit portable relative paths (as <code>portableBuildSbt()</code> does in <code>scala-cqrs-play-service/generate.mjs</code>).</li>
+<li><strong>Never convert the static registry into implicit directory auto-loading as a side effect</strong>: Keeping <code>registeredProductProducer()</code> static is an explicit security boundary; dynamic external plugin loading is a separate architectural decision.</li>
+</ol>
+<h3 id="section-6-2">Minimum 6-Piece Material Pack for Delegating a New Generator to an AI Agent</h3>
+<p>If you want an AI Agent to design and implement a new target-stack generator in <code>metarch-truthsrc</code> without drifting or polluting <code>lib/</code>, supply these six artifacts upfront:</p>
+<ol>
+<li><strong>Exact target semantic product list (with pinned versions)</strong>: Decide whether v1 covers the pure domain core (<code>reference-layout@1</code>, <code>exact-value-types@1</code>, <code>exact-value-codecs@1</code>, <code>domain-decision@4</code>, <code>domain-dependencies@6</code>, <code>domain-folds@6</code>) or also orchestration/host contracts.</li>
+<li><strong>Target Onion/Hexagonal layer &amp; path mapping table</strong>: Which <code>artifactKinds</code> belong to each layer (Domain, Application, Ports, Adapters, Composition Root) and how dependency direction points strictly inward (see <a href="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/#section-3">Sections 3–4 of the bank-wealth-demo Complete Guide</a>).</li>
+<li><strong>Type &amp; codec mapping specification</strong>: Exact target types for scalars, <code>unit-decimal</code> / <code>decimal</code> exact types, <code>minor-units-text</code> wire/PO codecs, and collections (e.g., <code>rust_decimal::Decimal</code> or minor-unit <code>i128</code> newtypes in Rust).</li>
+<li><strong>One minimal handwritten golden sample</strong> (1 aggregate + 1 value object + 1 port trait + 1 unit test): Anchors idiomatic target style far better than prose instructions alone.</li>
+<li><strong>Exact core source pointers</strong>: <code>generators/product-design-review/</code>, <code>src/core/product-plan.mjs</code>, <code>lib/products/generate-cli.mjs</code>, and <code>lib/project/provenance-annotations.mjs</code>.</li>
+<li><strong>Hard acceptance command list</strong>: <code>node tools/lint.mjs</code>, <code>node --test test/&lt;your-gen&gt;.test.mjs</code>, cross-domain non-bank <code>generate-project</code> + <code>verify-project</code>, and native target compilation/tests.</li>
+</ol>
+<h2 id="section-7">7. Reference Repositories &amp; Further Reading</h2>
+<ul>
+<li><strong>Core compiler &amp; generator repo</strong>: <a href="https://github.com/co-arising/metarch-truthsrc"><code>co-arising/metarch-truthsrc</code></a> (<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/SCHEMA.md">SCHEMA.md</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/CODEGEN.md">CODEGEN.md</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/generators/README.md">generators/README.md</a>)</li>
+<li><strong>Key source entrypoints</strong>:<ul>
+<li>Project pipeline &amp; input capture: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/cli.mjs"><code>lib/project/cli.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive.mjs"><code>lib/project/derive.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive-bindings.mjs"><code>lib/project/derive-bindings.mjs</code></a></li>
+<li>Product registry &amp; generator admission: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/registry.mjs"><code>lib/products/registry.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/generate-cli.mjs"><code>lib/products/generate-cli.mjs</code></a></li>
+<li>Plan orchestration, apply &amp; provenance anchoring: <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/product-plan.mjs"><code>src/core/product-plan.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/generate.mjs"><code>src/core/generate.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/code-mappings.mjs"><code>src/core/code-mappings.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/provenance-annotations.mjs"><code>lib/project/provenance-annotations.mjs</code></a></li>
+<li>Minimal &amp; full reference generators: <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/product-design-review"><code>generators/product-design-review/</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/scala-cqrs-play-service"><code>generators/scala-cqrs-play-service/</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a></li>
+</ul>
+</li>
+<li><strong>Reference demo project</strong>: <a href="https://github.com/co-arising/bank-wealth-demo"><code>co-arising/bank-wealth-demo</code></a> (<a href="https://github.com/co-arising/bank-wealth-demo/blob/main/truthsrc.project.json"><code>truthsrc.project.json</code></a>)</li>
+<li><strong>Related site reading</strong>:<ul>
+<li><a href="https://co-arising.github.io/pipeline/">Pipeline: six-stage lifecycle &amp; anchor boundaries</a></li>
+<li><a href="https://co-arising.github.io/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo Complete Guide: Quick Start, Onion Architecture Deep Dive, and Extending New Code Generators</a></li>
+<li><a href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 Technical Specification (v1.2 Bilingual Edition)</a></li>
+<li><a href="https://co-arising.github.io/status/">Status &amp; Facts Ledger (with latest snapshot verification evidence)</a></li>
+</ul>
+</li>
+</ul></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-25">2026-11-25</time></p>
+      <h3><a href="/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo Complete Guide: Quick Start, Onion Architecture Deep Dive, and Extending New Code Generators</a></h3>
+      <p class="article-deck">An end-to-end Quick Start for bank-wealth-demo (truth tree, code generation, bidirectional anchoring, and 5 live Docker playbooks), a deep dive into the generated Onion Architecture and DDD/DIP mechanics, and a contract plus AI-Agent material pack for extending new code generators.</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

@@ -40,6 +40,7 @@ CODE50_SLUG = "ai-engineer-code-2026-50-talks-20261119"
 KIRO_SLUG = "aws-kiro-smt-spec-analyzer-20261119"
 SPEC_SLUG = "co-arising-ears-spec-20261123"
 GUIDE_SLUG = "bank-wealth-quickstart-architecture-extensibility-20261125"
+CODEGEN_EXT_SLUG = "metarch-truthsrc-extending-code-generator-20261126"
 # Initial publication fixture; future valid manifest slugs stay in /zh/articles/.
 OWNED_OUTPUTS = (
     "articles/index.html",
@@ -58,6 +59,8 @@ OWNED_OUTPUTS = (
     f"articles/{SPEC_SLUG}/index.html",
     f"zh/articles/{GUIDE_SLUG}/index.html",
     f"articles/{GUIDE_SLUG}/index.html",
+    f"zh/articles/{CODEGEN_EXT_SLUG}/index.html",
+    f"articles/{CODEGEN_EXT_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"
@@ -65,6 +68,8 @@ SPEC_NOTE = "本文是前瞻性技术设计规范（v1.2.1），描述目标语�
 SPEC_NOTE_EN = "This article is a forward-looking technical design specification (v1.2.1). It describes the target language design and acceptance criteria, not delivered capabilities; commands, tools and artifacts named here are subject to the actually shipped versions, and landing progress is tracked on the status page."
 GUIDE_NOTE = "本文是面向 bank-wealth-demo 参考项目的端到端实战指南、洋葱架构源码拆解与代码生成器扩展规范；文中命令、产物类型与架构边界对照当前仓库版本整理，正式验收记录请以状态页为准。"
 GUIDE_NOTE_EN = "This article is an end-to-end hands-on guide, Onion Architecture source breakdown, and code-generator extension specification for the bank-wealth-demo reference project; commands, artifact types, and architectural boundaries reflect the current repositories, while formal acceptance records remain tracked on the status page."
+CODEGEN_EXT_NOTE = "本文是面向 metarch-truthsrc 0.5.0 的代码生成器扩展工程指南：管线中间产物、产品注册表与核心接线点均对照当前仓库源码核实；文中 Rust 洋葱架构示例为扩展蓝图而非已内置发货的生成器，正式验收边界请以状态页为准。"
+CODEGEN_EXT_NOTE_EN = "This article is an engineering guide for extending metarch-truthsrc 0.5.0 with a new code generator: pipeline artifacts, product registry entries, and core wiring seams reflect the current repository source; the Rust Onion Architecture example is an extension blueprint rather than a shipped built-in generator, and formal acceptance records remain on the status page."
 NAV = (
     ("/", "Home", "首页"),
     ("/why-co-arising/", "Why co-arising", "为何 co-arising"),
@@ -481,6 +486,8 @@ def detail_page(item, related, source, locale="zh"):
         note += f"<p>{SPEC_NOTE if zh else SPEC_NOTE_EN}</p>"
     if item["slug"] == GUIDE_SLUG:
         note += f"<p>{GUIDE_NOTE if zh else GUIDE_NOTE_EN}</p>"
+    if item["slug"] == CODEGEN_EXT_SLUG:
+        note += f"<p>{CODEGEN_EXT_NOTE if zh else CODEGEN_EXT_NOTE_EN}</p>"
     category = item["category"] if zh else CATEGORY_EN[item["category"]]
     counterpart_route = detail_route(item["slug"], "en" if zh else "zh")
     switch_label = "Read in English" if zh else "中文原文"

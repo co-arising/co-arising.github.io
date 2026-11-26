@@ -83,6 +83,18 @@
       "title_en": "bank-wealth-demo Complete Guide: Quick Start, Onion Architecture Deep Dive, and Extending New Code Generators",
       "deck_en": "An end-to-end Quick Start for bank-wealth-demo (truth tree, code generation, bidirectional anchoring, and 5 live Docker playbooks), a deep dive into the generated Onion Architecture and DDD/DIP mechanics, and a contract plus AI-Agent material pack for extending new code generators.",
       "source_en": "bank-wealth-quickstart-architecture-extensibility-20261125.en.md"
+    },
+    {
+      "slug": "metarch-truthsrc-extending-code-generator-20261126",
+      "title": "如何在 metarch-truthsrc 中扩展一个全新的代码生成器：管线中间产物、契约边界与 Rust 实战蓝图",
+      "deck": "对照 metarch-truthsrc 0.5.0 源码，逐层拆解从 YAML 真源、canonical.json、21 种产品注册表到 knowledge.sqlite 的落盘中间产物，详解正式产品生成器契约、唯一静态接线点、Rust 洋葱架构实战步骤与五条源码避坑红线。",
+      "category": "工程实践",
+      "date": "2026-11-26",
+      "source": "metarch-truthsrc-extending-code-generator-20261126.md",
+      "related": "bank-wealth-quickstart-architecture-extensibility-20261125",
+      "title_en": "How to Extend a New Code Generator in metarch-truthsrc: Pipeline Artifacts, Contract Boundaries, and a Rust Blueprint",
+      "deck_en": "Verified against metarch-truthsrc 0.5.0 source: an artifact-level pipeline map from the YAML tree and canonical.json through the 21-product registry and knowledge.sqlite, plus the formal generator contract, single static wiring seam, a Rust Onion Architecture blueprint, and five source-level pitfalls.",
+      "source_en": "metarch-truthsrc-extending-code-generator-20261126.en.md"
     }
   ]
 }

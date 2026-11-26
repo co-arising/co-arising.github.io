@@ -43,6 +43,8 @@ HASHES = {
     "co-arising-ears-spec-20261123.en.md": "98118f3333285cc54a8667a06a4e1cd023a2f25435d9b81e702a21e09a42fa51",
     "bank-wealth-quickstart-architecture-extensibility-20261125.md": "fa58d25f7a356b4f8fa1f9f7aa2e3f7ea4d28add8fb7cf99d42f2c3dffacf22c",
     "bank-wealth-quickstart-architecture-extensibility-20261125.en.md": "65bec908a3f97b30d2e074d4b4fbce76552f11db7043e5ebc76f76730119fd7d",
+    "metarch-truthsrc-extending-code-generator-20261126.md": "521dc2d34e4862d8a68ccc0c00b840eafbd630cb966b0428097d71c4dcf5d362",
+    "metarch-truthsrc-extending-code-generator-20261126.en.md": "5e26eddfdf65297b7d03db15395329fd97b40b031ed9c0d5cbeb646a393edfc1",
 }
 
 

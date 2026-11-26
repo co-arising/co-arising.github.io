@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>如何在 metarch-truthsrc 中扩展一个全新的代码生成器：管线中间产物、契约边界与 Rust 实战蓝图 — co-arising</title>
+  <meta name="description" content="对照 metarch-truthsrc 0.5.0 源码，逐层拆解从 YAML 真源、canonical.json、21 种产品注册表到 knowledge.sqlite 的落盘中间产物，详解正式产品生成器契约、唯一静态接线点、Rust 洋葱架构实战步骤与五条源码避坑红线。" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="如何在 metarch-truthsrc 中扩展一个全新的代码生成器：管线中间产物、契约边界与 Rust 实战蓝图" />
+  <meta property="og:description" content="对照 metarch-truthsrc 0.5.0 源码，逐层拆解从 YAML 真源、canonical.json、21 种产品注册表到 knowledge.sqlite 的落盘中间产物，详解正式产品生成器契约、唯一静态接线点、Rust 洋葱架构实战步骤与五条源码避坑红线。" />
+  <meta property="og:url" content="https://co-arising.github.io/zh/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/articles/metarch-truthsrc-extending-code-generator-20261126/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/articles/metarch-truthsrc-extending-code-generator-20261126/">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a> · <a href="/zh/articles/" aria-current="page">技术观察</a> · <a class="nav-link" href="/articles/metarch-truthsrc-extending-code-generator-20261126/" lang="en" rel="alternate" hreflang="en">EN</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript 已关闭——正文、目录、链接与下载仍可使用。</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="面包屑"><a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a> / <span aria-current="page">工程实践</span></nav>
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-26">2026-11-26</time> · 中文原文</p>
+      <h1>如何在 metarch-truthsrc 中扩展一个全新的代码生成器：管线中间产物、契约边界与 Rust 实战蓝图</h1>
+      <p class="article-deck">对照 metarch-truthsrc 0.5.0 源码，逐层拆解从 YAML 真源、canonical.json、21 种产品注册表到 knowledge.sqlite 的落盘中间产物，详解正式产品生成器契约、唯一静态接线点、Rust 洋葱架构实战步骤与五条源码避坑红线。</p>
+      <div class="article-actions"><a href="/content/articles/metarch-truthsrc-extending-code-generator-20261126.md" download="metarch-truthsrc-extending-code-generator-20261126.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/metarch-truthsrc-extending-code-generator-20261126/">Read in English</a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是面向 metarch-truthsrc 0.5.0 的代码生成器扩展工程指南：管线中间产物、产品注册表与核心接线点均对照当前仓库源码核实；文中 Rust 洋葱架构示例为扩展蓝图而非已内置发货的生成器，正式验收边界请以状态页为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 全链路产物地图：新代码生成器究竟在哪一步分叉？</a></li><li><a href="#section-2"><span class="toc-number">02</span> 两类生成器契约对比：为什么正式扩展必须走 Formal Product Generator？</a></li><li><a href="#section-3"><span class="toc-number">03</span> 输入总表与 21 种产品注册表：哪些直接复用，哪些需要扩展？</a></li><li><a href="#section-4"><span class="toc-number">04</span> 目录布局与唯一核心接线点：严守 lib/ 语言无关边界</a></li><li><a href="#section-5"><span class="toc-number">05</span> 手把手实战蓝图：从零扩展一个 Rust 洋葱架构生成器</a></li><li><a href="#section-6"><span class="toc-number">06</span> 五条源码级避坑红线与 AI Agent 协作物料清单</a></li><li><a href="#section-7"><span class="toc-number">07</span> 参考源码与延伸阅读</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">阅读全文</p>
+      </aside>
+      <article id="article-body" class="article-body"><blockquote>
+<p><strong>适用版本与口径说明</strong>：本文基于 <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> <strong>0.5.0</strong>（Node ≥ 22.13.0，零 npm 运行时依赖，内置 <code>node:sqlite</code>）源码与 <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> 参考仓核对撰写。站上 <a href="https://co-arising.github.io/zh/pipeline/">流水线页面</a> 介绍的是六阶段职责分工，<a href="https://co-arising.github.io/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo 实战全景指南</a> 拆解了参考生成的 Scala 洋葱架构与 AI Agent 物料规范；<strong>本文聚焦于落盘产物级的管线剖析与源码级接入步骤</strong>——当你决定把同一份领域真源编译到 Rust、Go、TypeScript 或 Java 等全新目标技术栈时，究竟在哪一步分叉、要写哪些文件、接哪一行代码、避开哪些源码里的隐藏坑。</p>
+</blockquote>
+<h2 id="section-1">一、全链路产物地图：新代码生成器究竟在哪一步分叉？</h2>
+<p>在动手写第一行生成器代码之前，必须先看清 <code>truthsrc</code> 从作者 YAML 真源树到目标工程的<strong>完整磁盘产物链路</strong>。记住一条铁律（见 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/SCHEMA.md"><code>SCHEMA.md</code></a>）：</p>
+<blockquote>
+<p>真源树（YAML 原子文件）是<strong>唯一的编辑面</strong>；<code>canonical.json</code>、派生语义产物、<code>knowledge.sqlite</code> 与生成代码全部是可丢弃重建的确定性投影，绝不手改。</p>
+</blockquote>
+<pre class="code"><code class="language-text">第 0 步  作者 YAML 树（truth/&lt;system&gt;/system.yaml + contexts/&lt;id&gt;/*.yaml）  ← 唯一编辑面
+           │
+第 1 步  validate / roundtrip                                               ← 两道门，只出结论，不落盘
+           │  • validate：结构 V* + 关系 R* + ES/CS/AG/RF/SM 规则，0 hard 过门
+           │  • roundtrip：compile ∘ decompose ∘ compile 逐字节恒等
+           ▼
+第 2 步  compile ──► canonical.json                                         ← 唯一规范中间表示（IR）
+           │          （含稳定原子身份与内容哈希；Scala/Rust/Go 共享同一份）
+           │
+           ├──────────────────────────────────────────────┐
+           ▼                                              ▼
+第 3 步  compile-project                         第 4 步  graph ──► .truthsrc/knowledge.sqlite
+           │  • captureProject 抓拍全输入 SHA-256          • canonical.json 的纯缓存 SQLite 图投影
+           │  • 派生 request.json（类型化源计划）           • 节点=原子，边=22 种类型化关系
+           │  • compileProductSet ──► compilation          • blast_radius / query-project / MCP 26 工具
+           │    （多份带版本号的编译语义产物集）               • 语义产物仅挂接 compiles-to 边作溯源
+           ▼
+       ═══════════════ ★ 新代码生成器的架构分叉点（不改真源树，不重写 Knowledge 本体）★ ═══════════════
+           │
+第 5 步  generate-project --project truthsrc.project.json --out &lt;owned-dir&gt; [--plan | --update]
+           │  • registeredProductProducer() 查静态注册表，路由到目标生成器
+           │  • planProductSet() 双跑确定性门禁 + 严格契约校验
+           │  • annotateProjectEntries() 加盖 @generated / @knowledge-release / @knowledge 头
+           │  • applyEntries() 落盘目标工程 + 4 份证据（.truthsrc/{canonical,request,compiled,inputs}.json）
+           │    + truthsrc.ledger.json + anchors.json，并向图库发布锚点
+           ▼
+第 6 步  status-project / query-project / verify-project                    ← 漂移检测、双向溯源、逐字节重验
+           ▼
+第 7 步  目标工具链编译与测试（sbt / cargo / go test / tsc）                 ← 已在 truthsrc 之外
+</code></pre>
+<p>这张产物图直接回答了扩展新架构时最容易犯错的三个问题：</p>
+<ol>
+<li><strong>Knowledge 图谱需要为新语言重写吗？不需要。</strong>
+   <code>.truthsrc/knowledge.sqlite</code> 是单份 <code>canonical.json</code> 的纯缓存投影（可随时删除重建），节点 payload 按 JSON Pointer 直接取自 <code>canonical.json</code>。语义产物在图里仅作为 <code>semantic-product</code> 节点并通过 <code>compiles-to</code> 边关联作溯源；<code>generate-project</code> 只要拿到完整干净的 <code>compilation</code>，图构建、双向回锚与 Explorer 导出便天然复用。</li>
+<li><strong>变化检测与构建模型是什么？全量推导、增量写回。</strong>
+   <code>truthsrc</code> 没有 watch 守护进程。每次执行 <code>compile-project</code> / <code>generate-project</code> 时，<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/cli.mjs"><code>lib/project/cli.mjs</code></a> 中的 <code>captureProject()</code> 会把项目清单、整棵 YAML 树、显式技术绑定文档以及工具自身源码全部计算 SHA-256 抓拍，落盘前再用 <code>assertUnchanged()</code> 复核（任意输入中途变化直接报错 <code>PROJECT_CHANGED</code>）。推导始终全量重算；落盘时带上 <code>--update</code> 则只重写内容变化的文件，未变文件保持不动，手写隔离区永不触碰。</li>
+<li><strong>代码生成器的真实输入是什么？不是原始 YAML，而是类型化编译产物。</strong>
+   生成器绝不应自己去重新解析 YAML 或猜测 <code>canonical.json</code> 的松散结构——它消费的是经过 <code>compileProductSet()</code> 验证后的<strong>版本化语义产物集（<code>truthsrc.semantic-product-set/v1</code>）</strong>。</li>
+</ol>
+<h2 id="section-2">二、两类生成器契约对比：为什么正式扩展必须走 Formal Product Generator？</h2>
+<p>翻开 <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators"><code>metarch-truthsrc/generators/</code></a>（当前包含 55 个目录条目），你会同时看到两套不同的 <code>generator.json</code> 形态。新手最常踩的第一个坑，就是复制错了起步模板：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：维度 / 轻量级 / Legacy 插件契约（generators/_template/） / 正式产品生成器契约（truthsrc.product-generator/v1）"><table>
+<thead>
+<tr>
+<th scope="col">维度</th>
+<th scope="col">轻量级 / Legacy 插件契约（<code>generators/_template/</code>）</th>
+<th scope="col">正式产品生成器契约（<code>truthsrc.product-generator/v1</code>）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>典型示例</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/_template"><code>generators/_template/</code></a></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/product-design-review"><code>generators/product-design-review/</code></a>（最小非 Scala 范本）、<a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/scala-cqrs-play-service"><code>generators/scala-cqrs-play-service/</code></a>（完整服务范本）</td>
+</tr>
+<tr>
+<td><strong>清单声明</strong></td>
+<td><code>inputSchema: "truthsrc/v0.3"</code> + 宽松 <code>products: ["template"]</code></td>
+<td><code>schemaVersion: "truthsrc.product-generator/v1"</code>，严格绑定 <code>products[]</code>（含 <code>id</code>、<code>version</code>、<code>payloadSchemaVersion</code>、<code>capabilities</code>）、<code>producers[]</code>、<code>artifactKinds[]</code>、<code>options[]</code></td>
+</tr>
+<tr>
+<td><strong>输入形态</strong></td>
+<td>直接读取原始 <code>canonical</code> 对象</td>
+<td>通过 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/product-plan.mjs"><code>src/core/product-plan.mjs</code></a> 的 <code>planProductSet()</code> 接收深拷贝冻结的 <code>products</code>（带 Proxy 防越界读取未声明产品）与 <code>options</code></td>
+</tr>
+<tr>
+<td><strong>CLI 入口</strong></td>
+<td><code>truthsrc generate --generator &lt;dir&gt;</code>（独立扫描）</td>
+<td><code>truthsrc generate-project --project truthsrc.project.json --out &lt;dir&gt;</code>（同时兼容 <code>generate-products</code>、<code>status-project</code>、<code>query-project</code>、<code>verify-project</code>）</td>
+</tr>
+<tr>
+<td><strong>核心门禁</strong></td>
+<td>基础双跑确定性与 <code>artifactKinds</code> 校验</td>
+<td>全量重编译一致校验、每个 <code>producer</code> 独立双跑字节确定性门禁、<code>???</code> 占位符拦截、<code>deps</code> 闭环校验、<code>codeMappings</code> UTF-8 字节区间校验、四份 <code>.truthsrc/*.json</code> 证据落盘与 SQLite 图谱锚点发布</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>快速写一次性 Markdown 摘要、原型文档</td>
+<td><strong>所有目标语言/架构的正式代码生成器（Rust / Go / TypeScript / Java 等）</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>工程结论</strong>：如果你只是想把聚合列表导出成 Markdown 文档，fork <code>generators/_template/</code> 即可；但只要你的目标是构建一个接入 <code>truthsrc.project.json</code>、<code>generate-project</code>、双向回锚与 <code>verify-project</code> 的<strong>正式代码生成器</strong>，请直接以 <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/product-design-review"><code>generators/product-design-review/</code></a>（仅有 15 行 <code>generator.json</code>、9 行 <code>generate.mjs</code> 和 64 行 <code>produce.mjs</code>）作为最小骨架蓝图，再按复杂度参照 <code>scala-cqrs-play-service</code> 拆分多子生产器（<code>producers[]</code>）。</p>
+<h2 id="section-3">三、输入总表与 21 种产品注册表：哪些直接复用，哪些需要扩展？</h2>
+<p>在项目级入口下，命令行只接收一份清单：<code>--project truthsrc.project.json</code>。它在 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive.mjs"><code>lib/project/derive.mjs</code></a> 中被划分为 <code>CONFIG_INPUTS</code> 与 <code>CONFIG_IO</code> 四大输入组：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：输入组 / 字段 / 职责说明"><table>
+<thead>
+<tr>
+<th scope="col">输入组</th>
+<th scope="col">字段</th>
+<th scope="col">职责说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>知识来源</strong></td>
+<td><code>tree</code>、<code>context</code>、<code>canonicalId</code></td>
+<td>指定唯一真源树路径、当前有界上下文与规范文档标识</td>
+</tr>
+<tr>
+<td><strong>产品与精确值类型</strong></td>
+<td><code>products</code>、<code>exactTypes</code>、<code>exactCodecs</code></td>
+<td>点名要编译的语义产品及精确版本号，声明 <code>Money</code>、<code>AmountDecimal</code> 等精确数值类型与 wire/PO 编解码（如 <code>minor-units-text</code>）</td>
+</tr>
+<tr>
+<td><strong>技术绑定</strong></td>
+<td><code>documents</code>、<code>assemblies</code>、<code>roles</code></td>
+<td>为技术类产品提供运行时绑定文档与角色映射。注：对于 <code>sagaBinding</code>、<code>runtimeBinding</code>、<code>executionBinding</code>，<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive-bindings.mjs"><code>lib/project/derive-bindings.mjs</code></a> 现已支持<strong>约定优于配置的自动推导</strong>（当前 <a href="https://github.com/co-arising/bank-wealth-demo/blob/main/truthsrc.project.json"><code>bank-wealth-demo/truthsrc.project.json</code></a> 中这三项已精简为空数组/空对象）；而当你接入自定义运行时（例如 Rust 的自定义工作流或持久化引擎）时，仍可通过显式 <code>documents</code>/<code>assemblies</code>/<code>roles</code> 传入技术绑定，或为新栈补齐自动推导逻辑</td>
+</tr>
+<tr>
+<td><strong>生成器与选项</strong></td>
+<td><code>generator</code>、<code>options</code></td>
+<td><code>generator</code> 指向 <code>generators/</code> 下的注册目录名；<code>options</code> 必须与 <code>generator.json</code> 的 <code>options[]</code> 声明完全对齐（多余或缺失字段都会在 <code>captureProject</code> 阶段 fail-closed 拦截）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-3-1">21 种已注册产品：语言无关层直接复用，架构特化层按需扩展</h3>
+<p><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/registry.mjs"><code>lib/products/registry.mjs</code></a> 与 <code>lib/project/derive.mjs</code> 共注册了 <strong>21 种</strong>语义产品（14 种 <code>DERIVED</code> 自动派生产品 + 7 种 <code>TECHNICAL_PRODUCTS</code> 技术绑定产品；此外注册表还保留了 <code>classic-architecture@1..5</code> 系列脚手架产品）：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：分类 / 产品 ID（及当前主版本） / 跨语言复用策略（以新建 Rust 洋葱架构生成器为例）"><table>
+<thead>
+<tr>
+<th scope="col">分类</th>
+<th scope="col">产品 ID（及当前主版本）</th>
+<th scope="col">跨语言复用策略（以新建 Rust 洋葱架构生成器为例）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>核心领域与值类型（直接复用）</strong></td>
+<td><code>reference-layout@1</code>、<code>exact-value-types@1</code>、<code>exact-value-codecs@1</code>、<code>domain-decision@4</code>、<code>domain-dependencies@6</code>、<code>domain-folds@6</code>、<code>domain-external-events@2</code></td>
+<td><strong>100% 语言无关，零改动直接复用</strong>。聚合、状态字段、命令、守卫优先级、事件绑定、状态折叠、值对象精度与编解码规则全部已结构化编译完毕</td>
+</tr>
+<tr>
+<td><strong>契约、接口与设计面（按需复用）</strong></td>
+<td><code>artifact-contract@3</code>、<code>api-contract@1</code>、<code>workflow-contract@1</code>、<code>module-seams-contract@1</code>、<code>product-design@1</code></td>
+<td><strong>语言无关契约层，优先复用</strong>。服务边界、HTTP API 契约、模块接缝签名与五平面产品设计均不绑定 Scala 语法</td>
+</tr>
+<tr>
+<td><strong>宿主与编排契约（视运行时复用或替换）</strong></td>
+<td><code>saga-host-contract@2/3</code>、<code>effect-host-contract@2</code>、<code>saga-contract@1/2</code>、<code>saga-runtime-contract@1/2</code>、<code>execution-contract@1/2</code>、<code>child-plan-contract@1</code></td>
+<td>若新目标栈同样实现 TCC Saga + 有限阶段流水线，可复用 <code>saga-contract</code> / <code>execution-contract</code> 语义模型并替换运行时绑定；若新栈采用纯同步/事件总线模型，则无需选入这些产品</td>
+</tr>
+<tr>
+<td><strong>组合与持久化技术产品（按需新增）</strong></td>
+<td><code>module-seams-composition@1</code>、<code>persistence-readside-contract@1</code>、<code>application-composition@1</code></td>
+<td>若新目标架构需要声明式模块布局或读侧持久化契约，可参考这三类产品在 <code>registry.mjs</code> 与 <code>derive.mjs</code> 中新增语言无关的<strong>布局契约产品</strong>——<strong>铁律：产品只表达语义与边界契约，绝不推导目标语言语法</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-4">四、目录布局与唯一核心接线点：严守 <code>lib/</code> 语言无关边界</h2>
+<p>检视 <code>metarch-truthsrc</code> 的仓库结构，可以归纳出一条必须死守的架构红线：</p>
+<ul>
+<li><strong><code>lib/</code> 只放语言无关的核心</strong>：校验（<code>validate.mjs</code>）、编译（<code>compile.mjs</code>）、逆拆（<code>decompose.mjs</code>）、图谱（<code>knowledge-sqlite.mjs</code>）、产品注册与推导（<code>products/</code>、<code>domain-products/</code>、<code>value-products/</code>、<code>project/</code>、<code>derivation/</code>）。</li>
+<li><strong>前车之鉴：<code>lib/scala-target/</code></strong>：历史上 Scala 的部分命名与目标模型曾放进 <code>lib/scala-target/</code>。<strong>扩展 Rust、Go、TypeScript 或 Java 生成器时，绝对不要重蹈覆辙——不要建 <code>lib/rust-target/</code>！</strong> 所有目标语言专有的命名转换（<code>snake_case</code> / <code>PascalCase</code>）、类型映射表、AST 渲染器、模块布局器与模板，都必须内聚在 <code>generators/&lt;your-generator&gt;/</code> 目录下。</li>
+<li><strong><code>generators/</code> 遵循「一个目标架构一个独立目录」</strong>：<ul>
+<li>顶层完整服务生成器（如 <code>generators/scala-cqrs-play-service/</code>）可把内部渲染职责拆成多个子生产器（<code>producers[]</code>），每个子生产器在 <code>generator.json</code> 中显式声明自己消费哪些 <code>products</code>、产出哪些 <code>artifactKinds</code>。</li>
+<li>退役的旧生成器统一挪入 <code>generators/_deprecated/</code> 隔离，不干扰新生成器。</li>
+</ul>
+</li>
+</ul>
+<h3 id="section-4-1">唯一必须改动的核心接线点：<code>registeredProductProducer</code></h3>
+<p>当项目在 <code>truthsrc.project.json</code> 里写 <code>"generator": "rust-onion-service"</code> 时，<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/cli.mjs"><code>lib/project/cli.mjs</code></a> 会定位到 <code>generators/rust-onion-service/</code>，并交给 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/generate-cli.mjs"><code>lib/products/generate-cli.mjs</code></a> 中的 <code>registeredProductProducer()</code> 准入检查：</p>
+<pre class="code"><code class="language-javascript">// lib/products/generate-cli.mjs（唯一核心接线点）
+import { generate as generateRustOnion } from '../../generators/rust-onion-service/generate.mjs';
+
+const rustOnion = new URL('../../generators/rust-onion-service/', import.meta.url);
+
+export function registeredProductProducer(generatorDir) {
+  const directory = realpathSync(generatorDir);
+  const generate = [
+    // ... 现有内置生成器表项
+    [rustOnion, generateRustOnion],
+  ].find(([path]) =&gt; directory === realpathSync(path))?.[1];
+  if (!generate) fail('PRODUCT_PRODUCER', 'generator must be a shipped registered source producer');
+  return Object.freeze({ directory, generate, ...implementationProducers.get(generate) });
+}
+</code></pre>
+<p>如果目录存在但没登记在这张静态对照表里，CLI 会直接 fail-closed 报错 <code>PRODUCT_PRODUCER: generator must be a shipped registered source producer</code>。<strong>这张静态表是刻意设计的安全接缝</strong>：它保证 <code>truthsrc</code> 永远不会根据外部 JSON 动态 <code>import()</code> 不可信代码。因此，在 <code>metarch-truthsrc</code> 中新增一个完整代码生成器，<strong>对核心目录 <code>lib/</code> 的唯一必改项就是这里的一行 <code>import</code> + 一个 URL 常量 + 一个对照表项</strong>（外加可选的 <code>implementationProducers</code> 注册，见下节）。</p>
+<h2 id="section-5">五、手把手实战蓝图：从零扩展一个 Rust 洋葱架构生成器</h2>
+<p>下面以虚构但完全贴合源码契约的新生成器 <code>generators/rust-onion-service/</code> 为例，走完落地全流程。</p>
+<h3 id="section-5-1">第 1 步：搭建独立目录结构</h3>
+<pre class="code"><code class="language-text">generators/rust-onion-service/
+├── generator.json            # truthsrc.product-generator/v1 正式清单
+├── generate.mjs              # 入口：校验 profile，组装 producerRegistry 并调用 planProductSet
+├── naming.mjs                # Rust 专有命名与类型映射（绝不放进 lib/）
+├── producers/
+│   ├── domain-model.mjs      # 消费 reference-layout + exact-value-types + domain-decision + domain-folds → domain crate
+│   ├── ports-adapters.mjs    # 消费 domain-dependencies + domain-external-events + exact-value-codecs → ports &amp; serde codecs
+│   └── workspace-cargo.mjs   # 消费 artifact-contract + reference-layout → Cargo.toml / workspace scaffold
+└── templates/                # 可选纯字符串模板或渲染辅助函数
+</code></pre>
+<h3 id="section-5-2">第 2 步：编写严格版本锁定的 <code>generator.json</code></h3>
+<p><code>src/core/product-plan.mjs</code> 会对 <code>generator.json</code> 做逐字段白名单检查（多一个未声明字段都会失败），并校验每个 <code>products[]</code> 的 <code>id</code>、<code>version</code>、<code>payloadSchemaVersion</code>、<code>capabilities</code> 与 <code>lib/products/registry.mjs</code> 中的 <code>profileFor()</code> <strong>完全一致</strong>：</p>
+<pre class="code"><code class="language-json">{
+  "schemaVersion": "truthsrc.product-generator/v1",
+  "name": "rust-onion-service",
+  "version": "1",
+  "targetProfile": "rust-onion-service@1",
+  "products": [
+    {
+      "id": "reference-layout",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.reference-layout/v1",
+      "capabilities": [{ "id": "qualified-reference-layout", "version": "1" }]
+    },
+    {
+      "id": "exact-value-types",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.exact-value-types/v1",
+      "capabilities": [{ "id": "exact-value-types", "version": "1" }]
+    },
+    {
+      "id": "exact-value-codecs",
+      "version": "1",
+      "payloadSchemaVersion": "truthsrc.exact-value-codecs/v1",
+      "capabilities": [{ "id": "exact-value-codecs", "version": "1" }]
+    },
+    {
+      "id": "domain-decision",
+      "version": "4",
+      "payloadSchemaVersion": "truthsrc.domain-decision/v4",
+      "capabilities": [{ "id": "ordered-domain-decision", "version": "4" }]
+    },
+    {
+      "id": "domain-dependencies",
+      "version": "6",
+      "payloadSchemaVersion": "truthsrc.domain-dependencies/v6",
+      "capabilities": [{ "id": "domain-dependencies", "version": "6" }]
+    },
+    {
+      "id": "domain-folds",
+      "version": "6",
+      "payloadSchemaVersion": "truthsrc.domain-folds/v6",
+      "capabilities": [{ "id": "domain-folds", "version": "6" }]
+    }
+  ],
+  "producers": [
+    {
+      "id": "rust-domain-model",
+      "version": "1",
+      "products": ["reference-layout", "exact-value-types", "domain-decision", "domain-folds"],
+      "artifactKinds": ["rust-value-object", "rust-aggregate", "rust-rules"]
+    },
+    {
+      "id": "rust-ports-adapters",
+      "version": "1",
+      "products": ["reference-layout", "exact-value-types", "exact-value-codecs", "domain-dependencies"],
+      "artifactKinds": ["rust-port", "rust-codec"]
+    },
+    {
+      "id": "rust-workspace",
+      "version": "1",
+      "products": ["reference-layout"],
+      "artifactKinds": ["cargo-manifest"]
+    }
+  ],
+  "artifactKinds": [
+    "rust-value-object",
+    "rust-aggregate",
+    "rust-rules",
+    "rust-port",
+    "rust-codec",
+    "cargo-manifest"
+  ],
+  "options": ["cratePrefix", "handwrittenRoots"]
+}
+</code></pre>
+<p>注意 <code>options</code> 数组的语义：<code>planProductSet()</code> 会执行 <code>object(o, m.options, at('options'))</code>，要求 <code>truthsrc.project.json</code> 中的 <code>options</code> 对象<strong>不多不少正好包含</strong>这些顶层键。</p>
+<h3 id="section-5-3">第 3 步：实现 <code>generate.mjs</code> 与满足 8 字段契约的 <code>produce()</code></h3>
+<p>入口文件非常精炼——复用核心编排器 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/product-plan.mjs"><code>planProductSet</code></a>：</p>
+<pre class="code"><code class="language-javascript">// generators/rust-onion-service/generate.mjs
+import { planProductSet } from '../../src/core/product-plan.mjs';
+import { fail } from '../../lib/products/request.mjs';
+import * as domainModel from './producers/domain-model.mjs';
+import * as portsAdapters from './producers/ports-adapters.mjs';
+import * as workspaceCargo from './producers/workspace-cargo.mjs';
+
+export const producerRegistry = Object.freeze({
+  'rust-domain-model': Object.freeze({ version: domainModel.version, produce: domainModel.produce }),
+  'rust-ports-adapters': Object.freeze({ version: portsAdapters.version, produce: portsAdapters.produce }),
+  'rust-workspace': Object.freeze({ version: workspaceCargo.version, produce: workspaceCargo.produce }),
+});
+
+export function generate({ compilation, manifest, options }) {
+  if (manifest?.targetProfile !== 'rust-onion-service@1') {
+    fail('RUST_PROFILE', 'explicit rust-onion-service@1 profile required');
+  }
+  return planProductSet({ compilation, manifest, options }, producerRegistry);
+}
+</code></pre>
+<p>而在每个 <code>producer.produce({ products, options })</code> 内部，必须严格遵守 <code>planProductSet()</code> 强制执行的 <strong>6 条铁律</strong>：</p>
+<ol>
+<li><strong>只读声明产品</strong>：传入的 <code>products</code> 被 <code>Proxy</code> 包裹，读取任何未列在当前 <code>producer.products</code> 中的键会立刻抛 <code>PRODUCT_UNDECLARED</code>。</li>
+<li><strong>纯函数与字节确定性</strong>：<code>planProductSet()</code> 会用两份独立深拷贝的输入<strong>连续调用两次 <code>produce()</code></strong>，逐字段比对输出；只要引入当前时间戳、随机数、未排序 <code>Set</code>/<code>Map</code> 遍历或环境变量，立即报错 <code>PRODUCT_NONDETERMINISTIC</code>。</li>
+<li><strong>精确的 Entry 8 字段契约</strong>：每个返回对象只能包含以下键（<code>codeMappings</code> 可选，其余 7 个必填）：</li>
+</ol>
+<pre class="code"><code class="language-javascript">{
+  path: 'crates/domain/src/value_objects/money.rs',     // 相对规范路径，禁止 ../、反斜杠或与 receipts 冲突
+  content: renderedRustSource,                          // UTF-8 字符串，禁止出现 "???" 占位符
+  kind: 'rust-value-object',                            // 必须在当前 producer.artifactKinds 中声明
+  deps: ['crates/domain/Cargo.toml'],                   // 所有依赖路径必须同批生成（闭环校验）
+  knowledgeIds: ['source:bank-v1#/valueObjects/0'],     // 非空数组，声明文件级知识溯源身份
+  productFootprint: [                                   // 必须与当前 producer.products 的 (id, version) 逐项一致
+    { id: 'reference-layout', version: '1' },
+    { id: 'exact-value-types', version: '1' },
+    { id: 'domain-decision', version: '4' },
+    { id: 'domain-folds', version: '6' },
+  ],
+  merge: null,                                          // 必须显式为 null（使用核心默认 MANUAL 合并策略）
+  codeMappings: [                                       // 可选：精确到 UTF-8 字节区间的符号/语句级锚点
+    {
+      knowledgeKey: 'source:bank-v1#/valueObjects/0',
+      span: { start: 120, end: 215, text: 'pub struct Money { ... }' },
+      scope: { start: 100, end: 240, text: '// Money domain value object\npub struct Money { ... }\n' },
+    },
+  ],
+}
+</code></pre>
+<ol start="4">
+<li><strong>全量 <code>deps</code> 闭环</strong>：<code>entries</code> 中声明的每一条 <code>deps</code> 路径，都必须存在于同一轮生成计划的 <code>entries</code> 路径集合内，否则报错 <code>PRODUCT_ENTRY_DEPENDENCY</code>。</li>
+<li><strong>大小写不敏感路径去重</strong>：<code>path.normalize('NFC').toLowerCase()</code> 跨所有子生产器唯一，避免 macOS / Windows 大小写折叠碰撞（<code>PRODUCT_PATH_ALIAS</code>）。</li>
+<li><strong>无未实现占位符</strong>：正式产品计划禁止 <code>content</code> 中残留 <code>???</code>（只有显式白名单中的 <code>classic-architecture</code> 教学脚手架除外）。</li>
+</ol>
+<h3 id="section-5-4">第 4 步：接入注册表，并处理 2 处容易漏掉的源码接缝</h3>
+<p>完成生成器目录并把它加入 <code>lib/products/generate-cli.mjs</code> 的 <code>registeredProductProducer()</code> 表后，务必检查以下两处与语言特性相关的真实源码接缝：</p>
+<h4>接缝 A：<code>lib/project/provenance-annotations.mjs</code> 的文件后缀白名单</h4>
+<p>在 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/provenance-annotations.mjs"><code>lib/project/provenance-annotations.mjs</code></a> 中，核心在 <code>applyEntries()</code> 写盘前会自动给源码加盖 <code>// @generated by truthsrc ...</code>、<code>// @knowledge-release ...</code> 与顺序无关的 <code>// @knowledge &lt;stableId&gt;@&lt;elementHash16&gt;</code> 头，并自动平移所有 <code>codeMappings</code> 的 UTF-8 字节偏移量。但当前的后缀判断函数只认两种后缀：</p>
+<pre class="code"><code class="language-javascript">// lib/project/provenance-annotations.mjs:140-142
+function supportsSlashHeader(filePath) {
+  return filePath.endsWith('.scala') || filePath.endsWith('.proto');
+}
+</code></pre>
+<p>这意味着，如果你新生成的是 <code>.rs</code>、<code>.go</code>、<code>.ts</code> 或 <code>.java</code> 文件，<strong>默认不会被自动加盖统一溯源头</strong>！建议做法是把该函数扩展为语言注释前缀表（例如 <code>.rs</code>/<code>.go</code>/<code>.ts</code>/<code>.java</code>/<code>.scala</code>/<code>.proto</code> 用 <code>//</code>，<code>.py</code>/<code>.toml</code> 用 <code>#</code>），并同步在测试里验证 <code>codeMappings</code> 字节偏移在加盖头部后仍然通过 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/code-mappings.mjs"><code>src/core/code-mappings.mjs</code></a> 的 <code>validateCodeMappings()</code>。</p>
+<h4>接缝 B：手写实现区的边界与 <code>implementationProducers</code></h4>
+<ul>
+<li><strong>若只需隔离手写代码目录（推荐起点）</strong>：在 <code>options</code> 中声明手写路径（如 <code>handwrittenRoots</code>），确保输出目录与手写目录完全不相交，并在生成的 <code>Cargo.toml</code>（Workspace members）里引用该外部 crate；如需要在生成文件内部留口子，遵循 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/generators/README.md"><code>generators/README.md</code></a> 约定的 Protected Regions（<code>// ==== BEGIN MANUAL ====</code> / <code>// ==== END MANUAL ====</code> 与 <code>AI_PROMPT</code> 块），核心的 <code>applyEntries()</code> 会自动保护这些区域在 <code>--update</code> 重生成时不丢失。</li>
+<li><strong>若需把特定手写实现纳入双向哈希证明</strong>：才需要像 <code>scala-cqrs-play-application</code>、<code>scala-cqrs-module-seams</code>、<code>scala-cqrs-saga-monarch</code> 那样，在 <code>lib/products/generate-cli.mjs</code> 的 <code>implementationProducers</code> Map 中注册 <code>resolveImplementations</code> 回调。</li>
+</ul>
+<h3 id="section-5-5">第 5 步：测试放置与四道质量门禁</h3>
+<p>在 <code>metarch-truthsrc</code> 中，<strong>测试文件不放进 <code>generators/&lt;name&gt;/</code> 目录</strong>，而是平铺放在仓根 <code>test/</code> 目录下（当前共 211 个 <code>*.test.mjs</code> 文件，按领域命名），文档同步更新 <code>generators/README.md</code> 与 <code>MIGRATION.md</code>。</p>
+<p>一个新代码生成器要达到可合入、可信赖的工程水准，建议至少补齐四道自动化验证：</p>
+<ol>
+<li><strong>契约与确定性单测（<code>test/rust-onion-service.test.mjs</code>）</strong>：<ul>
+<li>验证 <code>compile-project</code> → <code>generate-project --plan</code> → <code>generate-project</code> → <code>generate-project --update</code> → <code>status-project</code> → <code>query-project</code> → <code>verify-project</code> 全链路通过；</li>
+<li>验证负例：缺少必填产品、版本不匹配、多余 <code>options</code> 字段、读未声明产品、<code>???</code> 残留、输出目录与手写区重叠均 fail-closed 报错。</li>
+</ul>
+</li>
+<li><strong>反硬编码静态门禁（<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a>）</strong>：<ul>
+<li>运行 <code>node tools/lint.mjs</code>，确保所有 <code>.mjs</code> 语法合规、无 <code>console.log</code> / <code>debugger</code> / 重复 import，且<strong>严禁出现任何银行或特定业务域标识符硬编码</strong>（如 <code>bankwealth</code>、<code>FundOrder</code>、<code>CreditBalance</code> 等）。</li>
+</ul>
+</li>
+<li><strong>跨领域第二业务域冒烟证明</strong>：<ul>
+<li>千万不要只在银行夹具上测通！用一份与金融完全无关的独立小树（例如电商 <code>commerce</code>：<code>Order</code>、<code>Inventory</code>、<code>Payment</code>，或最小 <code>Counter</code> 树）跑通整条 <code>generate-project</code> + <code>verify-project</code> 闭环，证明生成器对任意符合 SCHEMA 的领域模型泛化成立。</li>
+</ul>
+</li>
+<li><strong>目标语言编译器与运行时闭环</strong>：<ul>
+<li>在生成的目标目录执行真实工具链验证（例如 <code>cargo check --workspace &amp;&amp; cargo test --workspace</code>），并把验证收据与 <code>truthsrc</code> 自身契约测试区分记录。</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-6">六、五条源码级避坑红线与 AI Agent 协作物料清单</h2>
+<h3 id="section-6-1">避坑清单（来自 <code>metarch-truthsrc</code> 真实源码）</h3>
+<ol>
+<li><strong>绝不在 <code>lib/</code> 下新建目标语言目录</strong>：不要建 <code>lib/rust-target/</code> 或 <code>lib/go-target/</code>；目标语言映射与布局全部留在 <code>generators/&lt;name&gt;/</code>。</li>
+<li><strong>绝不把非 JVM 生成器塞进 <code>planCompiledProducts</code> 的 Maven JAR 白名单</strong>：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/generate-cli.mjs"><code>lib/products/generate-cli.mjs</code></a> 第 125–139 行写死了 7 个 Scala 应用/服务生成器，强制要求 <code>options.runtimeArtifact.repository</code> 指向本地 <code>file:///</code> Maven 仓库并按 SHA-256 校验 <code>saga-core</code> 与 <code>monarch</code> 的 JAR。Rust/Go/TS 生成器<strong>绝不要</strong>加入那张名单；若需锁定第三方运行时依赖，应在自己的生成器中校验 <code>Cargo.lock</code> / <code>go.sum</code> / <code>package-lock.json</code> 哈希，或在纯零依赖领域层完全省去运行时 pin。</li>
+<li><strong>不要绕过编译产物去重解析 <code>canonical.json</code></strong>：消费已编译的 <code>domain-decision@4</code>、<code>domain-folds@6</code>、<code>exact-value-types@1</code> 等产物，才能确保新生成器与既有 Scala 生成器对守卫顺序、类型引用、精度标度拥有 100% 相同的语义解释。</li>
+<li><strong>不要把测试夹具里的明文密钥或本地绝对路径写进模板</strong>：目标配置模板（如数据库连接串、HTTP Secret）必须通过环境变量占位符注入；任何路径表达式（参考 <code>scala-cqrs-play-service/generate.mjs</code> 中的 <code>portableBuildSbt()</code>）必须保持相对可移植。</li>
+<li><strong>不要顺手把静态注册表改成“扫描目录自动 dynamic import”</strong>：<code>registeredProductProducer</code> 的静态表是安全边界（防不可信路径注入与版本漂移），是否开放外部动态插件是独立的架构决策，不要在新增单个生成器时夹带修改。</li>
+</ol>
+<h3 id="section-6-2">交给 AI Agent 实现新代码生成器的最小物料包</h3>
+<p>如果你想直接让 AI Agent 在 <code>metarch-truthsrc</code> 中帮你推理并实现一个全新目标栈生成器，把下面 <strong>6 件最小物料</strong>一次性对齐清楚，就能避免 Agent 瞎猜框架约定或污染核心：</p>
+<ol>
+<li><strong>已选定的语义产品清单（带精确版本）</strong>：明确本次先覆盖最小领域核心（<code>reference-layout@1</code> + <code>exact-value-types@1</code> + <code>exact-value-codecs@1</code> + <code>domain-decision@4</code> + <code>domain-dependencies@6</code> + <code>domain-folds@6</code>），还是同时包含编排/宿主契约。</li>
+<li><strong>目标架构的分层与目录映射表</strong>：每一层（Domain / Application / Ports / Adapters / Composition Root）对应哪些 <code>artifactKinds</code>、落到什么路径模式、依赖方向如何单向指向内层（洋葱架构与 DIP 原则可参照 <a href="https://co-arising.github.io/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/#section-3">bank-wealth-demo 实战全景指南第 3–4 节</a>）。</li>
+<li><strong>类型与编解码映射规格</strong>：标量类型、精确数值类型（<code>unit-decimal</code> / <code>decimal</code> + <code>minor-units-text</code>）以及 <code>Option</code> / <code>List</code> / <code>Map</code> 在目标语言中的精确映射（例如 Rust 中 <code>rust_decimal::Decimal</code> 或 <code>i128</code> 分值封装）。</li>
+<li><strong>最小手写黄金参考样例（1 个聚合 + 1 个值对象 + 1 个端口 + 1 个单测）</strong>：比千字提示词更有效——把你认可的目标语言惯用写法给 Agent 当作格式与风格锚点。</li>
+<li><strong>契约参考源码指针</strong>：直接指向 <code>generators/product-design-review/</code>（最小正式生成器）、<code>src/core/product-plan.mjs</code>（计划校验器）、<code>lib/products/generate-cli.mjs</code>（唯一注册点）与 <code>lib/project/provenance-annotations.mjs</code>（注释头后缀表）。</li>
+<li><strong>硬验收命令清单</strong>：要求 Agent 交付前必须一次性跑绿 <code>node tools/lint.mjs</code>、<code>node --test test/&lt;your-gen&gt;.test.mjs</code>、跨领域非银行夹具的 <code>generate-project</code> + <code>verify-project</code>，以及目标语言的原生编译与单测命令。</li>
+</ol>
+<h2 id="section-7">七、参考源码与延伸阅读</h2>
+<ul>
+<li><strong>核心工具仓</strong>：<a href="https://github.com/co-arising/metarch-truthsrc"><code>co-arising/metarch-truthsrc</code></a>（<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/SCHEMA.md">SCHEMA.md</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/CODEGEN.md">CODEGEN.md</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/generators/README.md">generators/README.md</a>）</li>
+<li><strong>关键源码入口</strong>：<ul>
+<li>项目管线与抓拍门禁：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/cli.mjs"><code>lib/project/cli.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive.mjs"><code>lib/project/derive.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/derive-bindings.mjs"><code>lib/project/derive-bindings.mjs</code></a></li>
+<li>产品注册与生成器准入：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/registry.mjs"><code>lib/products/registry.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/products/generate-cli.mjs"><code>lib/products/generate-cli.mjs</code></a></li>
+<li>正式计划编排、写盘与精确回锚：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/product-plan.mjs"><code>src/core/product-plan.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/generate.mjs"><code>src/core/generate.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/src/core/code-mappings.mjs"><code>src/core/code-mappings.mjs</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/project/provenance-annotations.mjs"><code>lib/project/provenance-annotations.mjs</code></a></li>
+<li>最小与完整参考生成器：<a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/product-design-review"><code>generators/product-design-review/</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/scala-cqrs-play-service"><code>generators/scala-cqrs-play-service/</code></a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a></li>
+</ul>
+</li>
+<li><strong>参考示例项目</strong>：<a href="https://github.com/co-arising/bank-wealth-demo"><code>co-arising/bank-wealth-demo</code></a>（<a href="https://github.com/co-arising/bank-wealth-demo/blob/main/truthsrc.project.json"><code>truthsrc.project.json</code></a>）</li>
+<li><strong>站内关联阅读</strong>：<ul>
+<li><a href="https://co-arising.github.io/zh/pipeline/">流水线：六阶段职责分工与回锚边界</a></li>
+<li><a href="https://co-arising.github.io/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo 实战全景指南：从真源到运行时试玩、洋葱架构拆解与 AI 时代代码生成器扩展规范</a></li>
+<li><a href="https://co-arising.github.io/zh/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）</a></li>
+<li><a href="https://co-arising.github.io/zh/status/">事实与状态台账（含最新快照验证证据）</a></li>
+</ul>
+</li>
+</ul></article>
+    </div>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">继续阅读</h2>
+      <div class="article-card" lang="zh-CN">
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-25">2026-11-25</time></p>
+      <h3><a href="/zh/articles/bank-wealth-quickstart-architecture-extensibility-20261125/">bank-wealth-demo 实战全景指南：从真源到运行时试玩、洋葱架构拆解与 AI 时代代码生成器扩展规范</a></h3>
+      <p class="article-deck">面向 bank-wealth-demo 的端到端 Quick Start（真源、生成、回锚与 5 套 Docker 运行时玩法）、生成代码的洋葱架构与 DDD/DIP 原理深拆，以及基于编译语义产物的多栈代码生成器扩展与 AI Agent 物料规范。</p>
+      <p class="small">中文原文</p>
+    </div>
+      <p><a href="/zh/articles/">返回文章索引</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>
