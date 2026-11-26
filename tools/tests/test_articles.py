@@ -47,8 +47,8 @@ HASHES = {
     "metarch-truthsrc-extending-code-generator-20261126.en.md": "5e26eddfdf65297b7d03db15395329fd97b40b031ed9c0d5cbeb646a393edfc1",
     "co-arising-v2-ears-native-architecture-20261126.md": "2e7a115ce0f1d1fa1730e0c5821078ab8632dcce34dfd8a8723a7f44829ee9b1",
     "co-arising-v2-ears-native-architecture-20261126.en.md": "0a892cb127974bd1586be972b059d2693ca7268ecb075cba2a5c81f5cc897099",
-    "co-arising-v2-ga-prd-to-running-guide-20261126.md": "77b26c9c882c92290151cdd700d14a13e86e086fd79d9ac1f488b0eb085a15f6",
-    "co-arising-v2-ga-prd-to-running-guide-20261126.en.md": "1ad4fe963f95cb4b26d2112dbd55ac6739b5b15d3c46ba3aa4ba797a543dc811",
+    "co-arising-v2-ga-prd-to-running-guide-20261126.md": "f0b72ea865999ecaf9daa0a95276634de41bbad65711638cb1abeb278cfb3d85",
+    "co-arising-v2-ga-prd-to-running-guide-20261126.en.md": "aafd9b469cd2448f99d889f9e07824f2b425b16ccaa5584833cfe91527c084cf",
 }
 
 

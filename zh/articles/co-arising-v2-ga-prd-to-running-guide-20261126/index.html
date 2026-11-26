@@ -254,7 +254,7 @@ node "$TRUTHSRC_CLI" tasks-v2 --root v2-pilot --format human
   }
 }
 </code></pre>
-<p>v2 新增的 5 个核心 MCP 工具：</p>
+<p>v2 新增的 6 个核心 MCP 工具（连同 26 个 v1 工具共 32 个）：</p>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：MCP 工具 / 职责 / 典型调用时机"><table>
 <thead>
 <tr>
@@ -286,8 +286,13 @@ node "$TRUTHSRC_CLI" tasks-v2 --root v2-pilot --format human
 </tr>
 <tr>
 <td style="text-align: left;"><strong><code>v2_verify</code></strong></td>
-<td style="text-align: left;">校验锁定测试 SHA-256 并运行指定槽位或全量 TS/Scala 预言机测试，回写 SQLite 溯源</td>
+<td style="text-align: left;">校验锁定测试 SHA-256、运行 <code>domain / application / interfaces</code> 全三层 TS/Scala 预言机测试、执行洋葱 DIP 审计并回写 SQLite 溯源</td>
 <td style="text-align: left;">每次改动后作为硬验证门禁</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>v2_view</code></strong></td>
+<td style="text-align: left;">为任意 v2 项目一键导出严格 CSP 的单文件离线可视化工作坊 HTML（真源 ↔ 洋葱五层代码 ↔ 锁定测试双向点行反查）</td>
+<td style="text-align: left;">需求签字或测试全绿后，在本地浏览器直接验收自己项目的知识与代码</td>
 </tr>
 </tbody>
 </table></div>
@@ -369,9 +374,9 @@ cp -r "$COARISING_WS/metarch-truthsrc/skills/coarising_cloze_worker" .claude/ski
   --strict \
   --format human
 </code></pre>
-<p><strong>步骤 C · 签字后生成代码、锁定预言机与派生任务队列</strong></p>
-<p>业务确认无误后，生成 L1 零 Token 实现代码、L2/L3 Port 与 <code>@cloze</code> 骨架、SHA-256 锁定测试预言机，并查看待填槽任务清单：</p>
-<pre class="code"><code class="language-bash">node "$TRUTHSRC_CLI" generate-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
+<p><strong>步骤 C · 签字后复制脚手架、生成洋葱五层代码、锁定三层预言机与派生任务队列</strong></p>
+<p>业务确认无误后，一条命令复制静态工程脚手架（TS Node HTTP 入口 + Scala Play <code>play-scaffold/</code>）并落盘完整的 <strong>洋葱五层代码</strong>（<code>domain/</code> 零依赖核心、<code>application/</code> 编排与出站连接器端口、<code>interfaces/</code> 入站 HTTP Controller + <code>HttpAuthority</code> 401/403/CSRF 路由、<code>infrastructure/</code> 内存存储与外部适配器、<code>modules/</code> 依赖注入装配根），同时生成 <code>domain / application / interfaces</code> 三层 SHA-256 锁定预言机与待填槽清单：</p>
+<pre class="code"><code class="language-bash">node "$TRUTHSRC_CLI" generate-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx --with-scaffold
 node "$TRUTHSRC_CLI" emit-tests-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
 node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
 </code></pre>
@@ -379,7 +384,7 @@ node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
 <pre class="code"><code class="language-text">请使用 coarising-cloze-worker skill 的 Mode A：
 1. 调用 v2_tasks 获取下一个可执行的 @cloze 槽位；
 2. 仅通过 v2_context_pack 读取该槽位的最小上下文，严格只在 // @cloze:start(&lt;slot-id&gt;) 与 // @cloze:end(&lt;slot-id&gt;) 之间编写实现，严禁修改 generated-tests/、generated-scaffold/ 或围栏外代码，金额运算必须使用定点数助手而不能用浮点；
-3. 调用 v2_verify（strict: true）确认 SHA-256 防篡改与全部锁定测试通过后再汇报。
+3. 调用 v2_verify（strict: true）确认 SHA-256 防篡改、洋葱 DIP 依赖门禁以及 domain / application / interfaces 全三层锁定测试通过后再汇报。
 </code></pre>
 <p><strong>步骤 D · 独立盲审与最终全量门禁</strong></p>
 <p>为避免“自己审自己”的确认偏差，新开一个干净的 Claude Code 会话（或派发只读子代理），发送第三轮盲审 Prompt：</p>
@@ -391,6 +396,40 @@ truthsrc tasks-v2 --root . --record-review --slot &lt;slot-id&gt; --verdict PASS
 <p>当 <code>tasks-v2</code> 显示待办与待审均为 0 时，执行一键终检门禁（同时把新增文件登记进 <code>governance/coverage-manifest.json</code> 即可实现 100% 零灰区审计）：</p>
 <pre class="code"><code class="language-bash">node "$TRUTHSRC_CLI" check-v2 --root . --strict --format human
 </code></pre>
+<p><strong>步骤 E · 在本地真正跑起来 + 打开自己项目的离线可视化工作坊</strong></p>
+<p>终检全绿后，你手里已经是一套<strong>可直接在本地启动并接受真实 HTTP 请求的完整洋葱架构服务</strong>，而且可以一键生成属于你自己项目的离线可视化工作坊：</p>
+<ol>
+<li><strong>本地启动零依赖 TypeScript HTTP 服务并实测接口</strong>：</li>
+</ol>
+<pre class="code"><code class="language-bash"># 终端 1：启动自动装配的本地 HTTP 服务（默认监听 127.0.0.1:3000，无需任何第三方 npm 包）
+node handwritten/server.ts
+
+# 终端 2：探测健康检查与自动派生的业务路由（/api/v1/&lt;context&gt;/&lt;port&gt;/&lt;op&gt;）
+curl -s http://127.0.0.1:3000/health
+curl -s -X POST http://127.0.0.1:3000/api/v1/my-ctx/&lt;port-slug&gt;/&lt;op-slug&gt; \
+  -H 'content-type: application/json' \
+  -d '{"actor":"alice","reqId":"req-001"}'
+</code></pre>
+<ol start="2">
+<li>
+<p><strong>如果你使用 Scala / Play Framework 底座</strong>：
+   <code>--with-scaffold</code> 已同步生成 <code>play-scaffold/</code>（含 <code>build.sbt</code>、<code>conf/routes</code> 与 <code>app/controllers/PlayHttpBridge.scala</code>），直接把 Play 的 <code>AbstractController</code> 与 <code>auth-core</code> / <code>HttpAuthority</code> 接到纯 Scala 的 <code>BootstrapModule</code> 和 <code>HttpRouter</code> 上，核心领域层一行无需依赖 Play。</p>
+</li>
+<li>
+<p><strong>一键生成并打开你自己项目的离线可视化工作坊（真源 ↔ 洋葱代码 ↔ 锁定测试）</strong>：</p>
+</li>
+</ol>
+<pre class="code"><code class="language-bash"># CLI 生成（或直接让 Claude Code 调用 MCP 工具 v2_view）
+node "$TRUTHSRC_CLI" view-v2 --root . --out workshop.html
+
+# macOS 直接双击或命令打开（Linux 用 xdg-open，Windows 用 start）
+open workshop.html
+</code></pre>
+<p>打开 <code>workshop.html</code> 后无需起任何 Web 服务器：左侧按你的应用故事与领域切片自动组织章节，中间展示全量知识图谱（0 省略），右侧可切换“作者来源（<code>.ears</code> / <code>.yaml</code>）”与“生成代码（洋葱五层 TS/Scala + <code>@cloze</code> + 锁定测试）”，<strong>点击任意代码行号还能反查回对应的 EARS 规则</strong>。</p>
+<ol start="4">
+<li><strong>后续 PRD 变更时的演进循环</strong>：
+   以后改需求时不要盲改代码——直接修改 <code>truth/&lt;context&gt;/</code> 里的 <code>.ears</code> 或结构文件，重新执行 <code>compile-v2</code> → <code>generate-v2</code> → <code>emit-tests-v2</code> → <code>tasks-v2</code>：未受影响的模块零改动，只有规则哈希变化的 <code>@cloze</code> 槽位会被自动标脏为 <code>STALE</code>，让 Claude Code 精准重填并通过 <code>check-v2 --strict</code> 即可。</li>
+</ol>
 <p><strong>两条顺滑体验小贴士</strong></p>
 <ul>
 <li><strong>几十页的大 PRD 请分块蒸馏</strong>：按“核心聚合 / 子域”切片（每次喂 1 个核心聚合或 1–2 条主用例），Z3 澄清卡最聚焦，收敛最快；每收敛一块再追加下一块。</li>
@@ -437,7 +476,7 @@ truthsrc tasks-v2 --root . --record-review --slot &lt;slot-id&gt; --verdict PASS
 <li>独立盲审子代理核对 EARS 规则与 Diff 后签核 <code>tasks-v2 --root v2-pilot --record-review --slot cash-fund-purchase --verdict PASS --reviewer blind-reviewer</code>，槽位正式归档为 <strong><code>DONE</code></strong>。</li>
 </ol>
 <h3 id="section-5-5">Step 5：全仓审计与对抗回归</h3>
-<p>最后运行 <code>audit-coverage-v2</code> 与 <code>run-tck-v2</code>：56/56 文件全部纳入显式治理分区（0 灰区、0 架构越界），TA 外部适配器通过 8/8 混沌 TCK，变异体测试证实若有人在隔离区偷偷把 <code>UNKNOWN</code> 当成失败直接退款，锁定预言机将 100% 击杀该错误实现。</p>
+<p>最后运行 <code>audit-coverage-v2</code> 与 <code>run-tck-v2</code>：76/76 文件全部纳入显式治理分区（0 灰区、0 架构与洋葱 DIP 越界），<code>domain / application / interfaces</code> 全三层 6 TS + 6 Scala 实测套件通过，TA 外部适配器通过 8/8 混沌 TCK，变异体测试证实若有人在隔离区偷偷把 <code>UNKNOWN</code> 当成失败直接退款，锁定预言机将 100% 击杀该错误实现。</p>
 <hr>
 <h2 id="section-6">六、与 v1 的关系及诚实边界</h2>
 <ul>

@@ -254,7 +254,7 @@ node "$TRUTHSRC_CLI" tasks-v2 --root v2-pilot --format human
   }
 }
 </code></pre>
-<p>The five v2 MCP tools:</p>
+<p>The six v2 MCP tools (32 total alongside the 26 v1 tools):</p>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：MCP Tool / Responsibility / Typical Usage"><table>
 <thead>
 <tr>
@@ -286,8 +286,13 @@ node "$TRUTHSRC_CLI" tasks-v2 --root v2-pilot --format human
 </tr>
 <tr>
 <td style="text-align: left;"><strong><code>v2_verify</code></strong></td>
-<td style="text-align: left;">Verifies locked-test SHA-256 hashes, runs TS/Scala suites, and records provenance in SQLite</td>
+<td style="text-align: left;">Verifies locked-test SHA-256 hashes, runs <code>domain / application / interfaces</code> TS &amp; Scala suites, audits Onion DIP, and records SQLite provenance</td>
 <td style="text-align: left;">Mandatory verification gate after every edit</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>v2_view</code></strong></td>
+<td style="text-align: left;">Exports a self-contained strict-CSP offline HTML visual workbench (truth ↔ Onion 5-layer code ↔ locked tests with line reverse lookup) for any v2 project</td>
+<td style="text-align: left;">Interactive local browser inspection after signoff or green verification</td>
 </tr>
 </tbody>
 </table></div>
@@ -369,9 +374,9 @@ cp -r "$COARISING_WS/metarch-truthsrc/skills/coarising_cloze_worker" .claude/ski
   --strict \
   --format human
 </code></pre>
-<p><strong>Step C · Emit Scaffolds, Locked Oracles, and Derived Task Queue</strong></p>
-<p>After signoff, materialize zero-token L1 code, L2/L3 Ports &amp; <code>@cloze</code> skeletons, SHA-256 locked oracles, and the derived task queue:</p>
-<pre class="code"><code class="language-bash">node "$TRUTHSRC_CLI" generate-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
+<p><strong>Step C · Copy Scaffolds, Emit Onion 5-Layer Code, Locked 3-Layer Oracles &amp; Task Queue</strong></p>
+<p>After signoff, copy the static project scaffolds (TS zero-dep HTTP server + Scala Play <code>play-scaffold/</code>), emit all <strong>5 Onion Architecture layers</strong> (<code>domain/</code> pure core, <code>application/</code> orchestration &amp; outbound connector ports, <code>interfaces/</code> inbound HTTP Controllers + <code>HttpAuthority</code> 401/403/CSRF router, <code>infrastructure/</code> in-memory store &amp; adapters, <code>modules/</code> DI composition root), lock all <code>domain / application / interfaces</code> oracle suites via SHA-256, and inspect the task queue:</p>
+<pre class="code"><code class="language-bash">node "$TRUTHSRC_CLI" generate-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx --with-scaffold
 node "$TRUTHSRC_CLI" emit-tests-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
 node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
 </code></pre>
@@ -379,7 +384,7 @@ node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
 <pre class="code"><code class="language-text">Use the coarising-cloze-worker skill (Mode A):
 1. Call v2_tasks to claim the next actionable @cloze slot;
 2. Load only that slot's minimal context via v2_context_pack, edit strictly inside // @cloze:start(&lt;slot-id&gt;)..// @cloze:end(&lt;slot-id&gt;), never touch generated-tests/, generated-scaffold/, or lines outside the fence, and use exact fixed-point decimal helpers instead of floating point;
-3. Run v2_verify (strict: true) and confirm SHA-256 tamper checks and all locked oracles pass before reporting back.
+3. Run v2_verify (strict: true) and confirm SHA-256 tamper checks, Onion DIP boundaries, and all domain / application / interfaces locked oracles pass before reporting back.
 </code></pre>
 <p><strong>Step D · Independent Blind Review &amp; Final Gate</strong></p>
 <p>Open a fresh Claude Code session (or read-only subagent) so review has zero shared implementation bias, and send Turn 3 Prompt:</p>
@@ -391,6 +396,40 @@ truthsrc tasks-v2 --root . --record-review --slot &lt;slot-id&gt; --verdict PASS
 <p>Once <code>tasks-v2</code> shows zero pending/review items (and new files are registered in <code>governance/coverage-manifest.json</code>), run the single final gate:</p>
 <pre class="code"><code class="language-bash">node "$TRUTHSRC_CLI" check-v2 --root . --strict --format human
 </code></pre>
+<p><strong>Step E · Run the Local HTTP Service &amp; Open Your Project's Offline Visual Workbench</strong></p>
+<p>Once the final gate is green, you have a <strong>directly runnable Onion Architecture HTTP service</strong> on your local machine plus a one-command offline visual workbench for your own PRD project:</p>
+<ol>
+<li><strong>Start the zero-dependency local TypeScript HTTP server and curl it</strong>:</li>
+</ol>
+<pre class="code"><code class="language-bash"># Terminal 1: boot the wired local HTTP server (listens on 127.0.0.1:3000 with zero npm deps)
+node handwritten/server.ts
+
+# Terminal 2: hit /health and your derived business routes (/api/v1/&lt;context&gt;/&lt;port&gt;/&lt;op&gt;)
+curl -s http://127.0.0.1:3000/health
+curl -s -X POST http://127.0.0.1:3000/api/v1/my-ctx/&lt;port-slug&gt;/&lt;op-slug&gt; \
+  -H 'content-type: application/json' \
+  -d '{"actor":"alice","reqId":"req-001"}'
+</code></pre>
+<ol start="2">
+<li>
+<p><strong>If you run on Scala / Play Framework</strong>:
+   <code>--with-scaffold</code> also emits <code>play-scaffold/</code> (<code>build.sbt</code>, <code>conf/routes</code>, and <code>app/controllers/PlayHttpBridge.scala</code>), bridging Play's <code>AbstractController</code> and <code>auth-core</code> / <code>HttpAuthority</code> straight into the pure Scala <code>BootstrapModule</code> and <code>HttpRouter</code> without leaking Play into <code>domain/</code> or <code>application/</code>.</p>
+</li>
+<li>
+<p><strong>Export and open your own project's offline visual workbench (Truth ↔ Onion Code ↔ Tests)</strong>:</p>
+</li>
+</ol>
+<pre class="code"><code class="language-bash"># Export via CLI (or ask Claude Code to invoke MCP tool v2_view)
+node "$TRUTHSRC_CLI" view-v2 --root . --out workshop.html
+
+# Open directly in your browser (macOS: open; Linux: xdg-open; Windows: start)
+open workshop.html
+</code></pre>
+<p><code>workshop.html</code> is a single strict-CSP offline file requiring no web server: chapters are auto-organized by your stories and slices, the full graph renders with 0 omitted nodes, and clicking any line number in the TS/Scala code panel reverse-navigates straight back to the owning EARS rule.</p>
+<ol start="4">
+<li><strong>Day-2 PRD evolution loop</strong>:
+   When requirements change later, edit <code>truth/&lt;context&gt;/</code> (<code>.ears</code> / YAML) instead of patching code blindly, then re-run <code>compile-v2</code> → <code>generate-v2</code> → <code>emit-tests-v2</code> → <code>tasks-v2</code>: untouched modules stay intact, only affected <code>@cloze</code> slots flip to <code>STALE</code>, and Claude Code re-implements and re-verifies them under <code>check-v2 --strict</code>.</li>
+</ol>
 <p><strong>Two Practical Tips for a Smooth First Run</strong></p>
 <ul>
 <li><strong>Chunk large PRDs by aggregate or subdomain</strong>: For a 20+ page PRD, distill 1 core aggregate or 1–2 main stories at a time so Z3 Clarification Cards stay focused and converge rapidly, then append the next slice.</li>
@@ -437,7 +476,7 @@ truthsrc tasks-v2 --root . --record-review --slot &lt;slot-id&gt; --verdict PASS
 <li>An independent blind reviewer checks the EARS rules against the diff and signs off via <code>tasks-v2 --root v2-pilot --record-review --slot cash-fund-purchase --verdict PASS --reviewer blind-reviewer</code>, transitioning the slot to <strong><code>DONE</code></strong>.</li>
 </ol>
 <h3 id="section-5-5">Step 5: Full-Coverage Audit &amp; Adversary Verification</h3>
-<p>Finally, <code>audit-coverage-v2</code> and <code>run-tck-v2</code> confirm 56/56 governed files (0 gray zone, 0 architecture violations), 8/8 S1 chaos TCK passes on the TA adapter, and mutation tests prove that any mutant attempting blind refund on <code>UNKNOWN</code> is immediately killed by the locked oracles.</p>
+<p>Finally, <code>audit-coverage-v2</code> and <code>run-tck-v2</code> confirm 76/76 governed files (0 gray zone, 0 architecture or Onion DIP violations), 6 TS + 6 Scala live suites across <code>domain / application / interfaces</code>, 8/8 S1 chaos TCK passes on the TA adapter, and mutation tests prove that any mutant attempting blind refund on <code>UNKNOWN</code> is immediately killed by the locked oracles.</p>
 <hr>
 <h2 id="section-6">6. Relationship with v1 and Honest Evidence Boundaries</h2>
 <ul>

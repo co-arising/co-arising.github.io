@@ -182,7 +182,7 @@ claude mcp add truthsrc -- node /absolute/path/to/metarch-truthsrc/bin/truthsrc.
 }
 ```
 
-v2 新增的 5 个核心 MCP 工具：
+v2 新增的 6 个核心 MCP 工具（连同 26 个 v1 工具共 32 个）：
 
 | MCP 工具 | 职责 | 典型调用时机 |
 | :--- | :--- | :--- |
@@ -190,7 +190,8 @@ v2 新增的 5 个核心 MCP 工具：
 | **`v2_query_graph`** | 查询 v2 SQLite 知识图谱（`overview`、`cloze_slots`、`coverage`、`node`、`edges`） | 变更影响分析、检查槽位与文件覆盖归属 |
 | **`v2_tasks`** | 实时派生全部 L1 / `@cloze` 任务队列与状态（含 `STALE_SPEC_CHANGED`） | 规划下一个待办槽位或决定并行派发列表 |
 | **`v2_context_pack`** | 为指定 `slotId` 打包最小隔离上下文（仅含相关 EARS 规则、类型定义、Port 签名、围栏行号与锁定测试路径） | 隔离区工人填槽前的唯一上下文入口，避免污染上下文 |
-| **`v2_verify`** | 校验锁定测试 SHA-256 并运行指定槽位或全量 TS/Scala 预言机测试，回写 SQLite 溯源 | 每次改动后作为硬验证门禁 |
+| **`v2_verify`** | 校验锁定测试 SHA-256、运行 `domain / application / interfaces` 全三层 TS/Scala 预言机测试、执行洋葱 DIP 审计并回写 SQLite 溯源 | 每次改动后作为硬验证门禁 |
+| **`v2_view`** | 为任意 v2 项目一键导出严格 CSP 的单文件离线可视化工作坊 HTML（真源 ↔ 洋葱五层代码 ↔ 锁定测试双向点行反查） | 需求签字或测试全绿后，在本地浏览器直接验收自己项目的知识与代码 |
 
 ### 2. 安装双端 Skills（需求蒸馏 + 隔离区填槽）
 
@@ -288,12 +289,12 @@ node "$TRUTHSRC_CLI" compile-v2 \
   --format human
 ```
 
-**步骤 C · 签字后生成代码、锁定预言机与派生任务队列**
+**步骤 C · 签字后复制脚手架、生成洋葱五层代码、锁定三层预言机与派生任务队列**
 
-业务确认无误后，生成 L1 零 Token 实现代码、L2/L3 Port 与 `@cloze` 骨架、SHA-256 锁定测试预言机，并查看待填槽任务清单：
+业务确认无误后，一条命令复制静态工程脚手架（TS Node HTTP 入口 + Scala Play `play-scaffold/`）并落盘完整的 **洋葱五层代码**（`domain/` 零依赖核心、`application/` 编排与出站连接器端口、`interfaces/` 入站 HTTP Controller + `HttpAuthority` 401/403/CSRF 路由、`infrastructure/` 内存存储与外部适配器、`modules/` 依赖注入装配根），同时生成 `domain / application / interfaces` 三层 SHA-256 锁定预言机与待填槽清单：
 
 ```bash
-node "$TRUTHSRC_CLI" generate-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
+node "$TRUTHSRC_CLI" generate-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx --with-scaffold
 node "$TRUTHSRC_CLI" emit-tests-v2 --in .truthsrc/canonical-v2.json --out . --target typescript,scala --package example.myctx
 node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
 ```
@@ -304,7 +305,7 @@ node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
 请使用 coarising-cloze-worker skill 的 Mode A：
 1. 调用 v2_tasks 获取下一个可执行的 @cloze 槽位；
 2. 仅通过 v2_context_pack 读取该槽位的最小上下文，严格只在 // @cloze:start(<slot-id>) 与 // @cloze:end(<slot-id>) 之间编写实现，严禁修改 generated-tests/、generated-scaffold/ 或围栏外代码，金额运算必须使用定点数助手而不能用浮点；
-3. 调用 v2_verify（strict: true）确认 SHA-256 防篡改与全部锁定测试通过后再汇报。
+3. 调用 v2_verify（strict: true）确认 SHA-256 防篡改、洋葱 DIP 依赖门禁以及 domain / application / interfaces 全三层锁定测试通过后再汇报。
 ```
 
 **步骤 D · 独立盲审与最终全量门禁**
@@ -323,6 +324,41 @@ truthsrc tasks-v2 --root . --record-review --slot <slot-id> --verdict PASS --rev
 ```bash
 node "$TRUTHSRC_CLI" check-v2 --root . --strict --format human
 ```
+
+**步骤 E · 在本地真正跑起来 + 打开自己项目的离线可视化工作坊**
+
+终检全绿后，你手里已经是一套**可直接在本地启动并接受真实 HTTP 请求的完整洋葱架构服务**，而且可以一键生成属于你自己项目的离线可视化工作坊：
+
+1. **本地启动零依赖 TypeScript HTTP 服务并实测接口**：
+
+```bash
+# 终端 1：启动自动装配的本地 HTTP 服务（默认监听 127.0.0.1:3000，无需任何第三方 npm 包）
+node handwritten/server.ts
+
+# 终端 2：探测健康检查与自动派生的业务路由（/api/v1/<context>/<port>/<op>）
+curl -s http://127.0.0.1:3000/health
+curl -s -X POST http://127.0.0.1:3000/api/v1/my-ctx/<port-slug>/<op-slug> \
+  -H 'content-type: application/json' \
+  -d '{"actor":"alice","reqId":"req-001"}'
+```
+
+2. **如果你使用 Scala / Play Framework 底座**：
+   `--with-scaffold` 已同步生成 `play-scaffold/`（含 `build.sbt`、`conf/routes` 与 `app/controllers/PlayHttpBridge.scala`），直接把 Play 的 `AbstractController` 与 `auth-core` / `HttpAuthority` 接到纯 Scala 的 `BootstrapModule` 和 `HttpRouter` 上，核心领域层一行无需依赖 Play。
+
+3. **一键生成并打开你自己项目的离线可视化工作坊（真源 ↔ 洋葱代码 ↔ 锁定测试）**：
+
+```bash
+# CLI 生成（或直接让 Claude Code 调用 MCP 工具 v2_view）
+node "$TRUTHSRC_CLI" view-v2 --root . --out workshop.html
+
+# macOS 直接双击或命令打开（Linux 用 xdg-open，Windows 用 start）
+open workshop.html
+```
+
+打开 `workshop.html` 后无需起任何 Web 服务器：左侧按你的应用故事与领域切片自动组织章节，中间展示全量知识图谱（0 省略），右侧可切换“作者来源（`.ears` / `.yaml`）”与“生成代码（洋葱五层 TS/Scala + `@cloze` + 锁定测试）”，**点击任意代码行号还能反查回对应的 EARS 规则**。
+
+4. **后续 PRD 变更时的演进循环**：
+   以后改需求时不要盲改代码——直接修改 `truth/<context>/` 里的 `.ears` 或结构文件，重新执行 `compile-v2` → `generate-v2` → `emit-tests-v2` → `tasks-v2`：未受影响的模块零改动，只有规则哈希变化的 `@cloze` 槽位会被自动标脏为 `STALE`，让 Claude Code 精准重填并通过 `check-v2 --strict` 即可。
 
 **两条顺滑体验小贴士**
 
@@ -378,7 +414,7 @@ Agent 自动生成三张 **A/B 业务澄清卡**请业务负责人拍板。业�
 
 ### Step 5：全仓审计与对抗回归
 
-最后运行 `audit-coverage-v2` 与 `run-tck-v2`：56/56 文件全部纳入显式治理分区（0 灰区、0 架构越界），TA 外部适配器通过 8/8 混沌 TCK，变异体测试证实若有人在隔离区偷偷把 `UNKNOWN` 当成失败直接退款，锁定预言机将 100% 击杀该错误实现。
+最后运行 `audit-coverage-v2` 与 `run-tck-v2`：76/76 文件全部纳入显式治理分区（0 灰区、0 架构与洋葱 DIP 越界），`domain / application / interfaces` 全三层 6 TS + 6 Scala 实测套件通过，TA 外部适配器通过 8/8 混沌 TCK，变异体测试证实若有人在隔离区偷偷把 `UNKNOWN` 当成失败直接退款，锁定预言机将 100% 击杀该错误实现。
 
 ---
 
