@@ -37,10 +37,10 @@
       <p class="article-deck">从第一性原理出发，彻底告别双表达式引擎与有损 Lowering 层：确立“结构归 YAML、行为归 EARS”的正交唯一真源、SMT/Z3 硬编译闸门、EARS-Native Canonical Model v2，以及 L1 零 Token 生成与原隔离区锁定预言机 AI @cloze TDD 的双通道终局架构。</p>
       <div class="article-actions"><a href="/content/articles/co-arising-v2-ears-native-architecture-20261126.md" download="co-arising-v2-ears-native-architecture-20261126.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/co-arising-v2-ears-native-architecture-20261126/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
     </header>
-    <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是 co-arising 2.0 的长期架构设计蓝图（ADR）：除第 7 节标注的 v1 基线与 EARS 1.0/Z3/Hooks 原型外，Canonical Model v2、直连 EARS IR 的多语言代码生成与可执行预言机 TDD 闭环均属于规划中的目标架构，非当前已发货能力，正式进度以状态页为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是 co-arising 2.0 的架构设计蓝图（ADR），文末已追加 v2.0.0 GA 落地实况附录；关于已交付工具链、银行试点与上手命令的完整说明，请同步阅读《co-arising 2.0 GA 完整指南》并以状态页（F-32–F-34）为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
-        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 为什么在 v2 彻底告别「双表达式引擎 + Lowering 翻译层」？</a></li><li><a href="#section-2"><span class="toc-number">02</span> co-arising 2.0 全景架构流程图</a></li><li><a href="#section-3"><span class="toc-number">03</span> 正交唯一真源：结构归 YAML，行为归 EARS</a></li><li><a href="#section-4"><span class="toc-number">04</span> 数学验证硬闸门：未证毕，不产出 Canonical Model v2</a></li><li><a href="#section-5"><span class="toc-number">05</span> Canonical Model v2 原生设计：钉死三个核心语义契约</a></li><li><a href="#section-6"><span class="toc-number">06</span> 双通道落地：零 Token 脚手架（4A）vs 隔离区 AI TDD（4B）</a></li><li><a href="#section-7"><span class="toc-number">07</span> 与 v1 基线的诚实边界与分阶段演进路线</a></li><li><a href="#section-8"><span class="toc-number">08</span> 参考标准、学术出处与关联文档</a></li></ol></nav></details>
+        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 为什么在 v2 彻底告别「双表达式引擎 + Lowering 翻译层」？</a></li><li><a href="#section-2"><span class="toc-number">02</span> co-arising 2.0 全景架构流程图</a></li><li><a href="#section-3"><span class="toc-number">03</span> 正交唯一真源：结构归 YAML，行为归 EARS</a></li><li><a href="#section-4"><span class="toc-number">04</span> 数学验证硬闸门：未证毕，不产出 Canonical Model v2</a></li><li><a href="#section-5"><span class="toc-number">05</span> Canonical Model v2 原生设计：钉死三个核心语义契约</a></li><li><a href="#section-6"><span class="toc-number">06</span> 双通道落地：零 Token 脚手架（4A）vs 隔离区 AI TDD（4B）</a></li><li><a href="#section-7"><span class="toc-number">07</span> 与 v1 基线的诚实边界与分阶段演进路线</a></li><li><a href="#section-8"><span class="toc-number">08</span> 参考标准、学术出处与关联文档</a></li><li><a href="#section-9"><span class="toc-number">09</span> 附录：v2.0 GA 实现落地与 v2.1 全域治理更新（2026-11-26）</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">阅读全文</p>
         <div class="sidebar-community">
           <p class="sidebar-community-kicker">社区讨论</p>
@@ -499,7 +499,16 @@ rules:
 <li><a href="https://martinfowler.com/articles/harness-engineering.html">Harness Engineering for Coding Agent Users（Martin Fowler / Birgitta Böckeler）</a> —— 拓扑降维减熵与 Behaviour Harness 理论出处</li>
 <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code Best Practices</a> —— <code>PreToolUse</code> / <code>Stop</code> Hooks（<code>exit 2</code>）物理拦截与独立上下文盲审机制出处</li>
 <li><a href="https://github.com/co-arising/metarch-truthsrc"><code>co-arising/metarch-truthsrc</code></a> &amp; <a href="https://github.com/co-arising/bank-wealth-demo"><code>co-arising/bank-wealth-demo</code></a> —— 当前 v1 编译器与参考基准仓库</li>
-</ul></article>
+</ul>
+<hr>
+<h2 id="section-9">附录：v2.0 GA 实现落地与 v2.1 全域治理更新（2026-11-26）</h2>
+<p>本蓝图已于 <code>metarch-truthsrc</code>（<code>feat/co-arising-v2-ears-native</code>）与 <code>bank-wealth-demo</code>（<code>feat/co-arising-v2-pilot</code>）完成端到端落地并通过 P0–P2 全量发布门禁验证：</p>
+<ol>
+<li><strong>正交限界上下文真源目录</strong>：每个限界上下文按知识形态拆分为 <code>structures/</code>（静态名词 YAML）、<code>behaviors/domain/</code>（领域聚合 <code>.ears</code>）、<code>behaviors/application/</code>（用户故事 <code>*.story.ears</code> 与外部系统集成策略 <code>*.integration.ears</code>）以及 <code>bindings/</code>（解空间 S1 效果协议与禁止跨层依赖规则），由编译器路径-层级静态门禁（<code>V2_PATH_LAYER_MISMATCH</code>、<code>V2_LAYER_ACTION_VIOLATION</code>）与 4 项严格领域边界门禁物理守护。</li>
+<li><strong>双栈确定性闭环（TypeScript + Scala）</strong>：<code>compile-v2</code>（Z3 + First-Hit + 边界等式证人 + 应用层 <code>k</code>-step BMC + <code>.zh.ears</code> 双语等价检查 + Style E/B 投影）→ <code>generate-v2</code>（TS + Scala 领域层与应用层全对齐）→ <code>emit-tests-v2</code>（SHA-256 锁定预言机）→ <code>verify-v2 --strict</code>（跨平台防静默跳过门禁）。<code>bank-wealth-demo</code> 已实现 5 TS + 5 Scala 套件全量真实编译运行通过。</li>
+<li><strong>全域 100% 覆盖治理（v2.1）与多协议 S1 TCK</strong>：问题空间（D1/D2 → E1）与解空间（S1/S2/S3 → E2/E3/E4）零灰区分类（<code>bank-wealth-demo</code> 56/56 = 100%）；内置 <code>three-phase-reconcile</code>、<code>transactional-outbox</code>、<code>saga-compensation</code>、<code>idempotent-consumer</code> 四族 S1 故障注入 TCK（支持 Node ESM 与 Scala/JVM 执行器）。</li>
+<li><strong>开箱即用 DX 与编辑器生态</strong>：一等子命令 <code>truthsrc init-v2</code>、<code>truthsrc check-v2 --strict</code>、<code>truthsrc guard-write</code>、<code>truthsrc init-hooks</code>、<code>truthsrc lsp-ears</code> 及 <code>.ears</code> TextMate 语法高亮与 VS Code 插件脚手架。</li>
+</ol></article>
     </div>
     <aside class="article-community" aria-label="加入 Discord 社区">
       <div class="article-community-copy">
@@ -512,9 +521,9 @@ rules:
     <section id="related-reading" class="article-related" aria-labelledby="related-heading">
       <h2 id="related-heading">继续阅读</h2>
       <div class="article-card" lang="zh-CN">
-      <p class="article-meta"><span>设计规范</span> · <time datetime="2026-11-23">2026-11-23</time></p>
-      <h3><a href="/zh/articles/co-arising-ears-spec-20261123/">co-arising EARS 1.0 技术规格说明书（v1.2 双语对照版）</a></h3>
-      <p class="article-deck">受控 EARS 唯一真源 + SMT-LIB 2 单跳确定性验证的完整语言规范：双语同构文法、bank-wealth-demo 四类实战样例、只读投影与 BDD 测试锁定，作为待落地的设计基准。</p>
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-26">2026-11-26</time></p>
+      <h3><a href="/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">co-arising 2.0 GA 完整指南：核心特色、从 PRD 到跑起来的全流程与立刻上手（CLI + MCP + Skills）</a></h3>
+      <p class="article-deck">全面介绍 co-arising 2.0.0 GA 的六大特色与七步闭环：从一份非结构化 PRD 出发，串联 coarising-distill 技能、Z3 数学证明、TS/Scala 双栈生成、tasks-v2 派生队列、隔离区 @cloze TDD（MCP + Hooks + AGY Workflow）与 100% 覆盖审计，附 5 分钟立刻上手命令。</p>
       <p class="small">中文原文</p>
     </div>
       <p><a href="/zh/articles/">返回文章索引</a></p>

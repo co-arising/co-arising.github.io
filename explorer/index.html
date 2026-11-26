@@ -88,11 +88,12 @@
       <div class="sec-head"><span class="no">01</span><h2 id="xp-nodes-heading">Browse the nodes</h2></div>
       <p class="sec-sub">Search nodes by full ID or name, inspect their relationships, then follow verified author and code locations. Qualified aliases keep separate node IDs; matching names alone never establish identity.</p>
       <details id="graph-scopes">
-        <summary>Three graph representations, different scopes</summary>
+        <summary>Four graph representations, different scopes</summary>
         <dl>
           <dt>Canonical graphstore</dt><dd>The legacy declaration graph fallback: 389 nodes / 413 edges, captured 2026-11-11 (<a href="/status/#F-03">F-03</a>). This file alone does not provide code anchors. A published Graph / Code snapshot binds its own graph and project mappings under one manifest.</dd>
           <dt>Project knowledge/anchor graph</dt><dd>Knowledge and generated-location mappings from a matching project and output. Code queries require that project's identities, precision and freshness.</dd>
           <dt>Workshop project-view export</dt><dd>A browsing export that may be truncated: the 2026-11-06 snapshot contains 120 nodes / 183 edges from declared totals of 861 / 737 (<a href="/status/#F-17">F-17</a>), not a complete copy of either database.</dd>
+          <dt>co-arising 2.0.0 SQLite graph (<code>v2-pilot/.truthsrc/knowledge.sqlite</code>)</dt><dd>Compiled directly from orthogonal v2 structures/EARS/bindings: 58 nodes / 47 edges / 3 Channel 4B <code>@cloze</code> slots / 56 <code>file_coverage</code> rows (<a href="/status/#F-34" data-fact="F-34">F-34</a>). Queryable locally via <code>truthsrc tasks-v2</code> and MCP <code>v2_query_graph</code>; the browser workbench above remains bound to the v1 F-31 snapshot.</dd>
         </dl>
       </details>
       <div class="xp-filters">
@@ -188,6 +189,7 @@ ORDER BY n DESC;</textarea>
 : "${BANK:?Set BANK to your matched bank checkout absolute path}"
 cd "$BANK"
 node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out my-copy.sqlite</code></pre>
+      <p class="small">For the <strong>co-arising 2.0.0</strong> SQLite graph (<code>nodes</code>, <code>edges</code>, <code>cloze_slots</code>, <code>file_coverage</code>; <a href="/status/#F-34" data-fact="F-34">F-34</a>), run <code>npm run v2:compile &amp;&amp; npm run v2:audit-coverage</code> inside <code>bank-wealth-demo</code>, then inspect with <code>truthsrc tasks-v2 --root v2-pilot</code> or MCP <code>v2_query_graph</code>. See the <a href="/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">co-arising 2.0 GA Guide</a>.</p>
       <div class="callout"><b>DEGRADE GRACEFULLY</b><p>If the sqlite file fails to load (offline first visit, very old browser), the presets fall back to their documented expected answers so the page still teaches the query semantics.</p></div>
     </section>
   </main>

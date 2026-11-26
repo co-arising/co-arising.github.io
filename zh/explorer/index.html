@@ -88,11 +88,12 @@
       <div class="sec-head"><span class="no">01</span><h2 id="xp-nodes-heading">浏览真实节点</h2></div>
       <p class="sec-sub">按完整 ID 或名称浏览节点及关系，再打开经过核验的作者位置和生成代码。限定别名保留独立节点；不会仅凭同名认定同一身份。</p>
       <details id="graph-scopes">
-        <summary>三种图表示，各有范围</summary>
+        <summary>四种图表示，各有范围</summary>
         <dl>
           <dt>Canonical graphstore</dt><dd>旧声明图降级入口：2026-11-11 捕获，389 节点 / 413 边（<a href="/zh/status/#F-03">F-03</a>）。该文件单独不提供代码锚点；已发布的 Graph / Code 快照通过同一清单绑定它自己的图谱与项目映射。</dd>
           <dt>项目知识/回锚图</dt><dd>来自配套项目与生成输出的知识及代码位置映射；查询代码需要匹配的项目身份、精度和新鲜度。</dd>
           <dt>Workshop project-view 导出</dt><dd>供浏览的视图，可以截断：2026-11-06 快照从声明总量 861 节点 / 737 边中导出 120 节点 / 183 边（<a href="/zh/status/#F-17">F-17</a>），不是上述任一数据库的完整副本。</dd>
+          <dt>co-arising 2.0.0 SQLite 知识图谱（<code>v2-pilot/.truthsrc/knowledge.sqlite</code>）</dt><dd>由正交 v2 结构/EARS/绑定直接编译落盘：58 节点 / 47 边 / 3 个通道 4B <code>@cloze</code> 槽位 / 56 行 <code>file_coverage</code>（<a href="/zh/status/#F-34" data-fact="F-34">F-34</a>）；本地可通过 <code>truthsrc tasks-v2</code> 与 MCP <code>v2_query_graph</code> 查询。上方浏览器工作台仍绑定 v1 的 F-31 快照。</dd>
         </dl>
       </details>
       <div class="xp-filters">
@@ -188,6 +189,7 @@ ORDER BY n DESC;</textarea>
 : "${BANK:?Set BANK to your matched bank checkout absolute path}"
 cd "$BANK"
 node "$TRUTHSRC_CLI" graph --tree truth/bank-wealth --out my-copy.sqlite</code></pre>
+      <p class="small">如需本地重建与查询 <strong>co-arising 2.0.0</strong> SQLite 图谱（<code>nodes</code>、<code>edges</code>、<code>cloze_slots</code>、<code>file_coverage</code>；<a href="/zh/status/#F-34" data-fact="F-34">F-34</a>），可在 <code>bank-wealth-demo</code> 中运行 <code>npm run v2:compile &amp;&amp; npm run v2:audit-coverage</code>，再通过 <code>truthsrc tasks-v2 --root v2-pilot</code> 或 MCP <code>v2_query_graph</code> 查询。详见<a href="/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">co-arising 2.0 GA 完整指南</a>。</p>
       <div class="callout"><b>优雅降级</b><p>如果 sqlite 文件加载失败（首次访问离线、浏览器过旧），预设会回退到文档记录的期望答案，页面依然能教会你这些查询的语义。</p></div>
     </section>
   </main>

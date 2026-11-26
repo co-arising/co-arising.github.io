@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>co-arising 2.0 GA Complete Guide: Core Features, End-to-End PRD-to-Running Flow, and Quick Start (CLI + MCP + Skills) — co-arising</title>
+  <meta name="description" content="A complete guide to co-arising 2.0.0 GA: six core capabilities, the 7-step flow from a raw PRD to running TypeScript &amp; Scala code via coarising-distill, Z3 strict proofs, tasks-v2 derived queues, locked-oracle @cloze TDD (MCP + Hooks + AGY Workflow), and a 5-minute Quick Start." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="co-arising 2.0 GA Complete Guide: Core Features, End-to-End PRD-to-Running Flow, and Quick Start (CLI + MCP + Skills)" />
+  <meta property="og:description" content="A complete guide to co-arising 2.0.0 GA: six core capabilities, the 7-step flow from a raw PRD to running TypeScript &amp; Scala code via coarising-distill, Z3 strict proofs, tasks-v2 derived queues, locked-oracle @cloze TDD (MCP + Hooks + AGY Workflow), and a 5-minute Quick Start." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Engineering practice</span></nav>
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-26">2026-11-26</time> · English translation</p>
+      <h1>co-arising 2.0 GA Complete Guide: Core Features, End-to-End PRD-to-Running Flow, and Quick Start (CLI + MCP + Skills)</h1>
+      <p class="article-deck">A complete guide to co-arising 2.0.0 GA: six core capabilities, the 7-step flow from a raw PRD to running TypeScript &amp; Scala code via coarising-distill, Z3 strict proofs, tasks-v2 derived queues, locked-oracle @cloze TDD (MCP + Hooks + AGY Workflow), and a 5-minute Quick Start.</p>
+      <div class="article-actions"><a href="/content/articles/co-arising-v2-ga-prd-to-running-guide-20261126.en.md" download="co-arising-v2-ga-prd-to-running-guide-20261126.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">中文原文</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p>This guide reflects the shipped @madpolaris/truthsrc v2.0.0 and bank-wealth-demo v2-pilot source and verification runs; v2 pilot evidence (F-32–F-34) is tracked separately from the 2026-11-12 v1 full-service acceptance run (F-24–F-28) on the status page.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol><li><a href="#section-1"><span class="toc-number">01</span> 1. Why co-arising 2.0: Six Core Capabilities</a></li><li><a href="#section-2"><span class="toc-number">02</span> 2. From a Raw PRD to Running Verified Code: The 7-Step End-to-End Flow</a></li><li><a href="#section-3"><span class="toc-number">03</span> 3. Quick Start: Run Your First co-arising 2.0 Project in 5 Minutes</a></li><li><a href="#section-4"><span class="toc-number">04</span> 4. Wiring AI Agents: CLI + MCP + Skills + Hooks + Workflow Setup</a></li><li><a href="#section-5"><span class="toc-number">05</span> 5. Worked Walkthrough: From a One-Page PRD to Verified TS &amp; Scala Code</a></li><li><a href="#section-6"><span class="toc-number">06</span> 6. Relationship with v1 and Honest Evidence Boundaries</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">Community</p>
+          <p>Have questions or feedback on this article? Join the discussion on Discord.</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a>
+        </div>
+      </aside>
+      <article id="article-body" class="article-body"><p><strong>Published: 2026-11-26</strong> · Release scope: <code>@madpolaris/truthsrc</code> <code>v2.0.0</code> · <code>bank-wealth-demo</code> <code>v2.0.0</code> (the original v1 baseline is preserved as tag <code>v1.0.0-baseline</code>)</p>
+<p>If you have an unstructured product requirements document (PRD) and want AI agents to turn it into a <strong>mathematically unambiguous, drift-proof, architecturally sound, and running TypeScript + Scala system</strong>, this guide walks you through the entire co-arising 2.0.0 loop.</p>
+<p>With co-arising 2.0.0 GA, the toolchain moves beyond v1's model graph and scaffold generation into a full closed loop: <strong>PRD distillation → EARS-native single behavior truth → Z3 compile-time mathematical proof → dual-channel deterministic codegen &amp; locked-oracle AI <code>@cloze</code> TDD → 100% full-coverage governance and chaos TCK</strong>. This guide covers:</p>
+<ol>
+<li>The six core capabilities of co-arising 2.0;</li>
+<li>The 7-step end-to-end flow from a raw PRD to running verified code;</li>
+<li>A 5-minute Quick Start (<code>init-v2</code> → <code>check-v2 --strict</code> → <code>tasks-v2</code>);</li>
+<li>Wiring <strong>CLI + MCP + Skills + Hooks + Workflow + LSP</strong> into Antigravity (AGY) and Claude Code;</li>
+<li>A worked walkthrough from a one-page PRD to green TypeScript &amp; Scala suites.</li>
+</ol>
+<hr>
+<h2 id="section-1">1. Why co-arising 2.0: Six Core Capabilities</h2>
+<p>In the era of AI coding, the bottleneck is no longer typing speed—it is <strong>specification ambiguity, context rot, architectural erosion, and un-auditable black-box edits</strong>. co-arising 2.0 redesigns the compilation and agent-collaboration trunk around those four failure modes:</p>
+<h3 id="section-1-1">1. Orthogonal Single Source of Truth: Structure, Behavior, and Bindings Separated</h3>
+<p>v2 retires dual expression engines and lossy lowering layers in favor of four strictly orthogonal directories:</p>
+<ul>
+<li><strong><code>structures/*.yaml</code></strong>: Pure static types, nominal value objects (<code>Money</code>, <code>AccountId</code>), aggregate state fields, and command/event/error definitions—<strong>no embedded behavioral expressions</strong>;</li>
+<li><strong><code>behaviors/domain/*.ears</code></strong>: Pure domain rules and state folds (<code>slice</code> + <code>post:</code>) authored in controlled EARS 1.0 (with bilingual <code>.zh.ears</code> semantic-drift gating);</li>
+<li><strong><code>behaviors/application/*.story.ears</code> and <code>*.integration.ears</code></strong>: Application-layer use-case orchestration and external system integration specs declaring state transitions, port calls, <code>WHEN event</code> reactions, and <code>within &lt;dur&gt;</code> timing bounds;</li>
+<li><strong><code>bindings/*.yaml</code></strong>: Technical port and external effect bindings (<code>transactional-outbox</code>, <code>saga-compensation</code>, <code>idempotent-consumer</code>), decoupling infrastructure mechanics from business truth.</li>
+</ul>
+<h3 id="section-1-2">2. Four Domain-Boundary Gates + Path-to-Layer Physical Isolation</h3>
+<p>The v2 compiler enforces a <strong>Path-to-Layer gate</strong> alongside <strong>four domain-boundary anti-regression gates</strong>: files under <code>behaviors/domain/</code> cannot declare <code>layer: application</code> or leak database, HTTP, queue, retry, or distributed-lock terms; conversely, application specs (<code>*.story.ears</code> / <code>*.integration.ears</code>) cannot mutate aggregate internals directly. Violations fail at compile time with exact <code>file:line:col</code> caret diagnostics and actionable remediation hints.</p>
+<h3 id="section-1-3">3. Z3 SMT Compile-Time Hard Gate (<code>--strict</code>, Zero Silent Skip)</h3>
+<p>Before a single line of implementation code is written, <code>compile-v2 --strict</code> translates EARS rules, First-Hit priority ordering, quantifiers and aggregations (<code>forall</code> / <code>exists</code> / <code>sum</code> / <code>count</code> / <code>len</code>), optional predicates (<code>is some</code> / <code>is none</code>), time windows (<code>within</code>), and application-layer <code>k</code>-step bounded model checking (BMC) directly into SMT-LIB2 for Z3:</p>
+<ul>
+<li>Automatically detects <strong>contradictions</strong>, <strong>dead rules shadowed by earlier rules</strong>, <strong>uncovered input gaps</strong>, and <strong>unreachable terminal states</strong>;</li>
+<li>Under <code>--strict</code>, a missing Z3 binary never silently skips proof—it hard-fails with <code>V2_SOLVER_MISSING</code>;</li>
+<li>Passing specs emit concrete <strong>boundary witnesses</strong> that seed downstream test oracles.</li>
+</ul>
+<h3 id="section-1-4">4. Dual-Channel Delivery: Zero-Token Codegen × Locked-Oracle AI <code>@cloze</code> TDD</h3>
+<p>co-arising 2.0 splits delivery into two orthogonal channels with <strong>TypeScript and Scala parity</strong>:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Channel / Scope / Generation Strategy / Verification &amp; Locking"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Channel</th>
+<th style="text-align: left;" scope="col">Scope</th>
+<th style="text-align: left;" scope="col">Generation Strategy</th>
+<th style="text-align: left;" scope="col">Verification &amp; Locking</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Channel 4A (L1)</strong></td>
+<td style="text-align: left;">Deterministic pure domain rules (e.g., balance reserve, quota reserve)</td>
+<td style="text-align: left;"><strong>Zero-token deterministic compilation</strong> emits complete production code + unit tests</td>
+<td style="text-align: left;">Compiler guarantees isomorphism between spec and code; zero AI hand-writing</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Channel 4B (L2 / L3)</strong></td>
+<td style="text-align: left;">Complex domain calculations (L2) and cross-port application orchestration (L3)</td>
+<td style="text-align: left;">Compiler emits <strong>Port interfaces</strong>, fenced <code>@coarising:cloze-start/end</code> skeletons, and <strong>SHA-256 locked test oracles</strong> (Vitest / ScalaTest)</td>
+<td style="text-align: left;">AI agents edit strictly inside <code>@cloze</code> fences until all locked oracles pass, followed by independent blind review</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-1-5">5. 100% Full-Coverage Zero-Gray-Zone Governance &amp; Chaos TCK</h3>
+<p>Most spec-driven approaches govern only 30% of core logic while leaving 70% of glue code, adapters, and scripts in an ungoverned gray zone. v2 introduces a complete ledger separating <strong>Problem Space (D1/D2 → E1)</strong> from <strong>Solution Space (S1/S2/S3 → E2/E3/E4)</strong>:</p>
+<ul>
+<li><strong><code>audit-coverage-v2</code></strong> requires <strong>100% of repository files</strong> (<strong>56 / 56</strong> in the <code>bank-wealth-demo</code> pilot) to carry explicit governance ownership with zero unclassified files and zero architectural violations;</li>
+<li>For S1 infrastructure adapters, the toolchain ships <strong>4 chaos TCK suites</strong> (generic effect idempotency, <code>transactional-outbox</code>, <code>saga-compensation</code>, <code>idempotent-consumer</code>) with both <strong>TypeScript and Scala/JVM runners</strong> to test duplicate deliveries, reordering, and partial-failure crashes.</li>
+</ul>
+<h3 id="section-1-6">6. The Last-Mile Kit: Derived Queue + MCP + Cross-Platform Skills + Hooks + LSP</h3>
+<p>To make the loop practical in everyday engineering, 2.0.0 ships the complete last-mile workflow:</p>
+<ul>
+<li><strong><code>tasks-v2</code> derived task queue</strong>: Instead of drifting manual <code>TODO.md</code> files, task states (<code>PENDING</code>, <code>STALE_SPEC_CHANGED</code>, <code>GREEN_NEEDS_REVIEW</code>, <code>DONE</code>) are derived deterministically from <code>canonical-v2.json</code> hashes and SQLite verification provenance;</li>
+<li><strong>31 MCP tools</strong>: Adds 5 v2 tools (<code>v2_compile</code>, <code>v2_query_graph</code>, <code>v2_tasks</code>, <code>v2_context_pack</code>, <code>v2_verify</code>) alongside the 26 v1 graph tools;</li>
+<li><strong>Cross-platform Skills</strong>: Ships <code>coarising-distill</code> (PRD → truth source) and <code>coarising-cloze-worker</code> (isolated <code>@cloze</code> TDD worker) for both Antigravity and Claude Code;</li>
+<li><strong>Physical write-guard Hooks + Parallel Workflow + LSP</strong>: One-command Claude Code <code>PreToolUse</code>/<code>Stop</code> hook installation, AGY <code>workflows/coarising_cloze_pipeline.py</code> parallel fan-out template, and zero-dependency <code>truthsrc lsp-ears</code> + VS Code TextMate extension.</li>
+</ul>
+<hr>
+<h2 id="section-2">2. From a Raw PRD to Running Verified Code: The 7-Step End-to-End Flow</h2>
+<p>The table below traces a requirement from an unstructured document to green dual-stack suites:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Stage / Actor &amp; Tooling / Inputs / Deterministic Outputs &amp; Gates"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">Stage</th>
+<th style="text-align: left;" scope="col">Actor &amp; Tooling</th>
+<th style="text-align: left;" scope="col">Inputs</th>
+<th style="text-align: left;" scope="col">Deterministic Outputs &amp; Gates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Step 1 · Distillation</strong></td>
+<td style="text-align: left;">Human + AI (<code>coarising-distill</code> Skill + MCP <code>v2_compile</code>)</td>
+<td style="text-align: left;">Raw PRD / stakeholder notes</td>
+<td style="text-align: left;"><code>structures/*.yaml</code>, <code>behaviors/{domain,application}/*.ears</code>, <code>bindings/*.yaml</code> + Z3-backed A/B Clarification Cards + Style E/B business signoff projections</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Step 2 · Proof &amp; Graph</strong></td>
+<td style="text-align: left;"><code>truthsrc compile-v2 --strict</code></td>
+<td style="text-align: left;">Orthogonal truth directories</td>
+<td style="text-align: left;"><code>canonical-v2.json</code>, Z3 boundary witnesses, <code>.truthsrc/knowledge.sqlite</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Step 3 · Code &amp; Oracles</strong></td>
+<td style="text-align: left;"><code>truthsrc generate-v2</code> + <code>emit-tests-v2</code></td>
+<td style="text-align: left;"><code>canonical-v2.json</code></td>
+<td style="text-align: left;">L1 zero-token implementations; L2/L3 Ports + <code>@cloze</code> skeletons + <code>locked-tests.sha256.json</code> oracles</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Step 4 · Derived Queue</strong></td>
+<td style="text-align: left;"><code>truthsrc tasks-v2</code> / MCP <code>v2_tasks</code></td>
+<td style="text-align: left;"><code>canonical-v2.json</code> + SQLite</td>
+<td style="text-align: left;">Live task queue with automatic <code>STALE_SPEC_CHANGED</code> dirty invalidation</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Step 5 · Cloze TDD</strong></td>
+<td style="text-align: left;">AI (<code>coarising-cloze-worker</code> / AGY <code>run_workflow</code>) + <code>guard-write</code></td>
+<td style="text-align: left;"><code>v2_context_pack</code> minimal slice</td>
+<td style="text-align: left;">Edits strictly inside <code>@cloze</code> fences; <code>verify-v2 --strict</code> passes all locked TS + Scala tests</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Step 6 · Blind Review &amp; Audit</strong></td>
+<td style="text-align: left;">Read-only blind reviewer + <code>audit-coverage-v2</code> + <code>run-tck-v2</code></td>
+<td style="text-align: left;">EARS spec + slot Diff + adapter</td>
+<td style="text-align: left;"><code>tasks-v2 --record-review</code> marks <code>DONE</code>; 100% file coverage and S1 chaos TCK pass</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Step 7 · Continuous CI</strong></td>
+<td style="text-align: left;"><code>truthsrc check-v2 --strict</code> + GitHub Actions</td>
+<td style="text-align: left;">Any spec or code PR</td>
+<td style="text-align: left;">Single command chaining compile, proof, codegen, tamper checks, dual-stack tests, and coverage</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-2-1">Why Never Track Spec-to-Code Tasks in a Manual Markdown Checklist?</h3>
+<p>Whenever an upstream PRD changes and a single EARS threshold is edited, manual checklists routinely miss which previously implemented handwritten files are now stale. In co-arising 2.0, every behavior unit carries a <code>behaviorSha256</code> into compilation, and every passing <code>verify-v2</code> run persists provenance in <code>.truthsrc/knowledge.sqlite</code>. Changing even one number in an <code>.ears</code> file immediately flips only the affected slot to <strong><code>STALE_SPEC_CHANGED</code></strong>, allowing agents to surgically re-implement just what drifted while leaving untouched slots <code>DONE</code>.</p>
+<hr>
+<h2 id="section-3">3. Quick Start: Run Your First co-arising 2.0 Project in 5 Minutes</h2>
+<h3 id="section-3-1">1. Prerequisites</h3>
+<ul>
+<li><strong>Required</strong>: Node.js <strong>≥ 22.13.0</strong> (built-in <code>node:sqlite</code>, <strong>0 npm runtime dependencies</strong>) and the <strong>Z3 SMT solver</strong> (required under <code>--strict</code>);</li>
+<li><strong>Optional (for Scala dual-stack tests and JVM TCK)</strong>: JDK 11+ and <code>sbt</code>.</li>
+</ul>
+<pre class="code"><code class="language-bash"># macOS example (on Linux: apt install z3 or install an official Z3 release)
+brew install node@22 z3
+node --version   # must be &gt;= v22.13.0
+z3 --version     # confirm z3 is on PATH
+</code></pre>
+<h3 id="section-3-2">2. Clone the Toolchain and Scaffold a Minimal v2 Project (<code>init-v2</code>)</h3>
+<pre class="code"><code class="language-bash">export COARISING_WS="$PWD"
+git clone https://github.com/co-arising/metarch-truthsrc.git
+export TRUTHSRC_CLI="$COARISING_WS/metarch-truthsrc/bin/truthsrc.js"
+
+# Confirm version (prints 2.0.0)
+node "$TRUTHSRC_CLI" --version
+
+# Scaffold a ready-to-run v2 project (orthogonal truth, bindings, and coverage-manifest)
+node "$TRUTHSRC_CLI" init-v2 my-v2-app --format human
+cd my-v2-app
+
+# Run the full v2 gate: Z3 strict proof + code/oracle gen + SHA-256 tamper check + live tests + coverage audit
+node "$TRUTHSRC_CLI" check-v2 --root . --strict --format human
+
+# Inspect the derived task queue backed by canonical-v2.json and SQLite
+node "$TRUTHSRC_CLI" tasks-v2 --root . --format human
+</code></pre>
+<p>In three commands, you have verified:</p>
+<ol>
+<li>Orthogonal parsing and domain-boundary checks over <code>structures/</code>, <code>behaviors/</code>, and <code>bindings/</code>;</li>
+<li>Strict Z3 SMT contradiction, dead-rule, and gap proofs;</li>
+<li>TypeScript (and Scala when <code>--target typescript,scala</code> is passed) codegen plus SHA-256 locked test oracles;</li>
+<li>SQLite knowledge-graph persistence and derived <code>tasks-v2</code> queue computation.</li>
+</ol>
+<h3 id="section-3-3">3. Run the Real <code>bank-wealth-demo</code> v2.0.0 Pilot</h3>
+<p>To explore a full banking pilot featuring <strong>3 domain slices (L1 + L2) + 2 application stories (<code>*.story.ears</code> / <code>*.integration.ears</code>) + TS &amp; Scala live suites + S1 chaos TCK + mutation kills</strong>, run <code>bank-wealth-demo</code>:</p>
+<pre class="code"><code class="language-bash">cd "$COARISING_WS"
+git clone https://github.com/co-arising/bank-wealth-demo.git
+cd bank-wealth-demo
+
+# 1. Confirm the frozen v1 truth tree remains 100% intact (160 YAML atoms)
+npm run validate
+
+# 2. Run the v2 pilot: compile + Z3 proof + dual-stack (5 TS + 5 Scala suites) tamper-checked execution
+npm run v2:compile
+npm run v2:verify
+
+# 3. 100% full-coverage governance audit (56 / 56 files, 0 gray zone, 0 arch violations)
+npm run v2:audit-coverage
+
+# 4. S1 chaos TCK (8 / 8) and end-to-end mutation-kill suite (5 / 5)
+npm run v2:tck
+npm run test:v2
+
+# 5. Inspect the derived task queue for v2-pilot
+node "$TRUTHSRC_CLI" tasks-v2 --root v2-pilot --format human
+</code></pre>
+<hr>
+<h2 id="section-4">4. Wiring AI Agents: CLI + MCP + Skills + Hooks + Workflow Setup</h2>
+<p>co-arising 2.0 gives <strong>Antigravity (AGY)</strong> and <strong>Claude Code</strong> a clean separation of concerns: <strong>MCP handles deterministic reads, compilation, and verification; Skills encode engineering discipline; Hooks and Workflows enforce physical write boundaries and parallel orchestration</strong>.</p>
+<h3 id="section-4-1">1. Register <code>truthsrc mcp</code> (31 Tools: 26 v1 + 5 v2)</h3>
+<p>In Claude Code:</p>
+<pre class="code"><code class="language-bash">claude mcp add truthsrc -- node /absolute/path/to/metarch-truthsrc/bin/truthsrc.js mcp
+</code></pre>
+<p>Or in Antigravity / standard MCP client configuration:</p>
+<pre class="code"><code class="language-json">{
+  "mcpServers": {
+    "truthsrc": {
+      "command": "node",
+      "args": ["/absolute/path/to/metarch-truthsrc/bin/truthsrc.js", "mcp"]
+    }
+  }
+}
+</code></pre>
+<p>The five v2 MCP tools:</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：MCP Tool / Responsibility / Typical Usage"><table>
+<thead>
+<tr>
+<th style="text-align: left;" scope="col">MCP Tool</th>
+<th style="text-align: left;" scope="col">Responsibility</th>
+<th style="text-align: left;" scope="col">Typical Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><code>v2_compile</code></strong></td>
+<td style="text-align: left;">Compiles orthogonal truth, runs strict Z3 proofs (<code>strict: true</code>), persists <code>canonical-v2.json</code> &amp; <code>knowledge.sqlite</code></td>
+<td style="text-align: left;">Iterative ambiguity checks during PRD distillation</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>v2_query_graph</code></strong></td>
+<td style="text-align: left;">Queries v2 SQLite graph (<code>overview</code>, <code>cloze_slots</code>, <code>coverage</code>, <code>node</code>, <code>edges</code>)</td>
+<td style="text-align: left;">Blast-radius checks, slot discovery, coverage inspection</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>v2_tasks</code></strong></td>
+<td style="text-align: left;">Derives live L1 / <code>@cloze</code> task queue with <code>STALE_SPEC_CHANGED</code> invalidation</td>
+<td style="text-align: left;">Deciding which slots to implement or re-verify next</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>v2_context_pack</code></strong></td>
+<td style="text-align: left;">Builds a minimal isolated context pack for one <code>slotId</code> (relevant EARS rules, types, Port signatures, fence lines, locked oracle paths)</td>
+<td style="text-align: left;">Sole context input for a Cloze TDD worker, preventing prompt bloat</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>v2_verify</code></strong></td>
+<td style="text-align: left;">Verifies locked-test SHA-256 hashes, runs TS/Scala suites, and records provenance in SQLite</td>
+<td style="text-align: left;">Mandatory verification gate after every edit</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-4-2">2. Install Cross-Platform Skills (Distillation + Cloze Worker)</h3>
+<p>The toolchain ships two open-format skills under <code>skills/</code> ready for <code>.claude/skills/</code> (Claude Code) or your Antigravity skills directory:</p>
+<pre class="code"><code class="language-bash"># Example project-local install for Claude Code
+mkdir -p .claude/skills
+cp -r /absolute/path/to/metarch-truthsrc/skills/coarising_distill .claude/skills/
+cp -r /absolute/path/to/metarch-truthsrc/skills/coarising_cloze_worker .claude/skills/
+</code></pre>
+<ul>
+<li><strong><code>coarising-distill</code></strong>: Activated when turning a PRD into truth source. Follows a strict loop—inventory entities &amp; invariants → author orthogonal files → call <code>v2_compile</code> to let Z3 surface gaps/conflicts → issue A/B Clarification Cards → export readable signoff projections—never jumping straight into code;</li>
+<li><strong><code>coarising-cloze-worker</code></strong>: Activated when implementing a <code>@cloze</code> slot. Fetches the minimal <code>v2_context_pack</code>, edits only inside <code>@coarising:cloze-start</code> / <code>@coarising:cloze-end</code>, proves green via <code>v2_verify</code> (strict), and hands off for independent blind review.</li>
+</ul>
+<h3 id="section-4-3">3. One-Command Physical Write-Guard Hooks (Claude Code)</h3>
+<p>Prompt reminders alone cannot stop an agent from editing locked tests or generated code. Install deterministic physical fences in one command:</p>
+<pre class="code"><code class="language-bash">node "$TRUTHSRC_CLI" init-hooks --root . --format human
+</code></pre>
+<p>This writes <code>.claude/settings.json</code> with two hard hooks:</p>
+<ol>
+<li><strong><code>PreToolUse</code> (<code>Edit|Write|MultiEdit</code>)</strong>: Invokes <code>truthsrc guard-write</code> to <strong>physically block</strong> writes to <code>generated/</code>, <code>generated-tests/</code>, <code>locked-tests.sha256.json</code>, or any line outside the active <code>@cloze</code> fence;</li>
+<li><strong><code>Stop</code> hook</strong>: Runs <code>truthsrc verify-v2 --strict</code> before the agent may finish, blocking completion if any oracle fails or a locked hash drifts.</li>
+</ol>
+<h3 id="section-4-4">4. Parallel Multi-Slot Orchestration in Antigravity (<code>run_workflow</code>)</h3>
+<p>When a spec update opens multiple independent <code>@cloze</code> slots (e.g., <code>cash-fund-purchase</code>, <code>fund-order-confirm-tashares</code>, and <code>ta-bridge-settlement</code>), run the bundled workflow template <code>workflows/coarising_cloze_pipeline.py</code>:</p>
+<ol>
+<li>Phase 1 invokes <code>v2_compile</code> and <code>v2_tasks</code> to discover all <code>PENDING</code> / <code>STALE_SPEC_CHANGED</code> slots;</li>
+<li>Phase 2 fans out independent <code>coarising-cloze-worker</code> subagents via <code>parallel(...)</code> for isolated TDD implementation;</li>
+<li>Phase 3 dispatches a <strong>fresh, read-only blind reviewer subagent</strong> per green slot comparing only the EARS spec and slot diff, then records approval with <code>tasks-v2 --record-review</code>.</li>
+</ol>
+<h3 id="section-4-5">5. Editor Support: VS Code TextMate Grammar &amp; Zero-Dependency LSP</h3>
+<ul>
+<li>Syntax highlighting lives in <code>metarch-truthsrc/editor/ears-vscode/</code>, covering <code>.ears</code>, <code>.zh.ears</code>, <code>.story.ears</code>, and <code>.integration.ears</code>;</li>
+<li>Start the zero-dependency stdio language server via <code>node "$TRUTHSRC_CLI" lsp-ears</code> for live parse diagnostics, symbol outlines, and hover help.</li>
+</ul>
+<hr>
+<h2 id="section-5">5. Worked Walkthrough: From a One-Page PRD to Verified TS &amp; Scala Code</h2>
+<p>Here is how every piece fits together on a concise banking purchase story:</p>
+<h3 id="section-5-1">Step 1: Raw PRD Excerpt (Full of Hidden Ambiguity)</h3>
+<blockquote>
+<p>"When a customer purchases a fund, check available balance and reserve funds; then submit the purchase order to the external Transfer Agent (TA). If TA confirms, finalize reserved funds and confirm shares; if TA rejects, trigger an independent refund flow."</p>
+</blockquote>
+<h3 id="section-5-2">Step 2: <code>coarising-distill</code> + Z3 Catch Three Unspoken Edge Cases</h3>
+<p>The agent splits the requirement cleanly into:</p>
+<ul>
+<li><code>structures/bankwealth.yaml</code>: <code>AccountId</code>, <code>Money(amount, currency)</code>, <code>CreditBalance</code> state, and <code>ReserveFunds</code> command/events;</li>
+<li><code>behaviors/domain/credit-balance-reserve.ears</code> (L1 domain slice): currency match, positive amount, sufficient balance guards, and <code>post:</code> reservation folds;</li>
+<li><code>behaviors/application/cash-fund-purchase.story.ears</code> (L3 application orchestration): reserve → TA submit → confirm/reject choreography.</li>
+</ul>
+<p>Calling MCP <strong><code>v2_compile</code> (<code>strict: true</code>)</strong> immediately lets Z3 surface three gaps the PRD omitted:</p>
+<ol>
+<li><strong>Is <code>amount == 0</code> accepted or rejected?</strong> (Z3 reports an uncovered gap at zero);</li>
+<li><strong>Does retrying the same <code>requestId</code> reject or succeed idempotently?</strong>;</li>
+<li><strong>If the TA channel times out with <code>UNKNOWN</code>, may the workflow refund immediately?</strong> (Application BMC flags the missing <code>UNKNOWN</code> branch).</li>
+</ol>
+<p>The agent presents three concise <strong>A/B Clarification Cards</strong>. Stakeholders decide: amount must be strictly <code>&gt; 0</code>; matching <code>requestId</code> + matching amount is idempotent while mismatched amount rejects as a conflict; and <code>UNKNOWN</code> must <strong>never</strong> trigger blind refund—it enters an explicit reconciliation hold state.</p>
+<h3 id="section-5-3">Step 3: Business Signoff &amp; Deterministic Generation (<code>compile-v2</code> + <code>generate-v2</code> + <code>emit-tests-v2</code>)</h3>
+<p>Once updated, <code>v2_compile</code> proves <strong>0 conflicts, 0 dead rules, and 0 gaps</strong>, exporting Style E/B read-only signoff tables for product and compliance review. Then:</p>
+<ul>
+<li><strong>L1 slice <code>credit-balance-reserve.ears</code></strong> compiles via Channel 4A with <strong>zero tokens</strong> into complete TypeScript and Scala implementations plus unit tests;</li>
+<li><strong>L3 story <code>cash-fund-purchase.story.ears</code></strong> emits via Channel 4B the <code>CashFundPurchasePort</code> interface, fenced <code>cash-fund-purchase.cloze.ts</code> and <code>CashFundPurchaseCloze.scala</code> skeletons, and SHA-256 locked oracle suites (<code>locked-tests.sha256.json</code>) including an explicit adversary test forbidding blind refund on <code>UNKNOWN</code>.</li>
+</ul>
+<h3 id="section-5-4">Step 4: <code>tasks-v2</code> Dispatch &amp; Isolated Cloze TDD</h3>
+<p><code>v2_tasks</code> reports:</p>
+<ul>
+<li><code>CreditBalance.ReserveFunds</code>: L1 <code>DONE</code> (zero hand-written code);</li>
+<li><code>cash-fund-purchase</code>: L3 <code>PENDING</code>.</li>
+</ul>
+<p>Running <code>coarising-cloze-worker</code> (or AGY <code>run_workflow</code>):</p>
+<ol>
+<li>Calls <code>v2_context_pack(slotId="cash-fund-purchase")</code> to load only the bounded EARS rules, Port types, and fence lines;</li>
+<li>Edits strictly inside the <code>@cloze</code> fence under <code>PreToolUse</code> <code>guard-write</code> protection;</li>
+<li>Calls <code>v2_verify(strict=true)</code>: locked SHA-256 hashes verify, both TS Vitest and Scala ScalaTest pass, SQLite records provenance, and the slot moves to <code>GREEN_NEEDS_REVIEW</code>;</li>
+<li>An independent blind reviewer checks the EARS rules against the diff and signs off via <code>tasks-v2 --record-review --slot cash-fund-purchase --status APPROVED</code>, transitioning the slot to <strong><code>DONE</code></strong>.</li>
+</ol>
+<h3 id="section-5-5">Step 5: Full-Coverage Audit &amp; Adversary Verification</h3>
+<p>Finally, <code>audit-coverage-v2</code> and <code>run-tck-v2</code> confirm 56/56 governed files (0 gray zone, 0 architecture violations), 8/8 S1 chaos TCK passes on the TA adapter, and mutation tests prove that any mutant attempting blind refund on <code>UNKNOWN</code> is immediately killed by the locked oracles.</p>
+<hr>
+<h2 id="section-6">6. Relationship with v1 and Honest Evidence Boundaries</h2>
+<ul>
+<li><strong>Coexistence without breaking changes</strong>: The original v1 architecture and frozen 160-atom <code>bank-wealth-demo</code> truth tree remain intact and tagged as <strong><code>v1.0.0-baseline</code></strong>. Inside <code>metarch-truthsrc</code> <code>v2.0.0</code>, every v1 command (<code>validate</code>, <code>roundtrip</code>, <code>graph</code>, <code>generate-project</code>, <code>verify-project</code>) and all 26 v1 MCP tools continue to work unchanged.</li>
+<li><strong>Explicit evidence scope</strong>: The <code>bank-wealth-demo</code> v2 pilot (<a href="/status/#F-33">Status F-33</a>) verifies orthogonal EARS compilation, strict Z3 proofs, live TS + Scala dual-stack execution, 100% file-coverage auditing, S1 chaos TCK, and mutation kills. It <strong>does not replace</strong> the separate 2026-11-12 v1 full-service multi-JVM recovery run (<a href="/status/#F-24">F-24</a>–<a href="/status/#F-28">F-28</a>). All quantitative claims and reproduction commands remain tracked on the <a href="/status/#F-32">Status &amp; Ledger page</a>.</li>
+<li><strong>Further reading</strong>:<ul>
+<li><a href="/articles/co-arising-v2-ears-native-architecture-20261126/">co-arising 2.0 Long-Term Architecture Blueprint (ADR)</a></li>
+<li><a href="/guide/">Hands-on Guide (v1 Counter &amp; v2 Quick Entry)</a></li>
+<li><a href="/explorer/">Knowledge-Graph Explorer</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="section-6-1">Source &amp; Reference Links</h3>
+<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc">metarch-truthsrc Repository (v2.0.0)</a></li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/knowledge_base/guides/co_arising_v2_quickstart.md">co-arising v2 Quickstart Guide</a></li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/knowledge_base/reference/ears_v2_grammar_reference.md">EARS v2 Grammar Reference</a></li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/knowledge_base/reference/v2_diagnostics_error_codes.md">v2 Diagnostics &amp; Error Codes</a></li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/knowledge_base/releases/v2_0_0_release_notes.md">v2.0.0 Release Notes</a></li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/skills/coarising_distill/SKILL.md">coarising-distill Skill (PRD Distillation)</a></li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/skills/coarising_cloze_worker/SKILL.md">coarising-cloze-worker Skill (Isolated Cloze TDD)</a></li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/workflows/coarising_cloze_pipeline.py">Antigravity Parallel Workflow Pipeline</a></li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/tree/main/editor/ears-vscode">VS Code EARS TextMate Grammar</a></li>
+<li><a href="https://github.com/co-arising/bank-wealth-demo">bank-wealth-demo Repository (v2-pilot + frozen v1)</a></li>
+<li><a href="https://github.com/Z3Prover/z3">Z3 Theorem Prover (SMT Solver)</a></li>
+<li><a href="https://modelcontextprotocol.io/">Model Context Protocol (MCP) Specification</a></li>
+</ul></article>
+    </div>
+    <aside class="article-community" aria-label="Join the Discord community">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord Community</p>
+        <p class="article-community-title">Want to discuss this further or share feedback?</p>
+        <p>Join the co-arising Discord community to talk DDD, EARS/SMT verification, and deterministic code generation with the maintainers and peers.</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">Join the Discord community <span aria-hidden="true">↗</span></a>
+    </aside>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Design specification</span> · <time datetime="2026-11-26">2026-11-26</time></p>
+      <h3><a href="/articles/co-arising-v2-ears-native-architecture-20261126/">co-arising 2.0 Long-Term Architecture Blueprint: An EARS-Native Compilation Trunk and Locked Cloze TDD Loop</a></h3>
+      <p class="article-deck">A first-principles v2 architecture retiring dual expression engines and lossy lowering bridges: orthogonal YAML structure plus EARS 1.0 behavior truth, an SMT/Z3 hard compilation gate, EARS-Native Canonical Model v2, and dual-channel delivery uniting L1 zero-token codegen with locked-oracle AI @cloze TDD.</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

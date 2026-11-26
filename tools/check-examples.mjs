@@ -11,7 +11,7 @@ const ROUTES = ['', 'why-co-arising/', 'guide/', 'dsl/', 'pipeline/', 'bank-demo
 export const BASELINE_IDS = ['home-quickstart', 'install-source', 'counter-first', 'counter-reverse', 'counter-verify', 'counter-update', 'bank-convenience', 'initialize-account-file', 'graph-rebuild'];
 const PROJECT_COMMANDS = new Set(['generate-project', 'query-project', 'status-project', 'verify-project', 'view-project']);
 // The tutorial's declared CLI surface, not an assertion about every toolchain command.
-const DECLARED_COMMANDS = new Set([...PROJECT_COMMANDS, 'init', 'graph', 'validate', 'roundtrip', 'compile', 'compile-products', 'mcp', '--help', '--version']);
+const DECLARED_COMMANDS = new Set([...PROJECT_COMMANDS, 'init', 'graph', 'validate', 'roundtrip', 'compile', 'compile-products', 'mcp', 'init-v2', 'check-v2', 'compile-v2', 'generate-v2', 'emit-tests-v2', 'verify-v2', 'tasks-v2', 'audit-coverage-v2', 'run-tck-v2', 'init-hooks', 'guard-write', 'lsp-ears', '--help', '--version']);
 const decode = (text) => text.replace(/&(#x[\da-f]+|#\d+|amp|lt|gt|quot|apos);/gi, (_, entity) => {
   if (entity.startsWith('#')) return String.fromCodePoint(entity[1].toLowerCase() === 'x' ? parseInt(entity.slice(2), 16) : Number(entity.slice(1)));
   return { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" }[entity.toLowerCase()];

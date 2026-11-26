@@ -29,7 +29,7 @@
     <header class="page-hero">
       <p class="over">实战 · 从零到完整闭环</p>
       <h1>指南：<span class="accent">把整件事跑起来</span></h1>
-      <p class="thesis">三个层级：L1 是只需 Node 的 Counter 教程，L2 区分银行生成路径与正式工作坊前置条件，L3 通过 MCP 查询图谱。<strong>本地生成命令不等于正式服务验收。</strong>下文分别说明银行的新技术通过与仍未签收的独立体验。</p>
+      <p class="thesis">从 <strong>co-arising 2.0.0 快速上手</strong>（<code>init-v2</code> → <code>check-v2 --strict</code> → <code>tasks-v2</code>）起步，或按 v1 三个层级实践：L1 Counter、L2 银行生成与正式工作坊前置、L3 MCP/Skills 协作（31 个工具）。<strong>本地生成命令不等于正式服务验收。</strong></p>
     </header>
 
     <section id="env">
@@ -65,6 +65,12 @@ git clone https://github.com/co-arising/metarch-truthsrc.git
 export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
 node "$TRUTHSRC_CLI" --help</code></pre>
       <p class="small">在自己的练习区父目录运行；目录必须不存在。保持同一 shell，绝对路径变量在切换目录后仍有效；无需 npm 安装运行依赖。</p>
+      <div class="callout teal" id="v2-quickstart"><b>CO-ARISING 2.0.0 5 分钟快速上手（需 Z3 + NODE ≥ 22.13）</b><p>一键初始化正交 v2 项目、用 Z3 严格证明（<code>--strict</code>）、生成代码与 SHA-256 锁定测试、执行实测、审计 100% 文件覆盖并查看派生任务队列（<a href="/zh/status/#F-32" data-fact="F-32">F-32</a>）。含 MCP、Skills、Hooks 与 AGY 工作流的完整 PRD 到运行指南：<a href="/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">co-arising 2.0 GA 完整指南</a>。</p></div>
+      <pre class="code" data-example="v2-quickstart" data-example-kind="shell" data-grammar="bash"><code>: "${TRUTHSRC_CLI:?Complete the tool setup above first}"
+node "$TRUTHSRC_CLI" init-v2 my-v2-app --format human
+cd my-v2-app
+node "$TRUTHSRC_CLI" check-v2 --root . --strict --format human
+node "$TRUTHSRC_CLI" tasks-v2 --root . --format human</code></pre>
     </section>
 
     <section id="l1">
@@ -209,7 +215,7 @@ cd ../.. &amp;&amp; node "$TRUTHSRC_CLI" verify-project \
 
     <section id="l3">
       <div class="sec-head"><span class="no">04</span><h2>L3 · 可选：通过 MCP 协作查询图谱</h2></div>
-      <p class="sec-sub">MCP 是可选入口，不是 Counter CLI 闭环或规则变更练习的前置。它让智能体结合已声明的图谱与源码审阅规划变更。服务器提供 26 个读向工具 <span class="badge verified" title="F-16">已验证</span>。</p>
+      <p class="sec-sub">MCP 是可选入口，不是 CLI 闭环的前置。在 <strong>v2.0.0</strong> 中，<code>truthsrc mcp</code> 提供 <strong>31 个工具</strong>：26 个 v1 图谱工具 <span class="badge verified" title="F-16">F-16</span> 加 5 个 v2 工具（<code>v2_compile</code>、<code>v2_query_graph</code>、<code>v2_tasks</code>、<code>v2_context_pack</code>、<code>v2_verify</code>）<a class="badge verified" href="/zh/status/#F-32" data-fact="F-32">F-32</a>。</p>
 
       <h3>注册服务器</h3>
       <pre class="code"><code># 在任意目录执行（路径指向你的 metarch-truthsrc 检出）
@@ -226,7 +232,7 @@ cp -r /absolute/path/to/metarch-truthsrc/skills/truthsrc .claude/skills/</code><
         <div class="step-item"><div><h4>看纪律起作用</h4><p class="meta">describe → expand → blast_radius，跟随 next_actions</p><p>智能体应报告实际到达的节点、遍历限制与尚未建模的连接。本站快照的 55 节点结果只有聚合、命令、事件和切片，没有读模型或流水线 <a href="/zh/status/#F-21" data-fact="F-21">F-21</a>；这些依赖要另外审阅，再对正确的作者输入起草提案。</p></div></div>
         <div class="step-item"><div><h4>套用编辑契约</h4><p class="meta">智能体起草；人确认；闸门检查</p><p>由人确认业务预期与编辑范围。validate 和 roundtrip 检查各自的契约，不代替业务审批。用 <code>generate-project --project truthsrc.project.json --out generated/current --update --plan</code> 预览更新动作，再运行对应行为检查与回锚验证。计划不是文本 diff。</p></div></div>
       </div>
-      <p class="small">还附带：从既有代码库抽取树、从可达数据抽取树、或从一句话描述引导工作坊草稿的技能——见工具链仓库的 <code>skills/</code>。</p>
+      <p class="small">v2.0.0 同仓交付：跨平台技能 <code>coarising_distill</code>（PRD → 真源）与 <code>coarising_cloze_worker</code>（锁定预言机 TDD，见 <code>skills/</code>）、Claude Code 一键写围栏钩子（<code>truthsrc init-hooks --root .</code>）、Antigravity 并行编排模板 <code>workflows/coarising_cloze_pipeline.py</code>、VS Code 语法扩展（<code>editor/ears-vscode/</code>）与零依赖 LSP（<code>truthsrc lsp-ears</code>）。详见<a href="/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/#section-4">完整 AI Agent 接入指南</a>。</p>
     </section>
 
     <section id="redlines">

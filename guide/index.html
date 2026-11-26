@@ -29,7 +29,7 @@
     <header class="page-hero">
       <p class="over">Hands-on · zero to full loop</p>
       <h1>The guide: <span class="accent">run the whole thing</span></h1>
-      <p class="thesis">Three levels: L1 the Node-only Counter tutorial, L2 the bank generation path and its separate formal workshop prerequisites, and L3 graph queries through MCP. <strong>A local generation command is not a formal service acceptance run.</strong> The bank’s newer technical pass and the still-open independent experience are described separately below.</p>
+      <p class="thesis">Start with the <strong>co-arising 2.0.0 Quick Start</strong> (<code>init-v2</code> → <code>check-v2 --strict</code> → <code>tasks-v2</code>), or follow the three v1 levels: L1 Counter, L2 bank generation and formal workshop prerequisites, and L3 MCP/Skills collaboration (31 tools). <strong>A local generation command is not a formal service acceptance run.</strong></p>
     </header>
 
     <section id="env">
@@ -65,6 +65,12 @@ git clone https://github.com/co-arising/metarch-truthsrc.git
 export TRUTHSRC_CLI="$TRUTHSRC_WORKSPACE/metarch-truthsrc/bin/truthsrc.js"
 node "$TRUTHSRC_CLI" --help</code></pre>
       <p class="small">Run from your own exercise parent directory; the checkout directory must not exist. Keep the same shell: the absolute CLI path survives directory changes. No npm runtime installation is needed.</p>
+      <div class="callout teal" id="v2-quickstart"><b>CO-ARISING 2.0.0 QUICK START (5 MIN · Z3 + NODE ≥ 22.13)</b><p>Scaffold an orthogonal v2 project, prove EARS specs with Z3 (<code>--strict</code>), generate code + SHA-256 locked tests, run live verification, audit 100% file coverage, and inspect the derived task queue (<a href="/status/#F-32" data-fact="F-32">F-32</a>). Full PRD-to-running guide (with MCP, Skills, Hooks &amp; AGY Workflow): <a href="/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">co-arising 2.0 GA Complete Guide</a>.</p></div>
+      <pre class="code" data-example="v2-quickstart" data-example-kind="shell" data-grammar="bash"><code>: "${TRUTHSRC_CLI:?Complete the tool setup above first}"
+node "$TRUTHSRC_CLI" init-v2 my-v2-app --format human
+cd my-v2-app
+node "$TRUTHSRC_CLI" check-v2 --root . --strict --format human
+node "$TRUTHSRC_CLI" tasks-v2 --root . --format human</code></pre>
     </section>
 
     <section id="l1">
@@ -209,7 +215,7 @@ cd ../.. &amp;&amp; node "$TRUTHSRC_CLI" verify-project \
 
     <section id="l3">
       <div class="sec-head"><span class="no">04</span><h2>L3 · Optional graph collaboration through MCP</h2></div>
-      <p class="sec-sub">MCP is optional, not a prerequisite for the Counter CLI loop or rule-change exercise. It lets an agent use the declared graph alongside source inspection when planning a change. The server ships 26 read-oriented tools <span class="badge verified" title="F-16">verified</span>.</p>
+      <p class="sec-sub">MCP is optional, not a prerequisite for the CLI loop. In <strong>v2.0.0</strong>, <code>truthsrc mcp</code> ships <strong>31 tools</strong>: 26 v1 graph tools <span class="badge verified" title="F-16">F-16</span> plus 5 v2 tools (<code>v2_compile</code>, <code>v2_query_graph</code>, <code>v2_tasks</code>, <code>v2_context_pack</code>, <code>v2_verify</code>) <a class="badge verified" href="/status/#F-32" data-fact="F-32">F-32</a>.</p>
 
       <h3>Register the server</h3>
       <pre class="code"><code># from any directory (path to your metarch-truthsrc checkout)
@@ -226,7 +232,7 @@ cp -r /absolute/path/to/metarch-truthsrc/skills/truthsrc .claude/skills/</code><
         <div class="step-item"><div><h4>Watch the discipline work</h4><p class="meta">describe → expand → blast_radius, following next_actions</p><p>The agent should report nodes actually reached, traversal limits and missing modeled connections. The website’s 55-node snapshot result contains aggregates, commands, events and slices—not read models or pipelines <a href="/status/#F-21" data-fact="F-21">F-21</a>. Review those dependencies separately before drafting a proposal against the appropriate author inputs.</p></div></div>
         <div class="step-item"><div><h4>Apply the editing contract</h4><p class="meta">agents draft; humans approve; gates check</p><p>A human approves the business expectation and editing scope. Validate and roundtrip check their specified contracts; neither approves business meaning. Preview update actions with <code>generate-project --project truthsrc.project.json --out generated/current --update --plan</code>, then run the relevant behavioral checks and anchor verification. The plan is not a textual diff.</p></div></div>
       </div>
-      <p class="small">Also shipped: skills for extracting a tree from an existing codebase, from reachable data, or bootstrapping workshop drafts from a one-line description — <code>skills/</code> in the toolchain repo.</p>
+      <p class="small">Also shipped in v2.0.0: cross-platform skills <code>coarising_distill</code> (PRD → truth) &amp; <code>coarising_cloze_worker</code> (locked-oracle TDD) in <code>skills/</code>, one-command Claude Code write-guard hooks (<code>truthsrc init-hooks --root .</code>), Antigravity parallel pipeline <code>workflows/coarising_cloze_pipeline.py</code>, VS Code grammar (<code>editor/ears-vscode/</code>), and zero-dep LSP (<code>truthsrc lsp-ears</code>). See the <a href="/articles/co-arising-v2-ga-prd-to-running-guide-20261126/#section-4">complete AI Agent wiring guide</a>.</p>
     </section>
 
     <section id="redlines">
