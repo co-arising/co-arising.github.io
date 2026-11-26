@@ -383,3 +383,15 @@ v1 的测试验证发生在代码生成之后；而 v2 把基于 [SMT-LIB 2](htt
 - [Harness Engineering for Coding Agent Users（Martin Fowler / Birgitta Böckeler）](https://martinfowler.com/articles/harness-engineering.html) —— 拓扑降维减熵与 Behaviour Harness 理论出处
 - [Claude Code Best Practices](https://code.claude.com/docs/en/best-practices) —— `PreToolUse` / `Stop` Hooks（`exit 2`）物理拦截与独立上下文盲审机制出处
 - [`co-arising/metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) &amp; [`co-arising/bank-wealth-demo`](https://github.com/co-arising/bank-wealth-demo) —— 当前 v1 编译器与参考基准仓库
+
+
+---
+
+## 附录：v2.0 GA 实现落地与 v2.1 全域治理更新（2026-11-26）
+
+本蓝图已于 `metarch-truthsrc`（`feat/co-arising-v2-ears-native`）与 `bank-wealth-demo`（`feat/co-arising-v2-pilot`）完成端到端落地并通过 P0–P2 全量发布门禁验证：
+
+1. **正交限界上下文真源目录**：每个限界上下文按知识形态拆分为 `structures/`（静态名词 YAML）、`behaviors/domain/`（领域聚合 `.ears`）、`behaviors/application/`（用户故事 `*.story.ears` 与外部系统集成策略 `*.integration.ears`）以及 `bindings/`（解空间 S1 效果协议与禁止跨层依赖规则），由编译器路径-层级静态门禁（`V2_PATH_LAYER_MISMATCH`、`V2_LAYER_ACTION_VIOLATION`）与 4 项严格领域边界门禁物理守护。
+2. **双栈确定性闭环（TypeScript + Scala）**：`compile-v2`（Z3 + First-Hit + 边界等式证人 + 应用层 `k`-step BMC + `.zh.ears` 双语等价检查 + Style E/B 投影）→ `generate-v2`（TS + Scala 领域层与应用层全对齐）→ `emit-tests-v2`（SHA-256 锁定预言机）→ `verify-v2 --strict`（跨平台防静默跳过门禁）。`bank-wealth-demo` 已实现 5 TS + 5 Scala 套件全量真实编译运行通过。
+3. **全域 100% 覆盖治理（v2.1）与多协议 S1 TCK**：问题空间（D1/D2 → E1）与解空间（S1/S2/S3 → E2/E3/E4）零灰区分类（`bank-wealth-demo` 56/56 = 100%）；内置 `three-phase-reconcile`、`transactional-outbox`、`saga-compensation`、`idempotent-consumer` 四族 S1 故障注入 TCK（支持 Node ESM 与 Scala/JVM 执行器）。
+4. **开箱即用 DX 与编辑器生态**：一等子命令 `truthsrc init-v2`、`truthsrc check-v2 --strict`、`truthsrc guard-write`、`truthsrc init-hooks`、`truthsrc lsp-ears` 及 `.ears` TextMate 语法高亮与 VS Code 插件脚手架。

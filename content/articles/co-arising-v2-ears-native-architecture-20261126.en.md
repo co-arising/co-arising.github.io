@@ -383,3 +383,15 @@ To keep delivered facts distinct from forward-looking design goals:
 - [Harness Engineering for Coding Agent Users (Martin Fowler / Birgitta Böckeler)](https://martinfowler.com/articles/harness-engineering.html) — Variety-reduction topology and Behaviour Harness framing
 - [Claude Code Best Practices](https://code.claude.com/docs/en/best-practices) — Deterministic `PreToolUse`/`Stop` Hooks (`exit 2`) and fresh-context blind review
 - [`co-arising/metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) &amp; [`co-arising/bank-wealth-demo`](https://github.com/co-arising/bank-wealth-demo) — Current v1 compiler and benchmark repositories
+
+
+---
+
+## Appendix: v2.0 GA Implementation & v2.1 Full-Coverage Governance Update (2026-11-26)
+
+This architecture blueprint has been implemented end-to-end across `metarch-truthsrc` (`feat/co-arising-v2-ears-native`) and `bank-wealth-demo` (`feat/co-arising-v2-pilot`), closing all P0–P2 release readiness gates:
+
+1. **Orthogonal Bounded-Context Truth Layout**: Each bounded context separates `structures/` (static nouns in YAML), `behaviors/domain/` (aggregate `.ears`), `behaviors/application/` (`*.story.ears` user stories and `*.integration.ears` external integration policies), and `bindings/` (solution-space S1 effect protocols and forbidden-import rules), enforced by compiler Path-to-Layer static gates (`V2_PATH_LAYER_MISMATCH`, `V2_LAYER_ACTION_VIOLATION`) and 4 strict domain-boundary gates.
+2. **Full Dual-Stack Parity (TypeScript + Scala)**: `compile-v2` (Z3 + First-Hit + boundary equality witnesses + application `k`-step BMC + `.zh.ears` bilingual drift gate + Style E/B projections) → `generate-v2` (TS + Scala domain and application parity) → `emit-tests-v2` (SHA-256 locked oracles) → `verify-v2 --strict` (cross-platform anti-silent-skip gate). The `bank-wealth-demo` pilot compiles and passes all 5 TS + 5 Scala oracle suites live.
+3. **100% Full-Coverage Governance (v2.1) & Multi-Protocol S1 TCK**: Zero gray-zone classification across Problem Space (D1/D2 → E1) and Solution Space (S1/S2/S3 → E2/E3/E4) (`bank-wealth-demo`: 56/56 = 100%); four S1 fault-injection TCK suites (`three-phase-reconcile`, `transactional-outbox`, `saga-compensation`, `idempotent-consumer`) supporting both Node ESM and Scala/JVM runners.
+4. **Onboarding DX & Editor Tooling**: First-class `truthsrc init-v2`, `truthsrc check-v2 --strict`, `truthsrc guard-write`, `truthsrc init-hooks`, `truthsrc lsp-ears`, and a `.ears` TextMate grammar / VS Code extension scaffold.
