@@ -143,4 +143,11 @@ final class FundQuotaReserveSubscriptionQuotaEarsSpec extends AnyFunSuite {
     }
   }
 
+  test("[POSTCOND] FundQuotaRules.checkEventPostconditions validates SubscriptionQuotaReserved required fields") {
+    val validEv = FundQuotaEntity.SubscriptionQuotaReserved(accountId = "non-empty-id", amount = BigDecimal("0.00"))
+    assert(FundQuotaRules.checkEventPostconditions(List(validEv)).isEmpty)
+    val blankEv = FundQuotaEntity.SubscriptionQuotaReserved(accountId = "   ", amount = BigDecimal("0.00"))
+    assert(FundQuotaRules.checkEventPostconditions(List(blankEv)).nonEmpty)
+  }
+
 }

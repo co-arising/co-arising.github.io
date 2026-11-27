@@ -38,6 +38,8 @@ trait CashFundPurchaseHandler extends ApplicationService {
   def handle(req: CashFundPurchaseRequest, externs: CashFundPurchaseExternPorts, effects: CashFundPurchaseEffectsPort): Either[iMadzError, CashFundPurchaseSuccessResponse]
 }
 
+// @ProvenanceId(axiom:CashFundPurchase#AX-APP-1)
+// @knowledge source:CashFundPurchase#/axioms/AX-APP-1
 object CashFundPurchaseCallerContract {
   val spec: CallerContractSpec = CallerContractSpec(
     idempotencyKey = "(principal, clientRequestId)",

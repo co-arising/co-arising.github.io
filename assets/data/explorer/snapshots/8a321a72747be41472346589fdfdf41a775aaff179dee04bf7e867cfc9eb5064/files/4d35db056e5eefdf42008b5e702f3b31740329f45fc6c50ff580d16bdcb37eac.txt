@@ -121,4 +121,11 @@ final class CreditBalanceReserveFundsEarsSpec extends AnyFunSuite {
     }
   }
 
+  test("[POSTCOND] CreditBalanceRules.checkEventPostconditions validates FundsReserved required fields") {
+    val validEv = CreditBalanceEntity.FundsReserved(txId = "non-empty-id", amount = BigDecimal("0.00"))
+    assert(CreditBalanceRules.checkEventPostconditions(List(validEv)).isEmpty)
+    val blankEv = CreditBalanceEntity.FundsReserved(txId = "   ", amount = BigDecimal("0.00"))
+    assert(CreditBalanceRules.checkEventPostconditions(List(blankEv)).nonEmpty)
+  }
+
 }

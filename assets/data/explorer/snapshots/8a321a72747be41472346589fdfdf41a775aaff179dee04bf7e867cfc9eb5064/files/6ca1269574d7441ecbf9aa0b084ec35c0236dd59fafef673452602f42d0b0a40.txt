@@ -4,6 +4,7 @@ package example.bankwealth.v2.domain.services
 
 import net.imadz.common.CommonTypes.DomainService
 
+// L1-only aggregate: 0 abstract domain computation methods (all rules generated deterministically in FundQuotaRules).
 trait FundQuotaComputations extends DomainService
 object FundQuotaComputations {
   val Noop: FundQuotaComputations = new FundQuotaComputations {}

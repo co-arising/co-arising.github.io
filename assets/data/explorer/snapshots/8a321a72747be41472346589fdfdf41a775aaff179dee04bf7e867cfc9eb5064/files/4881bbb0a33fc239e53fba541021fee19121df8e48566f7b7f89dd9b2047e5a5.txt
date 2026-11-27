@@ -38,6 +38,8 @@ trait TaBridgeSettlementHandler extends ApplicationService {
   def handle(req: TaBridgeSettlementRequest, externs: TaBridgeSettlementExternPorts, effects: TaBridgeSettlementEffectsPort): Either[iMadzError, TaBridgeSettlementSuccessResponse]
 }
 
+// @ProvenanceId(axiom:TaBridgeSettlement#AX-TA-1)
+// @knowledge source:TaBridgeSettlement#/axioms/AX-TA-1
 object TaBridgeSettlementCallerContract {
   val spec: CallerContractSpec = CallerContractSpec(
     idempotencyKey = "(orderId, taSubmissionId)",

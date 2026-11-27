@@ -22,8 +22,8 @@ test('v2 bank workshop offline snapshot is self-contained, CSP-valid, sanitized,
 
   const view = JSON.parse(dataMatch[1]);
   assert.equal(view.schemaVersion, 'truthsrc.project-view/v1');
-  assert.equal(view.nodes.length, 58);
-  assert.equal(view.edges.length, 47);
+  assert.equal(view.nodes.length, 88);
+  assert.equal(view.edges.length, 87);
   assert.equal(view.totals.omittedNodes, 0);
   assert.equal(view.chapters.length, 5);
   assert.equal(view.verification.passed, true);
