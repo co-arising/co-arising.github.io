@@ -125,8 +125,8 @@ async function main() {
       title: '净值整除份额确认与通道 4B 隔离区',
       description: 'FundOrder.ConfirmTAShares 包含非线性整除不等式 shares * nav <= netAmount < (shares + 1) * nav，落入通道 4B @cloze 槽位；由 Z3 QF_NIA 生成临界边界测试 + 独立子代理盲审收口。',
       questions: [
-        '盲审在 FundOrderConfirmTASharesCloze.scala 中发现并加固了哪一处 Long.MaxValue 溢出边界？',
-        '对比 3 个精确数值类型（AmountDecimal / NavDecimal / Money）在 TS 与 Scala 中的零浮点映射。',
+        '盲审在 FundOrderConfirmTASharesImpl.scala 中发现并加固了哪一处 Long.MaxValue 溢出边界？',
+        '对比 3 个精确数值类型（AmountDecimal / NavDecimal / Money）在 1.0 强管控 domain/values/ 与 TS 中的零浮点映射。',
       ],
       nodeIds: [
         'agg:FundOrder',
@@ -150,8 +150,8 @@ async function main() {
       rootDir: v2Root,
       outFile: opts.out,
       pathPrefix: 'v2-pilot',
-      title: '银行财富 v2.0.0 知识工作坊 · EARS 真源 ↔ 洋葱五层 TS / Scala 代码',
-      subtitle: '由通用命令 truthsrc view-v2 直接采集自 bank-wealth-demo/v2-pilot/（co-arising 2.0.0 GA）。全量导出 58/58 知识节点与 47 条 SQLite 边（0 省略），覆盖洋葱五层（domain / application / interfaces / infrastructure / modules）与三层锁定测试，支持离线点行反查。',
+      title: '银行财富 v2.0.0 知识工作坊 · EARS 真源 ↔ scala-cqrs-play-service:2 强管控代码',
+      subtitle: '由 truthsrc view-v2 直接采集自 bank-wealth-demo/v2-pilot/（生成器：scala-cqrs-play-service:2）。全量导出 58/58 知识节点与 47 条 SQLite 边（0 省略），覆盖 1.0 强管控分层（domain/values、domain/entities、domain/invariants、application/aggregates、protobuf、infrastructure、interfaces/http、modules）、*Impl.scala 手写隔离区与锁定测试，支持离线点行反查。',
       chaptersFile: tmpChapters,
     });
     console.log(JSON.stringify({ ...res, out: relative(SITE_ROOT, res.outFile) }, null, 2));
