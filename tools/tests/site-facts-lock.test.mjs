@@ -20,6 +20,14 @@ test('assets/data/facts.lock.json is sanitized, matches current explorer pointer
   assert.equal(lock.capabilities.mcpTotal, 32);
   assert.equal(lock.pilot.governedFiles, 188);
   assert.equal(lock.pilot.coverageRatio, 1);
+  assert.ok(Array.isArray(lock.capabilities.targetArtifactCatalogs) && lock.capabilities.targetArtifactCatalogs.length >= 1);
+
+  const mapsLock = JSON.parse(readFileSync(join(ROOT, 'assets/data/artifact-maps.lock.json'), 'utf8'));
+  assert.equal(mapsLock.schemaVersion, 'co-arising.artifact-maps-lock/v1');
+  for (const cat of lock.capabilities.targetArtifactCatalogs) {
+    assert.ok(mapsLock.maps?.[cat.id], `missing artifact-maps.lock entry for ${cat.id}`);
+    assert.equal(mapsLock.maps[cat.id].catalogSha256, cat.catalogSha256);
+  }
 
   const stdout = execFileSync(process.execPath, [join(ROOT, 'tools/sync-site-facts.mjs'), '--check'], {
     cwd: ROOT,

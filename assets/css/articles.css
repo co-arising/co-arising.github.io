@@ -367,3 +367,66 @@
   .article-community { margin-left: 0; padding: 20px 18px; }
   .insights-community { padding: 18px 16px; }
 }
+
+/* ---------- 2-level collapsible Onion-layer TOC & Artifact Type map styling ---------- */
+.toc-tree { list-style: none; margin: 0; padding: 0; }
+.toc-group-item { margin: 2px 0; }
+.toc-group { border-bottom: 1px solid var(--line); }
+.toc-group-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+.toc-group-summary::-webkit-details-marker { display: none; }
+.toc-group-summary::after {
+  content: "▸";
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink-3);
+  transition: transform .15s ease;
+}
+.toc-group[open] > .toc-group-summary::after { transform: rotate(90deg); color: var(--teal); }
+.toc-sublist {
+  list-style: none;
+  margin: 0 0 8px 14px;
+  padding: 0 0 0 8px;
+  border-left: 1px solid var(--line-strong);
+}
+.toc-sublist a {
+  padding: 6px 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.toc-sub-overview a {
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.at-badge {
+  display: inline-block;
+  font-family: var(--font-mono), var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.at-kernel { background: var(--teal-soft); color: var(--teal); border: 1px solid var(--teal); }
+.at-seam { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber); }
+.at-glue { background: var(--bg-sink); color: var(--ink-2); border: 1px solid var(--line-strong); }
+
+.co-arch-fig.co-arch-map { padding: 22px 18px 18px; }
+.co-arch-fig a.arch-node { text-decoration: none; cursor: pointer; }
+.co-arch-fig a.arch-node:hover rect { stroke-width: 2.3; filter: brightness(.98); }
+.co-arch-fig a.arch-node:focus-visible rect { stroke: var(--red); stroke-width: 2.4; }
+.co-arch-fig .arch-band-ink { fill: var(--bg-sink); stroke: var(--line-strong); stroke-width: 1.3; }
+.co-arch-fig .arch-t-band-amber { font-family: var(--font-mono), var(--font-sans); font-size: 11.5px; font-weight: 700; fill: var(--amber); letter-spacing: .04em; }

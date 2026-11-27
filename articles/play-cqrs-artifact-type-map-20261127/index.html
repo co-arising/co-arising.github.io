@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Play CQRS (scala-cqrs-play-service:2) Artifact Type Architecture Map: Onion Layers, Decomposition &amp; Re-Assembly, and Target Code Reference — co-arising</title>
+  <meta name="description" content="Commit-pinned to metarch-truthsrc @ 0b925ad (catalog 156b224f3614) and bank-wealth-demo @ 80a9acb: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Play CQRS (scala-cqrs-play-service:2) Artifact Type Architecture Map: Onion Layers, Decomposition &amp; Re-Assembly, and Target Code Reference" />
+  <meta property="og:description" content="Commit-pinned to metarch-truthsrc @ 0b925ad (catalog 156b224f3614) and bank-wealth-demo @ 80a9acb: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets." />
+  <meta property="og:url" content="https://co-arising.github.io/articles/play-cqrs-artifact-type-map-20261127/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/play-cqrs-artifact-type-map-20261127/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/play-cqrs-artifact-type-map-20261127/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/play-cqrs-artifact-type-map-20261127/" />
+  <link rel="canonical" href="https://co-arising.github.io/articles/play-cqrs-artifact-type-map-20261127/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/zh/articles/play-cqrs-artifact-type-map-20261127/">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <nav id="site-nav" aria-label="Site navigation"><div class="site-nav"><div class="row"><a href="/">Home</a> · <a href="/why-co-arising/">Why co-arising</a> · <a href="/dsl/">Language</a> · <a href="/pipeline/">Pipeline</a> · <a href="/bank-demo/">Bank example</a> · <a href="/explorer/">Explorer</a> · <a href="/compare/">Landscape</a> · <a href="/guide/">Guide</a> · <a href="/status/">Status</a> · <a href="/articles/" aria-current="page">Insights</a> · <a class="nav-link" href="/zh/articles/play-cqrs-artifact-type-map-20261127/" lang="zh-CN" rel="alternate" hreflang="zh-CN">中文</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript is off — articles and navigation remain available.</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Engineering practice</span></nav>
+      <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-27">2026-11-27</time> · English translation</p>
+      <h1>Play CQRS (scala-cqrs-play-service:2) Artifact Type Architecture Map: Onion Layers, Decomposition &amp; Re-Assembly, and Target Code Reference</h1>
+      <p class="article-deck">Commit-pinned to metarch-truthsrc @ 0b925ad (catalog 156b224f3614) and bank-wealth-demo @ 80a9acb: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets.</p>
+      <div class="article-actions"><a href="/content/articles/play-cqrs-artifact-type-map-20261127.en.md" download="play-cqrs-artifact-type-map-20261127.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/play-cqrs-artifact-type-map-20261127/">中文原文</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p>This is a commit-pinned Play CQRS Artifact Type architecture map synchronized to metarch-truthsrc (scala-cqrs-play-service:2) and bank-wealth-demo; whenever any Artifact Type evolves upstream or a new target stack (such as Rust) is added, sync-site-facts and artifact-maps.lock.json require updating this bilingual map.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>Contents</summary><nav aria-label="Article contents"><ol class="toc-tree"><li class="toc-group-item"><details class="toc-group" open="open"><summary class="toc-group-summary"><span class="toc-number">01</span> Architecture Philosophy: Why Decompose Into 60 Artifact Families Before Re-Assembling</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-1">Section overview</a></li><li><a href="#section-1-1">1. First Principles: Partitioning Every Artifact Into Kernel, Seam, or Glue</a></li><li><a href="#section-1-2">2. Why Decompose Thoroughly Before Re-Assembling?</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">02</span> Master Play CQRS Artifact Type Map &amp; Wiring Topology</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-2">Section overview</a></li><li><a href="#section-2-1">How Decomposed Pieces Re-Assemble Into a Running Service</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">03</span> Domain Core Layer (Innermost · Zero Framework Dependencies)</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-3">Section overview</a></li><li><a href="#section-3-1">Value Object &amp; ExactType (#1)</a></li><li><a href="#section-3-2">Domain Entity (#2)</a></li><li><a href="#section-3-3">EventHandler (#3)</a></li><li><a href="#section-3-4">Aggregate Invariant Rules &amp; RuleParams (#4 / #5 / #45)</a></li><li><a href="#section-3-5">Z3 Axioms &amp; Replay (#48)</a></li><li><a href="#section-3-6">Domain Computations Port &amp; L2 @cloze Impl (#14 / #51)</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">04</span> Application Layer (Write Protocol, ReadSide, Reactive Policy &amp; Orchestration)</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-4">Section overview</a></li><li><a href="#section-4-1">Aggregate Protocol &amp; CommandHelpers (#7 / #11)</a></li><li><a href="#section-4-2">Aggregate, Factory &amp; Behaviors (#6 / #8 / #9 / #10)</a></li><li><a href="#section-4-3">Aggregate Repository Port (#12)</a></li><li><a href="#section-4-4">Application Story Port, CallerContractSpec &amp; L3 @cloze Impl (#51 / #52)</a></li><li><a href="#section-4-5">ReadModel View, QueryService &amp; ReadSide Projection (#15 / #23 / #26 / #27 / #28)</a></li><li><a href="#section-4-6">Reactive Policy &amp; PolicyMachine (#55–#58 / #60)</a></li><li><a href="#section-4-7">Orchestration, Saga, EffectFace &amp; ExternalEventBridge (#13 / #16–#21 / #40–#44 / #46)</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">05</span> Infrastructure Layer (Serialization, Persistence &amp; Re-Assembly Wiring)</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-5">Section overview</a></li><li><a href="#section-5-1">Protobuf Schema, ProtoConverters &amp; Serialization Adapters (#29–#33)</a></li><li><a href="#section-5-2">Repository Impl, ReadSide DDL &amp; PolicyDlqBury (#12 / #24)</a></li><li><a href="#section-5-3">Outbound Connectors &amp; Effect Implementations (#25)</a></li><li><a href="#section-5-4">Bootstrap Traits (#47 / #38b / #38c / #38d / #59 policy-bootstrap)</a></li><li><a href="#section-5-5">Guice DI Wiring &amp; ApplicationBootstrap (#38 / #50)</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">06</span> Interfaces &amp; Service Runtime Layer (HTTP, 5-Layer Authz &amp; Build Scaffold)</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-6">Section overview</a></li><li><a href="#section-6-1">5-Layer Authz PEP/PDP &amp; ApiDto (#49)</a></li><li><a href="#section-6-2">HTTP Controllers, AggregateStateApiController &amp; CommandDsl (#34–#36)</a></li><li><a href="#section-6-3">ServiceContract, ServiceLoader, PlayHttpBridge &amp; Routes (#37 / #38)</a></li><li><a href="#section-6-4">Project Scaffold &amp; Runtime Configs (#39)</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">07</span> Verification &amp; BDD Oracle Layer (Executable Proof Gates)</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-7">Section overview</a></li><li><a href="#section-7-1">Gherkin Features, Executable Oracles &amp; Locked Manifest (#53)</a></li><li><a href="#section-7-2">Mutation Gate &amp; Onion DIP Gate (#54)</a></li></ol></details></li><li><a href="#section-8"><span class="toc-number">08</span> End-to-End Walkthrough: Tracing a Bank Wealth Purchase Through All 5 Onion Layers</a></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">09</span> Artifact Type Upgrade Sync Contract &amp; Future Target Blueprint (Rust / Axum)</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-9">Section overview</a></li><li><a href="#section-9-1">Future Target Requirement: Rust (rust-cqrs-axum-service:2) Blueprint</a></li><li><a href="#section-9-2">Further Reading</a></li></ol></details></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">Read the full article</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">Community</p>
+          <p>Have questions or feedback on this article? Join the discussion on Discord.</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a>
+        </div>
+      </aside>
+      <article id="article-body" class="article-body"><blockquote>
+<p>Version lock: <code>metarch-truthsrc</code> @ <a href="https://github.com/co-arising/metarch-truthsrc"><code>0b925ad</code></a> (<code>scala-cqrs-play-service:2</code> · <code>catalogSha256: 156b224f3614</code> · 60 unified families / 14 producers / 64 <code>artifactKinds</code>) · <code>bank-wealth-demo</code> @ <a href="https://github.com/co-arising/bank-wealth-demo"><code>80a9acb</code></a> · Controlled by <code>assets/data/artifact-maps.lock.json</code> and the <code>sync-site-facts</code> CI gate (cross-referenced with <code>F-32</code> / <code>F-33</code> on the status page).</p>
+</blockquote>
+<p>Most code generators emit one giant <code>OrderService.scala</code> per model. That shortcut feels fast on day one, yet as soon as invariants, persistence adapters, authorization, read projections, and reactive policies evolve together, templates collapse into an untestable tangle where <strong>AI edits leak infrastructure into business rules and Onion boundaries erode silently</strong>.</p>
+<p><a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/scala-cqrs-play-service"><code>scala-cqrs-play-service:2</code></a> inside <code>metarch-truthsrc</code> takes the opposite approach: <strong>fine-grained orthogonal decomposition (60 unified families across 64 <code>artifactKinds</code> — expanding the 54-family baseline with <code>#55</code>–<code>#60</code> Reactive Policy families) + strict inward-only Onion dependencies + deterministic outer-edge re-assembly through Guice DI and <code>ApplicationBootstrap</code></strong>. This guide walks from <strong>architectural philosophy</strong> → <strong>clickable interactive Onion &amp; Wiring maps</strong> → <strong>layer-by-layer breakdown with real generated Scala</strong> → <strong>end-to-end transaction trace</strong> → <strong>the upgrade sync contract and Rust/Axum extension blueprint</strong>.</p>
+<hr>
+<h2 id="section-1">1. Architecture Philosophy: Why Decompose Into 60 Artifact Families Before Re-Assembling</h2>
+<div class="co-kpi-strip" role="region" aria-label="Play CQRS v2 Artifact Scale Overview">
+  <div><div class="kpi-num">60</div><div class="kpi-label">Unified Families (54 Baseline + Policy #55–#60)</div></div>
+  <div><div class="kpi-num">14</div><div class="kpi-label">Registered Producers (manifest-backed)</div></div>
+  <div><div class="kpi-num">64</div><div class="kpi-label">Governed Artifact Kinds (Full Pipeline)</div></div>
+  <div><div class="kpi-num red">0</div><div class="kpi-label">Onion DIP Violations (126 Scala files checked)</div></div>
+</div>
+
+<h3 id="section-1-1">1. First Principles: Partitioning Every Artifact Into Kernel, Seam, or Glue</h3>
+<p>Every Artifact Type in <code>co-arising</code> carries an explicit architectural role so neither humans nor agents mix business truth with framework plumbing:</p>
+<div class="article-table">
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Role / Badge / Authority &amp; Origin / Change Driver / Representative Artifact Types"><table>
+<thead>
+<tr><th scope="col">Role</th><th scope="col">Badge</th><th scope="col">Authority &amp; Origin</th><th scope="col">Change Driver</th><th scope="col">Representative Artifact Types</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Critical Business Kernel (Kernel)</strong></td><td><span class="at-badge at-kernel">KERNEL</span></td><td>Derived strictly from YAML structures + <a href="https://co-arising.github.io/articles/co-arising-ears-spec-20261123/">EARS behavioral specs</a> + Z3 mathematical proofs (<code>4A</code> zero-token codegen or verified contract)</td><td>Domain rule changes</td><td><code>ValueObject</code>, <code>Entity</code>, <code>EventHandler</code>, <code>Rules</code>, <code>Axioms</code>, <code>PolicyOn&lt;Cmd&gt;</code></td></tr>
+<tr><td><strong>Isolation Boundary (Seam &amp; Port)</strong></td><td><span class="at-badge at-seam">SEAM</span></td><td>Compiler-derived typed interfaces (<code>Port</code> / <code>Protocol</code> / <code>CallerContractSpec</code> / <code>Semantics</code>) caging non-deterministic <code>L2</code>/<code>L3</code>/Infra code inside <code>handwritten/</code> <code>@cloze</code> slots</td><td>Capability boundary changes</td><td><code>*Computations</code>, <code>*Protocol</code>, <code>*Repository</code>, <code>*Port.scala</code>, <code>ApplyEventSemantics</code>, <code>PolicyDlqSink</code></td></tr>
+<tr><td><strong>Wiring &amp; Runtime Plumbing (Glue)</strong></td><td><span class="at-badge at-glue">GLUE</span></td><td>Zero new business decisions — adapts Kernel and Seam contracts onto Akka Typed, ClusterSharding, Play HTTP, ScalaPB, and Guice DI</td><td>Target runtime/framework upgrades</td><td><code>*Aggregate</code>, <code>*Behaviors</code>, <code>*ProtoConverters</code>, <code>*Bootstrap</code>, <code>ApplicationBootstrap</code>, <code>GeneratedBindingsModule</code></td></tr>
+</tbody>
+</table></div>
+</div>
+
+<p><strong>Core invariant — purity inside, plumbing outside</strong>: The innermost <code>domain/</code> package contains zero <code>akka.*</code>, <code>play.*</code>, <code>scalikejdbc.*</code>, <code>javax.inject.*</code>, or Protobuf imports. That purity makes it possible for <a href="https://github.com/co-arising/metarch-truthsrc"><code>verify-gate.mjs</code></a> to compile <strong>all Kernel + Seam Scala files via standalone offline <code>scalac</code> in milliseconds and execute a 100% domain mutation gate</strong> without booting an Akka cluster.</p>
+<h3 id="section-1-2">2. Why Decompose Thoroughly Before Re-Assembling?</h3>
+<ol>
+<li><strong>Ownership Separation (Overwrite vs. Never-Overwrite)</strong>: Keeping compiler-owned <code>FundOrderRules.scala</code> separate from human/AI-owned <code>FundOrderComputationsImpl.scala</code> allows <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/CODEGEN.md"><code>generated-scaffold/</code> vs. <code>handwritten/</code></a> to live side by side and re-assemble cleanly via <code>GeneratedBindingsModule</code> without regeneration ever clobbering handwritten <code>@cloze</code> logic.</li>
+<li><strong>Dual-Channel Verification (<code>4A</code> vs. <code>4B</code>)</strong>: Deterministic linear rules and folds stay in <code>#45 Rules</code> / <code>#3 EventHandler</code> / <code>#48 Axioms</code>; non-linear math and multi-step orchestration stay behind <code>#51 ApplicationPort</code> and <code>*Computations</code> supervised by locked BDD oracles.</li>
+<li><strong>Cross-Stack Portability (Scala/Play → Rust/Axum)</strong>: Once Kernel contracts and Port seams are separated, porting <code>metarch-truthsrc</code> to another stack (see Section 9's Rust/Axum blueprint) primarily swaps <strong>Glue adapters</strong> while preserving the same semantic architecture.</li>
+</ol>
+<hr>
+<h2 id="section-2">2. Master Play CQRS Artifact Type Map &amp; Wiring Topology</h2>
+<blockquote>
+<p>Click any node in Figure 1 to jump directly to that layer's Artifact Type breakdown and Scala code sample. Use the 2-level collapsible Onion-layer sidebar on the left to expand or collapse individual layers.</p>
+</blockquote>
+<figure class="co-arch-fig co-arch-map">
+<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 0b925ad) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
+<svg viewBox="0 0 920 980" width="100%" role="img" aria-label="Master 5-layer Onion Architecture Artifact Type Map for Play CQRS showing Domain Core, Application, Infrastructure, Interfaces/Runtime, and Verification Oracle Gate with Kernel/Seam/Glue roles and dependency edges">
+  <defs>
+    <marker id="map-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
+    </marker>
+    <marker id="map-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"></path>
+    </marker>
+    <marker id="map-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+    <marker id="map-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"></path>
+    </marker>
+  </defs>
+
+  <rect x="14" y="12" width="892" height="104" rx="5" class="arch-band-red"></rect>
+  <text x="28" y="34" class="arch-t-band-red">LAYER 5 · VERIFICATION &amp; BDD ORACLE GATE (Independent Proof Harness · Never Runtime-Coupled)</text>
+  <a class="arch-node" href="#section-7-1">
+    <rect x="28" y="46" width="418" height="56" rx="4" class="arch-card-teal"></rect>
+    <text x="237" y="68" text-anchor="middle" class="arch-t-title">#53 Gherkin Features · TS/Scala Oracles · manifest.sha256.json</text>
+    <text x="237" y="88" text-anchor="middle" class="arch-t-mono">KERNEL · SHA-256 Locked Oracles &amp; Witness Suites (Domain/App/HTTP)</text>
+  </a>
+  <a class="arch-node" href="#section-7-2">
+    <rect x="468" y="46" width="424" height="56" rx="4" class="arch-card-red"></rect>
+    <text x="680" y="68" text-anchor="middle" class="arch-t-title">#54 Mutation Gate · Onion DIP Gate · sbt/scalac Partition</text>
+    <text x="680" y="88" text-anchor="middle" class="arch-t-mono">GLUE · 100% Guard Mutation Kill + 0 DIP Violations + Boundary Audit</text>
+  </a>
+
+  <rect x="14" y="130" width="892" height="132" rx="5" class="arch-band-ink"></rect>
+  <text x="28" y="152" class="arch-t-band">LAYER 4 · INTERFACES &amp; PLAY SERVICE RUNTIME (HTTP Entry / 5-Layer Authz / Build Scaffold)</text>
+  <a class="arch-node" href="#section-6-1">
+    <rect x="28" y="166" width="204" height="80" rx="4" class="arch-card-teal"></rect>
+    <text x="130" y="190" text-anchor="middle" class="arch-t-title">#49 ApiDto &amp; 5-Layer PEP/PDP</text>
+    <text x="130" y="210" text-anchor="middle" class="arch-t-sub">Principal / Authz / RowScope</text>
+    <text x="130" y="230" text-anchor="middle" class="arch-t-teal">KERNEL + SEAM</text>
+  </a>
+  <a class="arch-node" href="#section-6-2">
+    <rect x="248" y="166" width="210" height="80" rx="4" class="arch-card"></rect>
+    <text x="353" y="190" text-anchor="middle" class="arch-t-title">#34–#36 Controllers &amp; DSL</text>
+    <text x="353" y="210" text-anchor="middle" class="arch-t-sub">PlayController / StateApi / CommandDsl</text>
+    <text x="353" y="230" text-anchor="middle" class="arch-t-mono">GLUE · HTTP → AppPort</text>
+  </a>
+  <a class="arch-node" href="#section-6-3">
+    <rect x="474" y="166" width="212" height="80" rx="4" class="arch-card"></rect>
+    <text x="580" y="190" text-anchor="middle" class="arch-t-title">#37–#38 ServiceLoader &amp; Routes</text>
+    <text x="580" y="210" text-anchor="middle" class="arch-t-sub">ServiceContract / PlayHttpBridge</text>
+    <text x="580" y="230" text-anchor="middle" class="arch-t-mono">GLUE · Routing &amp; Contract Check</text>
+  </a>
+  <a class="arch-node" href="#section-6-4">
+    <rect x="702" y="166" width="190" height="80" rx="4" class="arch-card"></rect>
+    <text x="797" y="190" text-anchor="middle" class="arch-t-title">#39 Project Scaffold</text>
+    <text x="797" y="210" text-anchor="middle" class="arch-t-sub">build.sbt / dev.conf / serialization</text>
+    <text x="797" y="230" text-anchor="middle" class="arch-t-mono">GLUE · ScalaPB + Akka</text>
+  </a>
+
+  <rect x="14" y="278" width="892" height="162" rx="5" class="arch-band-amber"></rect>
+  <text x="28" y="300" class="arch-t-band-amber">LAYER 3 · INFRASTRUCTURE &amp; DI RE-ASSEMBLY (Outermost Implementations: Wire Codecs, Stores &amp; Boot)</text>
+  <a class="arch-node" href="#section-5-1">
+    <rect x="28" y="314" width="204" height="110" rx="4" class="arch-card"></rect>
+    <text x="130" y="338" text-anchor="middle" class="arch-t-title">#29–#33 Protobuf &amp; Adapters</text>
+    <text x="130" y="358" text-anchor="middle" class="arch-t-sub">*.proto / *ProtoConverter</text>
+    <text x="130" y="376" text-anchor="middle" class="arch-t-sub">*EventAdapter / SnapshotAdapter</text>
+    <text x="130" y="394" text-anchor="middle" class="arch-t-sub">DomainProtoSerializer</text>
+    <text x="130" y="412" text-anchor="middle" class="arch-t-mono">GLUE · ScalaPB Journal Codec</text>
+  </a>
+  <a class="arch-node" href="#section-5-2">
+    <rect x="248" y="314" width="204" height="110" rx="4" class="arch-card"></rect>
+    <text x="350" y="338" text-anchor="middle" class="arch-t-title">#12 / #24 Repo &amp; DLQ Impl</text>
+    <text x="350" y="358" text-anchor="middle" class="arch-t-sub">*RepositoryImpl / *Schema DDL</text>
+    <text x="350" y="376" text-anchor="middle" class="arch-t-sub">ReadsideRepositoryImpl</text>
+    <text x="350" y="394" text-anchor="middle" class="arch-t-sub">PolicyDlqBury (kn_projection_dlq)</text>
+    <text x="350" y="412" text-anchor="middle" class="arch-t-mono">GLUE · ScalikeJDBC / InMem</text>
+  </a>
+  <a class="arch-node" href="#section-5-3">
+    <rect x="468" y="314" width="196" height="110" rx="4" class="arch-card-amber"></rect>
+    <text x="566" y="338" text-anchor="middle" class="arch-t-title">#25 Connectors &amp; Effects</text>
+    <text x="566" y="358" text-anchor="middle" class="arch-t-sub">DefaultOutboundConnectors</text>
+    <text x="566" y="376" text-anchor="middle" class="arch-t-sub">*ConnectorImpl / *EffectPortImpl</text>
+    <text x="566" y="394" text-anchor="middle" class="arch-t-sub">ServerSnapshotProviderImpl</text>
+    <text x="566" y="412" text-anchor="middle" class="arch-t-amber">GLUE + Isolated Adapters</text>
+  </a>
+  <a class="arch-node" href="#section-5-5">
+    <rect x="680" y="314" width="212" height="110" rx="4" class="arch-card-dark"></rect>
+    <text x="786" y="338" text-anchor="middle" class="arch-t-title-dark">#38 / #47 / #50 DI &amp; Bootstrap</text>
+    <text x="786" y="358" text-anchor="middle" class="arch-t-sub-dark">*Bootstrap (#47 / #38b / #59 Policy)</text>
+    <text x="786" y="376" text-anchor="middle" class="arch-t-sub-dark">BootstrapModule + GeneratedBindings</text>
+    <text x="786" y="394" text-anchor="middle" class="arch-t-sub-dark">HandwrittenBindings + ProjectionMod</text>
+    <text x="786" y="412" text-anchor="middle" class="arch-t-teal">★ RE-ASSEMBLY HUB ★</text>
+  </a>
+
+  <rect x="14" y="456" width="892" height="252" rx="5" class="arch-band"></rect>
+  <text x="28" y="478" class="arch-t-band">LAYER 2 · APPLICATION LAYER (Write Hosts, Read Projections, Reactive Policy &amp; Long-Running Sagas)</text>
+  <a class="arch-node" href="#section-4-1">
+    <rect x="28" y="492" width="204" height="92" rx="4" class="arch-card-amber"></rect>
+    <text x="130" y="516" text-anchor="middle" class="arch-t-title">#7 / #11 Protocol &amp; Helpers</text>
+    <text x="130" y="536" text-anchor="middle" class="arch-t-sub">Command / Reply(Accepted/Refused)</text>
+    <text x="130" y="554" text-anchor="middle" class="arch-t-sub">Params → Command Unpacking</text>
+    <text x="130" y="572" text-anchor="middle" class="arch-t-amber">SEAM + GLUE</text>
+  </a>
+  <a class="arch-node" href="#section-4-2">
+    <rect x="248" y="492" width="204" height="92" rx="4" class="arch-card"></rect>
+    <text x="350" y="516" text-anchor="middle" class="arch-t-title">#6 / #8–#10 Aggregate &amp; Behaviors</text>
+    <text x="350" y="536" text-anchor="middle" class="arch-t-sub">EntityKey / tags / commandHandler</text>
+    <text x="350" y="554" text-anchor="middle" class="arch-t-sub">runReplyingPolicy + withPost</text>
+    <text x="350" y="572" text-anchor="middle" class="arch-t-mono">GLUE · Hosts Domain Rules</text>
+  </a>
+  <a class="arch-node" href="#section-4-4">
+    <rect x="468" y="492" width="212" height="92" rx="4" class="arch-card-teal"></rect>
+    <text x="574" y="516" text-anchor="middle" class="arch-t-title">#51 / #52 StoryPort &amp; @cloze Impl</text>
+    <text x="574" y="536" text-anchor="middle" class="arch-t-sub">ExternPorts / EffectsPort / Handler</text>
+    <text x="574" y="554" text-anchor="middle" class="arch-t-sub">CallerContractSpec · handwritten Impl</text>
+    <text x="574" y="572" text-anchor="middle" class="arch-t-teal">KERNEL + SEAM</text>
+  </a>
+  <a class="arch-node" href="#section-4-3">
+    <rect x="696" y="492" width="196" height="92" rx="4" class="arch-card-amber"></rect>
+    <text x="794" y="516" text-anchor="middle" class="arch-t-title">#12 Repository Port</text>
+    <text x="794" y="536" text-anchor="middle" class="arch-t-sub">&lt;Agg&gt;Repository trait</text>
+    <text x="794" y="554" text-anchor="middle" class="arch-t-sub">getState / askAsync</text>
+    <text x="794" y="572" text-anchor="middle" class="arch-t-amber">SEAM · DIP Boundary</text>
+  </a>
+
+  <a class="arch-node" href="#section-4-5">
+    <rect x="28" y="600" width="278" height="94" rx="4" class="arch-card-teal"></rect>
+    <text x="167" y="624" text-anchor="middle" class="arch-t-title">#15 / #23 / #26–#28 ReadSide Suite</text>
+    <text x="167" y="644" text-anchor="middle" class="arch-t-sub">&lt;View&gt; · QueryService · ReadsideRepository</text>
+    <text x="167" y="662" text-anchor="middle" class="arch-t-sub">ApplyEvent / ProjectionHandler / Projection</text>
+    <text x="167" y="680" text-anchor="middle" class="arch-t-teal">KERNEL + GLUE · Event → Query View</text>
+  </a>
+  <a class="arch-node" href="#section-4-6">
+    <rect x="322" y="600" width="280" height="94" rx="4" class="arch-card-teal"></rect>
+    <text x="462" y="624" text-anchor="middle" class="arch-t-title">#55–#60 Reactive Policy &amp; PolicyMachine</text>
+    <text x="462" y="644" text-anchor="middle" class="arch-t-sub">#55 Decision · #56 Mechanics · #57 Handler</text>
+    <text x="462" y="662" text-anchor="middle" class="arch-t-sub">#58 Runner · #60 PolicyMachine(Left→Dispose)</text>
+    <text x="462" y="680" text-anchor="middle" class="arch-t-teal">KERNEL + GLUE · Event ⇒ Command Loop</text>
+  </a>
+  <a class="arch-node" href="#section-4-7">
+    <rect x="618" y="600" width="274" height="94" rx="4" class="arch-card-amber"></rect>
+    <text x="755" y="624" text-anchor="middle" class="arch-t-title">#13 / #40–#46 Saga &amp; ExternalBridge</text>
+    <text x="755" y="644" text-anchor="middle" class="arch-t-sub">*SagaModule · CompositionHost · EffectFace</text>
+    <text x="755" y="662" text-anchor="middle" class="arch-t-sub">*ConnectorPort · #46 ExternalAuthority</text>
+    <text x="755" y="680" text-anchor="middle" class="arch-t-amber">KERNEL + SEAM · Cross-Agg &amp; Cross-BC</text>
+  </a>
+
+  <rect x="14" y="724" width="892" height="242" rx="5" class="arch-band-teal"></rect>
+  <text x="28" y="746" class="arch-t-band-teal">LAYER 1 · DOMAIN CORE (Innermost Ring · Zero Akka / Play / JDBC Dependencies · Standalone scalac + Mutation)</text>
+  <a class="arch-node" href="#section-3-1">
+    <rect x="28" y="762" width="278" height="84" rx="4" class="arch-card-teal"></rect>
+    <text x="167" y="786" text-anchor="middle" class="arch-t-title">#1 Value Objects &amp; ExactTypes</text>
+    <text x="167" y="806" text-anchor="middle" class="arch-t-sub">Money / AmountDecimal / NavDecimal</text>
+    <text x="167" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · Construction-Time Proofs</text>
+  </a>
+  <a class="arch-node" href="#section-3-2">
+    <rect x="322" y="762" width="280" height="84" rx="4" class="arch-card-teal"></rect>
+    <text x="462" y="786" text-anchor="middle" class="arch-t-title">#2 Domain Entity</text>
+    <text x="462" y="806" text-anchor="middle" class="arch-t-sub">State / empty / sealed trait Event</text>
+    <text x="462" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · Pure Aggregate Model</text>
+  </a>
+  <a class="arch-node" href="#section-3-3">
+    <rect x="618" y="762" width="274" height="84" rx="4" class="arch-card-teal"></rect>
+    <text x="755" y="786" text-anchor="middle" class="arch-t-title">#3 EventHandler (Event Fold)</text>
+    <text x="755" y="806" text-anchor="middle" class="arch-t-sub">(State, Event) =&gt; State Fold</text>
+    <text x="755" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · Single Truth from EARS post:</text>
+  </a>
+
+  <a class="arch-node" href="#section-3-4">
+    <rect x="28" y="862" width="278" height="88" rx="4" class="arch-card-teal"></rect>
+    <text x="167" y="886" text-anchor="middle" class="arch-t-title">#4 / #5 / #45 Invariant Rules &amp; Params</text>
+    <text x="167" y="906" text-anchor="middle" class="arch-t-sub">(State, Params) =&gt; Either[Err, List[Event]]</text>
+    <text x="167" y="926" text-anchor="middle" class="arch-t-teal">KERNEL · Z3 First-Hit + Postconditions</text>
+  </a>
+  <a class="arch-node" href="#section-3-5">
+    <rect x="322" y="862" width="280" height="88" rx="4" class="arch-card-teal"></rect>
+    <text x="462" y="886" text-anchor="middle" class="arch-t-title">#48 Domain Axioms &amp; Replay</text>
+    <text x="462" y="906" text-anchor="middle" class="arch-t-sub">replay(events) / checkAxioms(state)</text>
+    <text x="462" y="926" text-anchor="middle" class="arch-t-teal">KERNEL · Runtime ALWAYS Invariants</text>
+  </a>
+  <a class="arch-node" href="#section-3-6">
+    <rect x="618" y="862" width="274" height="88" rx="4" class="arch-card-amber"></rect>
+    <text x="755" y="886" text-anchor="middle" class="arch-t-title">#14 / #51 Computations Port &amp; Impl</text>
+    <text x="755" y="906" text-anchor="middle" class="arch-t-sub">L1 → .Noop / L2 → handwritten Impl</text>
+    <text x="755" y="926" text-anchor="middle" class="arch-t-amber">SEAM · Non-Linear / Domain Compute</text>
+  </a>
+
+  <line x1="130" y1="246" x2="130" y2="274" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
+  <line x1="353" y1="246" x2="353" y2="310" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
+  <line x1="580" y1="246" x2="580" y2="488" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
+  <line x1="786" y1="424" x2="786" y2="452" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <line x1="350" y1="584" x2="350" y2="858" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <line x1="462" y1="694" x2="462" y2="758" class="arch-edge-amber" marker-end="url(#map-arr-amber)"></line>
+  <line x1="167" y1="694" x2="167" y2="758" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <line x1="566" y1="424" x2="566" y2="488" class="arch-edge-amber" marker-end="url(#map-arr-amber)"></line>
+</svg>
+<figcaption>Figure 1: Five-layer Onion Architecture Artifact Type Map for Play CQRS (<code>scala-cqrs-play-service:2</code>). Solid arrows indicate <strong>inward compile-time dependencies</strong> (outer layers depend on inner Ports/Kernels; inner rings never import frameworks); dashed/accent edges show <strong>runtime DI assembly and reactive Event ⇒ Command loops</strong>.</figcaption>
+</figure>
+
+<h3 id="section-2-1">How Decomposed Pieces Re-Assemble Into a Running Service</h3>
+<p>On first inspection, splitting a service into 60 artifact kinds raises an obvious question: <strong>who actually stitches <code>FundQuotaRules</code>, <code>FundOrderComputationsImpl</code>, <code>CashFundPurchaseImpl</code>, <code>BankOrderApplyEventSemanticsImpl</code>, and <code>PolicyOn*Runner</code> together at boot?</strong> Figure 2 shows both assembly backbones:</p>
+<figure class="co-arch-fig co-arch-map">
+<div class="arch-caption-head">FIGURE 02 · DECOMPOSITION &amp; RE-ASSEMBLY WIRING TOPOLOGY (GUICE DI + AKKA RUNTIME)</div>
+<svg viewBox="0 0 920 390" width="100%" role="img" aria-label="How decomposed Artifact Types re-assemble via the Guice DI module tree and ApplicationBootstrap into running Akka Sharding and Projection daemons">
+  <defs>
+    <marker id="wire-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
+    </marker>
+    <marker id="wire-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"></path>
+    </marker>
+    <marker id="wire-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+  </defs>
+
+  <rect x="14" y="14" width="430" height="360" rx="5" class="arch-band"></rect>
+  <text x="28" y="38" class="arch-t-band">1. PLAY / GUICE DI MODULE TREE (STATIC WIRING)</text>
+
+  <rect x="34" y="56" width="390" height="68" rx="4" class="arch-card-dark"></rect>
+  <text x="229" y="82" text-anchor="middle" class="arch-t-title-dark">BootstrapModule (modules/BootstrapModule.scala)</text>
+  <text x="229" y="102" text-anchor="middle" class="arch-t-sub-dark">Binds AggRepositories → installs HandwrittenBindingsModule → eager ApplicationBootstrap</text>
+
+  <rect x="34" y="148" width="390" height="62" rx="4" class="arch-card-amber"></rect>
+  <text x="229" y="172" text-anchor="middle" class="arch-t-title">HandwrittenBindingsModule (handwritten/ · never overwritten)</text>
+  <text x="229" y="192" text-anchor="middle" class="arch-t-sub">install(GeneratedBindingsModule) + install(&lt;Ctx&gt;ProjectionModule)</text>
+
+  <rect x="34" y="234" width="212" height="122" rx="4" class="arch-card-teal"></rect>
+  <text x="140" y="258" text-anchor="middle" class="arch-t-title">GeneratedBindingsModule</text>
+  <text x="140" y="278" text-anchor="middle" class="arch-t-sub">• L1 Computations → .Noop</text>
+  <text x="140" y="296" text-anchor="middle" class="arch-t-sub">• L2 Computations → *Impl</text>
+  <text x="140" y="314" text-anchor="middle" class="arch-t-sub">• L3 StoryHandler → *Impl</text>
+  <text x="140" y="332" text-anchor="middle" class="arch-t-sub">• PolicySemantics + DlqSink</text>
+  <text x="140" y="348" text-anchor="middle" class="arch-t-sub">• HttpRouter + ToolGates</text>
+
+  <rect x="262" y="234" width="162" height="122" rx="4" class="arch-card"></rect>
+  <text x="343" y="258" text-anchor="middle" class="arch-t-title">&lt;Ctx&gt;ProjectionModule</text>
+  <text x="343" y="280" text-anchor="middle" class="arch-t-sub">#26 ApplyEventSemantics</text>
+  <text x="343" y="298" text-anchor="middle" class="arch-t-sub">→ ApplyEventSemanticsImpl</text>
+  <text x="343" y="322" text-anchor="middle" class="arch-t-mono">handwritten/ ReadModel</text>
+  <text x="343" y="340" text-anchor="middle" class="arch-t-mono">custom row fold hooks</text>
+
+  <line x1="229" y1="124" x2="229" y2="145" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="140" y1="210" x2="140" y2="231" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="343" y1="210" x2="343" y2="231" class="arch-edge-amber" marker-end="url(#wire-arr-amber)"></line>
+
+  <rect x="468" y="14" width="438" height="360" rx="5" class="arch-band-teal"></rect>
+  <text x="482" y="38" class="arch-t-band-teal">2. AKKA RUNTIME BOOTSTRAP &amp; REACTIVE LOOP (DYNAMIC)</text>
+
+  <rect x="488" y="56" width="398" height="68" rx="4" class="arch-card-dark"></rect>
+  <text x="687" y="82" text-anchor="middle" class="arch-t-title-dark">ApplicationBootstrap (mixes in all *Bootstrap traits)</text>
+  <text x="687" y="102" text-anchor="middle" class="arch-t-sub-dark">init&lt;Agg&gt;Aggregate + init&lt;View&gt;ReadsideProjection + initPolicyOn&lt;Cmd&gt;Projection</text>
+
+  <rect x="488" y="150" width="188" height="94" rx="4" class="arch-card-teal"></rect>
+  <text x="582" y="174" text-anchor="middle" class="arch-t-title">ClusterSharding Write Ring</text>
+  <text x="582" y="194" text-anchor="middle" class="arch-t-sub">EventSourcedBehavior</text>
+  <text x="582" y="212" text-anchor="middle" class="arch-t-sub">Behaviors → Rules + EventHandler</text>
+  <text x="582" y="230" text-anchor="middle" class="arch-t-sub">EventAdapter → Protobuf Journal</text>
+
+  <rect x="698" y="150" width="188" height="94" rx="4" class="arch-card-amber"></rect>
+  <text x="792" y="174" text-anchor="middle" class="arch-t-title">ShardedDaemonProcess</text>
+  <text x="792" y="194" text-anchor="middle" class="arch-t-sub">eventsByTag(ReadJournal)</text>
+  <text x="792" y="212" text-anchor="middle" class="arch-t-sub">① ReadSide → ViewTable</text>
+  <text x="792" y="230" text-anchor="middle" class="arch-t-sub">② PolicyMachine → EntityKey.ask</text>
+
+  <rect x="488" y="268" width="398" height="88" rx="4" class="arch-card"></rect>
+  <text x="687" y="292" text-anchor="middle" class="arch-t-title">PlayHttpBridge / ServiceLoader → StoryController → StoryImpl</text>
+  <text x="687" y="314" text-anchor="middle" class="arch-t-sub">5-Layer Authz (PEP/PDP + RowScope) → ExternPorts/EffectsPort → AggregateProtocol</text>
+  <text x="687" y="334" text-anchor="middle" class="arch-t-mono">SagaCoordinatorBootstrap drives cross-aggregate flows &amp; #46 ExternalAuthority</text>
+
+  <line x1="582" y1="124" x2="582" y2="147" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="792" y1="124" x2="792" y2="147" class="arch-edge-amber" marker-end="url(#wire-arr-amber)"></line>
+  <line x1="676" y1="196" x2="695" y2="196" class="arch-edge" marker-end="url(#wire-arr-ink)"></line>
+  <line x1="424" y1="90" x2="485" y2="90" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+</svg>
+<figcaption>Figure 2: Static assembly walks <code>BootstrapModule → HandwrittenBindingsModule → GeneratedBindingsModule + ProjectionModule</code>, while runtime startup executes inside <code>ApplicationBootstrap</code> mixing in aggregate, readside, and reactive policy bootstraps.</figcaption>
+</figure>
+
+<hr>
+<h2 id="section-3">3. Domain Core Layer (Innermost · Zero Framework Dependencies)</h2>
+<p>The <code>domain/</code> package holds the highest-trust <strong>Kernel</strong> and <strong>Seam</strong> artifacts: zero HTTP, Akka, or database knowledge, compiling standalone via offline <code>scalac</code>.</p>
+<h3 id="section-3-1">Value Object &amp; ExactType (#1)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>Problem solved</strong>: Eliminates raw <code>BigDecimal</code> / <code>String</code> currency mix-ups, precision drift, and unchecked domain enums. Generated from <code>structures/exactTypes</code> and <code>valueObjects</code> (<code>Money</code>, <code>AmountDecimal</code>, <code>NavDecimal</code>, <code>BankCashAcknowledgement</code>), enforcing scale/unit proofs at construction time.</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/values/Money.scala
+sealed abstract case class Money private (amount: BigDecimal, currency: String) {
+  def isPositive: Boolean = amount &gt; 0
+  def plus(other: Money): Either[iMadzError, Money] =
+    if (currency != other.currency) Left(iMadzError("EXACT_UNIT_MISMATCH", "exact units differ"))
+    else for {
+      lhs &lt;- Money.checkedAmount(amount)
+      rhs &lt;- Money.checkedAmount(other.amount)
+      result &lt;- Money.checkedAmount(lhs + rhs)
+    } yield new Money(result, currency) {}
+}
+</code></pre>
+<h3 id="section-3-2">Domain Entity (#2)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>Problem solved</strong>: Defines each aggregate root's immutable <code>State</code>, <code>empty</code> baseline, and <code>sealed trait Event extends CborSerializable</code> vocabulary from a single structural truth.</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/entities/FundOrderEntity.scala
+object FundOrderEntity {
+  final case class State(netAmount: BigDecimal, paymentOutcome: String, taStatus: String)
+  def empty: State = State(netAmount = BigDecimal("0.00"), paymentOutcome = "pending", taStatus = "pending")
+
+  sealed trait Event extends CborSerializable
+  final case class CashRequestSourceRecorded(principal: String, clientRequestId: String) extends Event
+  final case class FundTASharesConfirmed(shares: Long, nav: BigDecimal) extends Event
+  type EventHandler = (State, Event) =&gt; State
+}
+</code></pre>
+<h3 id="section-3-3">EventHandler (#3)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>Problem solved</strong>: Guarantees Event Sourcing state replay matches EARS <code>post:</code> assignments identically, preventing divergence between write guards and state folding.</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/entities/behaviors/FundQuotaEventHandler.scala
+object FundQuotaEventHandler extends EventHandler {
+  override def apply(state: State, input: Event): State = input match {
+    case event: SubscriptionQuotaReserved =&gt;
+      state.copy(
+        fundTotalUsed = (state.fundTotalUsed + event.amount),
+        accountUsed = state.accountUsed.updated(
+          event.accountId,
+          (state.accountUsed.getOrElse(event.accountId, BigDecimal("0")) + event.amount))
+      )
+  }
+}
+</code></pre>
+<h3 id="section-3-4">Aggregate Invariant Rules &amp; RuleParams (#4 / #5 / #45)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>Problem solved</strong>: Encapsulates pure command inputs inside <code>&lt;Agg&gt;RuleParams.&lt;Cmd&gt;Params</code> and compiles EARS rules into <code>InvariantRule[Event, State, Params]</code> enforcing <strong>DMN FIRST-HIT</strong> order and <code>checkEventPostconditions</code>, each tagged with <code>@knowledge</code> provenance anchors.</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/invariants/FundQuotaRules.scala
+final class ReserveSubscriptionQuotaRule(hosts: FundQuotaComputations)
+    extends InvariantRule[Event, State, ReserveSubscriptionQuotaParams] {
+  override def apply(state: State, p: ReserveSubscriptionQuotaParams): Either[iMadzError, List[Event]] = {
+    if ((p.amount &lt; state.minPurchase || p.amount &gt; state.maxSingleLimit)) Left(iMadzError("QUOTA_AMOUNT_RANGE", "QUOTA_AMOUNT_RANGE"))
+    else if (((state.fundTotalUsed + p.amount) &gt; state.fundTotalCap)) Left(iMadzError("QUOTA_FUND_CAP", "QUOTA_FUND_CAP"))
+    else if (((state.accountUsed.getOrElse(p.accountId, BigDecimal("0")) + p.amount) &gt; state.perAccountCap)) Left(iMadzError("QUOTA_ACCOUNT_CAP", "QUOTA_ACCOUNT_CAP"))
+    else Right(List(SubscriptionQuotaReserved(p.accountId, p.amount)))
+  }
+}
+</code></pre>
+<h3 id="section-3-5">Z3 Axioms &amp; Replay (#48)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>Problem solved</strong>: Turns <a href="https://github.com/Z3Prover/z3">Z3 Prover</a>-verified <code>axioms: ALWAYS</code> into executable runtime/test predicates (<code>checkAxioms(state)</code>) paired with deterministic <code>replay(initial, events)</code>.</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/entities/FundQuotaAxioms.scala
+object FundQuotaAxioms {
+  def replay(initial: State, events: Seq[Event]): State =
+    events.foldLeft(initial)(FundQuotaEventHandler.apply)
+
+  def checkAxioms(state: State): Seq[String] = {
+    val violated = scala.collection.mutable.ListBuffer.empty[String]
+    if (!(state.fundTotalUsed &lt;= state.fundTotalCap)) violated += "AX-Q-1"
+    if (state.accountUsed.keys.exists(accountId =&gt; !(state.accountUsed.getOrElse(accountId, BigDecimal("0")) &lt;= state.perAccountCap))) violated += "AX-Q-2"
+    violated.toSeq
+  }
+}
+</code></pre>
+<h3 id="section-3-6">Domain Computations Port &amp; L2 @cloze Impl (#14 / #51)</h3>
+<p><span class="at-badge at-seam">SEAM</span> <strong>Problem solved</strong>: <code>L1</code> aggregates auto-bind <code>Computations.Noop</code>; <code>L2</code> aggregates (e.g., non-linear <code>shares * nav &lt;= netAmount</code>) get a typed <code>domain/services/&lt;Agg&gt;Computations</code> trait plus a never-overwritten <code>handwritten/</code> <code>*ComputationsImpl.scala</code> <code>@cloze</code> slot wired via Guice.</p>
+<hr>
+<h2 id="section-4">4. Application Layer (Write Protocol, ReadSide, Reactive Policy &amp; Orchestration)</h2>
+<p>The application ring turns pure domain kernels into scheduled CQRS endpoints, materialized views, reactive <code>Event =&gt; Command</code> projections, and cross-aggregate sagas.</p>
+<h3 id="section-4-1">Aggregate Protocol &amp; CommandHelpers (#7 / #11)</h3>
+<p><span class="at-badge at-seam">SEAM</span> <span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Defines <a href="https://doc.akka.io/docs/akka/current/typed/cluster-sharding.html">Akka Cluster Sharding</a> command envelopes (<code>replyTo: ActorRef[Reply]</code>, <code>Accepted(events)</code> / <code>Refused(error)</code>) and pure <code>Command → RuleParams</code> extractors so <code>ActorRef</code> never leaks into Domain Rules.</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/application/aggregates/FundOrderProtocol.scala
+object FundOrderProtocol {
+  sealed trait Command extends CborSerializable
+  final case class RecordFundTAConfirmed(shares: Long, nav: BigDecimal, replyTo: ActorRef[Reply]) extends Command
+  final case class RequestIndependentRefund(orderId: String, replyTo: ActorRef[Reply]) extends Command
+  final case class GetState(replyTo: ActorRef[State]) extends Command
+
+  sealed trait Reply extends CborSerializable
+  final case class Accepted(events: Vector[Event]) extends Reply
+  final case class Refused(error: iMadzError) extends Reply
+  type CommandHandler = (State, Command) =&gt; Effect[Event, State]
+}
+</code></pre>
+<h3 id="section-4-2">Aggregate, Factory &amp; Behaviors (#6 / #8 / #9 / #10)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Pure framework <strong>Glue</strong>. <code>&lt;Agg&gt;Aggregate</code> exports <code>EntityKey</code> and <code>tags</code>; <code>&lt;Agg&gt;Behaviors</code> adapts pure <code>Rules</code> onto Akka persistence via <code>runReplyingPolicy(rule, helper)(state, cmd).withPost(...).replyWith(cmd.replyTo)</code>.</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/application/aggregates/behaviors/FundQuotaBehaviors.scala
+private def executionBehavior(state: State, hosts: FundQuotaComputations): PartialFunction[Command, Effect[Event, State]] = {
+  case cmd: ReserveSubscriptionQuota =&gt;
+    runReplyingPolicy(new FundQuotaRules.ReserveSubscriptionQuotaRule(hosts), ReserveSubscriptionQuotaHelper)(state, cmd)
+      .withPost(FundQuotaRules.checkEventPostconditions)
+      .replyWith(cmd.replyTo)
+}
+</code></pre>
+<h3 id="section-4-3">Aggregate Repository Port (#12)</h3>
+<p><span class="at-badge at-seam">SEAM</span> <strong>Problem solved</strong>: Exposes <code>&lt;Agg&gt;Repository</code> traits to upper orchestration layers so callers never depend directly on <code>ClusterSharding</code>.</p>
+<h3 id="section-4-4">Application Story Port, CallerContractSpec &amp; L3 @cloze Impl (#51 / #52)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-seam">SEAM</span> <strong>Problem solved</strong>: For <code>layer: application</code> EARS stories, generates typed <code>Request</code>, <code>ExternPorts</code>, <code>EffectsPort</code>, <code>CallerContractSpec</code> (replacing raw JSON strings with typed idempotency/retry/untrusted-field contracts), and <code>&lt;Story&gt;Impl.scala</code> inside <code>handwritten/</code>.</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/application/services/CashFundPurchasePort.scala
+trait CashFundPurchaseHandler extends ApplicationService {
+  def handle(req: CashFundPurchaseRequest, externs: CashFundPurchaseExternPorts, effects: CashFundPurchaseEffectsPort): Either[iMadzError, CashFundPurchaseSuccessResponse]
+}
+object CashFundPurchaseCallerContract {
+  val spec: CallerContractSpec = CallerContractSpec(
+    idempotencyKey = "(principal, clientRequestId)",
+    retryPolicy = "at-least-once safe; replayed identical payload must never re-dispatch settlement",
+    forbiddenUntrustedFields = Seq("operationId", "investorAccountId", "fundCollectionAccountId")
+  )
+}
+</code></pre>
+<h3 id="section-4-5">ReadModel View, QueryService &amp; ReadSide Projection (#15 / #23 / #26 / #27 / #28)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Realizes CQRS read models via <code>&lt;View&gt;</code>, <code>&lt;View&gt;QueryService</code>, <code>ReadsideRepository</code>, <a href="https://doc.akka.io/docs/akka-projection/current/"><code>Akka Projection</code></a> definitions, <code>ProjectionHandler</code>, and <code>#26</code> <code>ApplyEventSemantics</code> (bound in <code>&lt;Context&gt;ProjectionModule</code> to handwritten <code>ApplyEventSemanticsImpl</code>).</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/application/readmodels/bank_order_readside/BankOrderReadsideProjectionHandler.scala
+override def process(envelope: EventEnvelope[Any]): Future[Done] =
+  envelope.event match {
+    case e: FundOrderEntity.CashRequestSourceRecorded =&gt;
+      val base = BankOrderView(clientRequestId = envelope.persistenceId)
+      repository.upsert(base.copy(principal = e.principal, clientRequestId = e.clientRequestId)).map(_ =&gt; Done)
+    case _ =&gt; bindings.onUnmatchedEvent(envelope)
+  }
+</code></pre>
+<h3 id="section-4-6">Reactive Policy &amp; PolicyMachine (#55–#58 / #60)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Wires <code>WHEN event &lt;SrcAgg&gt;.&lt;SrcEvent&gt; SHALL dispatch &lt;TargetAgg&gt;.&lt;TargetCmd&gt;</code> specs into fault-tolerant <code>Event ⇒ Command</code> projections — accounting for the <strong>6 new families (<code>#55</code>–<code>#60</code>)</strong> added on top of the 54-family baseline:</p>
+<ul>
+<li><strong><code>#55 policy-decision</code> (<code>PolicyOn&lt;Cmd&gt;.scala</code>)</strong>: Pure <code>(decide, dispose)</code> kernel pair + <code>DefaultSemantics</code> with zero Akka dependencies;</li>
+<li><strong><code>#56 policy-mechanics</code> (<code>PolicyOn&lt;Cmd&gt;Mechanics.scala</code>)</strong>: Sends commands via <code>ClusterSharding.entityRefFor(EntityKey, entityId).ask[Reply]</code>, translating <code>Refused(err)</code> into <code>Left(err)</code>;</li>
+<li><strong><code>#57 policy-handler</code> (<code>PolicyOn&lt;Cmd&gt;Handler.scala</code>)</strong>: Akka <code>Handler[EventEnvelope[Any]]</code> shell decoding events into <code>PolicyEnvelope</code> and delegating to <code>PolicyMachine.run</code>;</li>
+<li><strong><code>#58 policy-runner</code> (<code>PolicyOn&lt;Cmd&gt;Runner.scala</code>)</strong>: Owns <code>EventSourcedProvider.eventsByTag</code> and <code>ProjectionId</code>;</li>
+<li><strong><code>#60 projection-runtime-mechanism</code> (<code>PolicyMachine.scala</code> / <code>FailureVerdict.scala</code> / <code>PolicyEnvelope.scala</code> / <code>PolicyDlqBury.scala</code>)</strong>: Shared 4-stage execution pipeline inspecting <strong>every <code>Left(err)</code> inside <code>Future.traverse(commands)(execute)</code></strong> — burying <code>Permanent</code> verdicts via <code>PolicyDlqSink.bury</code> (advancing offsets) while failing the <code>Future</code> on <code>Retryable</code> verdicts (blocking offset commits for at-least-once replay); daemon registration traits belong to <strong><code>#59 policy-bootstrap</code></strong> (Section 5.4).</li>
+</ul>
+<pre class="code"><code class="language-scala">// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 0b925ad)
+Future
+  .traverse(commands)(execute)
+  .flatMap { results =&gt;
+    val verdicts = results.collect { case Left(err) =&gt; dispose(e, err) }
+    val permanents = verdicts.collect { case p: FailureVerdict.Permanent =&gt; p }
+    val retryables = verdicts.collect { case r: FailureVerdict.Retryable =&gt; r }
+    Future
+      .traverse(permanents)(p =&gt; bury(envelope, s"$aggType·${p.what}"))
+      .flatMap { _ =&gt;
+        retryables.headOption match {
+          case Some(FailureVerdict.Retryable(err)) =&gt;
+            Future.failed(new RuntimeException(s"[policy] $aggType retryable failure: err=${err.code}"))
+          case None =&gt; Future.successful(())
+        }
+      }
+  }
+</code></pre>
+<h3 id="section-4-7">Orchestration, Saga, EffectFace &amp; ExternalEventBridge (#13 / #16–#21 / #40–#44 / #46)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-seam">SEAM</span> <strong>Problem solved</strong>: Unifies multi-step Sagas (<code>#40</code>–<code>#44</code> superseding legacy <code>#16</code>–<code>#21</code>), toolgate connectors, effect hosts, and cross-bounded-context ACL integration (<code>#46 ExternalEventBridge</code>).</p>
+<hr>
+<h2 id="section-5">5. Infrastructure Layer (Serialization, Persistence &amp; Re-Assembly Wiring)</h2>
+<p>The outermost implementation ring handles Protobuf persistence, SQL/in-memory stores, external connectors, and—critically—<strong>re-assembling every decomposed Artifact Type into a live system</strong>.</p>
+<h3 id="section-5-1">Protobuf Schema, ProtoConverters &amp; Serialization Adapters (#29–#33)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Protects <a href="https://doc.akka.io/docs/akka/current/typed/persistence.html">Akka Persistence Typed</a> event journals with schema-evolved <a href="https://scalapb.github.io/">ScalaPB</a> Protobuf messages, converters, <code>EventAdapter</code>/<code>SnapshotAdapter</code>, and <code>DomainProtoSerializer</code> with explicit <code>ClassTag</code> registries.</p>
+<pre class="code"><code class="language-scala">// infrastructure/persistence/FundOrderEventAdapter.scala
+class FundOrderEventAdapter extends EventAdapter[Event, pb.FundOrderEventPO] with FundOrderProtoConverters {
+  override def manifest(event: Event): String = "FundOrderEventPO"
+  override def toJournal(event: Event): pb.FundOrderEventPO = encodeFundOrderEventPO(event)
+  override def fromJournal(envelope: pb.FundOrderEventPO, manifest: String): EventSeq[Event] =
+    EventSeq.single(decodeFundOrderEventPO(envelope))
+}
+</code></pre>
+<h3 id="section-5-2">Repository Impl, ReadSide DDL &amp; PolicyDlqBury (#12 / #24)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Emits SQL <code>CREATE TABLE IF NOT EXISTS</code> DDLs (<code>&lt;View&gt;ReadsideSchema</code>), <a href="http://scalikejdbc.org/">ScalikeJDBC</a> upsert repositories (<code>&lt;View&gt;RepositoryImpl</code>), aggregate repository sharding adapters, and <code>PolicyDlqBury</code> writing dead-letter rows to <code>kn_projection_dlq</code>.</p>
+<h3 id="section-5-3">Outbound Connectors &amp; Effect Implementations (#25)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Supplies default runnable adapters (<code>DefaultOutboundConnectors</code>, <code>InMemoryStore</code>) and handwritten extension points (<code>*ConnectorImpl</code>, <code>*EffectPortImpl</code>).</p>
+<h3 id="section-5-4">Bootstrap Traits (#47 / #38b / #38c / #38d / #59 policy-bootstrap)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Isolates Akka cluster initialization ceremonies into composable traits (<code>&lt;Agg&gt;Bootstrap</code>, <code>&lt;View&gt;ReadsideBootstrap</code>, <code>PolicyOn&lt;Cmd&gt;Bootstrap</code>, <code>SagaCoordinatorBootstrap</code>) using <code>EventSourcedBehavior</code> and <code>ShardedDaemonProcess</code>.</p>
+<pre class="code"><code class="language-scala">// infrastructure/bootstrap/FundQuotaBootstrap.scala
+EventSourcedBehavior[Command, Event, State](
+  persistenceId = PersistenceId.ofUniqueId(persistenceId),
+  emptyState = initial,
+  commandHandler = FundQuotaAggregate.commandHandler(hosts),
+  eventHandler = FundQuotaEventHandler.apply
+).withTagger(_ =&gt; Set(tag))
+ .withRetention(RetentionCriteria.snapshotEvery(numberOfEvents = 100, keepNSnapshots = 3))
+ .eventAdapter(new FundQuotaEventAdapter)
+ .snapshotAdapter(new FundQuotaSnapshotAdapter)
+</code></pre>
+<h3 id="section-5-5">Guice DI Wiring &amp; ApplicationBootstrap (#38 / #50)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: The <strong>global re-assembly switch</strong> chaining <a href="https://github.com/google/guice">Google Guice</a> and <a href="https://www.playframework.com/">Play Framework</a> modules in four clear hops:</p>
+<ol>
+<li><strong><code>BootstrapModule</code></strong>: Binds <code>&lt;Agg&gt;RepositoryImpl</code>, loads <code>HandwrittenBindingsModule</code> via <code>installOptionalModule</code>, and marks <code>ApplicationBootstrap</code> <code>.asEagerSingleton()</code>.</li>
+<li><strong><code>HandwrittenBindingsModule</code> (<code>handwritten/</code> never overwritten)</strong>: Installs <code>GeneratedBindingsModule</code> and <code>&lt;Context&gt;ProjectionModule</code>, offering a single safe override point for custom production bindings.</li>
+<li><strong><code>GeneratedBindingsModule</code></strong>: Closes all DI loops (<code>L1 Computations → .Noop</code>, <code>L2 Computations → *Impl</code>, <code>L3 StoryHandler → *Impl</code>, <code>ReadsideRepositoryImpl</code>, <code>PolicyDlqSink</code>, <code>PolicyOn&lt;Cmd&gt;Semantics</code>, <code>HttpRouter</code>).</li>
+<li><strong><code>ApplicationBootstrap</code></strong>: Mixes in every <code>&lt;Agg&gt;Bootstrap</code>, <code>&lt;View&gt;ReadsideBootstrap</code>, and <code>PolicyOn&lt;Cmd&gt;Bootstrap</code> trait and initializes them at startup.</li>
+</ol>
+<hr>
+<h2 id="section-6">6. Interfaces &amp; Service Runtime Layer (HTTP, 5-Layer Authz &amp; Build Scaffold)</h2>
+<p>The service interface shell translates HTTP traffic, enforces 5-layer authorization, and packages the complete Play/sbt build.</p>
+<h3 id="section-6-1">5-Layer Authz PEP/PDP &amp; ApiDto (#49)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-seam">SEAM</span> <strong>Problem solved</strong>: Standardizes <code>Principal</code>, <code>AuthzDecisionQuery</code>, <code>AuthorizationPort</code>, <code>EntitlementPort</code>, CSRF checks, and HTTP error status mapping.</p>
+<h3 id="section-6-2">HTTP Controllers, AggregateStateApiController &amp; CommandDsl (#34–#36)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Thin Play controllers merge request inputs and <code>Principal</code>, invoke <code>&lt;Story&gt;Handler</code>, and enforce post-handler <strong><code>RowScope</code> anti-IDOR verification</strong> (<code>403 FORBIDDEN_ROW_SCOPE</code> on mismatch), alongside <code>#34 AggregateStateApiController</code> read probes.</p>
+<pre class="code"><code class="language-scala">// interfaces/http/CashFundPurchaseController.scala
+handler.handle(appReq, externs, effects) match {
+  case Left(err) =&gt; HttpResponse(status = HttpStatusMapper.statusForRejection(err.code), body = Map("ok" -&gt; false, "code" -&gt; err.code))
+  case Right(res) =&gt;
+    if (rowScopeDenied) HttpResponse(status = 403, body = Map("ok" -&gt; false, "code" -&gt; "FORBIDDEN_ROW_SCOPE"))
+    else HttpResponse(status = 200, body = withView)
+}
+</code></pre>
+<h3 id="section-6-3">ServiceContract, ServiceLoader, PlayHttpBridge &amp; Routes (#37 / #38)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Enforces startup endpoint pinning (<code>requireInstalled</code>) and routes HTTP verbs/paths (<code>conf/routes</code>) through <code>PlayHttpBridge</code>.</p>
+<h3 id="section-6-4">Project Scaffold &amp; Runtime Configs (#39)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: Emits <code>build.sbt</code> (mounting both <code>generated-scaffold/scala</code> and <code>handwritten/scala</code> plus <code>sbt-protoc</code>/ScalaPB), <code>conf/serialization.conf</code>, and self-contained <code>conf/dev.conf</code>.</p>
+<hr>
+<h2 id="section-7">7. Verification &amp; BDD Oracle Layer (Executable Proof Gates)</h2>
+<p>Verification artifacts are first-class generated outputs—never afterthought prose.</p>
+<h3 id="section-7-1">Gherkin Features, Executable Oracles &amp; Locked Manifest (#53)</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>Problem solved</strong>: Materializes Z3 witnesses into Gherkin <code>.feature</code> files, TypeScript <code>node:test</code> specs, ScalaTest <code>AnyFunSuite</code> suites, and a SHA-256 anti-tamper lock <code>manifest.sha256.json</code>.</p>
+<h3 id="section-7-2">Mutation Gate &amp; Onion DIP Gate (#54)</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>Problem solved</strong>: <code>verify-v2</code> runs automated <code>checkOnionDipBoundaries</code> (verifying 0 inward-dependency violations across <code>domain/</code> and <code>application/</code>) plus <code>mutation-gate.mjs</code> (requiring 100% mutant kill rates on guarded rules).</p>
+<hr>
+<h2 id="section-8">8. End-to-End Walkthrough: Tracing a Bank Wealth Purchase Through All 5 Onion Layers</h2>
+<p>Tracing <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> alongside the newly wired Reactive Policy loop shows how all 60 families (64 artifact kinds) collaborate at runtime:</p>
+<ol>
+<li><strong>HTTP Ingress (Layer 4)</strong>: <code>POST /api/v1/bankwealth/bank-cash-submit-port/submit</code> enters <code>CashFundPurchaseController</code> via <code>PlayHttpBridge</code> and <code>HttpRouter</code>, authenticated and role-checked by <code>ApiDto</code> (#49).</li>
+<li><strong>Application Seam (Layer 2)</strong>: <code>CashFundPurchaseImpl</code> implements <code>CashFundPurchaseHandler</code> (#51), checks <code>ExternPorts.requestExists</code> &amp; <code>payloadMatchesOriginal</code> against <code>CallerContractSpec</code> (<code>(principal, clientRequestId)</code>, forbidding <code>investorAccountId</code>), then executes <code>pin</code> and <code>dispatch</code>.</li>
+<li><strong>Write Sharding → Domain Kernel (Layer 2 Glue → Layer 1 Kernel)</strong>: Commands hit <code>FundQuotaAggregate.EntityKey</code> and <code>FundQuotaBehaviors</code> → <code>FundQuotaRules.ReserveSubscriptionQuotaRule</code> (#45) → <code>Money</code> (#1) arithmetic → emits <code>SubscriptionQuotaReserved</code> (#2) → <code>FundQuotaEventHandler</code> (#3) updates state → <code>FundQuotaAxioms.checkAxioms</code> (#48) validates <code>ALWAYS</code> invariants.</li>
+<li><strong>Journal &amp; Reactive Consumers (Layer 3 + Layer 2)</strong>: <code>FundQuotaEventAdapter</code> + <code>DomainProtoSerializer</code> (#29–#33) persist Protobuf payloads and tags; <code>ShardedDaemonProcess</code> feeds both:<ul>
+<li><strong>ReadSide</strong>: <code>BankOrderReadsideProjectionHandler</code> (#28) upserts rows via <code>BankOrderReadsideRepositoryImpl</code> (#24) for <code>BankOrderViewQueryService</code> (#15);</li>
+<li><strong>Reactive Policy</strong>: <code>PolicyOn&lt;Cmd&gt;Runner</code> feeds <code>PolicyMachine.run</code> → <code>PolicyOn&lt;Cmd&gt;.DefaultSemantics.decide</code> → <code>PolicyOn&lt;Cmd&gt;Mechanics</code> (<code>EntityKey.ask</code>), inspecting every <code>Left(err)</code> via <code>dispose</code> to either bury <code>Permanent</code> failures in <code>PolicyDlqBury</code> or trigger at-least-once retries on <code>Retryable</code> failures.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="section-9">9. Artifact Type Upgrade Sync Contract &amp; Future Target Blueprint (Rust / Axum)</h2>
+<p>To guarantee this map <strong>never drifts from <code>metarch-truthsrc</code></strong>, CI enforces a machine-verifiable lock chain (documented in <code>docs/artifact-map-authoring-contract.md</code>):</p>
+<ol>
+<li><strong>Upstream Catalog Hash (<code>metarch-truthsrc</code>)</strong>: <code>lib/v2/surface-registry.mjs</code> scans <code>generators/*/generator.json</code> (<code>schemaVersion === "truthsrc.product-generator/v2"</code>), hashes <code>artifactFamilyCoverage</code>, <code>producers</code>, and <code>artifactKinds</code> into <code>catalogSha256</code>, and embeds <code>targetArtifactCatalogs</code> in <code>exportCapabilitiesLock()</code>.</li>
+<li><strong>Site Lock Synchronization</strong>: <code>tools/sync-site-facts.mjs --write</code> snapshots <code>targetArtifactCatalogs</code> into <code>assets/data/facts.lock.json</code>; <code>assets/data/artifact-maps.lock.json</code> maps every target generator to its bilingual article <code>slug</code>, <code>catalogSha256</code>, <code>truthsrcShort</code>, and <code>bankShort</code>.</li>
+<li><strong>CI Gate (<code>site_ci.yml</code>)</strong>: <code>sync-site-facts.mjs --check</code> fails whenever <code>metarch-truthsrc</code> upgrades any Artifact Type (changing <code>catalogSha256</code>) or adds a new target generator without updating the corresponding bilingual map article (embedding matching <code>truthsrcShort</code> + 12-char <code>catalogSha256</code>) and lock files.</li>
+</ol>
+<h3 id="section-9-1">Future Target Requirement: Rust (<code>rust-cqrs-axum-service:2</code>) Blueprint</h3>
+<p>As introduced in our <a href="https://co-arising.github.io/articles/metarch-truthsrc-extending-code-generator-20261126/">Extending metarch-truthsrc Code Generators guide</a>, whenever a future Rust target generator (<code>Axum + Tokio + SQLx + Prost + Tonic</code>) is added under <code>generators/</code>, it MUST ship a companion bilingual Onion Architecture Map covering this exact 5-layer mapping:</p>
+<div class="article-table">
+<div class="article-table" tabindex="0" role="region" aria-label="表格：Onion Layer / Play / Scala Role / Rust Target Artifact Type (e.g. rust-cqrs-axum-service:2) / Role"><table>
+<thead>
+<tr><th scope="col">Onion Layer</th><th scope="col">Play / Scala Role</th><th scope="col">Rust Target Artifact Type (e.g. <code>rust-cqrs-axum-service:2</code>)</th><th scope="col">Role</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Layer 1 · Domain Core</strong></td><td><code>Money</code>, <code>*Entity</code>, <code>*EventHandler</code>, <code>*Rules</code>, <code>*Axioms</code>, <code>*Computations</code></td><td>Zero-dependency crate <code>domain</code>: Newtypes / <code>rust_decimal</code>, <code>enum Event</code>, <code>fn apply(state, ev)</code>, <code>fn handle(state, params) -&gt; Result&lt;Vec&lt;Event&gt;, DomainError&gt;</code>, <code>trait Computations</code></td><td><span class="at-badge at-kernel">KERNEL</span> + <span class="at-badge at-seam">SEAM</span></td></tr>
+<tr><td><strong>Layer 2 · Application</strong></td><td><code>*Protocol</code>, <code>*StoryPort</code>, <code>*ReadsideProjection</code>, <code>PolicyMachine</code></td><td>Crate <code>application</code>: command/reply DTOs, <code>async trait Repository</code>, typed <code>CallerContract</code>, <code>ReadsideProjector</code>, and <code>PolicyMachine::run</code> effect loop</td><td><span class="at-badge at-kernel">KERNEL</span> + <span class="at-badge at-seam">SEAM</span> + <span class="at-badge at-glue">GLUE</span></td></tr>
+<tr><td><strong>Layer 3 · Infrastructure</strong></td><td><code>*.proto</code> / <code>*Serializer</code> / <code>*RepositoryImpl</code> / <code>GeneratedBindingsModule</code></td><td>Crate <code>infrastructure</code>: <code>prost</code> `.proto` codecs, <code>sqlx</code> Outbox/ReadSide/DLQ implementations, <code>AppState</code> DI container, and worker tasks</td><td><span class="at-badge at-glue">GLUE</span></td></tr>
+<tr><td><strong>Layer 4 · Interfaces &amp; Runtime</strong></td><td><code>*Controller</code>, <code>ApiDto</code>, <code>HttpRouter</code>, <code>build.sbt</code></td><td>Crate <code>interfaces</code> + binary entrypoint: <code>axum::Router</code>, Tower 5-layer Authz extractors, <code>RowScope</code> response guard, and <code>Cargo.toml</code> workspace</td><td><span class="at-badge at-kernel">KERNEL</span> + <span class="at-badge at-glue">GLUE</span></td></tr>
+<tr><td><strong>Layer 5 · Verification</strong></td><td>Gherkin + ScalaTest + Mutation Gate + DIP Check</td><td><code>cargo test</code> BDD oracles, <code>cargo-mutants</code> guard kill gate, and workspace dependency checks forbidding <code>tokio/axum/sqlx</code> inside <code>domain</code></td><td><span class="at-badge at-kernel">KERNEL</span> + <span class="at-badge at-glue">GLUE</span></td></tr>
+</tbody>
+</table></div>
+</div>
+
+<h3 id="section-9-2">Further Reading</h3>
+<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc">metarch-truthsrc Repository</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/CODEGEN.md">Generator Architecture (<code>CODEGEN.md</code>)</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/knowledge_base/reference/ears_v2_grammar_reference.md">EARS v2 Grammar Reference</a></li>
+<li><a href="https://github.com/co-arising/bank-wealth-demo">bank-wealth-demo Pilot Repository</a> · <a href="https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">co-arising 2.0 GA Complete Guide</a></li>
+<li><a href="https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/">The Onion Architecture (Jeffrey Palermo)</a> · <a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
+</ul></article>
+    </div>
+    <aside class="article-community" aria-label="Join the Discord community">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord Community</p>
+        <p class="article-community-title">Want to discuss this further or share feedback?</p>
+        <p>Join the co-arising Discord community to talk DDD, EARS/SMT verification, and deterministic code generation with the maintainers and peers.</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">Join the Discord community <span aria-hidden="true">↗</span></a>
+    </aside>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Continue reading</h2>
+      <div class="article-card" lang="en">
+      <p class="article-meta"><span>Design specification</span> · <time datetime="2026-11-26">2026-11-26</time></p>
+      <h3><a href="/articles/co-arising-v2-ears-native-architecture-20261126/">co-arising 2.0 Long-Term Architecture Blueprint: An EARS-Native Compilation Trunk and Locked Cloze TDD Loop</a></h3>
+      <p class="article-deck">A first-principles v2 architecture retiring dual expression engines and lossy lowering bridges: orthogonal YAML structure plus EARS 1.0 behavior truth, an SMT/Z3 hard compilation gate, EARS-Native Canonical Model v2, and dual-channel delivery uniting L1 zero-token codegen with locked-oracle AI @cloze TDD.</p>
+      <p class="small">English translation</p>
+    </div>
+      <p><a href="/articles/">Back to article index</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

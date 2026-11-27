@@ -45,6 +45,9 @@ CODEGEN_EXT_SLUG = "metarch-truthsrc-extending-code-generator-20261126"
 V2_ARCH_SLUG = "co-arising-v2-ears-native-architecture-20261126"
 V2_GA_GUIDE_SLUG = "co-arising-v2-ga-prd-to-running-guide-20261126"
 V2_PLAYBOOK_SLUG = "co-arising-v2-deterministic-playbook-20261126"
+PLAY_CQRS_MAP_SLUG = "play-cqrs-artifact-type-map-20261127"
+MINEFIELD_MAP_SLUG = "metarch-truthsrc-architecture-minefield-map-20261127"
+NESTED_TOC_SLUGS = frozenset({PLAY_CQRS_MAP_SLUG})
 # Initial publication fixture; future valid manifest slugs stay in /zh/articles/.
 OWNED_OUTPUTS = (
     "articles/index.html",
@@ -71,6 +74,10 @@ OWNED_OUTPUTS = (
     f"articles/{V2_GA_GUIDE_SLUG}/index.html",
     f"zh/articles/{V2_PLAYBOOK_SLUG}/index.html",
     f"articles/{V2_PLAYBOOK_SLUG}/index.html",
+    f"zh/articles/{PLAY_CQRS_MAP_SLUG}/index.html",
+    f"articles/{PLAY_CQRS_MAP_SLUG}/index.html",
+    f"zh/articles/{MINEFIELD_MAP_SLUG}/index.html",
+    f"articles/{MINEFIELD_MAP_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"
@@ -86,6 +93,10 @@ V2_GA_GUIDE_NOTE = "本文对照 @madpolaris/truthsrc v2.0.0 与 bank-wealth-dem
 V2_GA_GUIDE_NOTE_EN = "This guide reflects the shipped @madpolaris/truthsrc v2.0.0 and bank-wealth-demo v2-pilot source and verification runs; v2 pilot evidence (F-32–F-34) is tracked separately from the 2026-11-12 v1 full-service acceptance run (F-24–F-28) on the status page."
 V2_PLAYBOOK_NOTE = "本文面向社区与开发者介绍 co-arising 2.0 的确定性分层、最新 7 项更新与实验期（尤其是 Skill 交互层）的动手玩法；文中所列能力与正式验收边界仍以状态页（F-32–F-35）及仓库源码为准。"
 V2_PLAYBOOK_NOTE_EN = "This hands-on playbook introduces co-arising 2.0's determinism boundaries, 7 latest upgrades, and experimental walkthrough (especially the Skill layer); formal capability and verification scopes remain tracked on the status page (F-32–F-35) and in repository source."
+PLAY_CQRS_MAP_NOTE = "本文是与 metarch-truthsrc (scala-cqrs-play-service:2) 及 bank-wealth-demo 源码提交精确锁定的 Play CQRS Artifact Type 架构地图；当上游新增或升级任何 Artifact Type，或扩展新的目标技术栈（如 Rust）时，须通过 sync-site-facts 与 artifact-maps.lock.json 门禁同步更新本双语地图。"
+PLAY_CQRS_MAP_NOTE_EN = "This is a commit-pinned Play CQRS Artifact Type architecture map synchronized to metarch-truthsrc (scala-cqrs-play-service:2) and bank-wealth-demo; whenever any Artifact Type evolves upstream or a new target stack (such as Rust) is added, sync-site-facts and artifact-maps.lock.json require updating this bilingual map."
+MINEFIELD_MAP_NOTE = "本文对照 metarch-truthsrc v2.0.0（提交 0b925ad）真实源码撰写，记录当前模块拓扑、14 条跨文件隐蔽耦合暗道、已修复的 7 个实证 Bug 及下一波 8 个待排雷雷达靶点；正式产品验收基线请以状态页（F-32–F-35）为准。"
+MINEFIELD_MAP_NOTE_EN = "Written directly against metarch-truthsrc v2.0.0 (commit 0b925ad), this engineering manual maps the current module topology, 14 cross-file hidden couplings, 7 empirically confirmed bug fixes, and 8 next-wave probe targets; formal product evidence remains tracked on the status page (F-32–F-35)."
 NAV = (
     ("/", "Home", "首页"),
     ("/why-co-arising/", "Why co-arising", "为何 co-arising"),
@@ -280,24 +291,25 @@ def render_body(source, metadata):
     body.remove(headings[0])
     body.tag = "article"
     body.attrib = {"id": "article-body", "class": "article-body"}
-    toc = ET.Element("ol")
+    nested_toc = metadata["slug"] in NESTED_TOC_SLUGS
+    overview_label = "Section overview" if metadata["source"].endswith(".en.md") else "本层总览"
+    toc = ET.Element("ol", {"class": "toc-tree"} if nested_toc else {})
     section, subsection = 0, 0
+    sections_meta = []
     for node in body.iter():
         if node.tag == "h2":
             section += 1
             subsection = 0
             node.set("id", f"section-{section}")
-            entry = ET.SubElement(toc, "li")
-            link = ET.SubElement(entry, "a", {"href": "#" + node.get("id")})
-            number = ET.SubElement(link, "span", {"class": "toc-number"})
-            number.text = f"{section:02d}"
             text = "".join(node.itertext())
-            number.tail = " " + re.sub(r"^[〇零一二三四五六七八九十百]+、\s*", "", text)
+            clean_title = re.sub(r"^(?:[〇零一二三四五六七八九十百]+、|\d+\.\s*)", "", text)
+            sections_meta.append({"id": node.get("id"), "num": f"{section:02d}", "title": clean_title, "children": []})
         elif node.tag == "h3":
             if not section:
                 raise ValueError("H3 needs a preceding H2")
             subsection += 1
             node.set("id", f"section-{section}-{subsection}")
+            sections_meta[-1]["children"].append({"id": node.get("id"), "title": "".join(node.itertext())})
         elif node.tag == "pre":
             node.set("class", "code")
         elif node.tag in {"a", "img"}:
@@ -306,6 +318,33 @@ def render_body(source, metadata):
             if (metadata["slug"] == STRATEGY_SLUG
                     and url == "./ai-coding-evolution-20261116.md"):
                 node.set(attr, detail_route(SURVEY_SLUG))
+    first_group = True
+    for sec in sections_meta:
+        if nested_toc and sec["children"]:
+            entry = ET.SubElement(toc, "li", {"class": "toc-group-item"})
+            details_attrs = {"class": "toc-group"}
+            if first_group:
+                details_attrs["open"] = "open"
+                first_group = False
+            details = ET.SubElement(entry, "details", details_attrs)
+            summary = ET.SubElement(details, "summary", {"class": "toc-group-summary"})
+            number = ET.SubElement(summary, "span", {"class": "toc-number"})
+            number.text = sec["num"]
+            number.tail = " " + sec["title"]
+            sublist = ET.SubElement(details, "ol", {"class": "toc-sublist"})
+            ov_li = ET.SubElement(sublist, "li", {"class": "toc-sub-overview"})
+            ov_a = ET.SubElement(ov_li, "a", {"href": "#" + sec["id"]})
+            ov_a.text = overview_label
+            for child in sec["children"]:
+                ch_li = ET.SubElement(sublist, "li")
+                ch_a = ET.SubElement(ch_li, "a", {"href": "#" + child["id"]})
+                ch_a.text = child["title"]
+        else:
+            entry = ET.SubElement(toc, "li")
+            link = ET.SubElement(entry, "a", {"href": "#" + sec["id"]})
+            number = ET.SubElement(link, "span", {"class": "toc-number"})
+            number.text = sec["num"]
+            number.tail = " " + sec["title"]
     # Wrap via parent nodes; ElementTree has no parent pointer. Keep the tail
     # on the wrapper so no neighboring text is dropped or moved into the table.
     for parent in list(body.iter()):
@@ -518,6 +557,10 @@ def detail_page(item, related, source, locale="zh"):
         note += f"<p>{V2_GA_GUIDE_NOTE if zh else V2_GA_GUIDE_NOTE_EN}</p>"
     if item["slug"] == V2_PLAYBOOK_SLUG:
         note += f"<p>{V2_PLAYBOOK_NOTE if zh else V2_PLAYBOOK_NOTE_EN}</p>"
+    if item["slug"] == PLAY_CQRS_MAP_SLUG:
+        note += f"<p>{PLAY_CQRS_MAP_NOTE if zh else PLAY_CQRS_MAP_NOTE_EN}</p>"
+    if item["slug"] == MINEFIELD_MAP_SLUG:
+        note += f"<p>{MINEFIELD_MAP_NOTE if zh else MINEFIELD_MAP_NOTE_EN}</p>"
     category = item["category"] if zh else CATEGORY_EN[item["category"]]
     counterpart_route = detail_route(item["slug"], "en" if zh else "zh")
     switch_label = "Read in English" if zh else "中文原文"

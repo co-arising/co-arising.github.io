@@ -19,6 +19,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FACTS_LOCK_PATH = join(ROOT, 'assets', 'data', 'facts.lock.json');
+const ARTIFACT_MAPS_LOCK_PATH = join(ROOT, 'assets', 'data', 'artifact-maps.lock.json');
 
 function parseArgs(argv) {
   const opts = {
@@ -130,6 +131,7 @@ async function runWrite(opts) {
       skills: capabilities.skills,
       effectProtocols: capabilities.effectProtocols,
       errorCodeCount: capabilities.errorCodeCount,
+      targetArtifactCatalogs: capabilities.targetArtifactCatalogs ?? [],
       surfaceSha256: capabilities.surfaceSha256,
     },
     pilot: {
@@ -276,6 +278,63 @@ function runCheck() {
   }
   if (!zhSummary.includes(`${lock.capabilities.mcpTotal} 个 MCP 工具`) || !zhSummary.includes(suiteStr) || !zhSummary.includes(covRatioStr)) {
     errors.push(`zh/index.html #v2-ga-summary out of sync with facts.lock.json`);
+  }
+
+  // Verify Artifact Type Map lock & bilingual articles stay synchronized with metarch-truthsrc catalogs
+  if (!existsSync(ARTIFACT_MAPS_LOCK_PATH)) {
+    errors.push('Missing assets/data/artifact-maps.lock.json');
+  } else {
+    const mapsLock = JSON.parse(readFileSync(ARTIFACT_MAPS_LOCK_PATH, 'utf8'));
+    if (mapsLock.schemaVersion !== 'co-arising.artifact-maps-lock/v1') {
+      errors.push(`unexpected artifact-maps.lock schemaVersion: ${mapsLock.schemaVersion}`);
+    }
+    if (!mapsLock.contractDoc || !existsSync(join(ROOT, mapsLock.contractDoc))) {
+      errors.push(`Missing artifact-maps contractDoc: ${mapsLock.contractDoc}`);
+    }
+    const manifestPath = join(ROOT, 'content', 'articles', 'manifest.json');
+    const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : { articles: [] };
+    const manifestBySlug = new Map((manifest.articles ?? []).map(a => [a.slug, a]));
+
+    const catalogs = lock.capabilities?.targetArtifactCatalogs ?? [];
+    if (catalogs.length === 0) {
+      errors.push('facts.lock.json missing capabilities.targetArtifactCatalogs');
+    }
+    for (const cat of catalogs) {
+      const entry = mapsLock.maps?.[cat.id];
+      if (!entry) {
+        errors.push(`artifact-maps.lock.json missing registered bilingual map for target catalog "${cat.id}"`);
+        continue;
+      }
+      if (entry.catalogSha256 !== cat.catalogSha256) {
+        errors.push(`artifact-maps.lock.json ${cat.id} catalogSha256 mismatch (${entry.catalogSha256} !== ${cat.catalogSha256}) — update the bilingual map article & lock after upgrading Artifact Types`);
+      }
+      if (entry.artifactKindCount !== cat.artifactKindCount || entry.producerCount !== cat.producerCount) {
+        errors.push(`artifact-maps.lock.json ${cat.id} counts differ from facts.lock (kinds ${entry.artifactKindCount}/${cat.artifactKindCount}, producers ${entry.producerCount}/${cat.producerCount})`);
+      }
+      if (lock.cohort?.truthsrcShort && entry.truthsrcShort !== lock.cohort.truthsrcShort) {
+        errors.push(`artifact-maps.lock.json ${cat.id} truthsrcShort ${entry.truthsrcShort} !== cohort ${lock.cohort.truthsrcShort}`);
+      }
+      const artMeta = manifestBySlug.get(entry.slug);
+      if (!artMeta || !artMeta.source_en) {
+        errors.push(`content/articles/manifest.json missing bilingual entry for artifact map slug "${entry.slug}"`);
+        continue;
+      }
+      const shortCatalog = cat.catalogSha256.slice(0, 12);
+      for (const [label, fname] of [['zh', artMeta.source], ['en', artMeta.source_en]]) {
+        const mdPath = join(ROOT, 'content', 'articles', fname);
+        if (!existsSync(mdPath)) {
+          errors.push(`Missing artifact map article source (${label}): content/articles/${fname}`);
+          continue;
+        }
+        const mdText = readFileSync(mdPath, 'utf8');
+        if (lock.cohort?.truthsrcShort && !mdText.includes(lock.cohort.truthsrcShort)) {
+          errors.push(`content/articles/${fname} missing pinned truthsrc commit ${lock.cohort.truthsrcShort}`);
+        }
+        if (!mdText.includes(shortCatalog)) {
+          errors.push(`content/articles/${fname} missing catalogSha256 prefix ${shortCatalog}`);
+        }
+      }
+    }
   }
 
   console.log(JSON.stringify({

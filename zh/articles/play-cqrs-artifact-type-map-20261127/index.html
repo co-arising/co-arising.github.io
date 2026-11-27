@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景 — co-arising</title>
+  <meta name="description" content="对照 metarch-truthsrc @ 0b925ad（catalog 156b224f3614）与 bank-wealth-demo @ 80a9acb 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景" />
+  <meta property="og:description" content="对照 metarch-truthsrc @ 0b925ad（catalog 156b224f3614）与 bank-wealth-demo @ 80a9acb 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。" />
+  <meta property="og:url" content="https://co-arising.github.io/zh/articles/play-cqrs-artifact-type-map-20261127/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/play-cqrs-artifact-type-map-20261127/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/play-cqrs-artifact-type-map-20261127/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/play-cqrs-artifact-type-map-20261127/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/articles/play-cqrs-artifact-type-map-20261127/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/articles/play-cqrs-artifact-type-map-20261127/">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a> · <a href="/zh/articles/" aria-current="page">技术观察</a> · <a class="nav-link" href="/articles/play-cqrs-artifact-type-map-20261127/" lang="en" rel="alternate" hreflang="en">EN</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript 已关闭——正文、目录、链接与下载仍可使用。</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="面包屑"><a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a> / <span aria-current="page">工程实践</span></nav>
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-27">2026-11-27</time> · 中文原文</p>
+      <h1>Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景</h1>
+      <p class="article-deck">对照 metarch-truthsrc @ 0b925ad（catalog 156b224f3614）与 bank-wealth-demo @ 80a9acb 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。</p>
+      <div class="article-actions"><a href="/content/articles/play-cqrs-artifact-type-map-20261127.md" download="play-cqrs-artifact-type-map-20261127.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/play-cqrs-artifact-type-map-20261127/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是与 metarch-truthsrc (scala-cqrs-play-service:2) 及 bank-wealth-demo 源码提交精确锁定的 Play CQRS Artifact Type 架构地图；当上游新增或升级任何 Artifact Type，或扩展新的目标技术栈（如 Rust）时，须通过 sync-site-facts 与 artifact-maps.lock.json 门禁同步更新本双语地图。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol class="toc-tree"><li class="toc-group-item"><details class="toc-group" open="open"><summary class="toc-group-summary"><span class="toc-number">01</span> 架构哲学：为什么先拆成 60 族 Artifact Type，再经由 DI 与 Bootstrap 粘合</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-1">本层总览</a></li><li><a href="#section-1-1">1. 第一性原理：Kernel（关键业务信息）、Seam（隔离缝）与 Glue（胶水机制）的三分法</a></li><li><a href="#section-1-2">2. 为什么要先彻底分解，最后再粘合？</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">02</span> Play CQRS 全景 Artifact Type 架构图与粘合拓扑</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-2">本层总览</a></li><li><a href="#section-2-1">分解之后如何重新粘合？两条主干线看透全局</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">03</span> Domain 核心层（最内层 · 零框架依赖）</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-3">本层总览</a></li><li><a href="#section-3-1">Value Object &amp; ExactType（#1）</a></li><li><a href="#section-3-2">Domain Entity（#2）</a></li><li><a href="#section-3-3">EventHandler（#3）</a></li><li><a href="#section-3-4">Aggregate Invariant Rules &amp; RuleParams（#4 / #5 / #45）</a></li><li><a href="#section-3-5">Z3 Axioms &amp; Replay（#48）</a></li><li><a href="#section-3-6">Domain Computations Port &amp; L2 @cloze Impl（#14 / #51）</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">04</span> Application 应用层（写侧协议、读侧物化、反应式策略与长流程）</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-4">本层总览</a></li><li><a href="#section-4-1">Aggregate Protocol &amp; CommandHelpers（#7 / #11）</a></li><li><a href="#section-4-2">Aggregate, Factory &amp; Behaviors（#6 / #8 / #9 / #10）</a></li><li><a href="#section-4-3">Aggregate Repository Port（#12）</a></li><li><a href="#section-4-4">Application Story Port, CallerContractSpec &amp; L3 @cloze Impl（#51 / #52）</a></li><li><a href="#section-4-5">ReadModel View, QueryService &amp; ReadSide Projection（#15 / #23 / #26 / #27 / #28）</a></li><li><a href="#section-4-6">Reactive Policy &amp; PolicyMachine（#55–#58 / #60）</a></li><li><a href="#section-4-7">Orchestration, Saga, EffectFace &amp; ExternalEventBridge（#13 / #16–#21 / #40–#44 / #46）</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">05</span> Infrastructure 基础设施层（序列化、持久化与分解后的粘合引导）</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-5">本层总览</a></li><li><a href="#section-5-1">Protobuf Schema, ProtoConverters &amp; Serialization Adapters（#29–#33）</a></li><li><a href="#section-5-2">Repository Impl, ReadSide DDL &amp; PolicyDlqBury（#12 / #24）</a></li><li><a href="#section-5-3">Outbound Connectors &amp; Effect Implementations（#25）</a></li><li><a href="#section-5-4">Bootstrap Traits（#47 / #38b / #38c / #38d / #59 policy-bootstrap）</a></li><li><a href="#section-5-5">Guice DI Wiring &amp; ApplicationBootstrap（#38 / #50）</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">06</span> Interfaces 与 Service Runtime 层（HTTP 入口、5 层鉴权与构建脚手架）</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-6">本层总览</a></li><li><a href="#section-6-1">5-Layer Authz PEP/PDP &amp; ApiDto（#49）</a></li><li><a href="#section-6-2">HTTP Controllers, AggregateStateApiController &amp; CommandDsl（#34–#36）</a></li><li><a href="#section-6-3">ServiceContract, ServiceLoader, PlayHttpBridge &amp; Routes（#37 / #38）</a></li><li><a href="#section-6-4">Project Scaffold &amp; Runtime Configs（#39）</a></li></ol></details></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">07</span> Verification &amp; BDD Oracle 治理层（把架构边界变成机器闸门）</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-7">本层总览</a></li><li><a href="#section-7-1">Gherkin Features, Executable Oracles &amp; Locked Manifest（#53）</a></li><li><a href="#section-7-2">Mutation Gate &amp; Onion DIP Gate（#54）</a></li></ol></details></li><li><a href="#section-8"><span class="toc-number">08</span> 端到端实例串联：一笔理财申购如何穿过 5 层洋葱与胶水</a></li><li class="toc-group-item"><details class="toc-group"><summary class="toc-group-summary"><span class="toc-number">09</span> Artifact Type 升级同步契约与未来目标架构规范（Rust / Axum 范式）</summary><ol class="toc-sublist"><li class="toc-sub-overview"><a href="#section-9">本层总览</a></li><li><a href="#section-9-1">未来扩展规范：如果增加 Rust 目标架构（例：rust-cqrs-axum-service:2）</a></li><li><a href="#section-9-2">延伸参考资料</a></li></ol></details></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">阅读全文</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">社区讨论</p>
+          <p>对本文观点、EARS 规约或工程落地有疑问？欢迎来 Discord 一起交流。</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+        </div>
+      </aside>
+      <article id="article-body" class="article-body"><blockquote>
+<p>版本锚定：<code>metarch-truthsrc</code> @ <a href="https://github.com/co-arising/metarch-truthsrc"><code>0b925ad</code></a>（<code>scala-cqrs-play-service:2</code> · <code>catalogSha256: 156b224f3614</code> · 60 族 / 14 生产者 / 64 种 <code>artifactKinds</code>） · <code>bank-wealth-demo</code> @ <a href="https://github.com/co-arising/bank-wealth-demo"><code>80a9acb</code></a> · 本文受 <code>assets/data/artifact-maps.lock.json</code> 与 <code>sync-site-facts</code> 门禁受控同步（对应站点状态台账 <code>F-32</code> / <code>F-33</code>）。</p>
+</blockquote>
+<p>在大多数代码生成器里，“一个模型生成一份巨型 <code>Service.scala</code>”看似简单，但只要业务规则、持久化、权限、长流程和读模型同时演化，生成器很快就会退化成不可维护的字符串大杂烩——<strong>AI 和人类改一处就会污染十处，洋葱架构的依赖边界也形同虚设</strong>。</p>
+<p><code>metarch-truthsrc</code> 的 <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/scala-cqrs-play-service"><code>scala-cqrs-play-service:2</code></a> 选择了相反的工程路径：<strong>极度细粒度的正交分解（60 族统一产出 × 64 种 <code>artifactKinds</code>——在 v1/v2 原 54 族基础上新增 <code>#55</code>–<code>#60</code> 反应式策略族） + 严格向内依赖的洋葱边界 + 最后在基础设施最外缘通过 Guice DI 与 <code>ApplicationBootstrap</code> 重新粘合</strong>。本文按“<strong>架构哲学 → 可点击交互式全景图与粘合拓扑 → 从内到外五层逐一拆解（附样例代码与边界判断） → 端到端串联实例 → 升级同步与未来 Rust 扩展契约</strong>”展开。</p>
+<hr>
+<h2 id="section-1">一、架构哲学：为什么先拆成 60 族 Artifact Type，再经由 DI 与 Bootstrap 粘合</h2>
+<div class="co-kpi-strip" role="region" aria-label="Play CQRS v2 产物规模概览">
+  <div><div class="kpi-num">60</div><div class="kpi-label">统一产物家族（54 族基线 + Policy #55–#60）</div></div>
+  <div><div class="kpi-num">14</div><div class="kpi-label">生成器 Producer（manifest 声明）</div></div>
+  <div><div class="kpi-num">64</div><div class="kpi-label">受治理 Artifact Kinds（覆盖全链）</div></div>
+  <div><div class="kpi-num red">0</div><div class="kpi-label">洋葱 DIP 违规（126 个受检 Scala 文件）</div></div>
+</div>
+
+<h3 id="section-1-1">1. 第一性原理：Kernel（关键业务信息）、Seam（隔离缝）与 Glue（胶水机制）的三分法</h3>
+<p>在 <code>co-arising</code> 中，代码并不是平权的一堆文本，每一类 Artifact Type 都明确归属于三种角色之一：</p>
+<div class="article-table">
+<div class="article-table" tabindex="0" role="region" aria-label="表格：角色分类 / 徽标 / 决定权与来源 / 变更频率 / 典型代表"><table>
+<thead>
+<tr><th scope="col">角色分类</th><th scope="col">徽标</th><th scope="col">决定权与来源</th><th scope="col">变更频率</th><th scope="col">典型代表</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>关键业务信息（Kernel）</strong></td><td><span class="at-badge at-kernel">KERNEL</span></td><td>完全由 YAML 结构 + <a href="https://co-arising.github.io/zh/articles/co-arising-ears-spec-20261123/">EARS 规约</a> 与 Z3 数学证明推导（<code>4A</code> 零 Token 或受控语义契约）</td><td>随领域规则变化</td><td><code>ValueObject</code>、<code>Entity</code>、<code>EventHandler</code>、<code>Rules</code>、<code>Axioms</code>、<code>PolicyOn&lt;Cmd&gt;</code></td></tr>
+<tr><td><strong>边界与隔离缝（Seam &amp; Port）</strong></td><td><span class="at-badge at-seam">SEAM</span></td><td>由编译期推导签名契约（<code>Port</code> / <code>Protocol</code> / <code>CallerContractSpec</code> / <code>Semantics</code>），把非确定性实现（<code>L2</code>/<code>L3</code>/Infra）关进 <code>handwritten/</code> <code>@cloze</code> 隔离区</td><td>仅在能力接口演进时变化</td><td><code>*Computations</code>、<code>*Protocol</code>、<code>*Repository</code>、<code>*Port.scala</code>、<code>ApplyEventSemantics</code>、<code>PolicyDlqSink</code></td></tr>
+<tr><td><strong>胶水与运行时机制（Glue）</strong></td><td><span class="at-badge at-glue">GLUE</span></td><td>零新业务决策——把 Kernel 与 Seam 接到 Akka Typed、ClusterSharding、Play HTTP、ScalaPB 与 Guice DI 的标准框架仪式</td><td>仅随目标栈版本或家族升级变化</td><td><code>*Aggregate</code>、<code>*Behaviors</code>、<code>*ProtoConverters</code>、<code>*Bootstrap</code>、<code>ApplicationBootstrap</code>、<code>GeneratedBindingsModule</code></td></tr>
+</tbody>
+</table></div>
+</div>
+
+<p><strong>核心原则是“纯度不外泄、胶水不进核”</strong>：最内层的 <code>domain/</code> 不允许出现任何 <code>akka.*</code>、<code>play.*</code>、<code>scalikejdbc.*</code>、<code>javax.inject.*</code> 或 Protobuf 导入；不仅架构更干净，也让 <a href="https://github.com/co-arising/metarch-truthsrc"><code>verify-gate.mjs</code></a> 能把 <strong>Kernel + Seam 文件直接送进离线 <code>scalac</code> 毫秒级独立编译并执行 100% 领域变异测试</strong>，而无需每次拉起整个 Play/Akka 集群。</p>
+<h3 id="section-1-2">2. 为什么要先彻底分解，最后再粘合？</h3>
+<ol>
+<li><strong>所有权隔离（Overwrite vs. Never-Overwrite）</strong>：如果 <code>FundOrderRules.scala</code>（编译器拥有、每次覆盖）和 <code>FundOrderComputationsImpl.scala</code>（人工/<code>@cloze</code> 拥有、绝不覆盖）写在同一文件里，重新生成必然覆写人工语义；拆成独立 Artifact Type 后，<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/CODEGEN.md"><code>generated-scaffold/</code> 与 <code>handwritten/</code> 物理分目录</a>，再用 <code>GeneratedBindingsModule</code> 在运行期粘合。</li>
+<li><strong>双通道验证（L1 确定性 vs. L2/L3 预言机 TDD）</strong>：规则、状态折叠与公理校验留在纯粹无副作用的 <code>#45 Rules</code> / <code>#3 EventHandler</code> / <code>#48 Axioms</code>；复杂计算与外部调用留在 <code>#51 ApplicationPort</code> + <code>*Computations</code>。</li>
+<li><strong>跨技术栈可迁移（Scala/Play → Rust/Axum）</strong>：分解之后，所有 <strong>Kernel 契约</strong> 与 <strong>Port Seam</strong> 具有清晰的语言无关结构（见第九章 Rust 蓝图），替换的只是 <strong>Glue 层目标适配器</strong>。</li>
+</ol>
+<hr>
+<h2 id="section-2">二、Play CQRS 全景 Artifact Type 架构图与粘合拓扑</h2>
+<blockquote>
+<p>点击下图任意节点，可直接跳转到对应洋葱层与 Artifact Type 的详细拆解与真实样例代码；左侧目录支持按洋葱层次展开或折叠全部子类目。</p>
+</blockquote>
+<figure class="co-arch-fig co-arch-map">
+<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 0b925ad) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
+<svg viewBox="0 0 920 980" width="100%" role="img" aria-label="Play CQRS 五层洋葱架构 Artifact Type 全景地图：从 Domain Core、Application、Infrastructure、Interfaces 与 Verification 层展示所有产物类型、Kernel/Seam/Glue 分类与依赖粘合关系">
+  <defs>
+    <marker id="map-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
+    </marker>
+    <marker id="map-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"></path>
+    </marker>
+    <marker id="map-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+    <marker id="map-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"></path>
+    </marker>
+  </defs>
+
+  <rect x="14" y="12" width="892" height="104" rx="5" class="arch-band-red"></rect>
+  <text x="28" y="34" class="arch-t-band-red">LAYER 5 · VERIFICATION &amp; BDD ORACLE GATE（独立验证与防篡改层 · 不进入生产运行期依赖）</text>
+  <a class="arch-node" href="#section-7-1">
+    <rect x="28" y="46" width="418" height="56" rx="4" class="arch-card-teal"></rect>
+    <text x="237" y="68" text-anchor="middle" class="arch-t-title">#53 Gherkin Features · TS/Scala Oracles · manifest.sha256.json</text>
+    <text x="237" y="88" text-anchor="middle" class="arch-t-mono">KERNEL · 锁定预言机与双向 Witness 物化 · Domain/App/HTTP 全覆盖</text>
+  </a>
+  <a class="arch-node" href="#section-7-2">
+    <rect x="468" y="46" width="424" height="56" rx="4" class="arch-card-red"></rect>
+    <text x="680" y="68" text-anchor="middle" class="arch-t-title">#54 Mutation Gate · Onion DIP Gate · sbt/scalac Partition</text>
+    <text x="680" y="88" text-anchor="middle" class="arch-t-mono">GLUE · 100% Guard 变异击杀 + 0 DIP 违规 + handwritten/ 越界审计</text>
+  </a>
+
+  <rect x="14" y="130" width="892" height="132" rx="5" class="arch-band-ink"></rect>
+  <text x="28" y="152" class="arch-t-band">LAYER 4 · INTERFACES &amp; PLAY SERVICE RUNTIME（HTTP / 5-Layer Authz / 构建脚手架）</text>
+  <a class="arch-node" href="#section-6-1">
+    <rect x="28" y="166" width="204" height="80" rx="4" class="arch-card-teal"></rect>
+    <text x="130" y="190" text-anchor="middle" class="arch-t-title">#49 ApiDto &amp; 5-Layer PEP/PDP</text>
+    <text x="130" y="210" text-anchor="middle" class="arch-t-sub">Principal / Authz / RowScope</text>
+    <text x="130" y="230" text-anchor="middle" class="arch-t-teal">KERNEL + SEAM</text>
+  </a>
+  <a class="arch-node" href="#section-6-2">
+    <rect x="248" y="166" width="210" height="80" rx="4" class="arch-card"></rect>
+    <text x="353" y="190" text-anchor="middle" class="arch-t-title">#34–#36 Controllers &amp; DSL</text>
+    <text x="353" y="210" text-anchor="middle" class="arch-t-sub">PlayController / StateApi / CommandDsl</text>
+    <text x="353" y="230" text-anchor="middle" class="arch-t-mono">GLUE · HTTP → AppPort</text>
+  </a>
+  <a class="arch-node" href="#section-6-3">
+    <rect x="474" y="166" width="212" height="80" rx="4" class="arch-card"></rect>
+    <text x="580" y="190" text-anchor="middle" class="arch-t-title">#37–#38 ServiceLoader &amp; Routes</text>
+    <text x="580" y="210" text-anchor="middle" class="arch-t-sub">ServiceContract / PlayHttpBridge</text>
+    <text x="580" y="230" text-anchor="middle" class="arch-t-mono">GLUE · 路由与契约自检</text>
+  </a>
+  <a class="arch-node" href="#section-6-4">
+    <rect x="702" y="166" width="190" height="80" rx="4" class="arch-card"></rect>
+    <text x="797" y="190" text-anchor="middle" class="arch-t-title">#39 Project Scaffold</text>
+    <text x="797" y="210" text-anchor="middle" class="arch-t-sub">build.sbt / dev.conf / serialization</text>
+    <text x="797" y="230" text-anchor="middle" class="arch-t-mono">GLUE · ScalaPB + Akka</text>
+  </a>
+
+  <rect x="14" y="278" width="892" height="162" rx="5" class="arch-band-amber"></rect>
+  <text x="28" y="300" class="arch-t-band-amber">LAYER 3 · INFRASTRUCTURE &amp; DI RE-ASSEMBLY（最外实现层：序列化、库表与胶水粘合）</text>
+  <a class="arch-node" href="#section-5-1">
+    <rect x="28" y="314" width="204" height="110" rx="4" class="arch-card"></rect>
+    <text x="130" y="338" text-anchor="middle" class="arch-t-title">#29–#33 Protobuf &amp; Adapters</text>
+    <text x="130" y="358" text-anchor="middle" class="arch-t-sub">*.proto / *ProtoConverter</text>
+    <text x="130" y="376" text-anchor="middle" class="arch-t-sub">*EventAdapter / SnapshotAdapter</text>
+    <text x="130" y="394" text-anchor="middle" class="arch-t-sub">DomainProtoSerializer</text>
+    <text x="130" y="412" text-anchor="middle" class="arch-t-mono">GLUE · ScalaPB 持久编码</text>
+  </a>
+  <a class="arch-node" href="#section-5-2">
+    <rect x="248" y="314" width="204" height="110" rx="4" class="arch-card"></rect>
+    <text x="350" y="338" text-anchor="middle" class="arch-t-title">#12 / #24 Repo &amp; DLQ Impl</text>
+    <text x="350" y="358" text-anchor="middle" class="arch-t-sub">*RepositoryImpl / *Schema DDL</text>
+    <text x="350" y="376" text-anchor="middle" class="arch-t-sub">ReadsideRepositoryImpl</text>
+    <text x="350" y="394" text-anchor="middle" class="arch-t-sub">PolicyDlqBury (kn_projection_dlq)</text>
+    <text x="350" y="412" text-anchor="middle" class="arch-t-mono">GLUE · ScalikeJDBC / InMem</text>
+  </a>
+  <a class="arch-node" href="#section-5-3">
+    <rect x="468" y="314" width="196" height="110" rx="4" class="arch-card-amber"></rect>
+    <text x="566" y="338" text-anchor="middle" class="arch-t-title">#25 Connectors &amp; Effects</text>
+    <text x="566" y="358" text-anchor="middle" class="arch-t-sub">DefaultOutboundConnectors</text>
+    <text x="566" y="376" text-anchor="middle" class="arch-t-sub">*ConnectorImpl / *EffectPortImpl</text>
+    <text x="566" y="394" text-anchor="middle" class="arch-t-sub">ServerSnapshotProviderImpl</text>
+    <text x="566" y="412" text-anchor="middle" class="arch-t-amber">GLUE + 隔离区适配器</text>
+  </a>
+  <a class="arch-node" href="#section-5-5">
+    <rect x="680" y="314" width="212" height="110" rx="4" class="arch-card-dark"></rect>
+    <text x="786" y="338" text-anchor="middle" class="arch-t-title-dark">#38 / #47 / #50 DI &amp; Bootstrap</text>
+    <text x="786" y="358" text-anchor="middle" class="arch-t-sub-dark">*Bootstrap (#47 / #38b / #59 Policy)</text>
+    <text x="786" y="376" text-anchor="middle" class="arch-t-sub-dark">BootstrapModule + GeneratedBindings</text>
+    <text x="786" y="394" text-anchor="middle" class="arch-t-sub-dark">HandwrittenBindings + ProjectionMod</text>
+    <text x="786" y="412" text-anchor="middle" class="arch-t-teal">★ 全图粘合中枢 ★</text>
+  </a>
+
+  <rect x="14" y="456" width="892" height="252" rx="5" class="arch-band"></rect>
+  <text x="28" y="478" class="arch-t-band">LAYER 2 · APPLICATION LAYER（应用层：CQRS 写侧宿主、读侧投影、反应式 Policy 与长流程编排）</text>
+  <a class="arch-node" href="#section-4-1">
+    <rect x="28" y="492" width="204" height="92" rx="4" class="arch-card-amber"></rect>
+    <text x="130" y="516" text-anchor="middle" class="arch-t-title">#7 / #11 Protocol &amp; Helpers</text>
+    <text x="130" y="536" text-anchor="middle" class="arch-t-sub">Command / Reply(Accepted/Refused)</text>
+    <text x="130" y="554" text-anchor="middle" class="arch-t-sub">Params → Command 映射</text>
+    <text x="130" y="572" text-anchor="middle" class="arch-t-amber">SEAM + GLUE</text>
+  </a>
+  <a class="arch-node" href="#section-4-2">
+    <rect x="248" y="492" width="204" height="92" rx="4" class="arch-card"></rect>
+    <text x="350" y="516" text-anchor="middle" class="arch-t-title">#6 / #8–#10 Aggregate &amp; Behaviors</text>
+    <text x="350" y="536" text-anchor="middle" class="arch-t-sub">EntityKey / tags / commandHandler</text>
+    <text x="350" y="554" text-anchor="middle" class="arch-t-sub">runReplyingPolicy + withPost</text>
+    <text x="350" y="572" text-anchor="middle" class="arch-t-mono">GLUE · 挂载 Domain Rules</text>
+  </a>
+  <a class="arch-node" href="#section-4-4">
+    <rect x="468" y="492" width="212" height="92" rx="4" class="arch-card-teal"></rect>
+    <text x="574" y="516" text-anchor="middle" class="arch-t-title">#51 / #52 StoryPort &amp; @cloze Impl</text>
+    <text x="574" y="536" text-anchor="middle" class="arch-t-sub">ExternPorts / EffectsPort / Handler</text>
+    <text x="574" y="554" text-anchor="middle" class="arch-t-sub">CallerContractSpec · handwritten Impl</text>
+    <text x="574" y="572" text-anchor="middle" class="arch-t-teal">KERNEL + SEAM</text>
+  </a>
+  <a class="arch-node" href="#section-4-3">
+    <rect x="696" y="492" width="196" height="92" rx="4" class="arch-card-amber"></rect>
+    <text x="794" y="516" text-anchor="middle" class="arch-t-title">#12 Repository Port</text>
+    <text x="794" y="536" text-anchor="middle" class="arch-t-sub">&lt;Agg&gt;Repository trait</text>
+    <text x="794" y="554" text-anchor="middle" class="arch-t-sub">getState / askAsync</text>
+    <text x="794" y="572" text-anchor="middle" class="arch-t-amber">SEAM · 依赖倒置端口</text>
+  </a>
+
+  <a class="arch-node" href="#section-4-5">
+    <rect x="28" y="600" width="278" height="94" rx="4" class="arch-card-teal"></rect>
+    <text x="167" y="624" text-anchor="middle" class="arch-t-title">#15 / #23 / #26–#28 ReadSide Suite</text>
+    <text x="167" y="644" text-anchor="middle" class="arch-t-sub">&lt;View&gt; · QueryService · ReadsideRepository</text>
+    <text x="167" y="662" text-anchor="middle" class="arch-t-sub">ApplyEvent / ProjectionHandler / Projection</text>
+    <text x="167" y="680" text-anchor="middle" class="arch-t-teal">KERNEL + GLUE · Event → Query View</text>
+  </a>
+  <a class="arch-node" href="#section-4-6">
+    <rect x="322" y="600" width="280" height="94" rx="4" class="arch-card-teal"></rect>
+    <text x="462" y="624" text-anchor="middle" class="arch-t-title">#55–#60 Reactive Policy &amp; PolicyMachine</text>
+    <text x="462" y="644" text-anchor="middle" class="arch-t-sub">#55 Decision · #56 Mechanics · #57 Handler</text>
+    <text x="462" y="662" text-anchor="middle" class="arch-t-sub">#58 Runner · #60 PolicyMachine(Left→Dispose)</text>
+    <text x="462" y="680" text-anchor="middle" class="arch-t-teal">KERNEL + GLUE · Event ⇒ Command 闭环</text>
+  </a>
+  <a class="arch-node" href="#section-4-7">
+    <rect x="618" y="600" width="274" height="94" rx="4" class="arch-card-amber"></rect>
+    <text x="755" y="624" text-anchor="middle" class="arch-t-title">#13 / #40–#46 Saga &amp; ExternalBridge</text>
+    <text x="755" y="644" text-anchor="middle" class="arch-t-sub">*SagaModule · CompositionHost · EffectFace</text>
+    <text x="755" y="662" text-anchor="middle" class="arch-t-sub">*ConnectorPort · #46 ExternalAuthority</text>
+    <text x="755" y="680" text-anchor="middle" class="arch-t-amber">KERNEL + SEAM · 跨聚合与跨 BC 边界</text>
+  </a>
+
+  <rect x="14" y="724" width="892" height="242" rx="5" class="arch-band-teal"></rect>
+  <text x="28" y="746" class="arch-t-band-teal">LAYER 1 · DOMAIN CORE（洋葱最内层 · 零 Akka / Play / JDBC 依赖 · 可独立离线 scalac + 变异测试）</text>
+  <a class="arch-node" href="#section-3-1">
+    <rect x="28" y="762" width="278" height="84" rx="4" class="arch-card-teal"></rect>
+    <text x="167" y="786" text-anchor="middle" class="arch-t-title">#1 Value Objects &amp; ExactTypes</text>
+    <text x="167" y="806" text-anchor="middle" class="arch-t-sub">Money / AmountDecimal / NavDecimal</text>
+    <text x="167" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · 构造即精度/币种证明</text>
+  </a>
+  <a class="arch-node" href="#section-3-2">
+    <rect x="322" y="762" width="280" height="84" rx="4" class="arch-card-teal"></rect>
+    <text x="462" y="786" text-anchor="middle" class="arch-t-title">#2 Domain Entity</text>
+    <text x="462" y="806" text-anchor="middle" class="arch-t-sub">State / empty / sealed trait Event</text>
+    <text x="462" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · 聚合根纯数据模型</text>
+  </a>
+  <a class="arch-node" href="#section-3-3">
+    <rect x="618" y="762" width="274" height="84" rx="4" class="arch-card-teal"></rect>
+    <text x="755" y="786" text-anchor="middle" class="arch-t-title">#3 EventHandler (Event Fold)</text>
+    <text x="755" y="806" text-anchor="middle" class="arch-t-sub">(State, Event) =&gt; State 确定性折叠</text>
+    <text x="755" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · EARS post: 唯一派生源</text>
+  </a>
+
+  <a class="arch-node" href="#section-3-4">
+    <rect x="28" y="862" width="278" height="88" rx="4" class="arch-card-teal"></rect>
+    <text x="167" y="886" text-anchor="middle" class="arch-t-title">#4 / #5 / #45 Invariant Rules &amp; Params</text>
+    <text x="167" y="906" text-anchor="middle" class="arch-t-sub">(State, Params) =&gt; Either[Err, List[Event]]</text>
+    <text x="167" y="926" text-anchor="middle" class="arch-t-teal">KERNEL · Z3 First-Hit + 后置校验</text>
+  </a>
+  <a class="arch-node" href="#section-3-5">
+    <rect x="322" y="862" width="280" height="88" rx="4" class="arch-card-teal"></rect>
+    <text x="462" y="886" text-anchor="middle" class="arch-t-title">#48 Domain Axioms &amp; Replay</text>
+    <text x="462" y="906" text-anchor="middle" class="arch-t-sub">replay(events) / checkAxioms(state)</text>
+    <text x="462" y="926" text-anchor="middle" class="arch-t-teal">KERNEL · ALWAYS 不变量运行期守护</text>
+  </a>
+  <a class="arch-node" href="#section-3-6">
+    <rect x="618" y="862" width="274" height="88" rx="4" class="arch-card-amber"></rect>
+    <text x="755" y="886" text-anchor="middle" class="arch-t-title">#14 / #51 Computations Port &amp; Impl</text>
+    <text x="755" y="906" text-anchor="middle" class="arch-t-sub">L1 → .Noop / L2 → handwritten Impl</text>
+    <text x="755" y="926" text-anchor="middle" class="arch-t-amber">SEAM · 非线性/领域计算隔离缝</text>
+  </a>
+
+  <line x1="130" y1="246" x2="130" y2="274" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
+  <line x1="353" y1="246" x2="353" y2="310" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
+  <line x1="580" y1="246" x2="580" y2="488" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
+  <line x1="786" y1="424" x2="786" y2="452" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <line x1="350" y1="584" x2="350" y2="858" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <line x1="462" y1="694" x2="462" y2="758" class="arch-edge-amber" marker-end="url(#map-arr-amber)"></line>
+  <line x1="167" y1="694" x2="167" y2="758" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <line x1="566" y1="424" x2="566" y2="488" class="arch-edge-amber" marker-end="url(#map-arr-amber)"></line>
+</svg>
+<figcaption>图 1：Play CQRS（<code>scala-cqrs-play-service:2</code>）五层洋葱全景架构图。实线为<strong>向内编译依赖</strong>（DIP 方向：外层依赖内层 Port/Kernel，内层绝不反向引用框架），虚线为<strong>运行期粘合与事件/策略反应流</strong>。</figcaption>
+</figure>
+
+<h3 id="section-2-1">分解之后如何重新粘合？两条主干线看透全局</h3>
+<p>很多读者第一次看生成的脚手架目录会疑惑：文件拆得这么散，<strong>运行时到底是谁把 <code>FundQuotaRules</code>、<code>FundOrderComputationsImpl</code>、<code>CashFundPurchaseImpl</code>、<code>BankOrderApplyEventSemanticsImpl</code> 和 <code>PolicyOn*Runner</code> 串起来的？</strong>答案在下面这张粘合拓扑图里：</p>
+<figure class="co-arch-fig co-arch-map">
+<div class="arch-caption-head">FIGURE 02 · DECOMPOSITION &amp; RE-ASSEMBLY WIRING TOPOLOGY (GUICE DI + AKKA RUNTIME)</div>
+<svg viewBox="0 0 920 390" width="100%" role="img" aria-label="分解后的 Artifact Type 如何通过 Guice DI Module 树与 ApplicationBootstrap 重新粘合成完整 Akka CQRS 与 Play 运行时">
+  <defs>
+    <marker id="wire-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
+    </marker>
+    <marker id="wire-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"></path>
+    </marker>
+    <marker id="wire-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+  </defs>
+
+  <rect x="14" y="14" width="430" height="360" rx="5" class="arch-band"></rect>
+  <text x="28" y="38" class="arch-t-band">1. PLAY / GUICE DI MODULE 粘合树（静态装配）</text>
+
+  <rect x="34" y="56" width="390" height="68" rx="4" class="arch-card-dark"></rect>
+  <text x="229" y="82" text-anchor="middle" class="arch-t-title-dark">BootstrapModule (modules/BootstrapModule.scala)</text>
+  <text x="229" y="102" text-anchor="middle" class="arch-t-sub-dark">绑定 AggRepository → 挂载 HandwrittenBindingsModule → eager ApplicationBootstrap</text>
+
+  <rect x="34" y="148" width="390" height="62" rx="4" class="arch-card-amber"></rect>
+  <text x="229" y="172" text-anchor="middle" class="arch-t-title">HandwrittenBindingsModule (handwritten/ 隔离区 · 绝不覆盖)</text>
+  <text x="229" y="192" text-anchor="middle" class="arch-t-sub">install(GeneratedBindingsModule) + install(&lt;Ctx&gt;ProjectionModule)</text>
+
+  <rect x="34" y="234" width="212" height="122" rx="4" class="arch-card-teal"></rect>
+  <text x="140" y="258" text-anchor="middle" class="arch-t-title">GeneratedBindingsModule</text>
+  <text x="140" y="278" text-anchor="middle" class="arch-t-sub">• L1 Computations → .Noop</text>
+  <text x="140" y="296" text-anchor="middle" class="arch-t-sub">• L2 Computations → *Impl</text>
+  <text x="140" y="314" text-anchor="middle" class="arch-t-sub">• L3 StoryHandler → *Impl</text>
+  <text x="140" y="332" text-anchor="middle" class="arch-t-sub">• PolicySemantics + DlqSink</text>
+  <text x="140" y="348" text-anchor="middle" class="arch-t-sub">• HttpRouter + ToolGates</text>
+
+  <rect x="262" y="234" width="162" height="122" rx="4" class="arch-card"></rect>
+  <text x="343" y="258" text-anchor="middle" class="arch-t-title">&lt;Ctx&gt;ProjectionModule</text>
+  <text x="343" y="280" text-anchor="middle" class="arch-t-sub">#26 ApplyEventSemantics</text>
+  <text x="343" y="298" text-anchor="middle" class="arch-t-sub">→ ApplyEventSemanticsImpl</text>
+  <text x="343" y="322" text-anchor="middle" class="arch-t-mono">handwritten/ 读模型</text>
+  <text x="343" y="340" text-anchor="middle" class="arch-t-mono">自定义行折叠语义</text>
+
+  <line x1="229" y1="124" x2="229" y2="145" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="140" y1="210" x2="140" y2="231" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="343" y1="210" x2="343" y2="231" class="arch-edge-amber" marker-end="url(#wire-arr-amber)"></line>
+
+  <rect x="468" y="14" width="438" height="360" rx="5" class="arch-band-teal"></rect>
+  <text x="482" y="38" class="arch-t-band-teal">2. AKKA RUNTIME BOOTSTRAP 与 REACTIVE 闭环（动态运行）</text>
+
+  <rect x="488" y="56" width="398" height="68" rx="4" class="arch-card-dark"></rect>
+  <text x="687" y="82" text-anchor="middle" class="arch-t-title-dark">ApplicationBootstrap (mixes in all *Bootstrap traits)</text>
+  <text x="687" y="102" text-anchor="middle" class="arch-t-sub-dark">init&lt;Agg&gt;Aggregate + init&lt;View&gt;ReadsideProjection + initPolicyOn&lt;Cmd&gt;Projection</text>
+
+  <rect x="488" y="150" width="188" height="94" rx="4" class="arch-card-teal"></rect>
+  <text x="582" y="174" text-anchor="middle" class="arch-t-title">ClusterSharding 写侧集群</text>
+  <text x="582" y="194" text-anchor="middle" class="arch-t-sub">EventSourcedBehavior</text>
+  <text x="582" y="212" text-anchor="middle" class="arch-t-sub">Behaviors → Rules + EventHandler</text>
+  <text x="582" y="230" text-anchor="middle" class="arch-t-sub">EventAdapter → Protobuf Journal</text>
+
+  <rect x="698" y="150" width="188" height="94" rx="4" class="arch-card-amber"></rect>
+  <text x="792" y="174" text-anchor="middle" class="arch-t-title">ShardedDaemonProcess</text>
+  <text x="792" y="194" text-anchor="middle" class="arch-t-sub">eventsByTag(ReadJournal)</text>
+  <text x="792" y="212" text-anchor="middle" class="arch-t-sub">① ReadSide → ViewTable</text>
+  <text x="792" y="230" text-anchor="middle" class="arch-t-sub">② PolicyMachine → EntityKey.ask</text>
+
+  <rect x="488" y="268" width="398" height="88" rx="4" class="arch-card"></rect>
+  <text x="687" y="292" text-anchor="middle" class="arch-t-title">PlayHttpBridge / ServiceLoader → StoryController → StoryImpl</text>
+  <text x="687" y="314" text-anchor="middle" class="arch-t-sub">5 层 Authz (PEP/PDP + RowScope) → ExternPorts/EffectsPort → AggregateProtocol</text>
+  <text x="687" y="334" text-anchor="middle" class="arch-t-mono">SagaCoordinatorBootstrap 异步驱动跨聚合协调与 #46 ExternalAuthority</text>
+
+  <line x1="582" y1="124" x2="582" y2="147" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="792" y1="124" x2="792" y2="147" class="arch-edge-amber" marker-end="url(#wire-arr-amber)"></line>
+  <line x1="676" y1="196" x2="695" y2="196" class="arch-edge" marker-end="url(#wire-arr-ink)"></line>
+  <line x1="424" y1="90" x2="485" y2="90" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+</svg>
+<figcaption>图 2：静态依赖由 Guice DI 模块树按 <code>BootstrapModule → HandwrittenBindingsModule → GeneratedBindingsModule + ProjectionModule</code> 装配；运行期由 <code>ApplicationBootstrap</code> 同时初始化 Sharding 写侧实体与 <code>ShardedDaemonProcess</code> 投影。</figcaption>
+</figure>
+
+<hr>
+<h2 id="section-3">三、Domain 核心层（最内层 · 零框架依赖）</h2>
+<p>这一层位于 <code>domain/</code>，是整个架构里含金量最高的 <strong>Kernel 与 Seam 领地</strong>：没有任何 HTTP、Akka 或数据库知识，全部代码可用离线 <code>scalac</code> 毫秒级独立编译。</p>
+<h3 id="section-3-1">Value Object &amp; ExactType（#1）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>解决的问题</strong>：防止“裸 <code>BigDecimal</code> / 裸 <code>String</code> 货币混算、精度丢失与非法枚举透传”。编译器直接从 <code>structures/exactTypes</code> 与 <code>valueObjects</code> 产出带构造不变量和算术方法的受限值对象（如 <code>Money</code>、<code>AmountDecimal</code>、<code>NavDecimal</code>、<code>BankCashAcknowledgement</code>），把精度与单位检查前移到构造期。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/values/Money.scala
+sealed abstract case class Money private (amount: BigDecimal, currency: String) {
+  def isPositive: Boolean = amount &gt; 0
+  def plus(other: Money): Either[iMadzError, Money] =
+    if (currency != other.currency) Left(iMadzError("EXACT_UNIT_MISMATCH", "exact units differ"))
+    else for {
+      lhs &lt;- Money.checkedAmount(amount)
+      rhs &lt;- Money.checkedAmount(other.amount)
+      result &lt;- Money.checkedAmount(lhs + rhs)
+    } yield new Money(result, currency) {}
+}
+</code></pre>
+<h3 id="section-3-2">Domain Entity（#2）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>解决的问题</strong>：定义聚合根的不可变 <code>State</code> 快照、<code>empty</code> 初始状态与 <code>sealed trait Event extends CborSerializable</code> 事实契约，确保领域状态结构与事件载荷只有一套真源。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/entities/FundOrderEntity.scala
+object FundOrderEntity {
+  final case class State(netAmount: BigDecimal, paymentOutcome: String, taStatus: String)
+  def empty: State = State(netAmount = BigDecimal("0.00"), paymentOutcome = "pending", taStatus = "pending")
+
+  sealed trait Event extends CborSerializable
+  final case class CashRequestSourceRecorded(principal: String, clientRequestId: String) extends Event
+  final case class FundTASharesConfirmed(shares: Long, nav: BigDecimal) extends Event
+  type EventHandler = (State, Event) =&gt; State
+}
+</code></pre>
+<h3 id="section-3-3">EventHandler（#3）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>解决的问题</strong>：保证事件溯源（Event Sourcing）的状态重放与 EARS <code>post:</code> 后置条件严格同构。<code>FundQuotaEventHandler</code> 从 EARS <code>post:</code> 表达式直接生成 <code>(State, Event) =&gt; State</code> 纯函数，杜绝“命令校验和状态折叠各写一套”的语义分叉。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/entities/behaviors/FundQuotaEventHandler.scala
+object FundQuotaEventHandler extends EventHandler {
+  override def apply(state: State, input: Event): State = input match {
+    case event: SubscriptionQuotaReserved =&gt;
+      state.copy(
+        fundTotalUsed = (state.fundTotalUsed + event.amount),
+        accountUsed = state.accountUsed.updated(
+          event.accountId,
+          (state.accountUsed.getOrElse(event.accountId, BigDecimal("0")) + event.amount))
+      )
+  }
+}
+</code></pre>
+<h3 id="section-3-4">Aggregate Invariant Rules &amp; RuleParams（#4 / #5 / #45）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>解决的问题</strong>：把每条命令的纯输入参数封装为 <code>&lt;Agg&gt;RuleParams.&lt;Cmd&gt;Params</code>，并在 <code>&lt;Agg&gt;Rules</code> 中以 <code>InvariantRule[Event, State, Params]</code> 实现 <strong>DMN FIRST-HIT（先拒绝、后发射）</strong> 规则及 <code>checkEventPostconditions</code> 事实载荷防空校验。每个规则行都挂有 <code>@knowledge</code> 语义锚点以便逆向溯源。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/invariants/FundQuotaRules.scala
+final class ReserveSubscriptionQuotaRule(hosts: FundQuotaComputations)
+    extends InvariantRule[Event, State, ReserveSubscriptionQuotaParams] {
+  override def apply(state: State, p: ReserveSubscriptionQuotaParams): Either[iMadzError, List[Event]] = {
+    if ((p.amount &lt; state.minPurchase || p.amount &gt; state.maxSingleLimit)) Left(iMadzError("QUOTA_AMOUNT_RANGE", "QUOTA_AMOUNT_RANGE"))
+    else if (((state.fundTotalUsed + p.amount) &gt; state.fundTotalCap)) Left(iMadzError("QUOTA_FUND_CAP", "QUOTA_FUND_CAP"))
+    else if (((state.accountUsed.getOrElse(p.accountId, BigDecimal("0")) + p.amount) &gt; state.perAccountCap)) Left(iMadzError("QUOTA_ACCOUNT_CAP", "QUOTA_ACCOUNT_CAP"))
+    else Right(List(SubscriptionQuotaReserved(p.accountId, p.amount)))
+  }
+}
+</code></pre>
+<h3 id="section-3-5">Z3 Axioms &amp; Replay（#48）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>解决的问题</strong>：把编译期已经通过 <a href="https://github.com/Z3Prover/z3">Z3 Prover</a> 验证过的 <code>axioms: ALWAYS</code> 翻译成运行期与测试期可复用的 <code>FundQuotaAxioms.checkAxioms(state)</code> 和 <code>replay(initial, events)</code>，防止外部旁路构造破坏全局业务公理。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/domain/entities/FundQuotaAxioms.scala
+object FundQuotaAxioms {
+  def replay(initial: State, events: Seq[Event]): State =
+    events.foldLeft(initial)(FundQuotaEventHandler.apply)
+
+  def checkAxioms(state: State): Seq[String] = {
+    val violated = scala.collection.mutable.ListBuffer.empty[String]
+    if (!(state.fundTotalUsed &lt;= state.fundTotalCap)) violated += "AX-Q-1"
+    if (state.accountUsed.keys.exists(accountId =&gt; !(state.accountUsed.getOrElse(accountId, BigDecimal("0")) &lt;= state.perAccountCap))) violated += "AX-Q-2"
+    violated.toSeq
+  }
+}
+</code></pre>
+<h3 id="section-3-6">Domain Computations Port &amp; L2 @cloze Impl（#14 / #51）</h3>
+<p><span class="at-badge at-seam">SEAM</span> <strong>解决的问题</strong>：对 <code>L1</code>（纯粹线性算术）聚合，<code>Computations</code> 自动生成 <code>Noop</code> 零成本实例；对 <code>L2</code>（含非线性计算如 <code>shares * nav &lt;= netAmount</code> 或宿主算法）命令，编译器在 <code>domain/services/&lt;Agg&gt;Computations.scala</code> 吐出强类型 Port，同时在 <code>handwritten/</code> 下初始化永不覆写的 <code>*ComputationsImpl.scala</code> <code>@cloze</code> 隔离区，再由 <code>GeneratedBindingsModule</code> 通过 Guice 绑定回去。</p>
+<hr>
+<h2 id="section-4">四、Application 应用层（写侧协议、读侧物化、反应式策略与长流程）</h2>
+<p>这一层把纯 Domain 内核组织成可调度的 CQRS 用例：写入指令怎么进、读模型怎么折叠、<code>Event =&gt; Command</code> 策略怎么反应、多聚合长流程怎么编排。</p>
+<h3 id="section-4-1">Aggregate Protocol &amp; CommandHelpers（#7 / #11）</h3>
+<p><span class="at-badge at-seam">SEAM</span> <span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：定义 <a href="https://doc.akka.io/docs/akka/current/typed/cluster-sharding.html">Akka Cluster Sharding</a> 所需的消息信封（<code>sealed trait Command</code> 带 <code>replyTo: ActorRef[Reply]</code>，<code>Reply</code> 为 <code>Accepted(events)</code> 或 <code>Refused(error)</code>），并用 <code>CommandHelpers</code> 完成 <code>Command → RuleParams</code> 的纯胶水拆包转换，确保 Domain <code>Rules</code> 永远不认识 <code>ActorRef</code>。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/application/aggregates/FundOrderProtocol.scala
+object FundOrderProtocol {
+  sealed trait Command extends CborSerializable
+  final case class RecordFundTAConfirmed(shares: Long, nav: BigDecimal, replyTo: ActorRef[Reply]) extends Command
+  final case class RequestIndependentRefund(orderId: String, replyTo: ActorRef[Reply]) extends Command
+  final case class GetState(replyTo: ActorRef[State]) extends Command
+
+  sealed trait Reply extends CborSerializable
+  final case class Accepted(events: Vector[Event]) extends Reply
+  final case class Refused(error: iMadzError) extends Reply
+  type CommandHandler = (State, Command) =&gt; Effect[Event, State]
+}
+</code></pre>
+<h3 id="section-4-2">Aggregate, Factory &amp; Behaviors（#6 / #8 / #9 / #10）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：标准 <strong>Glue 层</strong>。<code>&lt;Agg&gt;Aggregate</code> 声明 <code>EntityTypeKey</code> 与分片标签 <code>tags</code>；<code>&lt;Agg&gt;Behaviors</code> 调用公共运行时 <code>runReplyingPolicy(rule, helper)(state, cmd).withPost(checkEventPostconditions).replyWith(cmd.replyTo)</code>，把无框架依赖的 Domain Rule 变成持久化 <code>Effect.persist(...).thenReply(...)</code>。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/application/aggregates/behaviors/FundQuotaBehaviors.scala
+private def executionBehavior(state: State, hosts: FundQuotaComputations): PartialFunction[Command, Effect[Event, State]] = {
+  case cmd: ReserveSubscriptionQuota =&gt;
+    runReplyingPolicy(new FundQuotaRules.ReserveSubscriptionQuotaRule(hosts), ReserveSubscriptionQuotaHelper)(state, cmd)
+      .withPost(FundQuotaRules.checkEventPostconditions)
+      .replyWith(cmd.replyTo)
+}
+</code></pre>
+<h3 id="section-4-3">Aggregate Repository Port（#12）</h3>
+<p><span class="at-badge at-seam">SEAM</span> <strong>解决的问题</strong>：对上层用例/网关暴露聚合访问接口（<code>trait &lt;Agg&gt;Repository</code>），把 <code>ClusterSharding</code> 的 <code>EntityRef.ask</code> 异步细节隐藏在基础设施实现里。</p>
+<h3 id="section-4-4">Application Story Port, CallerContractSpec &amp; L3 @cloze Impl（#51 / #52）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-seam">SEAM</span> <strong>解决的问题</strong>：针对 <code>layer: application</code> 的 <code>*.story.ears</code> / <code>*.integration.ears</code> 编排故事，生成器产出入站 <code>Request</code>、<code>ExternPorts</code>（只读幂等与鉴权谓词）、<code>EffectsPort</code>（<code>pin</code> / <code>dispatch</code>）、强类型 <code>CallerContractSpec</code>（<code>idempotencyKey</code>、<code>retryPolicy</code>、<code>forbiddenUntrustedFields</code>，彻底取代不安全的字符串 JSON）以及 <code>Handler</code>；人工或 AI 只需在 <code>handwritten/</code> 的 <code>&lt;Story&gt;Impl.scala</code> <code>@cloze</code> 槽中实现编排语义，受锁定 Oracle 测试监督。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/application/services/CashFundPurchasePort.scala
+trait CashFundPurchaseHandler extends ApplicationService {
+  def handle(req: CashFundPurchaseRequest, externs: CashFundPurchaseExternPorts, effects: CashFundPurchaseEffectsPort): Either[iMadzError, CashFundPurchaseSuccessResponse]
+}
+object CashFundPurchaseCallerContract {
+  val spec: CallerContractSpec = CallerContractSpec(
+    idempotencyKey = "(principal, clientRequestId)",
+    retryPolicy = "at-least-once safe; replayed identical payload must never re-dispatch settlement",
+    forbiddenUntrustedFields = Seq("operationId", "investorAccountId", "fundCollectionAccountId")
+  )
+}
+</code></pre>
+<h3 id="section-4-5">ReadModel View, QueryService &amp; ReadSide Projection（#15 / #23 / #26 / #27 / #28）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：实现 CQRS 读写分离。从 <code>readModels[*]</code> 产出 <code>&lt;View&gt;.scala</code>、<code>QueryService</code>、<code>ReadsideRepository</code> 接口、<a href="https://doc.akka.io/docs/akka-projection/current/"><code>Akka Projection</code></a> 定义 <code>&lt;View&gt;ReadsideProjection</code>、<code>&lt;View&gt;ReadsideProjectionHandler</code>，以及 <code>#26</code> <code>&lt;Stem&gt;ApplyEvent</code> + <code>ApplyEventSemantics</code> 隔离扩展口（允许手写 <code>ApplyEventSemanticsImpl</code> 注入自定义字段推导，并通过 <code>&lt;Context&gt;ProjectionModule</code> 单独绑定）。</p>
+<pre class="code"><code class="language-scala">// generated-scaffold/scala/example/bankwealth/v2/application/readmodels/bank_order_readside/BankOrderReadsideProjectionHandler.scala
+override def process(envelope: EventEnvelope[Any]): Future[Done] =
+  envelope.event match {
+    case e: FundOrderEntity.CashRequestSourceRecorded =&gt;
+      val base = BankOrderView(clientRequestId = envelope.persistenceId)
+      repository.upsert(base.copy(principal = e.principal, clientRequestId = e.clientRequestId)).map(_ =&gt; Done)
+    case _ =&gt; bindings.onUnmatchedEvent(envelope)
+  }
+</code></pre>
+<h3 id="section-4-6">Reactive Policy &amp; PolicyMachine（#55–#58 / #60）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：把 EARS <code>WHEN event &lt;SrcAgg&gt;.&lt;SrcEvent&gt; SHALL dispatch &lt;TargetAgg&gt;.&lt;TargetCmd&gt;</code> 反应式策略装配成可重试、带 DLQ 吞毒的 Akka Projection 闭环——这正是 v2 从 54 族扩展到 <strong>60 族</strong>的新增核心家族群：</p>
+<ul>
+<li><strong><code>#55 policy-decision</code> (<code>PolicyOn&lt;Cmd&gt;.scala</code>)</strong>：纯内核 <code>(decide, dispose)</code> 函数对与 <code>DefaultSemantics</code>，不含任何 Akka 依赖；</li>
+<li><strong><code>#56 policy-mechanics</code> (<code>PolicyOn&lt;Cmd&gt;Mechanics.scala</code>)</strong>：通过 <code>ClusterSharding.entityRefFor(EntityKey, entityId).ask[Reply]</code> 派发命令，把 <code>Refused(err)</code> 映射为 <code>Left(err)</code>；</li>
+<li><strong><code>#57 policy-handler</code> (<code>PolicyOn&lt;Cmd&gt;Handler.scala</code>)</strong>：Akka <code>Handler[EventEnvelope[Any]]</code> 装配壳，负责 <code>Event</code> 解码、包裹 <code>PolicyEnvelope</code> 并喂入 <code>PolicyMachine.run</code>；</li>
+<li><strong><code>#58 policy-runner</code> (<code>PolicyOn&lt;Cmd&gt;Runner.scala</code>)</strong>：封装 <code>EventSourcedProvider.eventsByTag</code> 与 <code>ProjectionId</code>；</li>
+<li><strong><code>#60 projection-runtime-mechanism</code> (<code>PolicyMachine.scala</code> / <code>FailureVerdict.scala</code> / <code>PolicyEnvelope.scala</code> / <code>PolicyDlqBury.scala</code>)</strong>：共享 4 段效果管线，并<strong>显式检查 <code>Future.traverse(commands)(execute)</code> 返回列表中的每一个 <code>Left(err)</code></strong>——<code>Permanent</code> 送入 <code>PolicyDlqSink.bury</code> 后推进 offset，<code>Retryable</code> 则返回失败 <code>Future</code> 以阻断 offset 提交触发重放；此外守护进程注册 trait 对应 <strong><code>#59 policy-bootstrap</code></strong>（见第 5.4 节）。</li>
+</ul>
+<pre class="code"><code class="language-scala">// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 0b925ad)
+Future
+  .traverse(commands)(execute)
+  .flatMap { results =&gt;
+    val verdicts = results.collect { case Left(err) =&gt; dispose(e, err) }
+    val permanents = verdicts.collect { case p: FailureVerdict.Permanent =&gt; p }
+    val retryables = verdicts.collect { case r: FailureVerdict.Retryable =&gt; r }
+    Future
+      .traverse(permanents)(p =&gt; bury(envelope, s"$aggType·${p.what}"))
+      .flatMap { _ =&gt;
+        retryables.headOption match {
+          case Some(FailureVerdict.Retryable(err)) =&gt;
+            Future.failed(new RuntimeException(s"[policy] $aggType retryable failure: err=${err.code}"))
+          case None =&gt; Future.successful(())
+        }
+      }
+  }
+</code></pre>
+<h3 id="section-4-7">Orchestration, Saga, EffectFace &amp; ExternalEventBridge（#13 / #16–#21 / #40–#44 / #46）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-seam">SEAM</span> <strong>解决的问题</strong>：承接多步 Saga、外部工具闸门（<code>ConnectorPort</code>）、外部副作用契约（<code>EffectFace</code> + <code>Host</code>）以及跨限界上下文集成（<code>#46 ExternalEventBridge</code> → <code>&lt;Agg&gt;ExternalEvents</code> + <code>ExternalAuthority</code> 4 处同步）。v2 通过 <code>#40</code>–<code>#44</code> 统一了 v1 的旧 <code>#16</code>–<code>#21</code> Saga 家族，用单一状态机事件与确定性步骤序列表替代碎裂的 Saga 模板。</p>
+<hr>
+<h2 id="section-5">五、Infrastructure 基础设施层（序列化、持久化与分解后的粘合引导）</h2>
+<p>外层基础设施解决“领域事件如何落盘、ReadModel/DLQ 如何写库、外部端口如何接上真实适配器”，并承担<strong>把所有分解后的部件最终粘合起来</strong>的工程职责。</p>
+<h3 id="section-5-1">Protobuf Schema, ProtoConverters &amp; Serialization Adapters（#29–#33）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：保证 <a href="https://doc.akka.io/docs/akka/current/typed/persistence.html">Akka Persistence Typed</a> 事件日志的长期演进兼容性（绝不用易碎的 Java/Jackson 全自动序列化直接写 State/Event）。生成器产出一整套 <a href="https://scalapb.github.io/">ScalaPB</a> <code>.proto</code>、领域与 PO 互转的 <code>*ProtoConverters</code>、<code>*EventAdapter</code> / <code>*SnapshotAdapter</code>，以及通过 <code>ClassTag</code> 显式注册所有消息清单的 <code>DomainProtoSerializer</code>。</p>
+<pre class="code"><code class="language-scala">// infrastructure/persistence/FundOrderEventAdapter.scala &amp; DomainProtoSerializer.scala
+class FundOrderEventAdapter extends EventAdapter[Event, pb.FundOrderEventPO] with FundOrderProtoConverters {
+  override def manifest(event: Event): String = "FundOrderEventPO"
+  override def toJournal(event: Event): pb.FundOrderEventPO = encodeFundOrderEventPO(event)
+  override def fromJournal(envelope: pb.FundOrderEventPO, manifest: String): EventSeq[Event] =
+    EventSeq.single(decodeFundOrderEventPO(envelope))
+}
+</code></pre>
+<h3 id="section-5-2">Repository Impl, ReadSide DDL &amp; PolicyDlqBury（#12 / #24）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：实现读库建表 DDL（<code>&lt;View&gt;ReadsideSchema</code>）、基于 <a href="http://scalikejdbc.org/">ScalikeJDBC</a> 的幂等 <code>ON CONFLICT DO UPDATE</code> 读写实现（<code>&lt;View&gt;RepositoryImpl</code>），以及策略毒丸事件持久化兜底 <code>PolicyDlqBury</code>（写入 <code>kn_projection_dlq</code>）。</p>
+<h3 id="section-5-3">Outbound Connectors &amp; Effect Implementations（#25）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：为 Application 层的 <code>ExternPorts</code>、<code>EffectsPort</code>、<code>ConnectorPort</code> 与 <code>EffectFace.Port</code> 提供可运行默认桩（<code>DefaultOutboundConnectors</code>、<code>InMemoryStore</code>）以及隔离区真实实现承接点（<code>*ConnectorImpl</code>、<code>*EffectPortImpl</code>）。</p>
+<h3 id="section-5-4">Bootstrap Traits（#47 / #38b / #38c / #38d / #59 policy-bootstrap）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：把复杂的 Akka 生命周期启动仪式从业务代码中完全剥离。每个聚合产出 <code>&lt;Agg&gt;Bootstrap</code>（装配 <code>EventSourcedBehavior</code>、<code>withTagger</code>、<code>RetentionCriteria</code>、<code>SupervisorStrategy</code> 与 <code>EventAdapter</code>），每个 ReadSide / Policy / Saga / Effect 各自产出对应的 <code>*Bootstrap</code> trait，内部统一使用 <code>ShardedDaemonProcess</code> 按标签分片拉起。</p>
+<pre class="code"><code class="language-scala">// infrastructure/bootstrap/FundQuotaBootstrap.scala
+EventSourcedBehavior[Command, Event, State](
+  persistenceId = PersistenceId.ofUniqueId(persistenceId),
+  emptyState = initial,
+  commandHandler = FundQuotaAggregate.commandHandler(hosts),
+  eventHandler = FundQuotaEventHandler.apply
+).withTagger(_ =&gt; Set(tag))
+ .withRetention(RetentionCriteria.snapshotEvery(numberOfEvents = 100, keepNSnapshots = 3))
+ .eventAdapter(new FundQuotaEventAdapter)
+ .snapshotAdapter(new FundQuotaSnapshotAdapter)
+</code></pre>
+<h3 id="section-5-5">Guice DI Wiring &amp; ApplicationBootstrap（#38 / #50）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：这是<strong>全系统重新粘合的总开关</strong>——把前面 50 多个零散的 Kernel、Seam 与 Glue 文件通过四段嵌套装配成一台完整的 <a href="https://github.com/google/guice">Google Guice</a> + <a href="https://www.playframework.com/">Play Framework</a> 应用：</p>
+<ol>
+<li><strong><code>BootstrapModule</code></strong>：绑定聚合仓库实现 <code>&lt;Agg&gt;RepositoryImpl</code>，通过 <code>installOptionalModule</code> 加载隔离区模块 <code>HandwrittenBindingsModule</code>，最后把 <code>ApplicationBootstrap</code> 设为 <code>.asEagerSingleton()</code>。</li>
+<li><strong><code>HandwrittenBindingsModule</code>（<code>handwritten/</code> 绝不覆写）</strong>：默认一行 <code>install(new GeneratedBindingsModule())</code> + <code>install(new &lt;Ctx&gt;ProjectionModule())</code>，人工需要替换生产级实现时只需在此覆盖绑定。</li>
+<li><strong><code>GeneratedBindingsModule</code></strong>：根据行为分层自动完成闭环绑定——<code>L1</code> 聚合绑定 <code>Computations.Noop</code>，<code>L2</code> 聚合绑定 <code>*ComputationsImpl</code>，<code>L3</code> 故事绑定 <code>*Impl</code>，以及 <code>ReadsideRepositoryImpl</code>、<code>ToolGate</code>、<code>PolicyDlqSink</code>、<code>PolicyOn&lt;Cmd&gt;Semantics</code> 与 <code>HttpRouter</code>。</li>
+<li><strong><code>ApplicationBootstrap</code></strong>：以多 trait 混入（<code>with FundQuotaBootstrap with FundOrderBootstrap with CreditBalanceBootstrap with BankOrderReadsideBootstrap with PolicyOn&lt;Cmd&gt;Bootstrap</code>）在构造期顺序启动全部聚合分片与 <code>ShardedDaemonProcess</code> 投影。</li>
+</ol>
+<hr>
+<h2 id="section-6">六、Interfaces 与 Service Runtime 层（HTTP 入口、5 层鉴权与构建脚手架）</h2>
+<p>接口与服务壳只做三件事：<strong>认证鉴权、协议翻译、以及把依赖打包成可编译运行的 Play/sbt 工程</strong>。</p>
+<h3 id="section-6-1">5-Layer Authz PEP/PDP &amp; ApiDto（#49）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <span class="at-badge at-seam">SEAM</span> <strong>解决的问题</strong>：将认证（<code>Principal</code>）、角色/策略决策点（<code>AuthorizationPort</code>、<code>AuthzDecisionQuery</code>）、Entitlement 校验（<code>EntitlementPort</code>）、CSRF 防护与 HTTP 状态码映射标准化，并承接从 <code>readModels[*].rowScopeSpec</code> 生成的行级权限上下文。</p>
+<h3 id="section-6-2">HTTP Controllers, AggregateStateApiController &amp; CommandDsl（#34–#36）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：为每个暴露 HTTP 的 Story 生成薄控制器 <code>&lt;Story&gt;Controller</code>——合并路径/Query/Body 与 <code>Principal</code>，调用 <code>&lt;Story&gt;Handler.handle(...)</code>，并在返回前执行 <strong>RowScope 行级防越权（IDOR）兜底校验</strong>（不匹配时直接截断返回 <code>403 FORBIDDEN_ROW_SCOPE</code>）；同时提供聚合状态只读探测控制器 <code>#34 AggregateStateApiController</code>。</p>
+<pre class="code"><code class="language-scala">// interfaces/http/CashFundPurchaseController.scala
+handler.handle(appReq, externs, effects) match {
+  case Left(err) =&gt; HttpResponse(status = HttpStatusMapper.statusForRejection(err.code), body = Map("ok" -&gt; false, "code" -&gt; err.code))
+  case Right(res) =&gt;
+    // Enforces rowScope matchField against req.principal before returning 200
+    if (rowScopeDenied) HttpResponse(status = 403, body = Map("ok" -&gt; false, "code" -&gt; "FORBIDDEN_ROW_SCOPE"))
+    else HttpResponse(status = 200, body = withView)
+}
+</code></pre>
+<h3 id="section-6-3">ServiceContract, ServiceLoader, PlayHttpBridge &amp; Routes（#37 / #38）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：<code>ServiceContract</code> 在启动时执行端点自检（<code>requireInstalled</code>），<code>ServiceLoader</code> + <code>PlayHttpBridge</code> + <code>conf/routes</code> 将 Play 请求安全解包并分派给强类型的 <code>HttpRouter</code>。</p>
+<h3 id="section-6-4">Project Scaffold &amp; Runtime Configs（#39）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：一键产出完整可构建工程元数据：<code>build.sbt</code>（精确接入 <code>generated-scaffold/scala</code> 与 <code>handwritten/scala</code> 双源码目录及 ScalaPB 代码生成插件）、<code>project/plugins.sbt</code>、<code>conf/serialization.conf</code>（绑定 <code>DomainProtoSerializer</code> 与 Saga/Effect 序列化器）和开箱可跑的本地 <code>conf/dev.conf</code>。</p>
+<hr>
+<h2 id="section-7">七、Verification &amp; BDD Oracle 治理层（把架构边界变成机器闸门）</h2>
+<p>与常见生成器最大的区别在于：<strong>验证产物本身就是一级 Artifact Type</strong>，并且与产品代码同源编译。</p>
+<h3 id="section-7-1">Gherkin Features, Executable Oracles &amp; Locked Manifest（#53）</h3>
+<p><span class="at-badge at-kernel">KERNEL</span> <strong>解决的问题</strong>：<code>test-emitter</code> 根据 Z3 反例/见证直接生成 <code>.feature</code> 规约、TypeScript <code>node:test</code> Oracle、ScalaTest <code>AnyFunSuite</code> Oracle 以及 <code>generated-tests/manifest.sha256.json</code>。由于测试脚本写入受 SHA-256 防篡改锁定，任何 AI 或开发者在填写 <code>handwritten/</code> <code>@cloze</code> 时都不能“改测试来凑通过”。</p>
+<h3 id="section-7-2">Mutation Gate &amp; Onion DIP Gate（#54）</h3>
+<p><span class="at-badge at-glue">GLUE</span> <strong>解决的问题</strong>：<code>verify-v2</code> 在交付前自动执行双重硬闸门：① <strong>Onion DIP Gate（<code>checkOnionDipBoundaries</code>）</strong> 扫描全部 <code>domain/</code> 与 <code>application/</code> 源文件，确认 0 条外层逆向导入；② <strong>Domain Mutation Gate（<code>mutation-gate.mjs</code>）</strong> 自动对生成出的规则边界做条件取反与符号变异（如 <code>&lt;</code> ↔ <code>&lt;=</code>），要求锁定测试 <strong>100% 击杀变异体</strong>。</p>
+<hr>
+<h2 id="section-8">八、端到端实例串联：一笔理财申购如何穿过 5 层洋葱与胶水</h2>
+<p>结合 <a href="https://github.com/co-arising/bank-wealth-demo"><code>bank-wealth-demo</code></a> 与刚落地的 Reactive Policy 闭环，我们可以完整追踪一条真实请求与事件链在 60 族（64 种）Artifact Type 之间的穿梭轨迹：</p>
+<ol>
+<li><strong>HTTP 入站（Layer 4）</strong>：<code>POST /api/v1/bankwealth/bank-cash-submit-port/submit</code> 经 <code>PlayHttpBridge</code> + <code>HttpRouter</code> 进入 <code>CashFundPurchaseController</code>，由 <code>ApiDto</code>（#49）完成 <code>investor</code> 角色与 <code>Principal</code> 注入。</li>
+<li><strong>应用层编排与幂等缝（Layer 2 + Seam）</strong>：<code>CashFundPurchaseImpl</code> 实现 <code>CashFundPurchaseHandler</code>（#51），先查 <code>ExternPorts.requestExists</code> 与 <code>payloadMatchesOriginal</code>（受 <code>CallerContractSpec</code> <code>(principal, clientRequestId)</code> 与禁止不可信字段 <code>investorAccountId</code> 约束），通过后触发 <code>EffectsPort.pin</code> 与 <code>dispatch</code>。</li>
+<li><strong>写侧实体与领域内核（Layer 2 Glue → Layer 1 Kernel）</strong>：命令经 <code>FundQuotaAggregate.EntityKey</code> 与 <code>FundQuotaBehaviors</code> 进入 <code>FundQuotaRules.ReserveSubscriptionQuotaRule</code>（#45）；通过 <code>Money</code>（#1）精确算术检查后发射 <code>SubscriptionQuotaReserved</code>（#2），再经 <code>FundQuotaEventHandler</code>（#3）确定性更新配额状态并由 <code>FundQuotaAxioms.checkAxioms</code>（#48）护航。</li>
+<li><strong>序列化落盘与异步投影（Layer 3 + Layer 2）</strong>：<code>FundQuotaEventAdapter</code> 与 <code>DomainProtoSerializer</code>（#29–#33）将事件按 Protobuf 写入持久化日志并打上 <code>tags</code>；<code>ShardedDaemonProcess</code> 拉起两条独立消费通道：<ul>
+<li><strong>读侧投影</strong>：<code>BankOrderReadsideProjectionHandler</code>（#28）消费事件并调用 <code>BankOrderReadsideRepositoryImpl</code>（#24）写入读表，供 <code>BankOrderViewQueryService</code>（#15）查询；</li>
+<li><strong>反应式 Policy 闭环</strong>：当出现 <code>WHEN event &lt;SrcAgg&gt;.&lt;SrcEvent&gt; SHALL dispatch &lt;TargetAgg&gt;.&lt;TargetCmd&gt;</code> 时，<code>PolicyOn&lt;Cmd&gt;Runner</code> 订阅源聚合事件流，经 <code>PolicyMachine.run</code> 驱动 <code>PolicyOn&lt;Cmd&gt;.DefaultSemantics.decide</code> 与 <code>PolicyOn&lt;Cmd&gt;Mechanics</code> 向目标聚合发送命令；若回执为 <code>Refused(err)</code>，<code>Left(err)</code> 经 <code>dispose</code> 分流给 <code>PolicyDlqBury</code>（<code>Permanent</code> 落 <code>kn_projection_dlq</code> 并推进 offset）或返回失败 <code>Future</code>（<code>Retryable</code> 触发重放）。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="section-9">九、Artifact Type 升级同步契约与未来目标架构规范（Rust / Axum 范式）</h2>
+<p>为了让这份架构地图<strong>永远不和 <code>metarch-truthsrc</code> 源码漂移</strong>，站点流水线已经把产物目录同步做成了一条机器可验证的闭环（同步规范见 <code>docs/artifact-map-authoring-contract.md</code>）：</p>
+<ol>
+<li><strong><code>metarch-truthsrc</code> 源头指纹</strong>：<code>lib/v2/surface-registry.mjs</code> 扫描全部 <code>generators/*/generator.json</code>（<code>schemaVersion === "truthsrc.product-generator/v2"</code>），计算每个目标技术栈的 <code>catalogSha256</code>（覆盖 <code>artifactFamilyCoverage</code>、<code>producers</code> 与 <code>artifactKinds</code>）并写入 <code>exportCapabilitiesLock()</code>。</li>
+<li><strong>双仓锁文件对齐</strong>：<code>co-arising.github.io/tools/sync-site-facts.mjs --write</code> 将 <code>targetArtifactCatalogs</code> 写入 <code>assets/data/facts.lock.json</code>；<code>assets/data/artifact-maps.lock.json</code> 为每一个目标栈绑定对应的双语地图文章 <code>slug</code>、期望 <code>catalogSha256</code>、<code>truthsrcShort</code> 与 <code>bankShort</code>。</li>
+<li><strong>CI 阻断门禁</strong>：<code>sync-site-facts.mjs --check</code>（在 <code>site_ci.yml</code> 中每次 push/PR 自动运行）强制校验——<strong>只要 <code>metarch-truthsrc</code> 新增或升级了任意 Artifact Type，或新增了一个目标技术栈生成器，就必须同步更新对应的双语地图文章（含 <code>truthsrcShort</code> 与 <code>catalogSha256</code> 前 12 位指纹）与锁文件，否则 CI 直接报错阻断</strong>。</li>
+</ol>
+<h3 id="section-9-1">未来扩展规范：如果增加 Rust 目标架构（例：<code>rust-cqrs-axum-service:2</code>）</h3>
+<p>参考我们在<a href="https://co-arising.github.io/zh/articles/metarch-truthsrc-extending-code-generator-20261126/">扩展代码生成器指南</a>中的 Rust 工程蓝图，任何未来新增的 Rust（例如 <code>Axum + Tokio + SQLx + Prost + Tonic</code>）v2 生成器一旦注册进 <code>generators/</code>，其配套 Artifact Type 地图文章必须按同等洋葱五层框架提供对应映射与真实 Rust 样例：</p>
+<div class="article-table">
+<div class="article-table" tabindex="0" role="region" aria-label="表格：洋葱层次 / Play / Scala 角色 / Rust 目标对应 Artifact Type（例：rust-cqrs-axum-service:2） / Kernel / Seam / Glue 归属"><table>
+<thead>
+<tr><th scope="col">洋葱层次</th><th scope="col">Play / Scala 角色</th><th scope="col">Rust 目标对应 Artifact Type（例：<code>rust-cqrs-axum-service:2</code>）</th><th scope="col">Kernel / Seam / Glue 归属</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Layer 1 · Domain Core</strong></td><td><code>Money</code>、<code>*Entity</code>、<code>*EventHandler</code>、<code>*Rules</code>、<code>*Axioms</code>、<code>*Computations</code></td><td>纯零依赖 Workspace Crate <code>domain</code>：Newtype/<code>rust_decimal</code>、<code>enum Event</code>、<code>fn apply(state, ev)</code>、<code>fn handle(state, params) -&gt; Result&lt;Vec&lt;Event&gt;, DomainError&gt;</code>、<code>trait Computations</code></td><td><span class="at-badge at-kernel">KERNEL</span> + <span class="at-badge at-seam">SEAM</span></td></tr>
+<tr><td><strong>Layer 2 · Application</strong></td><td><code>*Protocol</code>、<code>*StoryPort</code>、<code>*ReadsideProjection</code>、<code>PolicyMachine</code></td><td>Crate <code>application</code>：命令/回执 DTO、<code>async trait Repository</code>、<code>CallerContract</code> 常量、<code>ReadsideProjector</code> 与 <code>PolicyMachine::run</code> 效果循环</td><td><span class="at-badge at-kernel">KERNEL</span> + <span class="at-badge at-seam">SEAM</span> + <span class="at-badge at-glue">GLUE</span></td></tr>
+<tr><td><strong>Layer 3 · Infrastructure</strong></td><td><code>*.proto</code> / <code>*Serializer</code> / <code>*RepositoryImpl</code> / <code>GeneratedBindingsModule</code></td><td>Crate <code>infrastructure</code>：<code>prost</code> `.proto` 编码、<code>sqlx</code> Outbox/ReadSide/DLQ 实现、<code>AppState</code> 依赖注入容器与后台消费任务</td><td><span class="at-badge at-glue">GLUE</span></td></tr>
+<tr><td><strong>Layer 4 · Interfaces &amp; Runtime</strong></td><td><code>*Controller</code>、<code>ApiDto</code>、<code>HttpRouter</code>、<code>build.sbt</code></td><td>Crate <code>interfaces</code> + 二进制入口：<code>axum::Router</code>、Tower 中间件 5 层 Authz Extractor、<code>RowScope</code> 响应守卫与 <code>Cargo.toml</code> workspace</td><td><span class="at-badge at-kernel">KERNEL</span> + <span class="at-badge at-glue">GLUE</span></td></tr>
+<tr><td><strong>Layer 5 · Verification</strong></td><td>Gherkin + ScalaTest + Mutation Gate + DIP Check</td><td><code>cargo test</code> BDD Oracle、<code>cargo-mutants</code> Guard 变异门禁与 <code>Cargo.toml</code> 依赖方向检查（<code>domain</code> 严禁依赖 <code>tokio/axum/sqlx</code>）</td><td><span class="at-badge at-kernel">KERNEL</span> + <span class="at-badge at-glue">GLUE</span></td></tr>
+</tbody>
+</table></div>
+</div>
+
+<h3 id="section-9-2">延伸参考资料</h3>
+<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc">metarch-truthsrc 主仓源码</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/CODEGEN.md">生成器架构总览 (<code>CODEGEN.md</code>)</a> · <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/knowledge_base/reference/ears_v2_grammar_reference.md">EARS v2 文法规范</a></li>
+<li><a href="https://github.com/co-arising/bank-wealth-demo">bank-wealth-demo 银行试点参考仓</a> · <a href="https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">co-arising 2.0 GA 端到端实战</a></li>
+<li><a href="https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/">Onion Architecture (Jeffrey Palermo)</a> · <a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
+</ul></article>
+    </div>
+    <aside class="article-community" aria-label="加入 Discord 社区">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord 社区</p>
+        <p class="article-community-title">读完这篇，想进一步交流或提出质疑？</p>
+        <p>加入 co-arising Discord 社区，直接与作者及同行探讨 DDD、EARS/SMT 验证与 AI 时代代码生成实践。</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+    </aside>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">继续阅读</h2>
+      <div class="article-card" lang="zh-CN">
+      <p class="article-meta"><span>设计规范</span> · <time datetime="2026-11-26">2026-11-26</time></p>
+      <h3><a href="/zh/articles/co-arising-v2-ears-native-architecture-20261126/">co-arising 2.0 长期架构蓝图：以 EARS 为唯一行为主干的端到端编译与 AI 隔离区 TDD 闭环</a></h3>
+      <p class="article-deck">从第一性原理出发，彻底告别双表达式引擎与有损 Lowering 层：确立“结构归 YAML、行为归 EARS”的正交唯一真源、SMT/Z3 硬编译闸门、EARS-Native Canonical Model v2，以及 L1 零 Token 生成与原隔离区锁定预言机 AI @cloze TDD 的双通道终局架构。</p>
+      <p class="small">中文原文</p>
+    </div>
+      <p><a href="/zh/articles/">返回文章索引</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

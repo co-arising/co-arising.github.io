@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>metarch-truthsrc 战略架构地图与地下暗道排雷手册（v2.0.0 源码级全解） — co-arising</title>
+  <meta name="description" content="从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、7 个已实锤 Bug 的拓扑归因，以及一套可直接落地的探针排雷法与下一波 8 个高危靶点雷达（基于 metarch-truthsrc@0b925ad 源码核实）。" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="metarch-truthsrc 战略架构地图与地下暗道排雷手册（v2.0.0 源码级全解）" />
+  <meta property="og:description" content="从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、7 个已实锤 Bug 的拓扑归因，以及一套可直接落地的探针排雷法与下一波 8 个高危靶点雷达（基于 metarch-truthsrc@0b925ad 源码核实）。" />
+  <meta property="og:url" content="https://co-arising.github.io/zh/articles/metarch-truthsrc-architecture-minefield-map-20261127/" />
+  <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <meta property="og:site_name" content="co-arising" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://co-arising.github.io/assets/img/og-image.png" />
+  <link rel="alternate" hreflang="en" href="https://co-arising.github.io/articles/metarch-truthsrc-architecture-minefield-map-20261127/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://co-arising.github.io/zh/articles/metarch-truthsrc-architecture-minefield-map-20261127/" />
+  <link rel="alternate" hreflang="x-default" href="https://co-arising.github.io/articles/metarch-truthsrc-architecture-minefield-map-20261127/" />
+  <link rel="canonical" href="https://co-arising.github.io/zh/articles/metarch-truthsrc-architecture-minefield-map-20261127/" />
+  <link rel="icon" href="/assets/img/co-arising-icon.png" type="image/png" sizes="64x64" />
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+  <link rel="stylesheet" href="/assets/css/articles.css" />
+</head>
+<body data-page="article" data-language-index="/articles/" data-language-counterpart="/articles/metarch-truthsrc-architecture-minefield-map-20261127/">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <nav id="site-nav" aria-label="站点导航"><div class="site-nav"><div class="row"><a href="/zh/">首页</a> · <a href="/zh/why-co-arising/">为何 co-arising</a> · <a href="/zh/dsl/">真源语言</a> · <a href="/zh/pipeline/">流水线</a> · <a href="/zh/bank-demo/">银行示例</a> · <a href="/zh/explorer/">探索器</a> · <a href="/zh/compare/">全景对比</a> · <a href="/zh/guide/">指南</a> · <a href="/zh/status/">状态</a> · <a href="/zh/articles/" aria-current="page">技术观察</a> · <a class="nav-link" href="/articles/metarch-truthsrc-architecture-minefield-map-20261127/" lang="en" rel="alternate" hreflang="en">EN</a></div></div></nav>
+  <noscript><div class="wrap"><p class="small">JavaScript 已关闭——正文、目录、链接与下载仍可使用。</p></div></noscript>
+  <main id="main-content" class="wrap">
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="article-hero">
+      <nav class="article-breadcrumb" aria-label="面包屑"><a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a> / <span aria-current="page">工程实践</span></nav>
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-27">2026-11-27</time> · 中文原文</p>
+      <h1>metarch-truthsrc 战略架构地图与地下暗道排雷手册（v2.0.0 源码级全解）</h1>
+      <p class="article-deck">从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、7 个已实锤 Bug 的拓扑归因，以及一套可直接落地的探针排雷法与下一波 8 个高危靶点雷达（基于 metarch-truthsrc@0b925ad 源码核实）。</p>
+      <div class="article-actions"><a href="/content/articles/metarch-truthsrc-architecture-minefield-map-20261127.md" download="metarch-truthsrc-architecture-minefield-map-20261127.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/metarch-truthsrc-architecture-minefield-map-20261127/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
+    </header>
+    <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文对照 metarch-truthsrc v2.0.0（提交 0b925ad）真实源码撰写，记录当前模块拓扑、14 条跨文件隐蔽耦合暗道、已修复的 7 个实证 Bug 及下一波 8 个待排雷雷达靶点；正式产品验收基线请以状态页（F-32–F-35）为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
+    <div class="article-layout">
+      <aside class="article-sidebar">
+        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 战略俯瞰（Level 0）：整座城池的宏观地形图</a></li><li><a href="#section-2"><span class="toc-number">02</span> 战区与目录地图（Level 1）：六大模块与源码索引</a></li><li><a href="#section-3"><span class="toc-number">03</span> 核心数据流与状态机（Level 2）：一条规则如何穿越全链路？</a></li><li><a href="#section-4"><span class="toc-number">04</span> 地下暗道图（Level 3）：14 条最容易踩爆的跨文件隐蔽耦合</a></li><li><a href="#section-5"><span class="toc-number">05</span> 实战复盘（Level 4A）：上一波「按图排雷」如何 7 战 7 中？</a></li><li><a href="#section-6"><span class="toc-number">06</span> 下一波排雷手册（Level 4B）：四步探针法与 8 个高危靶点雷达</a></li></ol></nav></details>
+        <p id="reading-position" class="reading-position">阅读全文</p>
+        <div class="sidebar-community">
+          <p class="sidebar-community-kicker">社区讨论</p>
+          <p>对本文观点、EARS 规约或工程落地有疑问？欢迎来 Discord 一起交流。</p>
+          <a class="sidebar-community-btn" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+        </div>
+      </aside>
+      <article id="article-body" class="article-body"><blockquote>
+<p><strong>文档定位与源码基线</strong>：本文对照 <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> <strong>v2.0.0</strong>（提交 <a href="https://github.com/co-arising/metarch-truthsrc/commit/0b925ad387d2603f1d3e248a31a71831c13c112f"><code>0b925ad</code></a>）全部核心源码撰写，是一份<strong>从粗到细、从宏观主干到源码接缝</strong>的工程作战地图。与介绍设计理念的 <a href="https://co-arising.github.io/zh/articles/co-arising-v2-ears-native-architecture-20261126/">co-arising 2.0 长期架构蓝图</a> 以及面向用户的 <a href="https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">GA 完整指南</a> 不同，本文把整个编译器切开，标注<strong>模块边界、数据流向、14 条跨文件隐蔽耦合（地下暗道）</strong>，以及一套已被实证的<strong>探针排雷法与下一波 8 个高危靶点</strong>，用于系统性地提前发现并消灭生成器与门禁 Bug。</p>
+</blockquote>
+<div class="co-kpi-strip" role="region" aria-label="metarch-truthsrc v2.0.0 源码规模与排雷基线">
+<div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">v2 主干与 EARS/Play 生成器 34,486 LOC + 1.0 精选 24 家族发射器 14,125 LOC</div></div>
+<div><div class="kpi-num">44 / 32 / 158</div><div class="kpi-label">surface-registry 锁定的 44 个 CLI 命令、32 个 MCP 工具与 158 个诊断错误码</div></div>
+<div><div class="kpi-num red">14 条暗道</div><div class="kpi-label">横跨类型系统、1.0/2.0 桥接、测试预言机与门禁断层的隐蔽耦合拓扑</div></div>
+<div><div class="kpi-num">7 战 7 中</div><div class="kpi-label">上一轮按图推演并实锤修复的 7 个真实 Bug（锁定 SPEC-S13..S17）+ 8 个待排靶点</div></div>
+</div>
+
+<h2 id="section-1">一、战略俯瞰（Level 0）：整座城池的宏观地形图</h2>
+<p>想在 <code>metarch-truthsrc</code> 里精准排雷，先要破除一个常见错觉：<strong>它不是一个“读 YAML 填模板”的脚手架工具，而是一座叠加了两个历史地层的五段式领域编译器</strong>。</p>
+<ul>
+<li><strong>地层一（v1 严格治理遗产层，<code>emitter/families/</code>）</strong>：24 个经过 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/emitter/parity.mjs"><code>emitter/parity.mjs</code></a> 金文件锁死的 Scala CQRS/Play 确定性代码发射器（值对象、聚合协议、Akka 持久化、Protobuf 编解码、Play 运行时等）。</li>
+<li><strong>地层二（v2 EARS-Native 主干层，<code>lib/ears/</code> + <code>lib/v2/</code>）</strong>：正交 YAML 结构加载器、EARS 1.0 词法/语法/绑定/Z3 SMT 求解器、DMN First-Hit 见证合成器、<code>Canonical Model v2</code>、本地 SQLite 知识图谱、TS/Scala 双栈与 Scala 单栈生成器、锁定 BDD 测试发射器、变异测试与防作弊门禁。</li>
+</ul>
+<p><strong>绝大多数真实 Bug 并不藏在某个函数内部的算法里，而是藏在“地层交界处”与“同一语义被多个下游独立翻译”的接缝上。</strong>下面这张战略地形图标出了从真源到运行时的六大主战区，以及红色虚线标注的四大高危断层带：</p>
+<figure class="co-arch-fig">
+<div class="arch-caption-head">FIGURE 01 · METARCH-TRUTHSRC V2.0.0 STRATEGIC TERRAIN &amp; FAULT LINES</div>
+<svg viewBox="0 0 840 500" width="100%" role="img" aria-label="metarch-truthsrc v2.0.0 宏观六段编译主干与四大高危断层带战略地图">
+  <defs>
+    <marker id="map1-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
+    </marker>
+    <marker id="map1-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"></path>
+    </marker>
+    <marker id="map1-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"></path>
+    </marker>
+    <marker id="map1-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+  </defs>
+  <rect x="12" y="10" width="816" height="96" rx="4" class="arch-band"></rect>
+  <text x="24" y="30" class="arch-t-band">STAGE 1–2 · 正交真源前端与形式化硬闸门（lib/v2/structure-loader + lib/ears/* + lib/v2/compiler）</text>
+  <rect x="24" y="42" width="176" height="52" rx="4" class="arch-card"></rect>
+  <text x="112" y="63" text-anchor="middle" class="arch-t-title">正交真源输入</text>
+  <text x="112" y="81" text-anchor="middle" class="arch-t-sub">YAML 结构 + .ears 行为</text>
+  <rect x="226" y="42" width="194" height="52" rx="4" class="arch-card-teal"></rect>
+  <text x="323" y="63" text-anchor="middle" class="arch-t-title">解析 · 绑定 · 血缘校验</text>
+  <text x="323" y="81" text-anchor="middle" class="arch-t-sub">structure-loader / binder / lineage</text>
+  <rect x="446" y="42" width="184" height="52" rx="4" class="arch-card-teal"></rect>
+  <text x="538" y="63" text-anchor="middle" class="arch-t-title">Z3 SMT + First-Hit</text>
+  <text x="538" y="81" text-anchor="middle" class="arch-t-sub">5 项证明 + k-BMC + 见证合成</text>
+  <rect x="656" y="42" width="160" height="52" rx="4" class="arch-card-dark"></rect>
+  <text x="736" y="63" text-anchor="middle" class="arch-t-title-dark">Canonical v2</text>
+  <text x="736" y="81" text-anchor="middle" class="arch-t-sub-dark">+ knowledge.sqlite</text>
+  <line x1="200" y1="68" x2="223" y2="68" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"></line>
+  <line x1="420" y1="68" x2="443" y2="68" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"></line>
+  <line x1="630" y1="68" x2="653" y2="68" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"></line>
+
+  <rect x="12" y="126" width="816" height="148" rx="4" class="arch-band-teal"></rect>
+  <text x="24" y="146" class="arch-t-band-teal">STAGE 3–4 · 双通道代码生成与 1.0/2.0 桥接层（generators/scala-cqrs-play-service-v2 + lib/v2/bridge + codegen）</text>
+  <rect x="24" y="160" width="214" height="98" rx="4" class="arch-card"></rect>
+  <text x="131" y="181" text-anchor="middle" class="arch-t-title">多域打包与目标路由</text>
+  <text x="131" y="200" text-anchor="middle" class="arch-t-sub">mergeCanonicalsForBc (单体)</text>
+  <text x="131" y="218" text-anchor="middle" class="arch-t-sub">target-resolution (双栈 / Scala 单栈)</text>
+  <text x="131" y="236" text-anchor="middle" class="arch-t-mono">onion-routes 共享路由派生</text>
+  <rect x="264" y="160" width="276" height="98" rx="4" class="arch-card-teal"></rect>
+  <text x="402" y="181" text-anchor="middle" class="arch-t-title">v2 -&gt; 1.0 严格治理桥接群 (Block A–D)</text>
+  <text x="402" y="200" text-anchor="middle" class="arch-t-sub">v1-strict-scala · block-cd · readside</text>
+  <text x="402" y="218" text-anchor="middle" class="arch-t-sub">api-auth (Play 5层鉴权) · policy · orchestration</text>
+  <text x="402" y="236" text-anchor="middle" class="arch-t-teal">复用 emitter/families/* 24 个 1.0 精选家族</text>
+  <rect x="566" y="160" width="250" height="98" rx="4" class="arch-card-amber"></rect>
+  <text x="691" y="181" text-anchor="middle" class="arch-t-title">双通道物理落盘领地</text>
+  <text x="691" y="200" text-anchor="middle" class="arch-t-sub">4A 只读锁定：generated-scaffold/</text>
+  <text x="691" y="218" text-anchor="middle" class="arch-t-sub">4B 永不覆写：handwritten/ (@cloze)</text>
+  <text x="691" y="236" text-anchor="middle" class="arch-t-amber">ServerSnapshotProviderImpl · Bindings</text>
+  <line x1="238" y1="209" x2="261" y2="209" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"></line>
+  <line x1="540" y1="209" x2="563" y2="209" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"></line>
+
+  <rect x="12" y="294" width="816" height="114" rx="4" class="arch-band-amber"></rect>
+  <text x="24" y="314" class="arch-t-amber">STAGE 5–6 · 锁定 BDD 预言机发射与五重验证门禁（lib/v2/test-emitter + verify-gate + mutation-gate + guard-write）</text>
+  <rect x="24" y="328" width="236" height="66" rx="4" class="arch-card"></rect>
+  <text x="142" y="350" text-anchor="middle" class="arch-t-title">锁定测试预言机发射器</text>
+  <text x="142" y="368" text-anchor="middle" class="arch-t-sub">witness-materialize -&gt; TS/Scala/HTTP</text>
+  <text x="142" y="384" text-anchor="middle" class="arch-t-mono">generated-tests/ + manifest.sha256</text>
+  <rect x="286" y="328" width="254" height="66" rx="4" class="arch-card-teal"></rect>
+  <text x="413" y="350" text-anchor="middle" class="arch-t-title">verify-gate + mutation-gate</text>
+  <text x="413" y="368" text-anchor="middle" class="arch-t-sub">SHA-256 防篡改 · 离线 scalac · Onion DIP</text>
+  <text x="413" y="384" text-anchor="middle" class="arch-t-teal">Domain 变异杀灭率 100% + 溯源写回</text>
+  <rect x="566" y="328" width="250" height="66" rx="4" class="arch-card-red"></rect>
+  <text x="691" y="350" text-anchor="middle" class="arch-t-red">终极交付与运行时验收</text>
+  <text x="691" y="368" text-anchor="middle" class="arch-t-sub">sbt -batch stage + Play 2.8.18 HTTP 路演</text>
+  <text x="691" y="384" text-anchor="middle" class="arch-t-mono">tasks-v2 盲审 · view-v2 / atlas-v2</text>
+  <line x1="260" y1="361" x2="283" y2="361" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"></line>
+  <line x1="540" y1="361" x2="563" y2="361" class="arch-edge-red" marker-end="url(#map1-arr-red)"></line>
+
+  <path d="M 736 94 L 736 114 L 131 114 L 131 157" class="arch-edge" marker-end="url(#map1-arr-ink)"></path>
+  <path d="M 736 94 L 736 114 L 402 114 L 402 157" class="arch-edge" marker-end="url(#map1-arr-ink)"></path>
+  <path d="M 691 258 L 691 282 L 142 282 L 142 325" class="arch-edge-amber" marker-end="url(#map1-arr-amber)"></path>
+  <path d="M 691 258 L 691 282 L 413 282 L 413 325" class="arch-edge-amber" marker-end="url(#map1-arr-amber)"></path>
+
+  <rect x="12" y="424" width="816" height="64" rx="4" class="arch-band-red"></rect>
+  <text x="24" y="445" class="arch-t-band-red">FOUR HIGH-RISK SEAM FAULT LINES（四大高危断层带 — 90% 真实 Bug 落点）</text>
+  <text x="24" y="466" class="arch-t-sub">① 类型归一化断层 (record/ExactType/VO 多端重复翻译)   ② 1.0/2.0 桥接与离线 scalac 过滤断层 (SBT_FRAMEWORK_IMPORT_RE)</text>
+  <text x="24" y="481" class="arch-t-sub">③ 见证物化与 5 层 Authz 四端镜像断层 (TS/Scala/Play/HTTP)   ④ 多域单体 dedupBy 与永不覆写手写区的跨版本漂移断层</text>
+</svg>
+<figcaption>图 1：metarch-truthsrc v2.0.0 的六段式主干地形与四大高危断层带。主干看似线性，实则由 Canonical v2 扇出到代码桥接、测试发射、离线校验与 Play 运行时四条平行线，任何一端语义偏移都会在集成期引爆。</figcaption>
+</figure>
+
+<h3 id="section-1-1">必须先建立的两个顶层心智模型</h3>
+<ol>
+<li><strong>双栈（Dual-Stack）与 Scala 单栈（Single-Stack）的定位分工</strong>：<ul>
+<li><code>typescript</code> 目标提供毫秒级 Node 22 零编译反馈、浏览器友好验证与教学演示；<code>scala-cqrs-play-service-v2</code> 是面向生产的 Akka/Play/Protobuf/ScalikeJDBC 完整服务交付栈。</li>
+<li>在 <code>0b925ad</code> 引入 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/target-resolution.mjs"><code>lib/v2/target-resolution.mjs</code></a> 后，Scala 生产项目不再被迫维护“双槽”（<code>*.cloze.ts</code> + <code>*Impl.scala</code>）——只要项目仅存在 <code>generated-scaffold/scala</code>（或 <code>.truthsrc/generated-scala-manifest.json</code>）而无 <code>generated-scaffold/ts</code>，<code>tasks-v2</code>、<code>verify-v2</code> 与 <code>check-v2</code> 会自动收敛为 Scala 单栈模式。</li>
+</ul>
+</li>
+<li><strong>离线 <code>scalac</code> 与真实 <code>sbt stage</code> 的两层盲区差</strong>：<ul>
+<li><code>verify-v2</code> 为了在秒级完成 TDD 闭环，走的是<strong>离线裸 <code>scalac</code> + ScalaTest</strong>，并主动剥离了依赖 Akka/Play/ScalaPB/ScalikeJDBC 的框架文件。</li>
+<li>这意味着<strong>离线 <code>verify-v2</code> 全绿 ≠ <code>sbt -batch stage</code> 能编过 ≠ Play HTTP 路演返回 200</strong>。Play 控制器、ReadSide 投影仓储、Protobuf Converter、Guice DI 模块与 <code>conf/routes</code> 只有在真实 <code>sbt -batch stage</code> + 启动 Play 进程时才会接受编译器与运行时的终极检验。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="section-2">二、战区与目录地图（Level 1）：六大模块与源码索引</h2>
+<p>截至 <code>0b925ad</code>，整个 v2 工程核心分布于六大战区。下表精确标注每个关键文件的职责边界、体量（LOC）及读写契约，排雷时可直接按图索骥：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：战区 / 核心文件（点击直达源码） / LOC / 核心职责 / 关键输入 / 输出契约"><table>
+<thead>
+<tr>
+<th scope="col">战区</th>
+<th scope="col">核心文件（点击直达源码）</th>
+<th style="text-align: right;" scope="col">LOC</th>
+<th scope="col">核心职责</th>
+<th scope="col">关键输入 / 输出契约</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A · 入口与契约锁</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/bin/truthsrc.js"><code>bin/truthsrc.js</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/cli.mjs"><code>lib/v2/cli.mjs</code></a></td>
+<td style="text-align: right;">559 / 517</td>
+<td>44 个 CLI 命令总路由与 v2 子命令分发（含 <code>--bc</code> / <code>--packaging monolith</code>）</td>
+<td><code>BOOL_FLAGS</code> 严格白名单解析；缺失或误拼 flag 直接失败</td>
+</tr>
+<tr>
+<td><strong>A · 入口与契约锁</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/mcp/server.mjs"><code>mcp/server.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/surface-registry.mjs"><code>lib/v2/surface-registry.mjs</code></a></td>
+<td style="text-align: right;">370 / 300</td>
+<td>32 个 MCP 工具（含 6 个 <code>v2_*</code>）与能力面单一真源校验</td>
+<td><code>npm run check:contracts</code> 锁死 CLI、MCP、Skills、错误码总数</td>
+</tr>
+<tr>
+<td><strong>A · 入口与契约锁</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/runtime-profile.mjs"><code>lib/runtime-profile.mjs</code></a></td>
+<td style="text-align: right;">168 / —</td>
+<td>零业务硬编码静态架构门禁与运行时包坐标唯一入口</td>
+<td>禁止 <code>lib/</code>、<code>bin/</code>、活跃 <code>emitter/</code> 出现业务名或 <code>net.imadz</code> 字面量</td>
+</tr>
+<tr>
+<td><strong>B · 前端与 SMT</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/structure-loader.mjs"><code>lib/v2/structure-loader.mjs</code></a></td>
+<td style="text-align: right;"><strong>2,378</strong></td>
+<td><strong>全仓最大单体模块</strong>：加载 YAML 结构、拒绝旧 <code>@guard</code>、归一化 <code>resolvedType</code>、校验 5 层 Authz/PII/ReadModel</td>
+<td>产出 <code>structures</code> + <code>symbolTable</code> + <code>resolveCanonicalEventFields</code></td>
+</tr>
+<tr>
+<td><strong>B · 前端与 SMT</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/ears/parser.mjs"><code>lib/ears/parser.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/ears/binder.mjs"><code>lib/ears/binder.mjs</code></a></td>
+<td style="text-align: right;">772 / 1,146</td>
+<td>EARS 1.0 双语同构语法解析、规范化（<code>normalize.mjs</code>）与强类型符号绑定</td>
+<td>绑定所有 state/param/event/extern 引用，产出理论层级 <code>L1/L2/L3</code></td>
+</tr>
+<tr>
+<td><strong>B · 前端与 SMT</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/ears/smt-encoder.mjs"><code>lib/ears/smt-encoder.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/first-hit-witness.mjs"><code>lib/v2/first-hit-witness.mjs</code></a></td>
+<td style="text-align: right;">847 / 467</td>
+<td>EARS → SMT-LIB 2 单跳编码、Z3 五项体检 + <code>k</code>-BMC、DMN First-Hit 精确见证合成</td>
+<td>任何不可达/冲突/遮蔽规则阻断 <code>Canonical v2</code> 产出</td>
+</tr>
+<tr>
+<td><strong>B · 前端与 SMT</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/compiler.mjs"><code>lib/v2/compiler.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/lineage.mjs"><code>lib/v2/lineage.mjs</code></a></td>
+<td style="text-align: right;">594 / 1,061</td>
+<td>v2 编译总控、全链路字段血缘、Event Sourcing <code>post:</code> 折叠一致性与双语等价检查</td>
+<td>写出 <code>canonical-v2.json</code>、<code>knowledge.sqlite</code>、Style E/B 签核文档</td>
+</tr>
+<tr>
+<td><strong>C · 图谱与任务</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/knowledge-db.mjs"><code>lib/v2/knowledge-db.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/tasks-v2.mjs"><code>lib/v2/tasks-v2.mjs</code></a></td>
+<td style="text-align: right;">401 / 294</td>
+<td>Node 22 内置 <code>node:sqlite</code> 图谱存储与零漂移 <code>@cloze</code> 任务队列派生</td>
+<td>重建图谱时保留已有 <code>cloze_slots.provenance</code> 盲审记录</td>
+</tr>
+<tr>
+<td><strong>C · 图谱与任务</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/atlas-viewer.mjs"><code>lib/v2/atlas-viewer.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/diagrams.mjs"><code>lib/v2/diagrams.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/view-v2.mjs"><code>lib/v2/view-v2.mjs</code></a></td>
+<td style="text-align: right;">1,474 / 1,283 / 1,077</td>
+<td>11 张离线全景图谱 <code>atlas.html</code> 与交互式 Workshop HTML 渲染器</td>
+<td>纯只读消费 <code>canonical-v2.json</code> + SQLite，不参与运行时</td>
+</tr>
+<tr>
+<td><strong>D · 生成与桥接</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/generators/scala-cqrs-play-service-v2/generate.mjs"><code>generators/scala-cqrs-play-service-v2/generate.mjs</code></a></td>
+<td style="text-align: right;">396</td>
+<td><code>scala-cqrs-play-service:2</code> 总装配器、头章打标、多子域单体合并（<code>mergeCanonicalsForBc</code>）</td>
+<td>串联 Block A/B/C/D 桥接器，写 <code>.truthsrc/generated-scala-manifest.json</code></td>
+</tr>
+<tr>
+<td><strong>D · 生成与桥接</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-scala.mjs"><code>lib/v2/bridge/v1-strict-scala.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/ears-simplify.mjs"><code>ears-simplify.mjs</code></a></td>
+<td style="text-align: right;">1,231 / 298</td>
+<td>Block A 领域核心桥接：驱动 1.0 <code>#1/#2/#3/#45</code> 家族 + EARS NNF 表达式化简 + <code>@cloze</code> 槽位骨架</td>
+<td>输出 <code>domain/values</code>、<code>entities</code>、<code>invariants</code>、<code>Computations</code>、<code>*Impl.scala</code></td>
+</tr>
+<tr>
+<td><strong>D · 生成与桥接</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-block-cd.mjs"><code>lib/v2/bridge/v1-strict-block-cd.mjs</code></a></td>
+<td style="text-align: right;">1,354</td>
+<td>Block C/D 总调度：驱动 1.0 协议/聚合/仓储/Protobuf/序列化/Play 运行时/sbt 脚手架 + Authz PEP/DI</td>
+<td>内部调用 <code>readside</code>、<code>policy</code>、<code>api-auth</code>、<code>orchestration</code> 四个子桥接器</td>
+</tr>
+<tr>
+<td><strong>D · 生成与桥接</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-readside.mjs"><code>v1-strict-readside.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-api-auth.mjs"><code>v1-strict-api-auth.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-policy.mjs"><code>v1-strict-policy.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-orchestration.mjs"><code>v1-strict-orchestration.mjs</code></a></td>
+<td style="text-align: right;">709 / 576 / 569 / 702</td>
+<td>Play 完整垂直切面四件套：CQRS 读侧投影+JDBC、auth-core Play 控制器+<code>ServerSnapshotProvider</code>、事件 PolicyMachine、Saga/Effect/ToolGate</td>
+<td><strong>Play <code>sbt stage</code> 编译错误的最高发区</strong></td>
+</tr>
+<tr>
+<td><strong>D · 生成与桥接</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-routes.mjs"><code>lib/v2/codegen/onion-routes.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/typescript.mjs"><code>typescript.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-ts.mjs"><code>onion-ts.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-scala.mjs"><code>onion-scala.mjs</code></a></td>
+<td style="text-align: right;">120 / 1,085 / 761 / 603</td>
+<td>HTTP 路由唯一派生源（<code>deriveStoryHttpRoutes</code>）与 TS / Scala 洋葱接口层代码生成</td>
+<td>必须与 <code>v1-strict-api-auth</code> 和 <code>interfaces-http</code> 保持严格同构</td>
+</tr>
+<tr>
+<td><strong>E · 测试发射器</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/witness-materialize.mjs"><code>lib/v2/test-emitter/witness-materialize.mjs</code></a></td>
+<td style="text-align: right;">686</td>
+<td>把 Z3 稀疏见证补全为完整 TS/Scala 强类型命令、状态、快照与可信上下文</td>
+<td><strong>应用层 41 项测试成片失败的核心控制点</strong></td>
+</tr>
+<tr>
+<td><strong>E · 测试发射器</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/scala-strict-scalatest.mjs"><code>scala-strict-scalatest.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/typescript-node-test.mjs"><code>typescript-node-test.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/interfaces-http.mjs"><code>interfaces-http.mjs</code></a></td>
+<td style="text-align: right;">427 / 342 / 796</td>
+<td>发射领域/应用 ScalaTest、Node 22 TS 套件与 5 层 Authz/CSRF/PDP HTTP 锁定测试</td>
+<td>生成 <code>generated-tests/manifest.sha256.json</code> 哈希锁</td>
+</tr>
+<tr>
+<td><strong>F · 门禁与防作弊</strong></td>
+<td><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/verify-gate.mjs"><code>lib/v2/verify-gate.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/mutation-gate.mjs"><code>mutation-gate.mjs</code></a> / <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/guard-write.mjs"><code>guard-write.mjs</code></a></td>
+<td style="text-align: right;">843 / 381 / 232</td>
+<td>篡改检测、TS/离线 <code>scalac</code> 执行、Onion DIP 检查、Domain 变异测试与 <code>PreToolUse</code> 写守卫</td>
+<td>隔离区只允许编辑 <code>@cloze:start..end</code> 内行段，其余物理阻断</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="section-3">三、核心数据流与状态机（Level 2）：一条规则如何穿越全链路？</h2>
+<p>从宏观落到中观，要看清<strong>两条最关键的纵向数据通道</strong>和一个<strong>横向状态机</strong>——排雷时只要发现某条数据在不同节点被重新解析或重新推导，那里几乎必定存在分叉风险：</p>
+<figure class="co-arch-fig">
+<div class="arch-caption-head">FIGURE 02 · DUAL VERTICAL DATAFLOWS &amp; CLOZE TASK STATE MACHINE</div>
+<svg viewBox="0 0 840 430" width="100%" role="img" aria-label="领域规则与 HTTP 路由两条纵向数据流及 Cloze 任务状态机">
+  <defs>
+    <marker id="map2-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"></path>
+    </marker>
+    <marker id="map2-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+    <marker id="map2-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"></path>
+    </marker>
+  </defs>
+  <rect x="12" y="10" width="816" height="128" rx="4" class="arch-band-teal"></rect>
+  <text x="24" y="30" class="arch-t-band-teal">FLOW A · 领域规则纵向流（Domain Slice / L1 &amp; L2）</text>
+  <rect x="24" y="44" width="136" height="78" rx="4" class="arch-card"></rect>
+  <text x="92" y="66" text-anchor="middle" class="arch-t-title">YAML + .ears</text>
+  <text x="92" y="84" text-anchor="middle" class="arch-t-sub">ExactType / VO</text>
+  <text x="92" y="101" text-anchor="middle" class="arch-t-mono">aliases · rules · post</text>
+  <rect x="186" y="44" width="150" height="78" rx="4" class="arch-card"></rect>
+  <text x="261" y="66" text-anchor="middle" class="arch-t-title">binder + Z3</text>
+  <text x="261" y="84" text-anchor="middle" class="arch-t-sub">resolvedType 归一化</text>
+  <text x="261" y="101" text-anchor="middle" class="arch-t-mono">first-hit 稀疏见证</text>
+  <rect x="362" y="44" width="144" height="78" rx="4" class="arch-card-dark"></rect>
+  <text x="434" y="66" text-anchor="middle" class="arch-t-title-dark">Canonical v2</text>
+  <text x="434" y="84" text-anchor="middle" class="arch-t-sub-dark">behaviors + testIr</text>
+  <text x="434" y="101" text-anchor="middle" class="arch-t-sub-dark">eventFolds + lineage</text>
+  <rect x="532" y="44" width="136" height="78" rx="4" class="arch-card-teal"></rect>
+  <text x="600" y="66" text-anchor="middle" class="arch-t-title">v1-strict-scala</text>
+  <text x="600" y="84" text-anchor="middle" class="arch-t-sub">RuleParams / Rules</text>
+  <text x="600" y="101" text-anchor="middle" class="arch-t-mono">Computations / Impl</text>
+  <rect x="692" y="44" width="124" height="78" rx="4" class="arch-card-amber"></rect>
+  <text x="754" y="66" text-anchor="middle" class="arch-t-title">ScalaTest 预言机</text>
+  <text x="754" y="84" text-anchor="middle" class="arch-t-sub">witness-materialize</text>
+  <text x="754" y="101" text-anchor="middle" class="arch-t-amber">scalac + 变异门禁</text>
+  <line x1="160" y1="83" x2="183" y2="83" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"></line>
+  <line x1="336" y1="83" x2="359" y2="83" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"></line>
+  <line x1="506" y1="83" x2="529" y2="83" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"></line>
+  <line x1="668" y1="83" x2="689" y2="83" class="arch-edge-amber" marker-end="url(#map2-arr-amber)"></line>
+
+  <rect x="12" y="156" width="816" height="132" rx="4" class="arch-band-amber"></rect>
+  <text x="24" y="176" class="arch-t-amber">FLOW B · 应用层与 5 层 Authz 扇出流（1 个源头 -&gt; 4 个平行消费者，必须严格镜像！）</text>
+  <rect x="24" y="192" width="184" height="82" rx="4" class="arch-card-dark"></rect>
+  <text x="116" y="214" text-anchor="middle" class="arch-t-title-dark">onion-routes.mjs</text>
+  <text x="116" y="233" text-anchor="middle" class="arch-t-sub-dark">deriveStoryHttpRoutes</text>
+  <text x="116" y="251" text-anchor="middle" class="arch-t-sub-dark">mode/roles/pdp/rowScope</text>
+  <rect x="244" y="192" width="132" height="82" rx="4" class="arch-card"></rect>
+  <text x="310" y="216" text-anchor="middle" class="arch-t-title">① onion-ts</text>
+  <text x="310" y="236" text-anchor="middle" class="arch-t-sub">TS HTTP Router</text>
+  <text x="310" y="254" text-anchor="middle" class="arch-t-mono">Node 22 运行时</text>
+  <rect x="392" y="192" width="132" height="82" rx="4" class="arch-card"></rect>
+  <text x="458" y="216" text-anchor="middle" class="arch-t-title">② onion-scala</text>
+  <text x="458" y="236" text-anchor="middle" class="arch-t-sub">Scala HttpRouter</text>
+  <text x="458" y="254" text-anchor="middle" class="arch-t-mono">离线 scalac 校验</text>
+  <rect x="540" y="192" width="134" height="82" rx="4" class="arch-card-red"></rect>
+  <text x="607" y="216" text-anchor="middle" class="arch-t-red">③ v1-strict-api-auth</text>
+  <text x="607" y="236" text-anchor="middle" class="arch-t-sub">PlayController</text>
+  <text x="607" y="254" text-anchor="middle" class="arch-t-mono">auth-core + Snapshot</text>
+  <rect x="690" y="192" width="126" height="82" rx="4" class="arch-card-teal"></rect>
+  <text x="753" y="216" text-anchor="middle" class="arch-t-title">④ interfaces-http</text>
+  <text x="753" y="236" text-anchor="middle" class="arch-t-sub">TS + Scala HTTP</text>
+  <text x="753" y="254" text-anchor="middle" class="arch-t-teal">锁定鉴权预言机</text>
+  <line x1="208" y1="233" x2="241" y2="233" class="arch-edge-amber" marker-end="url(#map2-arr-amber)"></line>
+  <path d="M 208 212 L 226 212 L 226 184 L 458 184 L 458 189" class="arch-edge-amber" marker-end="url(#map2-arr-amber)"></path>
+  <path d="M 226 184 L 607 184 L 607 189" class="arch-edge-red" marker-end="url(#map2-arr-red)"></path>
+  <path d="M 226 184 L 753 184 L 753 189" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"></path>
+
+  <rect x="12" y="306" width="816" height="112" rx="4" class="arch-band"></rect>
+  <text x="24" y="326" class="arch-t-band">STATE MACHINE · tasks-v2 派生队列状态机（由磁盘 @cloze 文件 + knowledge.sqlite provenance 实时计算）</text>
+  <rect x="24" y="346" width="124" height="52" rx="4" class="arch-card-amber"></rect>
+  <text x="86" y="368" text-anchor="middle" class="arch-t-title">PENDING</text>
+  <text x="86" y="385" text-anchor="middle" class="arch-t-mono">含 NOT_IMPLEMENTED</text>
+  <rect x="184" y="346" width="142" height="52" rx="4" class="arch-card-red"></rect>
+  <text x="255" y="368" text-anchor="middle" class="arch-t-red">UNVERIFIED</text>
+  <text x="255" y="385" text-anchor="middle" class="arch-t-mono">已填空但 verify 未全绿</text>
+  <rect x="362" y="346" width="176" height="52" rx="4" class="arch-card-teal"></rect>
+  <text x="450" y="368" text-anchor="middle" class="arch-t-title">GREEN_NEEDS_REVIEW</text>
+  <text x="450" y="385" text-anchor="middle" class="arch-t-mono">verify-v2 全绿待盲审</text>
+  <rect x="574" y="346" width="112" height="52" rx="4" class="arch-card-dark"></rect>
+  <text x="630" y="368" text-anchor="middle" class="arch-t-title-dark">VERIFIED</text>
+  <text x="630" y="385" text-anchor="middle" class="arch-t-sub-dark">盲审 PASS 锁定</text>
+  <rect x="716" y="346" width="100" height="52" rx="4" class="arch-card-red arch-dash"></rect>
+  <text x="766" y="368" text-anchor="middle" class="arch-t-red">STALE</text>
+  <text x="766" y="385" text-anchor="middle" class="arch-t-mono">SHA 漂移重做</text>
+  <line x1="148" y1="372" x2="181" y2="372" class="arch-edge-amber" marker-end="url(#map2-arr-amber)"></line>
+  <line x1="326" y1="372" x2="359" y2="372" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"></line>
+  <line x1="538" y1="372" x2="571" y2="372" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"></line>
+  <line x1="686" y1="372" x2="713" y2="372" class="arch-edge-red" marker-end="url(#map2-arr-red)"></line>
+</svg>
+<figcaption>图 2：两条核心数据通道与 Cloze 派生状态机。注意 Flow B 中 onion-routes.mjs 同时扇出给四个平行消费者——任何鉴权、状态码或参数形态只改三家漏一家，就会立刻制造线上/测试分叉。</figcaption>
+</figure>
+
+<h3 id="section-3-1">磁盘三域所有权边界（物理隔离铁律）</h3>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：磁盘领地 / 所有者 / 生成器行为 / guard-write.mjs 写守卫策略"><table>
+<thead>
+<tr>
+<th scope="col">磁盘领地</th>
+<th scope="col">所有者</th>
+<th scope="col">生成器行为</th>
+<th scope="col"><code>guard-write.mjs</code> 写守卫策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>truth/</code>（YAML + <code>.ears</code> + bindings）</td>
+<td>领域作者 / 架构师</td>
+<td>只读输入，绝不回写</td>
+<td>允许编辑（变更后须重跑 <code>compile-v2</code>）</td>
+</tr>
+<tr>
+<td><code>generated-scaffold/</code>、<code>generated-tests/</code>、<code>projections/</code></td>
+<td>编译器与生成器</td>
+<td>全量确定性覆写</td>
+<td><strong>物理阻断（<code>TERRITORY_LOCKED</code>，exit 2）</strong></td>
+</tr>
+<tr>
+<td><code>handwritten/</code>（<code>*Impl.scala</code>、<code>*.cloze.ts</code>、<code>ServerSnapshotProviderImpl.scala</code>、<code>HandwrittenBindingsModule.scala</code>）</td>
+<td>人类 / 隔离区 AI Agent</td>
+<td>仅首次创建，<strong>已存在永不覆写（<code>overwrite: false</code>）</strong></td>
+<td>仅允许在 <code>@cloze:start(&lt;id&gt;)..@cloze:end(&lt;id&gt;)</code> 之间局部编辑，禁止整文件覆盖或修改标记</td>
+</tr>
+<tr>
+<td><code>.truthsrc/</code>（<code>canonical-v2.json</code>、<code>knowledge.sqlite</code>、manifests）</td>
+<td>派生状态缓存</td>
+<td>编译/验证阶段更新（重建 SQLite 时保留 <code>provenance</code>）</td>
+<td>可清理重建，但 <code>cloze_slots.provenance</code> 记录验证与盲审凭证</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="section-4">四、地下暗道图（Level 3）：14 条最容易踩爆的跨文件隐蔽耦合</h2>
+<p>地面上的主干看起来井然有序，但真正让大项目（例如 6 子域、50 领域行为、23 个 <code>@cloze</code> 槽位的考试平台）在集成期撞墙的，是埋在地下的 <strong>14 条隐蔽暗道（T01–T14）</strong>。每一条暗道都对应一对“<strong>表面上互不调用、实则共享隐式不变量</strong>”的源码模块：</p>
+<figure class="co-arch-fig">
+<div class="arch-caption-head">FIGURE 03 · UNDERGROUND TUNNELS MAP（T01–T14 跨模块隐蔽耦合拓扑）</div>
+<svg viewBox="0 0 840 460" width="100%" role="img" aria-label="14 条地下暗道（T01-T14）分属四大暗道网的跨文件耦合拓扑图">
+  <defs>
+    <marker id="map3-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"></path>
+    </marker>
+    <marker id="map3-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"></path>
+    </marker>
+  </defs>
+  <rect x="12" y="10" width="398" height="210" rx="4" class="arch-band-red"></rect>
+  <text x="24" y="30" class="arch-t-band-red">暗道网 A · 类型与名义系统断层（T01–T03）</text>
+  <rect x="24" y="42" width="374" height="50" rx="4" class="arch-card"></rect>
+  <text x="34" y="61" class="arch-t-red">T01 · record(ExactType/VO) 六端独立翻译</text>
+  <text x="34" y="79" class="arch-t-sub">structure-loader -&gt; readside / block-cd / policy / witness 漏一处即降级 String</text>
+  <rect x="24" y="100" width="374" height="50" rx="4" class="arch-card"></rect>
+  <text x="34" y="119" class="arch-t-red">T02 · SPEC-S10 原始集合 Json.toJson vs 名义递归编解码</text>
+  <text x="34" y="137" class="arch-t-sub">v1-strict-readside 须区分 typeUsesNominal 避免破坏惯用序列化</text>
+  <rect x="24" y="158" width="374" height="50" rx="4" class="arch-card"></rect>
+  <text x="34" y="177" class="arch-t-red">T03 · aliases 缺 'state' 导致 state.state.copy 递归错</text>
+  <text x="34" y="195" class="arch-t-sub">binder / smt-encoder / v1-strict-scala / witness 四处隐式要求含 'state'</text>
+
+  <rect x="430" y="10" width="398" height="210" rx="4" class="arch-band-amber"></rect>
+  <text x="442" y="30" class="arch-t-amber">暗道网 B · 1.0/2.0 桥接与离线 scalac 断层（T04–T07）</text>
+  <rect x="442" y="42" width="374" height="40" rx="4" class="arch-card"></rect>
+  <text x="452" y="59" class="arch-t-amber">T04 · SBT_FRAMEWORK_IMPORT_RE 双份拷贝（verify + mutation）</text>
+  <text x="452" y="74" class="arch-t-mono">新文件若引用被剥离 trait 却漏框架 import -&gt; 离线 scalac 必炸</text>
+  <rect x="442" y="88" width="374" height="40" rx="4" class="arch-card"></rect>
+  <text x="452" y="105" class="arch-t-amber">T05 · emitter/families 24 家族 parity 负例不可破</text>
+  <text x="452" y="120" class="arch-t-mono">零 VO 等 2.0 兜底必须在 lib/v2/bridge 侧实现，严禁破 1.0 parity</text>
+  <rect x="442" y="134" width="374" height="38" rx="4" class="arch-card"></rect>
+  <text x="452" y="150" class="arch-t-amber">T06 · 混合 L1+L2 聚合 RuleParams 统一 + SPEC-S4 零 Noop</text>
+  <text x="452" y="165" class="arch-t-mono">非空 Computations 禁 val Noop；L1 测试用 null.asInstanceOf</text>
+  <rect x="442" y="178" width="374" height="34" rx="4" class="arch-card"></rect>
+  <text x="452" y="199" class="arch-t-amber">T07 · lint.mjs 禁业务名/禁 net.imadz 字面量 -&gt; runtime-profile</text>
+
+  <rect x="12" y="238" width="398" height="210" rx="4" class="arch-band-teal"></rect>
+  <text x="24" y="258" class="arch-t-band-teal">暗道网 C · 见证物化与测试预言机断层（T08–T10）</text>
+  <rect x="24" y="272" width="374" height="52" rx="4" class="arch-card"></rect>
+  <text x="34" y="291" class="arch-t-teal">T08 · Z3 稀疏见证 -&gt; witness-materialize 具象填充失真</text>
+  <text x="34" y="309" class="arch-t-sub">isRejected 须保 []；accepted 须填非空集合、bindPrincipal、快照</text>
+  <rect x="24" y="332" width="374" height="50" rx="4" class="arch-card"></rect>
+  <text x="34" y="351" class="arch-t-teal">T09 · 事件字段解析双口径（显式 fields vs 血缘推导）</text>
+  <text x="34" y="369" class="arch-t-sub">生成代码与 [POSTCOND] 测试必须共用 resolveCanonicalEventFields</text>
+  <rect x="24" y="390" width="374" height="48" rx="4" class="arch-card"></rect>
+  <text x="34" y="409" class="arch-t-teal">T10 · 5 层 Authz 四端镜像（public / PDP / GET / PlayController）</text>
+  <text x="34" y="426" class="arch-t-sub">ownerField · requiresEntitlement · rowScope · HttpStatusMapper · JsNull</text>
+
+  <rect x="430" y="238" width="398" height="210" rx="4" class="arch-band"></rect>
+  <text x="442" y="258" class="arch-t-band">暗道网 D · 单体打包、单栈与门禁断层（T11–T14）</text>
+  <rect x="442" y="272" width="374" height="38" rx="4" class="arch-card-red"></rect>
+  <text x="452" y="288" class="arch-t-red">T11 · mergeCanonicalsForBc 短名 dedupBy 静默吞并 + 旧文件残留</text>
+  <text x="452" y="303" class="arch-t-mono">多子域同名 VO/ReadModel 后者静默丢失；增量生成不删旧包路径</text>
+  <rect x="442" y="316" width="374" height="38" rx="4" class="arch-card"></rect>
+  <text x="452" y="332" class="arch-t-title">T12 · target-resolution 双栈/单栈探测与 forbiddenImports</text>
+  <text x="452" y="347" class="arch-t-mono">tasks/verify/check 自动切单栈；init-v2 禁误伤 controllers/</text>
+  <rect x="442" y="360" width="374" height="38" rx="4" class="arch-card"></rect>
+  <text x="452" y="376" class="arch-t-title">T13 · verify-gate 短路跳过 mutation-gate + HTTP 句柄残留</text>
+  <text x="452" y="391" class="arch-t-mono">基础套件有 1 项失败即不跑变异门禁，掩盖超时与杀灭盲区</text>
+  <rect x="442" y="404" width="374" height="36" rx="4" class="arch-card-amber"></rect>
+  <text x="452" y="420" class="arch-t-amber">T14 · overwrite:false 永不覆写文件跨版本签名漂移</text>
+  <text x="452" y="434" class="arch-t-mono">HandwrittenBindingsModule / ServerSnapshotProviderImpl 升级失配</text>
+</svg>
+<figcaption>图 3：metarch-truthsrc 14 条地下暗道（T01–T14）全景图。红框与琥珀框标注了历史已爆雷和下阶段最高危的跨模块耦合接缝。</figcaption>
+</figure>
+
+<h3 id="section-4-1">暗道网 A · 类型与名义系统断层（T01–T03）</h3>
+<ol>
+<li><strong>T01 · <code>resolvedType.kind === 'record'</code> 的六端重复翻译</strong>：<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/structure-loader.mjs"><code>structure-loader.mjs</code></a> 把 <code>ExactType</code>（如 <code>Money</code>、<code>Score</code>）与 <code>ValueObject</code> 统一编码为 <code>{ kind: 'record', typeName }</code>。</li>
+<li>但下游至少 <strong>6 个文件</strong>各自写了一套 <code>scalaTypeOf</code> / <code>defaultScalaExpr</code> / <code>buildNominalIndex</code>：<code>v1-strict-scala.mjs</code>、<code>v1-strict-block-cd.mjs</code>、<code>v1-strict-readside.mjs</code>、<code>v1-strict-policy.mjs</code>、<code>v1-strict-api-auth.mjs</code>、<code>witness-materialize.mjs</code>。</li>
+<li><strong>爆雷机理</strong>：只要任意一端漏掉 <code>case 'record'</code> 的 <code>exactByName</code> / <code>voByName</code> 查找，就会走 <code>default: return 'String'</code>——直接导致 <strong>Play ReadSide 把 <code>String</code> 赋给 <code>BigDecimal</code>/<code>Long</code>（<a href="https://github.com/co-arising/metarch-truthsrc/issues/2">Issue #2</a>）</strong> 或 <strong>ReadModel 含 VO/ExactType 字段无法编译（Bug #4）</strong>。</li>
+</ul>
+</li>
+<li><strong>T02 · ReadSide 集合编解码的 <code>SPEC-S10</code> 双轨约束</strong>：<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-readside.mjs"><code>v1-strict-readside.mjs</code></a> 在生成 ScalikeJDBC 读写代码时，对于原始类型序列（如 <code>Vector[String]</code>）必须保留 <code>Json.stringify(Json.toJson(row.topics))</code> 与 <code>Json.parse(...).as[Vector[String]]</code>（受 <code>SPEC-S10</code> 锁定）；而当元素嵌套了 <code>ExactType</code> 或 <code>ValueObject</code>（无自动隐式 Play <code>Format</code>）时，必须通过 <code>typeUsesNominal</code> 分流到递归 <code>jsEncodeExpr</code> / <code>jsDecodeExpr</code>。</li>
+</ul>
+</li>
+<li><strong>T03 · <code>aliases</code> 必须恒含 <code>'state'</code> 的四处隐式假设</strong>：<ul>
+<li>当 YAML 给聚合手写自定义 <code>aliases: [bal]</code> 而未显式列出 <code>'state'</code> 时，<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-scala.mjs"><code>v1-strict-scala.mjs</code></a> 和 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/witness-materialize.mjs"><code>witness-materialize.mjs</code></a> 在展开 <code>state.field</code> 时会误把它当成嵌套记录成员，拼出 <code>state.copy(state = state.state.copy(...))</code>（Bug #7）。因此所有读取 <code>agg.aliases</code> 的位置都必须强归一化为 <code>new Set(['state', ...])</code>。</li>
+</ul>
+</li>
+</ol>
+<h3 id="section-4-2">暗道网 B · 1.0 遗产家族与 2.0 桥接层断层（T04–T07）</h3>
+<ol start="4">
+<li><strong>T04 · <code>SBT_FRAMEWORK_IMPORT_RE</code> 双份正则与离线 <code>scalac</code> 剥离暗道</strong>：<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/verify-gate.mjs#L359"><code>verify-gate.mjs:359</code></a> 与 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/mutation-gate.mjs#L210"><code>mutation-gate.mjs:210</code></a> 各维护了一份框架 import 正则，把依赖 <code>akka.*</code>、<code>play.*</code>、<code>scalapb.*</code>、<code>scalikejdbc.*</code>、<code>infrastructure.{proto,persistence.converters,...}</code> 的文件从离线 <code>scalac</code> 中过滤掉。</li>
+<li><strong>排雷铁律</strong>：每当新增或改造一个生成的 Scala 文件，如果它继承或引用了某个会被过滤掉的 trait（如零 VO 场景下的 <code>DomainConverters.scala</code> 继承 <code>&lt;Agg&gt;ProtoConverters</code>），它自身也<strong>必须</strong>携带匹配该正则的 import，否则 <code>sbt stage</code> 过了，离线 <code>verify-v2</code> 却会报 <code>not found: type</code>！同时改正则必须<strong>两处同步改</strong>。</li>
+</ul>
+</li>
+<li><strong>T05 · 1.0 <code>emitter/families/</code> 24 家族金文件红线</strong>：<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/emitter/parity.mjs"><code>emitter/parity.mjs</code></a> 锁死了全部 24 个 1.0 家族的正例字节输出与 <code>runNegatives</code> 负例契约（例如 <code>proto-converter.mjs</code> 明确断言 <code>valueObjects.length === 0</code> 必须抛错）。</li>
+<li><strong>工程红线</strong>：遇到 v2 特有的退化形态（如全项目零 VO/ExactType），绝不能通过放宽 1.0 家族断言来迁就，而要在 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-block-cd.mjs"><code>v1-strict-block-cd.mjs</code></a> 的 2.0 桥接层发射兜底实现，保住 1.0 <code>24/24 allGreen</code>。</li>
+</ul>
+</li>
+<li><strong>T06 · 混合 L1+L2 聚合的 <code>RuleParams</code> 统一与 <code>SPEC-S4</code> 零 <code>Noop</code> 铁律</strong>：<ul>
+<li>同一个聚合若同时拥有 L1 纯规则与 L2 <code>@cloze</code> 计算规则，参数必须全部统一生成在 <code>&lt;Agg&gt;RuleParams</code> 下，不能分裂出 <code>&lt;Agg&gt;DomainServiceRuleParams</code>。</li>
+<li>同时，<code>SPEC-S4</code> 严禁非空 L2 <code>&lt;Agg&gt;Computations</code> trait 在生产代码提供 <code>val Noop</code>（防止线上误绑定空实现）。因此在 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/scala-strict-scalatest.mjs"><code>scala-strict-scalatest.mjs</code></a> 中，L1 规则测试针对混合聚合必须传入 <code>null.asInstanceOf[&lt;Agg&gt;Computations]</code>（安全，因为 L1 分支永不调用宿主计算方法）。</li>
+</ul>
+</li>
+<li><strong>T07 · <code>tools/lint.mjs</code> 架构防污染门禁</strong>：<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a> 用正则静态扫描全部 625 个 JS/MJS 文件：严禁在通用核心出现业务专有名词（如 <code>CreditBalance</code>、<code>FundOrder</code>、<code>bankwealth</code>），严禁在 <code>lib/runtime-profile.mjs</code> 之外硬编码 <code>net.imadz</code>，严禁活跃 <code>emitter/families/</code> 拼接硬编码 <code>'app/'</code> 路径。</li>
+</ul>
+</li>
+</ol>
+<h3 id="section-4-3">暗道网 C · 见证物化与测试预言机断层（T08–T10）</h3>
+<ol start="8">
+<li><strong>T08 · Z3 稀疏见证 → <code>witness-materialize</code> 具象填充语义失真</strong>：<ul>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/first-hit-witness.mjs"><code>first-hit-witness.mjs</code></a> 只向 Z3 查询守卫表达式中实际出现的变量；其余字段全靠 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/witness-materialize.mjs"><code>witness-materialize.mjs</code></a> 补全。</li>
+<li><strong>两大陷阱</strong>：① 给接受规则构造有效集合需要非空样本，但若对拒绝规则（<code>isRejected</code>）也强制覆盖空数组 <code>[]</code>，就会把 <code>len(items) == 0</code> 的拒绝见证彻底篡改失效（Bug #1）；② 应用层成功用例若缺少 <code>bindPrincipal</code> 注入、服务端 <code>stateSnapshot</code> 或给序列字段传了标量，就会引发批量失败（<a href="https://github.com/co-arising/metarch-truthsrc/issues/3">Issue #3</a>）。</li>
+</ul>
+</li>
+<li><strong>T09 · 事件字段解析双口径</strong>：<ul>
+<li>聚合事件可以显式声明 <code>fields:</code>，也可以由命令参数与数据血缘自动推导。若 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-scala.mjs"><code>v1-strict-scala.mjs</code></a> 用 <code>resolveCanonicalEventFields(agg, ev)</code> 产出 <code>case class</code>，而测试发射器只读 <code>ev.fields</code>，<code>[POSTCOND]</code> 测试就会与真实事件构造器签名错位（Bug #6）。</li>
+</ul>
+</li>
+<li><strong>T10 · 5 层 Authz PEP/PDP 的四端镜像暗道</strong>：
+    - <code>onion-routes.mjs</code> 派生路由后，<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-ts.mjs"><code>onion-ts.mjs</code></a>、<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-scala.mjs"><code>onion-scala.mjs</code></a>、<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-api-auth.mjs"><code>v1-strict-api-auth.mjs</code></a>（真实 Play 控制器）与 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/interfaces-http.mjs"><code>interfaces-http.mjs</code></a>（HTTP 预言机）必须逐项对齐：
+      - 首条路由是 <code>public</code> 时，401/403 测试必须挑第一条非 <code>public</code> 路由；
+      - <code>external-pdp</code> 与 <code>resource-policy</code> 两种模式都必须向测试注入 allow-PDP；
+      - <code>GET</code> 路由在 <code>AUTHZ_*</code> 用例中必须拼装 query string；
+      - Play 控制器必须走 <code>HttpStatusMapper.statusForRejection(err.code)</code> 而非硬编码 400，递归转换 <code>JsNull =&gt; null</code>（<code>PlayHttpBridge.scala</code>），解析 <code>X-Entitlements</code> / <code>X-Principal-Attr-*</code>，并在服务端执行 <code>ownerField</code>（403）、<code>requiresEntitlement</code>（403）与 <code>rowScope</code>（403）及 <code>ServerSnapshotProvider.load</code>。</li>
+</ol>
+<h3 id="section-4-4">暗道网 D · 多域单体打包、目标解析与门禁断层（T11–T14）</h3>
+<ol start="11">
+<li><strong>T11 · 单体打包 <code>mergeCanonicalsForBc</code> 的静默 <code>dedupBy</code> 吞并与旧文件残留</strong>：
+    - 翻开 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/generators/scala-cqrs-play-service-v2/generate.mjs#L135"><code>generators/scala-cqrs-play-service-v2/generate.mjs:135</code></a>：合并多子域时，<code>valueObjects</code>、<code>exactTypes</code>、<code>readModels</code>、<code>aggregates</code>、<code>ports</code>、<code>stories</code> 全都用 <code>dedupBy(..., x =&gt; x.name)</code> 按短名去重。一旦两个子域定义了同名不同结构的 <code>ValueObject</code> 或 <code>ReadModel</code>，后者会被<strong>静默丢弃</strong>而非报冲突！此外，目录增量重生成不会删除旧包名/旧路由留下的孤立 <code>.scala</code> 文件（<a href="https://github.com/co-arising/metarch-truthsrc/issues/4">Issue #4</a>）。</li>
+<li><strong>T12 · <code>target-resolution.mjs</code> 双栈/单栈联动与 <code>init-v2</code> 规则分叉</strong>：
+    - <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/target-resolution.mjs"><code>lib/v2/target-resolution.mjs</code></a> 统一了 <code>tasks-v2</code>、<code>verify-gate</code>、<code>check-v2</code> 与 <code>cli.mjs</code> 的目标推断逻辑；但 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/init-v2.mjs"><code>init-v2.mjs</code></a> 里的 <code>forbiddenImports</code> 架构约束也必须随单栈/双栈切换（例如 Scala 单栈若误写全局禁止 <code>play.api.mvc.</code> 会立刻误伤自己生成的 <code>controllers/</code>，必须精确约束为禁止生成层反向 import <code>.handwritten.</code>）。</li>
+<li><strong>T13 · <code>verify-gate</code> 门禁短路与 HTTP 测试句柄驻留</strong>：
+    - <code>verify-gate.mjs</code> 在基础 TS/Scala 测试未全绿时会直接跳过内置 <code>mutation-gate</code>——导致大规模项目在修完业务失败前，完全看不到变异测试的耗时、内存或存活突变体问题。同时 <code>interfaces-http.ears.spec.ts</code> 若在异常路径未关闭 HTTP listener，独立 <code>node --test</code> 会在打印完统计后挂起进程。</li>
+<li><strong>T14 · <code>overwrite: false</code> 永不覆写文件的跨版本签名漂移</strong>：
+    - <code>HandwrittenBindingsModule.scala</code>、<code>ServerSnapshotProviderImpl.scala</code> 与全部 <code>@cloze</code> <code>*Impl.scala</code> 文件一旦落盘就永不覆写。当上游生成器新增 DI 参数（例如控制器新增 <code>ServerSnapshotProvider</code> 注入）或更新 <code>AuthEndpointDsl</code> 签名时，全新目录能过，<strong>存量老项目原地重生成却会因旧手写绑定文件缺新绑定而编译失败</strong>。</li>
+</ol>
+<hr>
+<h2 id="section-5">五、实战复盘（Level 4A）：上一波「按图排雷」如何 7 战 7 中？</h2>
+<p>在 6 子域考试平台首轮反馈（<a href="https://github.com/co-arising/metarch-truthsrc/issues/2">Issue #2</a>、<a href="https://github.com/co-arising/metarch-truthsrc/issues/3">#3</a>、<a href="https://github.com/co-arising/metarch-truthsrc/issues/4">#4</a>）落地修复后，我们正是顺着上述暗道图反推 6 个疑似雷区，写出真实端到端探针（跑完整 <code>compileCanonicalV2</code> + <code>node --test</code> + 真实 <code>sbt -batch compile</code>），结果<strong>6 个预测全中，还顺藤摸瓜多抓出 1 个编译级 Bug（共 7/7 实锤）</strong>：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：序号 / 实锤 Bug 症状 / 命中的暗道 / 最小对抗探针特征 / 最终修复与锁定验收"><table>
+<thead>
+<tr>
+<th scope="col">序号</th>
+<th scope="col">实锤 Bug 症状</th>
+<th scope="col">命中的暗道</th>
+<th scope="col">最小对抗探针特征</th>
+<th scope="col">最终修复与锁定验收</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>#1</strong></td>
+<td><code>len(items) == 0</code> 的拒绝规则测试失败</td>
+<td><strong>T08</strong></td>
+<td>聚合命令带 <code>Seq[String]</code>，规则要求空集合拒绝</td>
+<td><code>witness-materialize</code> 增加 <code>allowEmptySeq</code>，<code>isRejected</code> 保留 <code>[]</code>（<code>SPEC-S13</code>）</td>
+</tr>
+<tr>
+<td><strong>#2</strong></td>
+<td>混合 L1+L2 聚合编译报错 <code>DomainServiceRuleParams</code> 未定义</td>
+<td><strong>T06</strong></td>
+<td>同一聚合同时含 1 条 L1 规则 + 1 条 L2 <code>extern</code> 规则</td>
+<td>参数统一归入 <code>&lt;Agg&gt;RuleParams</code>；保 <code>SPEC-S4</code> 零 Noop，L1 测试传 <code>null.asInstanceOf</code>（<code>SPEC-S14</code>）</td>
+</tr>
+<tr>
+<td><strong>#3</strong></td>
+<td>首条路由为 <code>public</code> 时 401/403 测试误打公开接口；<code>resource-policy</code> 缺 PDP；<code>GET</code> 缺 query 参数</td>
+<td><strong>T10</strong></td>
+<td>首条路由 <code>mode: public</code>，另有 <code>resource-policy</code> 与 <code>GET</code> 路由</td>
+<td><code>interfaces-http</code> 选首条非 <code>public</code> 路由、<code>routeNeedsPdp</code> 涵盖两模式、补 <code>buildQuerySuffix</code>（<code>SPEC-S16</code>）</td>
+</tr>
+<tr>
+<td><strong>#4</strong></td>
+<td>ReadModel 含 <code>ExactType</code> / <code>ValueObject</code> 字段时 <code>sbt compile</code> 类型错</td>
+<td><strong>T01 + T02</strong></td>
+<td>ReadModel 含 <code>Money</code>（<code>unit-decimal</code>）与自定义 VO</td>
+<td><code>v1-strict-readside</code> 接入 <code>nominalIdx</code> 与 <code>typeUsesNominal</code> 递归编解码，保 <code>SPEC-S10</code>（<code>SPEC-S15</code>）</td>
+</tr>
+<tr>
+<td><strong>#5</strong></td>
+<td>Play 控制器硬编码 400、漏 <code>X-Entitlements</code>/<code>ownerField</code>/<code>rowScope</code>、<code>JsNull</code> 映射不一致</td>
+<td><strong>T10</strong></td>
+<td>带资源归属与权益约束的 Play 路由</td>
+<td><code>v1-strict-api-auth</code> 对齐 <code>HttpStatusMapper</code>、三层 403 检查与 <code>PlayHttpBridge</code> 递归 <code>JsNull</code>（<code>SPEC-S16</code>）</td>
+</tr>
+<tr>
+<td><strong>#6</strong></td>
+<td>零 VO/ExactType 项目缺 <code>ProtoConverters</code>；<code>[POSTCOND]</code> 构造器与派生事件字段错位</td>
+<td><strong>T04 + T05 + T09</strong></td>
+<td>全项目仅用基础类型 + 血缘派生事件字段</td>
+<td><code>v1-strict-block-cd</code> 发射零 VO 兜底并附框架 import 保 <code>SBT_FRAMEWORK_IMPORT_RE</code>；测试改用 <code>resolveCanonicalEventFields</code>（<code>SPEC-S15</code>）</td>
+</tr>
+<tr>
+<td><strong>#7</strong></td>
+<td>自定义 <code>aliases: [bal]</code> 不含 <code>'state'</code> 时生成 <code>state.state.copy(...)</code> 编译失败</td>
+<td><strong>T03</strong></td>
+<td>YAML 聚合声明自定义 <code>aliases</code> 且省略 <code>state</code></td>
+<td><code>v1-strict-scala</code> 与 <code>witness-materialize</code> 强制把 <code>'state'</code> 并入别名集合（<code>SPEC-S14</code>）</td>
+</tr>
+</tbody>
+</table></div>
+<p>全量回归结果已锁入 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs"><code>test/scala-cqrs-play-service-v2-acceptance.spec.mjs</code></a>（<code>SPEC-S1..S17</code> 17/17 PASS），并通过真实 <code>sbt -batch stage</code> + Play 2.8.18 活体 HTTP 路演与 <code>bank-wealth-demo</code> 100% 变异门禁复核（详见 <a href="https://co-arising.github.io/zh/status/">状态页</a>）。</p>
+<hr>
+<h2 id="section-6">六、下一波排雷手册（Level 4B）：四步探针法与 8 个高危靶点雷达</h2>
+<p>为了让后续每一轮排雷都像上一波一样“<strong>发发命中、不靠玄学</strong>”，固化以下四步标准作战流程：</p>
+<h3 id="section-6-1">四步对抗探针排雷法</h3>
+<ol>
+<li><strong>选暗道</strong>：从图 3 的 <code>T01–T14</code> 暗道中挑一个尚未被极端组合打过的跨模块接缝。</li>
+<li><strong>造最小对抗真源</strong>：只写 10–40 行最小 YAML + <code>.ears</code>，专门构造<strong>合法但反常规的边界组合</strong>（例如：零 VO、混合 L1+L2、嵌套 <code>Option[ExactType]</code>、Scala 保留字字段、两子域同名不同结构 VO）。</li>
+<li><strong>跑全链路真编译（严禁只跑正则单测）</strong>：在临时目录完整串跑：<ul>
+<li><code>compileCanonicalV2</code>（Z3 真求解）</li>
+<li><code>generateScalaCqrsPlayServiceV2</code> / <code>generateScalaCqrsPlayServiceV2ForBc</code></li>
+<li><code>emitV2ExecutableTests</code></li>
+<li><code>node --test</code> + 离线 <code>scalac</code> + <strong>真实 <code>sbt -batch stage</code> + 启动 Play 进程发真实 HTTP 请求</strong></li>
+</ul>
+</li>
+<li><strong>实锤即上锁</strong>：确认 Bug 后先修通用推导（守 <code>npm run lint:arch</code> 0 违规 + <code>emitter/parity.mjs</code> 24/24 全绿），再把对抗样例固化为 <code>SPEC-S18+</code>，绝不靠人眼审查结案。</li>
+</ol>
+<h3 id="section-6-2">下一波 8 个高危潜在地雷雷达（M01–M08）</h3>
+<p>以下 8 个靶点是我们对照当前 <code>0b925ad</code> 源码标出的<strong>下一轮优先探测清单</strong>，按命中概率与杀伤半径排序：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：雷达编号 / 疑似地雷点 / 关联暗道 / 建议对抗探针设计 / 预期杀伤面"><table>
+<thead>
+<tr>
+<th scope="col">雷达编号</th>
+<th scope="col">疑似地雷点</th>
+<th scope="col">关联暗道</th>
+<th scope="col">建议对抗探针设计</th>
+<th scope="col">预期杀伤面</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M01</strong></td>
+<td><strong>多子域单体同名碰撞</strong>：两子域定义同名但字段不同的 VO / ExactType / ReadModel / Port，被 <code>dedupBy</code> 静默吞并</td>
+<td><strong>T11</strong></td>
+<td>两子域各定义 <code>StatusVO</code>（字段不同），跑 <code>mergeCanonicalsForBc</code> + <code>sbt compile</code></td>
+<td>6+ 域单体静默丢字段或编译失败</td>
+</tr>
+<tr>
+<td><strong>M02</strong></td>
+<td><strong><code>stateSnapshot</code> 严格等值误杀</strong>：手写应用层 handler 对快照衍生字段做归一化或重算时，测试里的严格 <code>assert(res == expected)</code> / <code>deepStrictEqual</code> 误报失败</td>
+<td><strong>T08</strong></td>
+<td>手写 <code>*Impl.scala</code> 返回合理派生值而非原样透传快照字段，跑 <code>verify-v2</code></td>
+<td>应用层测试成批红灯</td>
+</tr>
+<tr>
+<td><strong>M03</strong></td>
+<td><strong>Scala / Play / Protobuf 保留字字段名</strong>：YAML 出现 <code>type</code>、<code>match</code>、<code>object</code>、<code>val</code>、<code>case</code>、<code>package</code>、<code>sealed</code>、<code>implicit</code> 字段或参数名未反引号转义</td>
+<td><strong>T01 + T05</strong></td>
+<td>聚合/命令/ReadModel 声明 <code>type: String</code>、<code>match: Boolean</code>，跑 <code>sbt stage</code></td>
+<td>生成 <code>.scala</code> / <code>.proto</code> 语法直接炸裂</td>
+</tr>
+<tr>
+<td><strong>M04</strong></td>
+<td><strong>大规模项目内置 <code>mutation-gate</code> 超时</strong>：6 域全绿后首次触发内置变异门禁，<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/verify-gate.mjs#L426"><code>verify-gate.mjs:426</code></a> 90s <code>scalac</code> 与 <code>mutation-gate.mjs</code> 逐突变体编译超时</td>
+<td><strong>T13</strong></td>
+<td>合成 20+ 聚合、50+ 行为的压测项目，实测 <code>verify-v2 --strict --mutation-gate</code> 耗时</td>
+<td>CI 严格门禁超时退出</td>
+</tr>
+<tr>
+<td><strong>M05</strong></td>
+<td><strong>存量手写项目升级 DI 签名漂移</strong>：旧版本生成的 <code>HandwrittenBindingsModule.scala</code> 缺新版本引入的 <code>ServerSnapshotProvider</code> 等绑定</td>
+<td><strong>T14</strong></td>
+<td>用旧版手写绑定文件 + 新版 <code>generate-v2</code> 原地重生成，跑 <code>sbt stage</code> + Play 启动</td>
+<td>老项目升级后 Guice 运行时 500</td>
+</tr>
+<tr>
+<td><strong>M06</strong></td>
+<td><strong>Policy 与 Orchestration 桥接层的名义类型缺口</strong>：<a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-policy.mjs"><code>v1-strict-policy.mjs</code></a> 与 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-orchestration.mjs"><code>v1-strict-orchestration.mjs</code></a> 对事件/Saga 携带的 <code>ExactType</code>、<code>Option[VO]</code>、<code>Map</code> 类型映射未完全对齐</td>
+<td><strong>T01</strong></td>
+<td>事件驱动 Policy + Saga 步骤参数包含 <code>Money</code>、<code>Option[AddressVO]</code>，跑 <code>sbt stage</code></td>
+<td>Play 事件策略与 Saga 编译报错</td>
+</tr>
+<tr>
+<td><strong>M07</strong></td>
+<td><strong>ReadSide 复合嵌套 JDBC 编解码边界</strong>：<code>Option[ExactType]</code>、<code>Option[VO]</code>、<code>Map[String, VO]</code>、<code>Vector[Decimal]</code> 在 <code>rsGetterExpr</code> / <code>sqlBindExpr</code> 下的空值与 JSON 解析边界</td>
+<td><strong>T01 + T02</strong></td>
+<td>ReadModel 塞满 4 种复合嵌套类型，跑 <code>sbt stage</code> + 内存 H2 读写单测</td>
+<td>读侧仓储编译或运行时抛解析异常</td>
+</tr>
+<tr>
+<td><strong>M08</strong></td>
+<td><strong><code>ears-simplify.mjs</code> 复杂布尔与 Decimal 精度化简偏差</strong>：深度嵌套否定 <code>NOT (a AND (b OR c))</code>、<code>Option</code> 判空、不同 scale Decimal 比较在 NNF 化简后的括号优先级与 TS/Scala 语义一致性</td>
+<td><strong>T01 + T08</strong></td>
+<td>构造 3 层嵌套布尔 + 2/4 位 scale 混算的 <code>.ears</code>，对照 Z3 见证双跑 TS 与 Scala</td>
+<td>罕见逻辑反转或编译类型不匹配</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-6-3">故障归因三方速查协议（防错怪、防越界）</h3>
+<p>当外部项目跑出红灯时，按以下顺序 30 秒完成归因，再决定修哪里：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：现象特征 / 归因归属 / 正确动作"><table>
+<thead>
+<tr>
+<th scope="col">现象特征</th>
+<th scope="col">归因归属</th>
+<th scope="col">正确动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>compile-v2</code> 报 <code>V2_SMT_GATE_FAILED</code>、<code>V2_FIRST_HIT_SHADOWED_RULE</code>、<code>V2_LINEAGE_*</code>、<code>EARS_*</code></td>
+<td><strong>真源层（Truth Source）</strong></td>
+<td>修正业务 YAML 或 <code>.ears</code> 规约，严禁放宽 Z3 闸门</td>
+</tr>
+<tr>
+<td><code>generated-tests/</code> 锁定用例期望与真源一致，仅 <code>@cloze</code> 槽位行为不达标，或 <code>ServerSnapshotProviderImpl</code> 返回空快照</td>
+<td><strong>手写隔离区（Handwritten）</strong></td>
+<td>仅在 <code>@cloze:start..end</code> 或手写 provider 内修复业务实现</td>
+</tr>
+<tr>
+<td>生成代码自身 <code>sbt stage</code> 报类型/语法错；或锁定测试传参违反真源结构/Authz 协议；或增量生成路径/清理缺陷</td>
+<td><strong>编译器 / 生成器（<code>metarch-truthsrc</code>）</strong></td>
+<td>提上游 Issue 附精确文件行号与最小复现 → 按四步探针法修复并锁入 <code>SPEC-S*</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>结语</strong>：这份地图的价值不在一次性读完，而在<strong>每次准备交付新特性或接入新多域项目前，拿出图 3 的 14 条暗道与雷达表 M01–M08，挑出最危险的 3–5 个接缝写 100 行对抗探针跑一遍真实 <code>sbt stage</code> + Play HTTP</strong>。把暗道变成亮路，把踩坑变成探针，这就是 <code>metarch-truthsrc</code> 持续逼近工业级确定性的核心打法。</p>
+</blockquote></article>
+    </div>
+    <aside class="article-community" aria-label="加入 Discord 社区">
+      <div class="article-community-copy">
+        <p class="article-community-kicker">Co-arising Discord 社区</p>
+        <p class="article-community-title">读完这篇，想进一步交流或提出质疑？</p>
+        <p>加入 co-arising Discord 社区，直接与作者及同行探讨 DDD、EARS/SMT 验证与 AI 时代代码生成实践。</p>
+      </div>
+      <a class="article-community-cta" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a>
+    </aside>
+    <section id="related-reading" class="article-related" aria-labelledby="related-heading">
+      <h2 id="related-heading">继续阅读</h2>
+      <div class="article-card" lang="zh-CN">
+      <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-27">2026-11-27</time></p>
+      <h3><a href="/zh/articles/play-cqrs-artifact-type-map-20261127/">Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景</a></h3>
+      <p class="article-deck">对照 metarch-truthsrc @ 0b925ad（catalog 156b224f3614）与 bank-wealth-demo @ 80a9acb 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。</p>
+      <p class="small">中文原文</p>
+    </div>
+      <p><a href="/zh/articles/">返回文章索引</a></p>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/articles.js"></script>
+</body>
+</html>

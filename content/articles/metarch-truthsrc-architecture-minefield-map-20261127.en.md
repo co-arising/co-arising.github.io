@@ -1,0 +1,424 @@
+# metarch-truthsrc Strategic Architecture Map & Underground Tunnels Mine-Sweeping Manual (v2.0.0 Source-Level Atlas)
+
+> **Scope & Source Baseline**: Written directly against [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0** (commit [`0b925ad`](https://github.com/co-arising/metarch-truthsrc/commit/0b925ad387d2603f1d3e248a31a71831c13c112f)), this is a **coarse-to-fine, macro-to-seam engineering battle map**. Unlike the [co-arising 2.0 Long-Term Architecture Blueprint](https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/) (design philosophy) or the [GA Complete Guide](https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) (user workflow), this manual slices the compiler open to chart its **module boundaries, vertical dataflows, 14 cross-file hidden couplings ("underground tunnels")**, and an empirically validated **probe-based mine-sweeping playbook plus 8 next-wave high-risk targets**.
+
+<div class="co-kpi-strip" role="region" aria-label="metarch-truthsrc v2.0.0 codebase scale and mine-sweeping baseline">
+<div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">34,486 LOC in v2 trunk/EARS/Play emitters + 14,125 LOC in 24 curated 1.0 families</div></div>
+<div><div class="kpi-num">44 / 32 / 158</div><div class="kpi-label">surface-registry lock: 44 CLI commands, 32 MCP tools, 158 diagnostic error codes</div></div>
+<div><div class="kpi-num red">14 Tunnels</div><div class="kpi-label">Hidden cross-file couplings spanning types, 1.0/2.0 bridge, oracles, and verify gates</div></div>
+<div><div class="kpi-num">7 / 7 Hit</div><div class="kpi-label">7 real bugs predicted and empirically confirmed (locked in SPEC-S13..S17) + 8 radar targets</div></div>
+</div>
+
+## 1. Strategic Overview (Level 0): The Macro Terrain Map
+
+To hunt latent bugs systematically inside `metarch-truthsrc`, discard one misconception first: **it is not a "YAML-to-template" scaffolder; it is a five-stage domain compiler built across two historical geological strata**.
+
+- **Stratum 1 (v1 Strict-Governance Legacy Layer, `emitter/families/`)**: 24 deterministic Scala CQRS/Play emitters locked by golden-file parity in [`emitter/parity.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/emitter/parity.mjs) (value objects, aggregate protocols, Akka persistence, Protobuf converters, Play runtime, and more).
+- **Stratum 2 (v2 EARS-Native Trunk, `lib/ears/` + `lib/v2/`)**: Orthogonal YAML structure loader, EARS 1.0 lexer/parser/binder/Z3 SMT solver, DMN First-Hit witness synthesizer, `Canonical Model v2`, local SQLite knowledge graph, TS/Scala dual-stack and Scala single-stack generators, locked BDD oracle emitters, mutation testing, and anti-cheat write guards.
+
+**Most real-world bugs do not live inside isolated function logic; they live at stratum boundaries and fan-out seams where one semantic concept is independently translated by multiple downstream consumers.** Figure 1 maps the six macro stages alongside the four high-risk fault lines:
+
+<figure class="co-arch-fig">
+<div class="arch-caption-head">FIGURE 01 · METARCH-TRUTHSRC V2.0.0 STRATEGIC TERRAIN &amp; FAULT LINES</div>
+<svg viewBox="0 0 840 500" width="100%" role="img" aria-label="metarch-truthsrc v2.0.0 six-stage compilation trunk and four high-risk fault lines">
+  <defs>
+    <marker id="map1-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"/>
+    </marker>
+    <marker id="map1-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"/>
+    </marker>
+    <marker id="map1-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"/>
+    </marker>
+    <marker id="map1-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"/>
+    </marker>
+  </defs>
+  <rect x="12" y="10" width="816" height="96" rx="4" class="arch-band"/>
+  <text x="24" y="30" class="arch-t-band">STAGE 1–2 · ORTHOGONAL FRONTEND &amp; FORMAL HARD GATE (structure-loader + lib/ears/* + compiler)</text>
+  <rect x="24" y="42" width="176" height="52" rx="4" class="arch-card"/>
+  <text x="112" y="63" text-anchor="middle" class="arch-t-title">Orthogonal Truth</text>
+  <text x="112" y="81" text-anchor="middle" class="arch-t-sub">YAML structs + .ears rules</text>
+  <rect x="226" y="42" width="194" height="52" rx="4" class="arch-card-teal"/>
+  <text x="323" y="63" text-anchor="middle" class="arch-t-title">Parse · Bind · Lineage</text>
+  <text x="323" y="81" text-anchor="middle" class="arch-t-sub">structure-loader / binder / lineage</text>
+  <rect x="446" y="42" width="184" height="52" rx="4" class="arch-card-teal"/>
+  <text x="538" y="63" text-anchor="middle" class="arch-t-title">Z3 SMT + First-Hit</text>
+  <text x="538" y="81" text-anchor="middle" class="arch-t-sub">5 proofs + k-BMC + witnesses</text>
+  <rect x="656" y="42" width="160" height="52" rx="4" class="arch-card-dark"/>
+  <text x="736" y="63" text-anchor="middle" class="arch-t-title-dark">Canonical v2</text>
+  <text x="736" y="81" text-anchor="middle" class="arch-t-sub-dark">+ knowledge.sqlite</text>
+  <line x1="200" y1="68" x2="223" y2="68" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"/>
+  <line x1="420" y1="68" x2="443" y2="68" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"/>
+  <line x1="630" y1="68" x2="653" y2="68" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"/>
+
+  <rect x="12" y="126" width="816" height="148" rx="4" class="arch-band-teal"/>
+  <text x="24" y="146" class="arch-t-band-teal">STAGE 3–4 · DUAL-CHANNEL CODEGEN &amp; 1.0/2.0 BRIDGE (scala-cqrs-play-service-v2 + lib/v2/bridge + codegen)</text>
+  <rect x="24" y="160" width="214" height="98" rx="4" class="arch-card"/>
+  <text x="131" y="181" text-anchor="middle" class="arch-t-title">Packaging &amp; Routing</text>
+  <text x="131" y="200" text-anchor="middle" class="arch-t-sub">mergeCanonicalsForBc (monolith)</text>
+  <text x="131" y="218" text-anchor="middle" class="arch-t-sub">target-resolution (dual / Scala-only)</text>
+  <text x="131" y="236" text-anchor="middle" class="arch-t-mono">onion-routes shared derivation</text>
+  <rect x="264" y="160" width="276" height="98" rx="4" class="arch-card-teal"/>
+  <text x="402" y="181" text-anchor="middle" class="arch-t-title">v2 -&gt; 1.0 Strict Bridge Suite (Block A–D)</text>
+  <text x="402" y="200" text-anchor="middle" class="arch-t-sub">v1-strict-scala · block-cd · readside</text>
+  <text x="402" y="218" text-anchor="middle" class="arch-t-sub">api-auth (5-layer Play) · policy · orchestration</text>
+  <text x="402" y="236" text-anchor="middle" class="arch-t-teal">Invokes 24 curated 1.0 emitter/families/*</text>
+  <rect x="566" y="160" width="250" height="98" rx="4" class="arch-card-amber"/>
+  <text x="691" y="181" text-anchor="middle" class="arch-t-title">Dual-Channel Disk Territories</text>
+  <text x="691" y="200" text-anchor="middle" class="arch-t-sub">4A Read-Only: generated-scaffold/</text>
+  <text x="691" y="218" text-anchor="middle" class="arch-t-sub">4B Never-Overwrite: handwritten/ (@cloze)</text>
+  <text x="691" y="236" text-anchor="middle" class="arch-t-amber">ServerSnapshotProviderImpl · Bindings</text>
+  <line x1="238" y1="209" x2="261" y2="209" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"/>
+  <line x1="540" y1="209" x2="563" y2="209" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"/>
+
+  <rect x="12" y="294" width="816" height="114" rx="4" class="arch-band-amber"/>
+  <text x="24" y="314" class="arch-t-amber">STAGE 5–6 · LOCKED BDD ORACLE EMITTERS &amp; FIVE-LAYER VERIFICATION GATES</text>
+  <rect x="24" y="328" width="236" height="66" rx="4" class="arch-card"/>
+  <text x="142" y="350" text-anchor="middle" class="arch-t-title">Locked Oracle Emitters</text>
+  <text x="142" y="368" text-anchor="middle" class="arch-t-sub">witness-materialize -&gt; TS/Scala/HTTP</text>
+  <text x="142" y="384" text-anchor="middle" class="arch-t-mono">generated-tests/ + manifest.sha256</text>
+  <rect x="286" y="328" width="254" height="66" rx="4" class="arch-card-teal"/>
+  <text x="413" y="350" text-anchor="middle" class="arch-t-title">verify-gate + mutation-gate</text>
+  <text x="413" y="368" text-anchor="middle" class="arch-t-sub">SHA-256 tamper · offline scalac · Onion DIP</text>
+  <text x="413" y="384" text-anchor="middle" class="arch-t-teal">100% Domain Mutation Kill + Provenance</text>
+  <rect x="566" y="328" width="250" height="66" rx="4" class="arch-card-red"/>
+  <text x="691" y="350" text-anchor="middle" class="arch-t-red">Ultimate Runtime Acceptance</text>
+  <text x="691" y="368" text-anchor="middle" class="arch-t-sub">sbt -batch stage + Play 2.8.18 Roadshow</text>
+  <text x="691" y="384" text-anchor="middle" class="arch-t-mono">tasks-v2 review · view-v2 / atlas-v2</text>
+  <line x1="260" y1="361" x2="283" y2="361" class="arch-edge-teal" marker-end="url(#map1-arr-teal)"/>
+  <line x1="540" y1="361" x2="563" y2="361" class="arch-edge-red" marker-end="url(#map1-arr-red)"/>
+
+  <path d="M 736 94 L 736 114 L 131 114 L 131 157" class="arch-edge" marker-end="url(#map1-arr-ink)"/>
+  <path d="M 736 94 L 736 114 L 402 114 L 402 157" class="arch-edge" marker-end="url(#map1-arr-ink)"/>
+  <path d="M 691 258 L 691 282 L 142 282 L 142 325" class="arch-edge-amber" marker-end="url(#map1-arr-amber)"/>
+  <path d="M 691 258 L 691 282 L 413 282 L 413 325" class="arch-edge-amber" marker-end="url(#map1-arr-amber)"/>
+
+  <rect x="12" y="424" width="816" height="64" rx="4" class="arch-band-red"/>
+  <text x="24" y="445" class="arch-t-band-red">FOUR HIGH-RISK SEAM FAULT LINES (WHERE ~90% OF REAL BUGS LAND)</text>
+  <text x="24" y="466" class="arch-t-sub">1) Type normalization (6-way record/ExactType/VO translation)   2) 1.0/2.0 bridge &amp; offline scalac filter (SBT_FRAMEWORK_IMPORT_RE)</text>
+  <text x="24" y="481" class="arch-t-sub">3) Witness materialization &amp; 4-way 5-layer Authz parity   4) Monolith dedupBy &amp; never-overwrite handwritten drift across upgrades</text>
+</svg>
+<figcaption>Figure 1: The six-stage trunk and four high-risk fault lines of metarch-truthsrc v2.0.0. While the trunk looks linear, Canonical v2 fans out into four parallel lines (bridge codegen, oracle tests, offline verification, and Play runtime); any single-consumer drift detonates at integration time.</figcaption>
+</figure>
+
+### Two Essential Top-Level Mental Models
+
+1. **Dual-Stack vs. Scala Single-Stack Delivery**:
+   - `typescript` gives millisecond zero-compile Node 22 feedback for rapid prototyping and demos; `scala-cqrs-play-service-v2` delivers the full production Akka/Play/Protobuf/ScalikeJDBC runtime.
+   - Since `0b925ad` introduced [`lib/v2/target-resolution.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/target-resolution.mjs), Scala production projects no longer carry dual-slot overhead (`*.cloze.ts` + `*Impl.scala`): when only `generated-scaffold/scala` (or `.truthsrc/generated-scala-manifest.json`) exists without `generated-scaffold/ts`, `tasks-v2`, `verify-v2`, and `check-v2` automatically operate in Scala single-stack mode.
+2. **The Blind Spot Between Offline `scalac` and Live `sbt stage`**:
+   - To keep TDD loops sub-second/second-level, `verify-v2` invokes **standalone `scalac` + ScalaTest** while filtering out Akka/Play/ScalaPB/ScalikeJDBC framework files.
+   - Therefore **green offline `verify-v2` does NOT guarantee green `sbt -batch stage` or HTTP 200 on Play**. Play controllers, ReadSide JDBC repositories, Protobuf converters, Guice DI modules, and `conf/routes` are only truly verified by a real `sbt -batch stage` and live Play 2.8.18 HTTP roadshow.
+
+---
+
+## 2. Module & Directory Atlas (Level 1): Six Zones Down to Exact Source Files
+
+As of `0b925ad`, the v2 engine spans six operational zones. Use this atlas as a direct jump-table during triage and bug-hunting:
+
+| Zone | Core Modules (clickable GitHub links) | LOC | Ownership & Responsibility | Key I/O Contract |
+|---|---|---:|---|---|
+| **A · Entrypoints & Locks** | [`bin/truthsrc.js`](https://github.com/co-arising/metarch-truthsrc/blob/main/bin/truthsrc.js) / [`lib/v2/cli.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/cli.mjs) | 559 / 517 | 44 CLI commands and v2 subcommand dispatch (including `--bc` / `--packaging monolith`) | Strict `BOOL_FLAGS` whitelist; unknown or missing flag values fail closed |
+| **A · Entrypoints & Locks** | [`mcp/server.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/mcp/server.mjs) / [`lib/v2/surface-registry.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/surface-registry.mjs) | 370 / 300 | 32 MCP tools (6 `v2_*`) and single-source capability lock | `npm run check:contracts` pins CLI, MCP, Skills, and error-code counts |
+| **A · Entrypoints & Locks** | [`tools/lint.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs) / [`lib/runtime-profile.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/runtime-profile.mjs) | 168 / — | Zero-business-hardcoding architectural gate and sole runtime coordinate registry | Forbids domain names and `net.imadz` literals across core `lib/`, `bin/`, and active `emitter/` |
+| **B · Frontend & SMT** | [`lib/v2/structure-loader.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/structure-loader.mjs) | **2,378** | **Largest single file**: loads YAML structs, rejects legacy `@guard`, normalizes `resolvedType`, validates 5-layer Authz/PII/ReadModels | Emits `structures`, `symbolTable`, and `resolveCanonicalEventFields` |
+| **B · Frontend & SMT** | [`lib/ears/parser.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/ears/parser.mjs) / [`lib/ears/binder.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/ears/binder.mjs) | 772 / 1,146 | Isomorphic EN/ZH EARS 1.0 parsing, normalization (`normalize.mjs`), and strongly typed symbol binding | Binds state/param/event/extern symbols and classifies `L1/L2/L3` |
+| **B · Frontend & SMT** | [`lib/ears/smt-encoder.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/ears/smt-encoder.mjs) / [`lib/v2/first-hit-witness.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/first-hit-witness.mjs) | 847 / 467 | Single-hop EARS → SMT-LIB 2 encoding, 5 Z3 proofs + `k`-BMC, DMN First-Hit exact witness synthesis | Any unreachable, conflicting, or shadowed rule blocks `Canonical v2` emission |
+| **B · Frontend & SMT** | [`lib/v2/compiler.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/compiler.mjs) / [`lib/v2/lineage.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/lineage.mjs) | 594 / 1,061 | v2 compile orchestrator, full-chain field lineage, Event Sourcing `post:` fold validation, bilingual equivalence | Writes `canonical-v2.json`, `knowledge.sqlite`, Style E/B signoff docs |
+| **C · Graph & Tasks** | [`lib/v2/knowledge-db.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/knowledge-db.mjs) / [`lib/v2/tasks-v2.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/tasks-v2.mjs) | 401 / 294 | Node 22 built-in `node:sqlite` dependency graph and drift-free `@cloze` task queue derivation | Preserves existing `cloze_slots.provenance` review records across rebuilds |
+| **C · Graph & Tasks** | [`lib/v2/atlas-viewer.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/atlas-viewer.mjs) / [`lib/v2/diagrams.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/diagrams.mjs) / [`lib/v2/view-v2.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/view-v2.mjs) | 1,474 / 1,283 / 1,077 | 11-diagram offline `atlas.html` and interactive Workshop HTML exporter | Pure read-only consumers of `canonical-v2.json` + SQLite |
+| **D · Codegen & Bridge** | [`generators/scala-cqrs-play-service-v2/generate.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/generators/scala-cqrs-play-service-v2/generate.mjs) | 396 | `scala-cqrs-play-service:2` top assembler, `@generated` stamping, multi-subdomain merge (`mergeCanonicalsForBc`) | Wires Block A/B/C/D bridges and writes `.truthsrc/generated-scala-manifest.json` |
+| **D · Codegen & Bridge** | [`lib/v2/bridge/v1-strict-scala.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-scala.mjs) / [`ears-simplify.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/ears-simplify.mjs) | 1,231 / 298 | Block A domain bridge invoking 1.0 `#1/#2/#3/#45` families + EARS NNF simplification + `@cloze` stubs | Emits `domain/values`, `entities`, `invariants`, `Computations`, `*Impl.scala` |
+| **D · Codegen & Bridge** | [`lib/v2/bridge/v1-strict-block-cd.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-block-cd.mjs) | 1,354 | Block C/D coordinator invoking 1.0 protocol/aggregate/repo/Protobuf/serializer/Play runtime/sbt scaffold + Authz/DI | Delegates to `readside`, `policy`, `api-auth`, and `orchestration` bridges |
+| **D · Codegen & Bridge** | [`v1-strict-readside.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-readside.mjs) / [`v1-strict-api-auth.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-api-auth.mjs) / [`v1-strict-policy.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-policy.mjs) / [`v1-strict-orchestration.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-orchestration.mjs) | 709 / 576 / 569 / 702 | Full Play vertical slices: CQRS ReadSide+JDBC, auth-core Play controllers + `ServerSnapshotProvider`, reactive PolicyMachine, Saga/Effect/ToolGate | **Highest-frequency zone for `sbt stage` compile errors** |
+| **D · Codegen & Bridge** | [`lib/v2/codegen/onion-routes.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-routes.mjs) / [`typescript.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/typescript.mjs) / [`onion-ts.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-ts.mjs) / [`onion-scala.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-scala.mjs) | 120 / 1,085 / 761 / 603 | Single HTTP route derivation (`deriveStoryHttpRoutes`) and TS/Scala Onion interface layers | Must remain strictly isomorphic with `v1-strict-api-auth` and `interfaces-http` |
+| **E · Oracle Emitters** | [`lib/v2/test-emitter/witness-materialize.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/witness-materialize.mjs) | 686 | Expands sparse Z3 witnesses into concrete typed TS/Scala commands, states, snapshots, and trusted contexts | **Primary leverage point behind bulk application-suite failures** |
+| **E · Oracle Emitters** | [`scala-strict-scalatest.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/scala-strict-scalatest.mjs) / [`typescript-node-test.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/typescript-node-test.mjs) / [`interfaces-http.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/interfaces-http.mjs) | 427 / 342 / 796 | Emits Domain/Application ScalaTest, Node 22 TS suites, and 5-layer Authz/CSRF/PDP HTTP oracles | Stamps `generated-tests/manifest.sha256.json` tamper lock |
+| **F · Gates & Guard** | [`lib/v2/verify-gate.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/verify-gate.mjs) / [`mutation-gate.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/mutation-gate.mjs) / [`guard-write.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/guard-write.mjs) | 843 / 381 / 232 | Tamper check, TS + offline `scalac` runners, Onion DIP check, Domain mutation gate, and `PreToolUse` write guard | Restricts AI writes strictly inside `@cloze:start..end`; blocks all locked zones |
+
+---
+
+## 3. Core Dataflows & State Machines (Level 2): Tracing a Rule End-to-End
+
+Zooming from modules to execution paths, every bug investigation starts by tracking **two vertical pipelines** and **one derived task state machine**:
+
+<figure class="co-arch-fig">
+<div class="arch-caption-head">FIGURE 02 · DUAL VERTICAL DATAFLOWS &amp; CLOZE TASK STATE MACHINE</div>
+<svg viewBox="0 0 840 430" width="100%" role="img" aria-label="Domain rule dataflow, 4-way HTTP Authz fan-out, and Cloze derived task state machine">
+  <defs>
+    <marker id="map2-arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-teal"/>
+    </marker>
+    <marker id="map2-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"/>
+    </marker>
+    <marker id="map2-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"/>
+    </marker>
+  </defs>
+  <rect x="12" y="10" width="816" height="128" rx="4" class="arch-band-teal"/>
+  <text x="24" y="30" class="arch-t-band-teal">FLOW A · DOMAIN RULE VERTICAL PIPELINE (Domain Slice / L1 &amp; L2)</text>
+  <rect x="24" y="44" width="136" height="78" rx="4" class="arch-card"/>
+  <text x="92" y="66" text-anchor="middle" class="arch-t-title">YAML + .ears</text>
+  <text x="92" y="84" text-anchor="middle" class="arch-t-sub">ExactType / VO</text>
+  <text x="92" y="101" text-anchor="middle" class="arch-t-mono">aliases · rules · post</text>
+  <rect x="186" y="44" width="150" height="78" rx="4" class="arch-card"/>
+  <text x="261" y="66" text-anchor="middle" class="arch-t-title">binder + Z3</text>
+  <text x="261" y="84" text-anchor="middle" class="arch-t-sub">resolvedType unified</text>
+  <text x="261" y="101" text-anchor="middle" class="arch-t-mono">sparse first-hit witness</text>
+  <rect x="362" y="44" width="144" height="78" rx="4" class="arch-card-dark"/>
+  <text x="434" y="66" text-anchor="middle" class="arch-t-title-dark">Canonical v2</text>
+  <text x="434" y="84" text-anchor="middle" class="arch-t-sub-dark">behaviors + testIr</text>
+  <text x="434" y="101" text-anchor="middle" class="arch-t-sub-dark">eventFolds + lineage</text>
+  <rect x="532" y="44" width="136" height="78" rx="4" class="arch-card-teal"/>
+  <text x="600" y="66" text-anchor="middle" class="arch-t-title">v1-strict-scala</text>
+  <text x="600" y="84" text-anchor="middle" class="arch-t-sub">RuleParams / Rules</text>
+  <text x="600" y="101" text-anchor="middle" class="arch-t-mono">Computations / Impl</text>
+  <rect x="692" y="44" width="124" height="78" rx="4" class="arch-card-amber"/>
+  <text x="754" y="66" text-anchor="middle" class="arch-t-title">ScalaTest Oracle</text>
+  <text x="754" y="84" text-anchor="middle" class="arch-t-sub">witness-materialize</text>
+  <text x="754" y="101" text-anchor="middle" class="arch-t-amber">scalac + mutation</text>
+  <line x1="160" y1="83" x2="183" y2="83" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"/>
+  <line x1="336" y1="83" x2="359" y2="83" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"/>
+  <line x1="506" y1="83" x2="529" y2="83" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"/>
+  <line x1="668" y1="83" x2="689" y2="83" class="arch-edge-amber" marker-end="url(#map2-arr-amber)"/>
+
+  <rect x="12" y="156" width="816" height="132" rx="4" class="arch-band-amber"/>
+  <text x="24" y="176" class="arch-t-amber">FLOW B · APPLICATION &amp; 5-LAYER AUTHZ FAN-OUT (1 SOURCE -&gt; 4 PARALLEL CONSUMERS)</text>
+  <rect x="24" y="192" width="184" height="82" rx="4" class="arch-card-dark"/>
+  <text x="116" y="214" text-anchor="middle" class="arch-t-title-dark">onion-routes.mjs</text>
+  <text x="116" y="233" text-anchor="middle" class="arch-t-sub-dark">deriveStoryHttpRoutes</text>
+  <text x="116" y="251" text-anchor="middle" class="arch-t-sub-dark">mode/roles/pdp/rowScope</text>
+  <rect x="244" y="192" width="132" height="82" rx="4" class="arch-card"/>
+  <text x="310" y="216" text-anchor="middle" class="arch-t-title">1. onion-ts</text>
+  <text x="310" y="236" text-anchor="middle" class="arch-t-sub">TS HTTP Router</text>
+  <text x="310" y="254" text-anchor="middle" class="arch-t-mono">Node 22 runtime</text>
+  <rect x="392" y="192" width="132" height="82" rx="4" class="arch-card"/>
+  <text x="458" y="216" text-anchor="middle" class="arch-t-title">2. onion-scala</text>
+  <text x="458" y="236" text-anchor="middle" class="arch-t-sub">Scala HttpRouter</text>
+  <text x="458" y="254" text-anchor="middle" class="arch-t-mono">offline scalac check</text>
+  <rect x="540" y="192" width="134" height="82" rx="4" class="arch-card-red"/>
+  <text x="607" y="216" text-anchor="middle" class="arch-t-red">3. v1-strict-api-auth</text>
+  <text x="607" y="236" text-anchor="middle" class="arch-t-sub">PlayController</text>
+  <text x="607" y="254" text-anchor="middle" class="arch-t-mono">auth-core + Snapshot</text>
+  <rect x="690" y="192" width="126" height="82" rx="4" class="arch-card-teal"/>
+  <text x="753" y="216" text-anchor="middle" class="arch-t-title">4. interfaces-http</text>
+  <text x="753" y="236" text-anchor="middle" class="arch-t-sub">TS + Scala HTTP</text>
+  <text x="753" y="254" text-anchor="middle" class="arch-t-teal">Locked authz oracle</text>
+  <line x1="208" y1="233" x2="241" y2="233" class="arch-edge-amber" marker-end="url(#map2-arr-amber)"/>
+  <path d="M 208 212 L 226 212 L 226 184 L 458 184 L 458 189" class="arch-edge-amber" marker-end="url(#map2-arr-amber)"/>
+  <path d="M 226 184 L 607 184 L 607 189" class="arch-edge-red" marker-end="url(#map2-arr-red)"/>
+  <path d="M 226 184 L 753 184 L 753 189" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"/>
+
+  <rect x="12" y="306" width="816" height="112" rx="4" class="arch-band"/>
+  <text x="24" y="326" class="arch-t-band">STATE MACHINE · DERIVED CLOZE TASK QUEUE (computed live from disk @cloze + sqlite provenance)</text>
+  <rect x="24" y="346" width="124" height="52" rx="4" class="arch-card-amber"/>
+  <text x="86" y="368" text-anchor="middle" class="arch-t-title">PENDING</text>
+  <text x="86" y="385" text-anchor="middle" class="arch-t-mono">has NOT_IMPLEMENTED</text>
+  <rect x="184" y="346" width="142" height="52" rx="4" class="arch-card-red"/>
+  <text x="255" y="368" text-anchor="middle" class="arch-t-red">UNVERIFIED</text>
+  <text x="255" y="385" text-anchor="middle" class="arch-t-mono">filled, verify not green</text>
+  <rect x="362" y="346" width="176" height="52" rx="4" class="arch-card-teal"/>
+  <text x="450" y="368" text-anchor="middle" class="arch-t-title">GREEN_NEEDS_REVIEW</text>
+  <text x="450" y="385" text-anchor="middle" class="arch-t-mono">verify-v2 green, review</text>
+  <rect x="574" y="346" width="112" height="52" rx="4" class="arch-card-dark"/>
+  <text x="630" y="368" text-anchor="middle" class="arch-t-title-dark">VERIFIED</text>
+  <text x="630" y="385" text-anchor="middle" class="arch-t-sub-dark">blind review PASS</text>
+  <rect x="716" y="346" width="100" height="52" rx="4" class="arch-card-red arch-dash"/>
+  <text x="766" y="368" text-anchor="middle" class="arch-t-red">STALE</text>
+  <text x="766" y="385" text-anchor="middle" class="arch-t-mono">SHA drifted</text>
+  <line x1="148" y1="372" x2="181" y2="372" class="arch-edge-amber" marker-end="url(#map2-arr-amber)"/>
+  <line x1="326" y1="372" x2="359" y2="372" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"/>
+  <line x1="538" y1="372" x2="571" y2="372" class="arch-edge-teal" marker-end="url(#map2-arr-teal)"/>
+  <line x1="686" y1="372" x2="713" y2="372" class="arch-edge-red" marker-end="url(#map2-arr-red)"/>
+</svg>
+<figcaption>Figure 2: Two vertical data pipelines and the live Cloze task state machine. Notice how onion-routes.mjs fans out to four parallel consumers; updating three while missing the fourth immediately causes runtime/test divergence.</figcaption>
+</figure>
+
+### Disk Territory Ownership Contract
+
+| Disk Territory | Owner | Generator Write Behavior | `guard-write.mjs` Enforcement |
+|---|---|---|---|
+| `truth/` (YAML + `.ears` + bindings) | Domain author / architect | Read-only input, never rewritten | Editable (requires re-running `compile-v2`) |
+| `generated-scaffold/`, `generated-tests/`, `projections/` | Compiler & generators | Full deterministic overwrite | **Physically blocked (`TERRITORY_LOCKED`, exit 2)** |
+| `handwritten/` (`*Impl.scala`, `*.cloze.ts`, `ServerSnapshotProviderImpl.scala`, `HandwrittenBindingsModule.scala`) | Humans / isolated AI Agents | Created once; **never overwritten once present (`overwrite: false`)** | Edits allowed only inside `@cloze:start(<id>)..@cloze:end(<id>)`; full-file overwrites blocked |
+| `.truthsrc/` (`canonical-v2.json`, `knowledge.sqlite`, manifests) | Derived state cache | Rebuilt on compile/verify (preserves `cloze_slots.provenance`) | Rebuildable, with provenance & blind-review state retained in SQLite |
+
+---
+
+## 4. Underground Tunnels Map (Level 3): 14 Hidden Cross-File Couplings
+
+On the surface the compiler pipeline looks clean and modular. What actually breaks multi-subdomain production projects (such as a 6-subdomain exam platform with 50 domain behaviors and 23 `@cloze` slots) are **14 underground tunnels (T01–T14)**—pairs of modules that never directly call each other yet silently share fragile invariants:
+
+<figure class="co-arch-fig">
+<div class="arch-caption-head">FIGURE 03 · UNDERGROUND TUNNELS MAP (T01–T14 HIDDEN COUPLING TOPOLOGY)</div>
+<svg viewBox="0 0 840 460" width="100%" role="img" aria-label="14 underground tunnels grouped into four hidden coupling networks">
+  <defs>
+    <marker id="map3-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-red"/>
+    </marker>
+    <marker id="map3-arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-amber"/>
+    </marker>
+  </defs>
+  <rect x="12" y="10" width="398" height="210" rx="4" class="arch-band-red"/>
+  <text x="24" y="30" class="arch-t-band-red">NETWORK A · TYPE &amp; NOMINAL SYSTEM FAULTS (T01–T03)</text>
+  <rect x="24" y="42" width="374" height="50" rx="4" class="arch-card"/>
+  <text x="34" y="61" class="arch-t-red">T01 · 6-way record(ExactType/VO) re-translation</text>
+  <text x="34" y="79" class="arch-t-sub">structure-loader -&gt; readside / block-cd / policy / witness: miss 1 =&gt; String</text>
+  <rect x="24" y="100" width="374" height="50" rx="4" class="arch-card"/>
+  <text x="34" y="119" class="arch-t-red">T02 · SPEC-S10 primitive Json.toJson vs nominal recursion</text>
+  <text x="34" y="137" class="arch-t-sub">v1-strict-readside must gate explicit JSON codecs on typeUsesNominal</text>
+  <rect x="24" y="158" width="374" height="50" rx="4" class="arch-card"/>
+  <text x="34" y="177" class="arch-t-red">T03 · Custom aliases missing 'state' =&gt; state.state.copy</text>
+  <text x="34" y="195" class="arch-t-sub">binder / smt-encoder / v1-strict-scala / witness all assume 'state' alias</text>
+
+  <rect x="430" y="10" width="398" height="210" rx="4" class="arch-band-amber"/>
+  <text x="442" y="30" class="arch-t-amber">NETWORK B · 1.0/2.0 BRIDGE &amp; OFFLINE SCALAC (T04–T07)</text>
+  <rect x="442" y="42" width="374" height="40" rx="4" class="arch-card"/>
+  <text x="452" y="59" class="arch-t-amber">T04 · Duplicated SBT_FRAMEWORK_IMPORT_RE (verify + mutation)</text>
+  <text x="452" y="74" class="arch-t-mono">File referencing filtered trait without matching import breaks scalac</text>
+  <rect x="442" y="88" width="374" height="40" rx="4" class="arch-card"/>
+  <text x="452" y="105" class="arch-t-amber">T05 · 1.0 emitter/families 24-family parity boundary</text>
+  <text x="452" y="120" class="arch-t-mono">Zero-VO fallbacks belong in lib/v2/bridge, never breaking 1.0 negatives</text>
+  <rect x="442" y="134" width="374" height="38" rx="4" class="arch-card"/>
+  <text x="452" y="150" class="arch-t-amber">T06 · Hybrid L1+L2 RuleParams unification &amp; SPEC-S4 zero-Noop</text>
+  <text x="452" y="165" class="arch-t-mono">Non-empty Computations bans val Noop; L1 test passes null.asInstanceOf</text>
+  <rect x="442" y="178" width="374" height="34" rx="4" class="arch-card"/>
+  <text x="452" y="199" class="arch-t-amber">T07 · lint.mjs bans domain names &amp; net.imadz -&gt; runtime-profile</text>
+
+  <rect x="12" y="238" width="398" height="210" rx="4" class="arch-band-teal"/>
+  <text x="24" y="258" class="arch-t-band-teal">NETWORK C · WITNESS &amp; LOCKED ORACLE FAULTS (T08–T10)</text>
+  <rect x="24" y="272" width="374" height="52" rx="4" class="arch-card"/>
+  <text x="34" y="291" class="arch-t-teal">T08 · Sparse Z3 witness -&gt; witness-materialize distortion</text>
+  <text x="34" y="309" class="arch-t-sub">isRejected keeps []; accepted needs non-empty seqs, bindPrincipal, snapshot</text>
+  <rect x="24" y="332" width="374" height="50" rx="4" class="arch-card"/>
+  <text x="34" y="351" class="arch-t-teal">T09 · Dual event-field resolution (explicit vs lineage-derived)</text>
+  <text x="34" y="369" class="arch-t-sub">Codegen and [POSTCOND] specs must share resolveCanonicalEventFields</text>
+  <rect x="24" y="390" width="374" height="48" rx="4" class="arch-card"/>
+  <text x="34" y="409" class="arch-t-teal">T10 · 4-way 5-layer Authz parity (public / PDP / GET / Play)</text>
+  <text x="34" y="426" class="arch-t-sub">ownerField · requiresEntitlement · rowScope · HttpStatusMapper · JsNull</text>
+
+  <rect x="430" y="238" width="398" height="210" rx="4" class="arch-band"/>
+  <text x="442" y="258" class="arch-t-band">NETWORK D · MONOLITH, TARGETS &amp; GATE FAULTS (T11–T14)</text>
+  <rect x="442" y="272" width="374" height="38" rx="4" class="arch-card-red"/>
+  <text x="452" y="288" class="arch-t-red">T11 · mergeCanonicalsForBc short-name dedupBy &amp; stale files</text>
+  <text x="452" y="303" class="arch-t-mono">Cross-subdomain name collisions silently drop the second definition</text>
+  <rect x="442" y="316" width="374" height="38" rx="4" class="arch-card"/>
+  <text x="452" y="332" class="arch-t-title">T12 · target-resolution single-stack &amp; forbiddenImports</text>
+  <text x="452" y="347" class="arch-t-mono">tasks/verify/check auto-detect Scala-only; avoid blocking controllers/</text>
+  <rect x="442" y="360" width="374" height="38" rx="4" class="arch-card"/>
+  <text x="452" y="376" class="arch-t-title">T13 · verify-gate short-circuit skips mutation + open HTTP handle</text>
+  <text x="452" y="391" class="arch-t-mono">Any base test failure hides mutation timeouts until full green</text>
+  <rect x="442" y="404" width="374" height="36" rx="4" class="arch-card-amber"/>
+  <text x="452" y="420" class="arch-t-amber">T14 · overwrite:false DI signature drift on existing repos</text>
+  <text x="452" y="434" class="arch-t-mono">HandwrittenBindingsModule / ServerSnapshotProviderImpl drift</text>
+</svg>
+<figcaption>Figure 3: Full topology of the 14 underground tunnels (T01–T14) across four hidden coupling networks. Red and amber boxes mark historically detonated seams and highest-risk upcoming minefields.</figcaption>
+</figure>
+
+### Network A · Type & Nominal System Faults (T01–T03)
+
+1. **T01 · 6-Way `resolvedType.kind === 'record'` Re-Translation**:
+   - [`structure-loader.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/structure-loader.mjs) normalizes both `ExactType` (such as `Money`) and `ValueObject` into `{ kind: 'record', typeName }`.
+   - At least **six downstream files** each maintain their own `buildNominalIndex` / `scalaTypeOf` / `defaultScalaExpr`: `v1-strict-scala.mjs`, `v1-strict-block-cd.mjs`, `v1-strict-readside.mjs`, `v1-strict-policy.mjs`, `v1-strict-api-auth.mjs`, and `witness-materialize.mjs`.
+   - **Failure mechanism**: Missing `case 'record'` in any single consumer silently degrades types to `String`—directly causing **Play ReadSide `String` assigned to `BigDecimal`/`Long` ([Issue #2](https://github.com/co-arising/metarch-truthsrc/issues/2))** and **ReadModel nominal-field compile errors (Bug #4)**.
+2. **T02 · `SPEC-S10` Idiomatic Primitive `Json.toJson` vs. Nominal Codecs**:
+   - In [`v1-strict-readside.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-readside.mjs), primitive sequences like `Vector[String]` must keep `Json.stringify(Json.toJson(row.topics))` and `.as[Vector[String]]` (pinned by `SPEC-S10`), while collections/maps containing `ExactType` or `ValueObject` must branch via `typeUsesNominal` into recursive `jsEncodeExpr` / `jsDecodeExpr`.
+3. **T03 · Four-Way Implicit Assumption That `aliases` Includes `'state'`**:
+   - If YAML defines custom `aliases: [bal]` without `'state'`, [`v1-strict-scala.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-scala.mjs) and [`witness-materialize.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/witness-materialize.mjs) misread `state.field` as a nested record member and emit `state.copy(state = state.state.copy(...))` (Bug #7). Every consumer must normalize aggregate aliases to include `'state'`.
+
+### Network B · 1.0/2.0 Bridge & Offline `scalac` Faults (T04–T07)
+
+4. **T04 · Duplicated `SBT_FRAMEWORK_IMPORT_RE` Offline `scalac` Filter**:
+   - [`verify-gate.mjs:359`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/verify-gate.mjs#L359) and [`mutation-gate.mjs:210`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/mutation-gate.mjs#L210) each hold a copy of the framework import regex that strips Akka/Play/ScalaPB/ScalikeJDBC/converter files out of standalone `scalac`.
+   - **Rule of thumb**: Any generated Scala file referencing a filtered trait (such as zero-VO `DomainConverters.scala` extending `<Agg>ProtoConverters`) MUST carry a matching framework import—otherwise `sbt stage` succeeds while offline `verify-v2` fails with `not found: type`. Always update both copies together.
+5. **T05 · 1.0 `emitter/families/` 24-Family Parity Red Line**:
+   - [`emitter/parity.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/emitter/parity.mjs) pins golden bytes and `runNegatives` assertions across all 24 families (for instance, `proto-converter.mjs` requires `valueObjects.length > 0`).
+   - **Rule of thumb**: Handle v2 edge cases (like zero-VO projects) in [`v1-strict-block-cd.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-block-cd.mjs) rather than weakening 1.0 negative batteries.
+6. **T06 · Hybrid L1+L2 Aggregate `RuleParams` & `SPEC-S4` Zero-Noop Contract**:
+   - Aggregates mixing L1 deterministic rules and L2 `@cloze` rules must unify all params under `<Agg>RuleParams` (never splitting out `<Agg>DomainServiceRuleParams`).
+   - Because `SPEC-S4` forbids exposing `val Noop` on non-empty `<Agg>Computations` in production code, [`scala-strict-scalatest.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/scala-strict-scalatest.mjs) passes `null.asInstanceOf[<Agg>Computations]` for L1 rule tests on hybrid aggregates.
+7. **T07 · `tools/lint.mjs` Architecture Guard**:
+   - [`tools/lint.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs) scans all 625 JS/MJS files: zero domain/business identifiers in generic core, zero `net.imadz` literals outside `lib/runtime-profile.mjs`, and zero hardcoded `'app/'` paths inside active `emitter/families/`.
+
+### Network C · Witness Materialization & Oracle Faults (T08–T10)
+
+8. **T08 · Sparse Z3 Witness → `witness-materialize` Semantic Distortion**:
+   - [`first-hit-witness.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/first-hit-witness.mjs) probes Z3 only for guard-referenced symbols; [`witness-materialize.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/witness-materialize.mjs) fills the rest.
+   - **Two classic traps**: (1) Overwriting `[]` with synthetic non-empty lists on rejected rules destroys `len(items) == 0` witnesses (Bug #1); (2) Omitting `bindPrincipal`, server `stateSnapshot`, or sending scalars to sequence fields breaks entire application test suites ([Issue #3](https://github.com/co-arising/metarch-truthsrc/issues/3)).
+9. **T09 · Dual Event-Field Resolution**:
+   - Event fields can be explicitly declared or derived from command parameters/lineage. Both [`v1-strict-scala.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-scala.mjs) and `[POSTCOND]` emitters in `scala-strict-scalatest.mjs` must share `resolveCanonicalEventFields(agg, ev)` or case-class arities drift apart (Bug #6).
+10. **T10 · 4-Way 5-Layer Authz PEP/PDP Mirroring**:
+    - [`onion-ts.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-ts.mjs), [`onion-scala.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/codegen/onion-scala.mjs), [`v1-strict-api-auth.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-api-auth.mjs) (Play controllers), and [`interfaces-http.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/interfaces-http.mjs) (HTTP oracles) must stay byte-for-byte semantically aligned on: skipping `public` routes for 401/403 checks, injecting allow-PDP for both `external-pdp` and `resource-policy`, appending query params for `GET` routes, mapping errors via `HttpStatusMapper.statusForRejection`, converting `JsNull => null`, parsing `X-Entitlements` / `X-Principal-Attr-*`, and enforcing `ownerField` / `requiresEntitlement` / `rowScope` + `ServerSnapshotProvider.load`.
+
+### Network D · Monolith Packaging, Targets & Gate Faults (T11–T14)
+
+11. **T11 · Silent `dedupBy` Swallowing in `mergeCanonicalsForBc` & Stale Files**:
+    - Look at [`generators/scala-cqrs-play-service-v2/generate.mjs:135`](https://github.com/co-arising/metarch-truthsrc/blob/main/generators/scala-cqrs-play-service-v2/generate.mjs#L135): multi-subdomain monolith merges deduplicate `valueObjects`, `exactTypes`, `readModels`, `aggregates`, `ports`, and `stories` by short `x.name`. Two subdomains defining same-named types with different fields silently drop the second definition. Meanwhile incremental regeneration does not garbage-collect stale `.scala` files left under old package paths ([Issue #4](https://github.com/co-arising/metarch-truthsrc/issues/4)).
+12. **T12 · `target-resolution.mjs` Single-Stack Detection & `init-v2` Import Rules**:
+    - [`lib/v2/target-resolution.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/target-resolution.mjs) unifies target resolution across `tasks-v2`, `verify-gate`, `check-v2`, and `cli.mjs`; [`init-v2.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/init-v2.mjs) must correspondingly switch `forbiddenImports` for Scala-only repos so Play controller imports are never false-flagged.
+13. **T13 · `verify-gate` Short-Circuiting Mutation & Open HTTP Server Handles**:
+    - Any single failure in the base test suite causes `verify-gate.mjs` to skip the built-in `mutation-gate`, deferring mutation timeouts or surviving-mutant surprises until after the entire suite turns green. Additionally, unclosed HTTP listeners in `interfaces-http` can keep standalone `node --test` workers alive after reporting counts.
+14. **T14 · Cross-Version DI Signature Drift in `overwrite: false` Handwritten Files**:
+    - Preserving `HandwrittenBindingsModule.scala`, `ServerSnapshotProviderImpl.scala`, and `@cloze` `*Impl.scala` files is a strict guarantee—which means when a newer generator adds a constructor dependency (like `ServerSnapshotProvider`), clean directories pass while pre-existing repos fail to compile until their handwritten bindings are upgraded.
+
+---
+
+## 5. Empirical Retrospective (Level 4A): How Tunnel-Guided Probing Scored 7/7
+
+Right after fixing the first real-world 6-subdomain run ([Issue #2](https://github.com/co-arising/metarch-truthsrc/issues/2), [#3](https://github.com/co-arising/metarch-truthsrc/issues/3), [#4](https://github.com/co-arising/metarch-truthsrc/issues/4)), we used the tunnel map above to hypothesize 6 latent bugs and built a real adversarial probe (`compileCanonicalV2` + `node --test` + real `sbt -batch compile`). **All 6 hypotheses confirmed as real bugs, plus 1 newly discovered compile bug (7/7 total)**:
+
+| # | Confirmed Bug Symptom | Tunnel Traversed | Minimal Adversarial Probe | Fix & Regression Lock |
+|---|---|---|---|---|
+| **#1** | `len(items) == 0` rejected rule test failed | **T08** | Aggregate command with `Seq[String]` rejected when empty | Added `allowEmptySeq` in `witness-materialize`, preserving `[]` when `isRejected` (`SPEC-S13`) |
+| **#2** | Hybrid L1+L2 aggregate failed `sbt compile` (`DomainServiceRuleParams` missing) | **T06** | Single aggregate combining 1 L1 rule + 1 L2 `extern` rule | Unified `<Agg>RuleParams`; preserved `SPEC-S4` zero-Noop via `null.asInstanceOf` in L1 tests (`SPEC-S14`) |
+| **#3** | First `public` route hijacked 401/403 tests; `resource-policy` lacked PDP; `GET` missed query params | **T10** | First route `mode: public`, plus `resource-policy` and `GET` routes | Selected first non-`public` route, unified `routeNeedsPdp`, appended `buildQuerySuffix` (`SPEC-S16`) |
+| **#4** | ReadModel with `ExactType`/`ValueObject` failed `sbt compile` | **T01 + T02** | ReadModel containing `Money` (`unit-decimal`) + custom VO | Wired `nominalIdx` & `typeUsesNominal` in `v1-strict-readside` while keeping `SPEC-S10` (`SPEC-S15`) |
+| **#5** | Play controller hardcoded 400, omitted `X-Entitlements`/`ownerField`/`rowScope`, and mismatched `JsNull` | **T10** | Play route declaring owner, entitlement, and rowScope | Aligned `v1-strict-api-auth` with `HttpStatusMapper`, 403 checks, and recursive `PlayHttpBridge` (`SPEC-S16`) |
+| **#6** | Zero-VO project missed `ProtoConverters`; `[POSTCOND]` arity mismatched derived event fields | **T04 + T05 + T09** | Primitive-only project with lineage-derived event fields | Emitted zero-VO fallback in `v1-strict-block-cd` with framework import; shared `resolveCanonicalEventFields` (`SPEC-S15`) |
+| **#7** | Custom `aliases: [bal]` omitting `'state'` emitted invalid `state.state.copy(...)` | **T03** | YAML aggregate with custom `aliases` excluding `state` | Normalized aggregate aliases to always include `'state'` across bridge & witness (`SPEC-S14`) |
+
+All regressions are now locked in [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs) (`SPEC-S1..S17`, 17/17 PASS), verified with live `sbt -batch stage` + Play 2.8.18 HTTP roadshow and `bank-wealth-demo` 100% Mutation Gate (see the [status page](https://co-arising.github.io/status/)).
+
+---
+
+## 6. Next-Wave Mine-Sweeping Playbook (Level 4B): Probe Method & 8-Target Radar
+
+### The 4-Step Adversarial Probe Method
+
+1. **Pick a Tunnel**: Choose an under-tested cross-module seam from T01–T14 in Figure 3.
+2. **Craft a Minimal Adversarial Truth**: Write 10–40 lines of valid but edge-case YAML + `.ears` (zero VO, hybrid L1+L2, nested `Option[ExactType]`, Scala reserved keywords, cross-subdomain colliding names).
+3. **Run the Full Real Pipeline (never rely on regex-only unit tests)**:
+   - `compileCanonicalV2` (real Z3)
+   - `generateScalaCqrsPlayServiceV2` / `generateScalaCqrsPlayServiceV2ForBc`
+   - `emitV2ExecutableTests`
+   - `node --test` + offline `scalac` + **real `sbt -batch stage` + live Play HTTP roadshow**
+4. **Lock Every Confirmed Hit**: Fix via general derivation (`npm run lint:arch` = 0 issues, `emitter/parity.mjs` = 24/24 green) and lock the probe permanently as `SPEC-S18+`.
+
+### Next-Wave High-Risk Minefield Radar (M01–M08)
+
+Ranked by likelihood and blast radius against current `0b925ad` source:
+
+| Radar ID | Suspected Latent Mine | Linked Tunnel | Recommended Adversarial Probe | Blast Radius |
+|---|---|---|---|---|
+| **M01** | **Multi-subdomain name collisions**: two subdomains define same-named VO/ExactType/ReadModel/Port with different fields, silently dropped by `dedupBy` | **T11** | Two subdomains each declaring `StatusVO` with distinct fields → `mergeCanonicalsForBc` + `sbt compile` | Silent field loss or compile errors in 6+ domain monoliths |
+| **M02** | **Strict `stateSnapshot` equality false failures**: handwritten app handler recomputes/normalizes derived snapshot fields, tripping strict `deepStrictEqual` / `assert(res == expected)` | **T08** | Handwritten `*Impl.scala` returning derived values rather than verbatim passthrough → `verify-v2` | Bulk false-red application tests |
+| **M03** | **Scala / Play / Protobuf reserved keywords**: YAML fields named `type`, `match`, `object`, `val`, `case`, `package`, `sealed`, or `implicit` emitted without backticks | **T01 + T05** | Aggregate/Command/ReadModel containing `type: String`, `match: Boolean` → `sbt stage` | Immediate `.scala` / `.proto` syntax breakage |
+| **M04** | **Built-in `mutation-gate` timeout at 6-domain scale**: first time strict gate runs full mutations after base suite turns green, hitting [`verify-gate.mjs:426`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/verify-gate.mjs#L426) 90s `scalac` / per-mutant timeouts | **T13** | 20+ aggregate, 50+ behavior benchmark repo under `verify-v2 --strict --mutation-gate` | CI strict gate timeout failures |
+| **M05** | **Existing-repo DI signature drift on upgrade**: pre-existing `HandwrittenBindingsModule.scala` lacks newly required bindings such as `ServerSnapshotProvider` | **T14** | Old handwritten bindings + fresh `generate-v2` in place → `sbt stage` + Play boot | Guice HTTP 500 on upgraded repos |
+| **M06** | **Nominal-type gaps in Policy & Orchestration bridges**: [`v1-strict-policy.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-policy.mjs) & [`v1-strict-orchestration.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/bridge/v1-strict-orchestration.mjs) handling `ExactType`, `Option[VO]`, and `Map` on event/Saga payloads | **T01** | Event-driven Policy + Saga step carrying `Money` & `Option[AddressVO]` → `sbt stage` | Play policy & Saga compile errors |
+| **M07** | **ReadSide nested-type JDBC codecs**: `Option[ExactType]`, `Option[VO]`, `Map[String, VO]`, `Vector[Decimal]` null/JSON edge cases in `rsGetterExpr` / `sqlBindExpr` | **T01 + T02** | ReadModel packing all four composite types → `sbt stage` + in-memory H2 roundtrip | ReadSide compile or runtime decode crash |
+| **M08** | **`ears-simplify.mjs` nested boolean & mixed-scale Decimal precedence**: deep `NOT (a AND (b OR c))`, optional null checks, and mixed-scale Decimal comparisons across TS & Scala | **T01 + T08** | 3-level nested boolean + 2/4-scale Decimal `.ears` verified against Z3 witnesses on both stacks | Subtle logic inversion or type mismatch |
+
+### 30-Second Failure Attribution Protocol
+
+| Failure Signature | Owner | Required Action |
+|---|---|---|
+| `compile-v2` emits `V2_SMT_GATE_FAILED`, `V2_FIRST_HIT_SHADOWED_RULE`, `V2_LINEAGE_*`, or `EARS_*` | **Truth Source** | Fix YAML / `.ears` specification; never weaken the Z3 gate |
+| Locked oracle matches truth, but `@cloze` implementation or `ServerSnapshotProviderImpl` diverges | **Handwritten Isolation Zone** | Fix logic strictly inside `@cloze:start..end` or handwritten provider |
+| Generated code fails `sbt stage`, locked oracle sends inputs violating truth/Authz contracts, or incremental packaging leaves stale artifacts | **Compiler / Generator (`metarch-truthsrc`)** | File upstream issue with file:line & minimal repro → fix via 4-step probe and lock in `SPEC-S*` |
+
+> **Closing Takeaway**: Do not read this map once and file it away. Before every major release or multi-subdomain onboarding, pick the 3–5 riskiest seams from Figure 3 and radar targets M01–M08, write a 100-line adversarial probe, and run it through real `sbt stage` + Play HTTP. Turning underground tunnels into lit corridors and turning surprises into locked probes is how `metarch-truthsrc` converges on industrial-grade determinism.

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "co-arising.artifact-maps-lock/v1",
+  "contractDoc": "docs/artifact-map-authoring-contract.md",
+  "futureTargetsPolicy": "Every new v2 target generator registered in metarch-truthsrc/generators/*/generator.json (such as a future Rust/Axum CQRS target) must publish a bilingual Onion Artifact Type Map article and register its catalogSha256 here.",
+  "maps": {
+    "scala-cqrs-play-service:2": {
+      "slug": "play-cqrs-artifact-type-map-20261127",
+      "truthsrcShort": "0b925ad",
+      "bankShort": "80a9acb",
+      "catalogSha256": "156b224f36141e33507879d5f35a5e8be2d572fe431781d6b9ff315812abf068",
+      "totalUnifiedFamilies": 60,
+      "producerCount": 14,
+      "artifactKindCount": 64,
+      "zhRoute": "/zh/articles/play-cqrs-artifact-type-map-20261127/",
+      "enRoute": "/articles/play-cqrs-artifact-type-map-20261127/",
+      "nestedOnionToc": true
+    }
+  }
+}

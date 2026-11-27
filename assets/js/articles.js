@@ -32,15 +32,27 @@
       if (heading && heading.getBoundingClientRect().top <= offset + 40) current = index;
     });
     links.forEach((link, index) => {
-      if (index === current) link.setAttribute("aria-current", "location");
-      else link.removeAttribute("aria-current");
+      if (index === current) {
+        link.setAttribute("aria-current", "location");
+        const group = link.closest("details.toc-group");
+        if (group) group.open = true;
+      } else {
+        link.removeAttribute("aria-current");
+      }
     });
+  }
+  function openGroupForHash(hash) {
+    if (!hash || hash.length < 2) return;
+    const match = links.find((l) => l.getAttribute("href") === hash);
+    const group = match && match.closest("details.toc-group");
+    if (group) group.open = true;
   }
   function schedule() {
     if (!pending) { pending = true; requestAnimationFrame(update); }
   }
   addEventListener("scroll", schedule, { passive: true });
   addEventListener("resize", schedule);
+  addEventListener("hashchange", () => openGroupForHash(location.hash));
   addEventListener("load", () => {
     // Align at full layout (a heavy page's fonts.ready can resolve before the
     // DOM finishes laying out, and the browser's late scroll restoration can
@@ -48,6 +60,7 @@
     const alignFragment = () => {
       let id;
       try { id = decodeURIComponent(location.hash.slice(1)); } catch (error) { return; }
+      if (id) openGroupForHash("#" + id);
       const target = id && document.getElementById(id);
       if (target && body.contains(target)) target.scrollIntoView({ block: "start", behavior: "instant" });
       schedule();
