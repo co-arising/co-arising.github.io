@@ -4,6 +4,7 @@
 package example.bankwealth.v2.infrastructure.connectors
 
 import example.bankwealth.v2.application.toolgates.BankCashSubmitPortConnectorPort
+import example.bankwealth.v2.domain.values._
 import scala.concurrent.Future
 
 final class BankCashSubmitPortConnectorImpl extends BankCashSubmitPortConnectorPort {
@@ -11,5 +12,5 @@ final class BankCashSubmitPortConnectorImpl extends BankCashSubmitPortConnectorP
   override def originAndCsrfValid(): Future[Boolean] = Future.successful(true)
   override def fundCodeActive(fundCode: String): Future[Boolean] = Future.successful(true)
   override def requestExists(principal: String, clientRequestId: String): Future[Boolean] = Future.successful(false)
-  override def payloadMatchesOriginal(principal: String, clientRequestId: String, fundCode: String, amount: String): Future[Boolean] = Future.successful(true)
+  override def payloadMatchesOriginal(principal: String, clientRequestId: String, fundCode: String, amount: Money): Future[Boolean] = Future.successful(true)
 }

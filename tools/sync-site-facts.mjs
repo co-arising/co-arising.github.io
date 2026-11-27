@@ -335,6 +335,32 @@ function runCheck() {
         }
       }
     }
+
+    // Verify commit-pinned compiler architecture & minefield map articles stay bound to cohort truthsrcCommit
+    for (const [archKey, entry] of Object.entries(mapsLock.architectureMaps ?? {})) {
+      if (lock.cohort?.truthsrcShort && entry.truthsrcShort !== lock.cohort.truthsrcShort) {
+        errors.push(`artifact-maps.lock.json architectureMaps.${archKey} truthsrcShort ${entry.truthsrcShort} !== cohort ${lock.cohort.truthsrcShort}`);
+      }
+      if (lock.cohort?.truthsrcCommit && entry.truthsrcCommit && entry.truthsrcCommit !== lock.cohort.truthsrcCommit) {
+        errors.push(`artifact-maps.lock.json architectureMaps.${archKey} truthsrcCommit ${entry.truthsrcCommit} !== cohort ${lock.cohort.truthsrcCommit}`);
+      }
+      const artMeta = manifestBySlug.get(entry.slug);
+      if (!artMeta || !artMeta.source_en) {
+        errors.push(`content/articles/manifest.json missing bilingual entry for architecture map slug "${entry.slug}"`);
+        continue;
+      }
+      for (const [label, fname] of [['zh', artMeta.source], ['en', artMeta.source_en]]) {
+        const mdPath = join(ROOT, 'content', 'articles', fname);
+        if (!existsSync(mdPath)) {
+          errors.push(`Missing architecture map article source (${label}): content/articles/${fname}`);
+          continue;
+        }
+        const mdText = readFileSync(mdPath, 'utf8');
+        if (lock.cohort?.truthsrcShort && !mdText.includes(lock.cohort.truthsrcShort)) {
+          errors.push(`content/articles/${fname} missing pinned truthsrc commit ${lock.cohort.truthsrcShort}`);
+        }
+      }
+    }
   }
 
   console.log(JSON.stringify({

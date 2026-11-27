@@ -5,8 +5,8 @@
   "maps": {
     "scala-cqrs-play-service:2": {
       "slug": "play-cqrs-artifact-type-map-20261127",
-      "truthsrcShort": "0b925ad",
-      "bankShort": "80a9acb",
+      "truthsrcShort": "b2b61e5",
+      "bankShort": "bd20e36",
       "catalogSha256": "156b224f36141e33507879d5f35a5e8be2d572fe431781d6b9ff315812abf068",
       "totalUnifiedFamilies": 60,
       "producerCount": 14,
@@ -14,6 +14,16 @@
       "zhRoute": "/zh/articles/play-cqrs-artifact-type-map-20261127/",
       "enRoute": "/articles/play-cqrs-artifact-type-map-20261127/",
       "nestedOnionToc": true
+    }
+  },
+  "architectureMaps": {
+    "metarch-truthsrc:v2": {
+      "slug": "metarch-truthsrc-architecture-minefield-map-20261127",
+      "truthsrcCommit": "b2b61e5c48894c25d9b935c6939519ccc214e4a9",
+      "truthsrcShort": "b2b61e5",
+      "bankShort": "bd20e36",
+      "zhRoute": "/zh/articles/metarch-truthsrc-architecture-minefield-map-20261127/",
+      "enRoute": "/articles/metarch-truthsrc-architecture-minefield-map-20261127/"
     }
   }
 }

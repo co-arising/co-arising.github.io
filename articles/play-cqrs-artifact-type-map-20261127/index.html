@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Play CQRS (scala-cqrs-play-service:2) Artifact Type Architecture Map: Onion Layers, Decomposition &amp; Re-Assembly, and Target Code Reference — co-arising</title>
-  <meta name="description" content="Commit-pinned to metarch-truthsrc @ 0b925ad (catalog 156b224f3614) and bank-wealth-demo @ 80a9acb: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets." />
+  <meta name="description" content="Commit-pinned to metarch-truthsrc @ b2b61e5 (catalog 156b224f3614) and bank-wealth-demo @ bd20e36: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets." />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Play CQRS (scala-cqrs-play-service:2) Artifact Type Architecture Map: Onion Layers, Decomposition &amp; Re-Assembly, and Target Code Reference" />
-  <meta property="og:description" content="Commit-pinned to metarch-truthsrc @ 0b925ad (catalog 156b224f3614) and bank-wealth-demo @ 80a9acb: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets." />
+  <meta property="og:description" content="Commit-pinned to metarch-truthsrc @ b2b61e5 (catalog 156b224f3614) and bank-wealth-demo @ bd20e36: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets." />
   <meta property="og:url" content="https://co-arising.github.io/articles/play-cqrs-artifact-type-map-20261127/" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -34,7 +34,7 @@
       <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles/">Articles</a> / <span aria-current="page">Engineering practice</span></nav>
       <p class="article-meta"><span>Engineering practice</span> · <time datetime="2026-11-27">2026-11-27</time> · English translation</p>
       <h1>Play CQRS (scala-cqrs-play-service:2) Artifact Type Architecture Map: Onion Layers, Decomposition &amp; Re-Assembly, and Target Code Reference</h1>
-      <p class="article-deck">Commit-pinned to metarch-truthsrc @ 0b925ad (catalog 156b224f3614) and bank-wealth-demo @ 80a9acb: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets.</p>
+      <p class="article-deck">Commit-pinned to metarch-truthsrc @ b2b61e5 (catalog 156b224f3614) and bank-wealth-demo @ bd20e36: architectural philosophy, interactive clickable Onion SVG map, 2-level collapsible layer sidebar, Kernel vs. Seam vs. Glue breakdown across all 60 families (#55–#60 PolicyMachine suite) / 64 artifact kinds, Guice &amp; ApplicationBootstrap wiring, and the sync contract for future Rust/Axum targets.</p>
       <div class="article-actions"><a href="/content/articles/play-cqrs-artifact-type-map-20261127.en.md" download="play-cqrs-artifact-type-map-20261127.en.md">Download the English Markdown</a> · <a href="#article-body">Read the full article</a> · <a href="/zh/articles/play-cqrs-artifact-type-map-20261127/">中文原文</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">Join Discord <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>These articles were compiled from a publicly shared conversation. External data and conclusions were not independently verified for this publication; consult the original references.</p><p>This is a commit-pinned Play CQRS Artifact Type architecture map synchronized to metarch-truthsrc (scala-cqrs-play-service:2) and bank-wealth-demo; whenever any Artifact Type evolves upstream or a new target stack (such as Rust) is added, sync-site-facts and artifact-maps.lock.json require updating this bilingual map.</p><p><a href="/status/">Delivered capabilities and evidence live on the status page</a>. The publication notes below do not rewrite the original views.</p></aside>
@@ -49,7 +49,7 @@
         </div>
       </aside>
       <article id="article-body" class="article-body"><blockquote>
-<p>Version lock: <code>metarch-truthsrc</code> @ <a href="https://github.com/co-arising/metarch-truthsrc"><code>0b925ad</code></a> (<code>scala-cqrs-play-service:2</code> · <code>catalogSha256: 156b224f3614</code> · 60 unified families / 14 producers / 64 <code>artifactKinds</code>) · <code>bank-wealth-demo</code> @ <a href="https://github.com/co-arising/bank-wealth-demo"><code>80a9acb</code></a> · Controlled by <code>assets/data/artifact-maps.lock.json</code> and the <code>sync-site-facts</code> CI gate (cross-referenced with <code>F-32</code> / <code>F-33</code> on the status page).</p>
+<p>Version lock: <code>metarch-truthsrc</code> @ <a href="https://github.com/co-arising/metarch-truthsrc"><code>b2b61e5</code></a> (<code>scala-cqrs-play-service:2</code> · <code>catalogSha256: 156b224f3614</code> · 60 unified families / 14 producers / 64 <code>artifactKinds</code>) · <code>bank-wealth-demo</code> @ <a href="https://github.com/co-arising/bank-wealth-demo"><code>bd20e36</code></a> · Controlled by <code>assets/data/artifact-maps.lock.json</code> and the <code>sync-site-facts</code> CI gate (cross-referenced with <code>F-32</code> / <code>F-33</code> on the status page).</p>
 </blockquote>
 <p>Most code generators emit one giant <code>OrderService.scala</code> per model. That shortcut feels fast on day one, yet as soon as invariants, persistence adapters, authorization, read projections, and reactive policies evolve together, templates collapse into an untestable tangle where <strong>AI edits leak infrastructure into business rules and Onion boundaries erode silently</strong>.</p>
 <p><a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/scala-cqrs-play-service"><code>scala-cqrs-play-service:2</code></a> inside <code>metarch-truthsrc</code> takes the opposite approach: <strong>fine-grained orthogonal decomposition (60 unified families across 64 <code>artifactKinds</code> — expanding the 54-family baseline with <code>#55</code>–<code>#60</code> Reactive Policy families) + strict inward-only Onion dependencies + deterministic outer-edge re-assembly through Guice DI and <code>ApplicationBootstrap</code></strong>. This guide walks from <strong>architectural philosophy</strong> → <strong>clickable interactive Onion &amp; Wiring maps</strong> → <strong>layer-by-layer breakdown with real generated Scala</strong> → <strong>end-to-end transaction trace</strong> → <strong>the upgrade sync contract and Rust/Axum extension blueprint</strong>.</p>
@@ -90,8 +90,8 @@
 <p>Click any node in Figure 1 to jump directly to that layer's Artifact Type breakdown and Scala code sample. Use the 2-level collapsible Onion-layer sidebar on the left to expand or collapse individual layers.</p>
 </blockquote>
 <figure class="co-arch-fig co-arch-map">
-<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 0b925ad) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
-<svg viewBox="0 0 920 980" width="100%" role="img" aria-label="Master 5-layer Onion Architecture Artifact Type Map for Play CQRS showing Domain Core, Application, Infrastructure, Interfaces/Runtime, and Verification Oracle Gate with Kernel/Seam/Glue roles and dependency edges">
+<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ b2b61e5) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
+<svg viewBox="0 0 1120 1110" width="100%" role="img" aria-label="Concentric 5-layer Onion Architecture Artifact Type Map for Play CQRS showing Domain Core, Application, Infrastructure, Interfaces/Runtime, and Verification Oracle Gate with Kernel/Seam/Glue roles and inward DIP edges">
   <defs>
     <marker id="map-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
@@ -107,191 +107,173 @@
     </marker>
   </defs>
 
-  <rect x="14" y="12" width="892" height="104" rx="5" class="arch-band-red"></rect>
-  <text x="28" y="34" class="arch-t-band-red">LAYER 5 · VERIFICATION &amp; BDD ORACLE GATE (Independent Proof Harness · Never Runtime-Coupled)</text>
-  <a class="arch-node" href="#section-7-1">
-    <rect x="28" y="46" width="418" height="56" rx="4" class="arch-card-teal"></rect>
-    <text x="237" y="68" text-anchor="middle" class="arch-t-title">#53 Gherkin Features · TS/Scala Oracles · manifest.sha256.json</text>
-    <text x="237" y="88" text-anchor="middle" class="arch-t-mono">KERNEL · SHA-256 Locked Oracles &amp; Witness Suites (Domain/App/HTTP)</text>
-  </a>
-  <a class="arch-node" href="#section-7-2">
-    <rect x="468" y="46" width="424" height="56" rx="4" class="arch-card-red"></rect>
-    <text x="680" y="68" text-anchor="middle" class="arch-t-title">#54 Mutation Gate · Onion DIP Gate · sbt/scalac Partition</text>
-    <text x="680" y="88" text-anchor="middle" class="arch-t-mono">GLUE · 100% Guard Mutation Kill + 0 DIP Violations + Boundary Audit</text>
-  </a>
+  <ellipse cx="560" cy="480" rx="540" ry="472" class="arch-ring-iface"></ellipse>
+  <ellipse cx="560" cy="480" rx="470" ry="400" class="arch-ring-infra"></ellipse>
+  <ellipse cx="560" cy="480" rx="368" ry="296" class="arch-ring-app"></ellipse>
+  <ellipse cx="560" cy="480" rx="220" ry="168" class="arch-ring-domain"></ellipse>
 
-  <rect x="14" y="130" width="892" height="132" rx="5" class="arch-band-ink"></rect>
-  <text x="28" y="152" class="arch-t-band">LAYER 4 · INTERFACES &amp; PLAY SERVICE RUNTIME (HTTP Entry / 5-Layer Authz / Build Scaffold)</text>
-  <a class="arch-node" href="#section-6-1">
-    <rect x="28" y="166" width="204" height="80" rx="4" class="arch-card-teal"></rect>
-    <text x="130" y="190" text-anchor="middle" class="arch-t-title">#49 ApiDto &amp; 5-Layer PEP/PDP</text>
-    <text x="130" y="210" text-anchor="middle" class="arch-t-sub">Principal / Authz / RowScope</text>
-    <text x="130" y="230" text-anchor="middle" class="arch-t-teal">KERNEL + SEAM</text>
-  </a>
-  <a class="arch-node" href="#section-6-2">
-    <rect x="248" y="166" width="210" height="80" rx="4" class="arch-card"></rect>
-    <text x="353" y="190" text-anchor="middle" class="arch-t-title">#34–#36 Controllers &amp; DSL</text>
-    <text x="353" y="210" text-anchor="middle" class="arch-t-sub">PlayController / StateApi / CommandDsl</text>
-    <text x="353" y="230" text-anchor="middle" class="arch-t-mono">GLUE · HTTP → AppPort</text>
-  </a>
-  <a class="arch-node" href="#section-6-3">
-    <rect x="474" y="166" width="212" height="80" rx="4" class="arch-card"></rect>
-    <text x="580" y="190" text-anchor="middle" class="arch-t-title">#37–#38 ServiceLoader &amp; Routes</text>
-    <text x="580" y="210" text-anchor="middle" class="arch-t-sub">ServiceContract / PlayHttpBridge</text>
-    <text x="580" y="230" text-anchor="middle" class="arch-t-mono">GLUE · Routing &amp; Contract Check</text>
-  </a>
-  <a class="arch-node" href="#section-6-4">
-    <rect x="702" y="166" width="190" height="80" rx="4" class="arch-card"></rect>
-    <text x="797" y="190" text-anchor="middle" class="arch-t-title">#39 Project Scaffold</text>
-    <text x="797" y="210" text-anchor="middle" class="arch-t-sub">build.sbt / dev.conf / serialization</text>
-    <text x="797" y="230" text-anchor="middle" class="arch-t-mono">GLUE · ScalaPB + Akka</text>
-  </a>
+  <text x="560" y="42" text-anchor="middle" class="arch-t-band">LAYER 4 · INTERFACES &amp; PLAY RUNTIME</text>
+  <text x="560" y="60" text-anchor="middle" class="arch-t-chip-sub">HTTP Entry · 5-Layer Authz · Build Scaffold</text>
 
-  <rect x="14" y="278" width="892" height="162" rx="5" class="arch-band-amber"></rect>
-  <text x="28" y="300" class="arch-t-band-amber">LAYER 3 · INFRASTRUCTURE &amp; DI RE-ASSEMBLY (Outermost Implementations: Wire Codecs, Stores &amp; Boot)</text>
-  <a class="arch-node" href="#section-5-1">
-    <rect x="28" y="314" width="204" height="110" rx="4" class="arch-card"></rect>
-    <text x="130" y="338" text-anchor="middle" class="arch-t-title">#29–#33 Protobuf &amp; Adapters</text>
-    <text x="130" y="358" text-anchor="middle" class="arch-t-sub">*.proto / *ProtoConverter</text>
-    <text x="130" y="376" text-anchor="middle" class="arch-t-sub">*EventAdapter / SnapshotAdapter</text>
-    <text x="130" y="394" text-anchor="middle" class="arch-t-sub">DomainProtoSerializer</text>
-    <text x="130" y="412" text-anchor="middle" class="arch-t-mono">GLUE · ScalaPB Journal Codec</text>
-  </a>
-  <a class="arch-node" href="#section-5-2">
-    <rect x="248" y="314" width="204" height="110" rx="4" class="arch-card"></rect>
-    <text x="350" y="338" text-anchor="middle" class="arch-t-title">#12 / #24 Repo &amp; DLQ Impl</text>
-    <text x="350" y="358" text-anchor="middle" class="arch-t-sub">*RepositoryImpl / *Schema DDL</text>
-    <text x="350" y="376" text-anchor="middle" class="arch-t-sub">ReadsideRepositoryImpl</text>
-    <text x="350" y="394" text-anchor="middle" class="arch-t-sub">PolicyDlqBury (kn_projection_dlq)</text>
-    <text x="350" y="412" text-anchor="middle" class="arch-t-mono">GLUE · ScalikeJDBC / InMem</text>
-  </a>
-  <a class="arch-node" href="#section-5-3">
-    <rect x="468" y="314" width="196" height="110" rx="4" class="arch-card-amber"></rect>
-    <text x="566" y="338" text-anchor="middle" class="arch-t-title">#25 Connectors &amp; Effects</text>
-    <text x="566" y="358" text-anchor="middle" class="arch-t-sub">DefaultOutboundConnectors</text>
-    <text x="566" y="376" text-anchor="middle" class="arch-t-sub">*ConnectorImpl / *EffectPortImpl</text>
-    <text x="566" y="394" text-anchor="middle" class="arch-t-sub">ServerSnapshotProviderImpl</text>
-    <text x="566" y="412" text-anchor="middle" class="arch-t-amber">GLUE + Isolated Adapters</text>
-  </a>
-  <a class="arch-node" href="#section-5-5">
-    <rect x="680" y="314" width="212" height="110" rx="4" class="arch-card-dark"></rect>
-    <text x="786" y="338" text-anchor="middle" class="arch-t-title-dark">#38 / #47 / #50 DI &amp; Bootstrap</text>
-    <text x="786" y="358" text-anchor="middle" class="arch-t-sub-dark">*Bootstrap (#47 / #38b / #59 Policy)</text>
-    <text x="786" y="376" text-anchor="middle" class="arch-t-sub-dark">BootstrapModule + GeneratedBindings</text>
-    <text x="786" y="394" text-anchor="middle" class="arch-t-sub-dark">HandwrittenBindings + ProjectionMod</text>
-    <text x="786" y="412" text-anchor="middle" class="arch-t-teal">★ RE-ASSEMBLY HUB ★</text>
-  </a>
+  <text x="560" y="114" text-anchor="middle" class="arch-t-band-amber">LAYER 3 · INFRASTRUCTURE &amp; DI RE-ASSEMBLY</text>
+  <text x="560" y="212" text-anchor="middle" class="arch-t-band">LAYER 2 · APPLICATION LAYER</text>
 
-  <rect x="14" y="456" width="892" height="252" rx="5" class="arch-band"></rect>
-  <text x="28" y="478" class="arch-t-band">LAYER 2 · APPLICATION LAYER (Write Hosts, Read Projections, Reactive Policy &amp; Long-Running Sagas)</text>
-  <a class="arch-node" href="#section-4-1">
-    <rect x="28" y="492" width="204" height="92" rx="4" class="arch-card-amber"></rect>
-    <text x="130" y="516" text-anchor="middle" class="arch-t-title">#7 / #11 Protocol &amp; Helpers</text>
-    <text x="130" y="536" text-anchor="middle" class="arch-t-sub">Command / Reply(Accepted/Refused)</text>
-    <text x="130" y="554" text-anchor="middle" class="arch-t-sub">Params → Command Unpacking</text>
-    <text x="130" y="572" text-anchor="middle" class="arch-t-amber">SEAM + GLUE</text>
-  </a>
-  <a class="arch-node" href="#section-4-2">
-    <rect x="248" y="492" width="204" height="92" rx="4" class="arch-card"></rect>
-    <text x="350" y="516" text-anchor="middle" class="arch-t-title">#6 / #8–#10 Aggregate &amp; Behaviors</text>
-    <text x="350" y="536" text-anchor="middle" class="arch-t-sub">EntityKey / tags / commandHandler</text>
-    <text x="350" y="554" text-anchor="middle" class="arch-t-sub">runReplyingPolicy + withPost</text>
-    <text x="350" y="572" text-anchor="middle" class="arch-t-mono">GLUE · Hosts Domain Rules</text>
-  </a>
-  <a class="arch-node" href="#section-4-4">
-    <rect x="468" y="492" width="212" height="92" rx="4" class="arch-card-teal"></rect>
-    <text x="574" y="516" text-anchor="middle" class="arch-t-title">#51 / #52 StoryPort &amp; @cloze Impl</text>
-    <text x="574" y="536" text-anchor="middle" class="arch-t-sub">ExternPorts / EffectsPort / Handler</text>
-    <text x="574" y="554" text-anchor="middle" class="arch-t-sub">CallerContractSpec · handwritten Impl</text>
-    <text x="574" y="572" text-anchor="middle" class="arch-t-teal">KERNEL + SEAM</text>
-  </a>
-  <a class="arch-node" href="#section-4-3">
-    <rect x="696" y="492" width="196" height="92" rx="4" class="arch-card-amber"></rect>
-    <text x="794" y="516" text-anchor="middle" class="arch-t-title">#12 Repository Port</text>
-    <text x="794" y="536" text-anchor="middle" class="arch-t-sub">&lt;Agg&gt;Repository trait</text>
-    <text x="794" y="554" text-anchor="middle" class="arch-t-sub">getState / askAsync</text>
-    <text x="794" y="572" text-anchor="middle" class="arch-t-amber">SEAM · DIP Boundary</text>
-  </a>
+  <text x="560" y="354" text-anchor="middle" class="arch-t-band-teal">LAYER 1 · DOMAIN CORE</text>
+  <text x="560" y="372" text-anchor="middle" class="arch-t-chip-sub">Zero Akka / Play / JDBC Deps</text>
+  <text x="560" y="574" text-anchor="middle" class="arch-t-chip-teal">KERNEL + SEAM · Standalone scalac</text>
 
-  <a class="arch-node" href="#section-4-5">
-    <rect x="28" y="600" width="278" height="94" rx="4" class="arch-card-teal"></rect>
-    <text x="167" y="624" text-anchor="middle" class="arch-t-title">#15 / #23 / #26–#28 ReadSide Suite</text>
-    <text x="167" y="644" text-anchor="middle" class="arch-t-sub">&lt;View&gt; · QueryService · ReadsideRepository</text>
-    <text x="167" y="662" text-anchor="middle" class="arch-t-sub">ApplyEvent / ProjectionHandler / Projection</text>
-    <text x="167" y="680" text-anchor="middle" class="arch-t-teal">KERNEL + GLUE · Event → Query View</text>
-  </a>
-  <a class="arch-node" href="#section-4-6">
-    <rect x="322" y="600" width="280" height="94" rx="4" class="arch-card-teal"></rect>
-    <text x="462" y="624" text-anchor="middle" class="arch-t-title">#55–#60 Reactive Policy &amp; PolicyMachine</text>
-    <text x="462" y="644" text-anchor="middle" class="arch-t-sub">#55 Decision · #56 Mechanics · #57 Handler</text>
-    <text x="462" y="662" text-anchor="middle" class="arch-t-sub">#58 Runner · #60 PolicyMachine(Left→Dispose)</text>
-    <text x="462" y="680" text-anchor="middle" class="arch-t-teal">KERNEL + GLUE · Event ⇒ Command Loop</text>
-  </a>
-  <a class="arch-node" href="#section-4-7">
-    <rect x="618" y="600" width="274" height="94" rx="4" class="arch-card-amber"></rect>
-    <text x="755" y="624" text-anchor="middle" class="arch-t-title">#13 / #40–#46 Saga &amp; ExternalBridge</text>
-    <text x="755" y="644" text-anchor="middle" class="arch-t-sub">*SagaModule · CompositionHost · EffectFace</text>
-    <text x="755" y="662" text-anchor="middle" class="arch-t-sub">*ConnectorPort · #46 ExternalAuthority</text>
-    <text x="755" y="680" text-anchor="middle" class="arch-t-amber">KERNEL + SEAM · Cross-Agg &amp; Cross-BC</text>
-  </a>
-
-  <rect x="14" y="724" width="892" height="242" rx="5" class="arch-band-teal"></rect>
-  <text x="28" y="746" class="arch-t-band-teal">LAYER 1 · DOMAIN CORE (Innermost Ring · Zero Akka / Play / JDBC Dependencies · Standalone scalac + Mutation)</text>
   <a class="arch-node" href="#section-3-1">
-    <rect x="28" y="762" width="278" height="84" rx="4" class="arch-card-teal"></rect>
-    <text x="167" y="786" text-anchor="middle" class="arch-t-title">#1 Value Objects &amp; ExactTypes</text>
-    <text x="167" y="806" text-anchor="middle" class="arch-t-sub">Money / AmountDecimal / NavDecimal</text>
-    <text x="167" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · Construction-Time Proofs</text>
+    <rect x="392" y="398" width="156" height="44" rx="5" class="arch-card-teal"></rect>
+    <text x="470" y="417" text-anchor="middle" class="arch-t-chip-title">#1 Value Objects</text>
+    <text x="470" y="434" text-anchor="middle" class="arch-t-chip-sub">Money · ExactTypes</text>
   </a>
   <a class="arch-node" href="#section-3-2">
-    <rect x="322" y="762" width="280" height="84" rx="4" class="arch-card-teal"></rect>
-    <text x="462" y="786" text-anchor="middle" class="arch-t-title">#2 Domain Entity</text>
-    <text x="462" y="806" text-anchor="middle" class="arch-t-sub">State / empty / sealed trait Event</text>
-    <text x="462" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · Pure Aggregate Model</text>
+    <rect x="572" y="398" width="156" height="44" rx="5" class="arch-card-teal"></rect>
+    <text x="650" y="417" text-anchor="middle" class="arch-t-chip-title">#2 Domain Entity</text>
+    <text x="650" y="434" text-anchor="middle" class="arch-t-chip-sub">State · sealed Event</text>
   </a>
   <a class="arch-node" href="#section-3-3">
-    <rect x="618" y="762" width="274" height="84" rx="4" class="arch-card-teal"></rect>
-    <text x="755" y="786" text-anchor="middle" class="arch-t-title">#3 EventHandler (Event Fold)</text>
-    <text x="755" y="806" text-anchor="middle" class="arch-t-sub">(State, Event) =&gt; State Fold</text>
-    <text x="755" y="826" text-anchor="middle" class="arch-t-teal">KERNEL · Single Truth from EARS post:</text>
+    <rect x="392" y="452" width="156" height="44" rx="5" class="arch-card-teal"></rect>
+    <text x="470" y="471" text-anchor="middle" class="arch-t-chip-title">#3 EventHandler</text>
+    <text x="470" y="488" text-anchor="middle" class="arch-t-chip-sub">(State, Evt) =&gt; State</text>
   </a>
-
   <a class="arch-node" href="#section-3-4">
-    <rect x="28" y="862" width="278" height="88" rx="4" class="arch-card-teal"></rect>
-    <text x="167" y="886" text-anchor="middle" class="arch-t-title">#4 / #5 / #45 Invariant Rules &amp; Params</text>
-    <text x="167" y="906" text-anchor="middle" class="arch-t-sub">(State, Params) =&gt; Either[Err, List[Event]]</text>
-    <text x="167" y="926" text-anchor="middle" class="arch-t-teal">KERNEL · Z3 First-Hit + Postconditions</text>
+    <rect x="572" y="452" width="156" height="44" rx="5" class="arch-card-teal"></rect>
+    <text x="650" y="471" text-anchor="middle" class="arch-t-chip-title">#4/#5/#45 Rules</text>
+    <text x="650" y="488" text-anchor="middle" class="arch-t-chip-sub">Z3 Guard + Postcond</text>
   </a>
   <a class="arch-node" href="#section-3-5">
-    <rect x="322" y="862" width="280" height="88" rx="4" class="arch-card-teal"></rect>
-    <text x="462" y="886" text-anchor="middle" class="arch-t-title">#48 Domain Axioms &amp; Replay</text>
-    <text x="462" y="906" text-anchor="middle" class="arch-t-sub">replay(events) / checkAxioms(state)</text>
-    <text x="462" y="926" text-anchor="middle" class="arch-t-teal">KERNEL · Runtime ALWAYS Invariants</text>
+    <rect x="392" y="506" width="156" height="44" rx="5" class="arch-card-teal"></rect>
+    <text x="470" y="525" text-anchor="middle" class="arch-t-chip-title">#48 Axioms/Replay</text>
+    <text x="470" y="542" text-anchor="middle" class="arch-t-chip-sub">ALWAYS Invariants</text>
   </a>
   <a class="arch-node" href="#section-3-6">
-    <rect x="618" y="862" width="274" height="88" rx="4" class="arch-card-amber"></rect>
-    <text x="755" y="886" text-anchor="middle" class="arch-t-title">#14 / #51 Computations Port &amp; Impl</text>
-    <text x="755" y="906" text-anchor="middle" class="arch-t-sub">L1 → .Noop / L2 → handwritten Impl</text>
-    <text x="755" y="926" text-anchor="middle" class="arch-t-amber">SEAM · Non-Linear / Domain Compute</text>
+    <rect x="572" y="506" width="156" height="44" rx="5" class="arch-card-amber"></rect>
+    <text x="650" y="525" text-anchor="middle" class="arch-t-chip-title">#14/#51 Compute</text>
+    <text x="650" y="542" text-anchor="middle" class="arch-t-chip-sub">L1 Noop / L2 Impl</text>
   </a>
 
-  <line x1="130" y1="246" x2="130" y2="274" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
-  <line x1="353" y1="246" x2="353" y2="310" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
-  <line x1="580" y1="246" x2="580" y2="488" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
-  <line x1="786" y1="424" x2="786" y2="452" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
-  <line x1="350" y1="584" x2="350" y2="858" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
-  <line x1="462" y1="694" x2="462" y2="758" class="arch-edge-amber" marker-end="url(#map-arr-amber)"></line>
-  <line x1="167" y1="694" x2="167" y2="758" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
-  <line x1="566" y1="424" x2="566" y2="488" class="arch-edge-amber" marker-end="url(#map-arr-amber)"></line>
+  <a class="arch-node" href="#section-4-1">
+    <rect x="380" y="228" width="170" height="52" rx="5" class="arch-card-amber"></rect>
+    <text x="465" y="249" text-anchor="middle" class="arch-t-chip-title">#7/#11 Protocol</text>
+    <text x="465" y="267" text-anchor="middle" class="arch-t-chip-sub">Command · Reply · Params</text>
+  </a>
+  <a class="arch-node" href="#section-4-2">
+    <rect x="570" y="228" width="170" height="52" rx="5" class="arch-card"></rect>
+    <text x="655" y="249" text-anchor="middle" class="arch-t-chip-title">#6/#8–#10 Behaviors</text>
+    <text x="655" y="267" text-anchor="middle" class="arch-t-chip-sub">EntityKey · Rules Host</text>
+  </a>
+  <a class="arch-node" href="#section-4-3">
+    <rect x="212" y="440" width="122" height="76" rx="5" class="arch-card-amber"></rect>
+    <text x="273" y="463" text-anchor="middle" class="arch-t-chip-title">#12 Repo Port</text>
+    <text x="273" y="482" text-anchor="middle" class="arch-t-chip-sub">Repository trait</text>
+    <text x="273" y="501" text-anchor="middle" class="arch-t-chip-amber">SEAM · DIP</text>
+  </a>
+  <a class="arch-node" href="#section-4-4">
+    <rect x="786" y="440" width="122" height="76" rx="5" class="arch-card-teal"></rect>
+    <text x="847" y="463" text-anchor="middle" class="arch-t-chip-title">#51/#52 Story</text>
+    <text x="847" y="482" text-anchor="middle" class="arch-t-chip-sub">ExternPorts/Impl</text>
+    <text x="847" y="501" text-anchor="middle" class="arch-t-chip-teal">KERNEL + SEAM</text>
+  </a>
+  <a class="arch-node" href="#section-4-5">
+    <rect x="320" y="640" width="152" height="52" rx="5" class="arch-card-teal"></rect>
+    <text x="396" y="661" text-anchor="middle" class="arch-t-chip-title">#15/#26+ ReadSide</text>
+    <text x="396" y="679" text-anchor="middle" class="arch-t-chip-sub">View · Query · Proj</text>
+  </a>
+  <a class="arch-node" href="#section-4-6">
+    <rect x="484" y="666" width="152" height="52" rx="5" class="arch-card-teal"></rect>
+    <text x="560" y="687" text-anchor="middle" class="arch-t-chip-title">#55–#60 Policy</text>
+    <text x="560" y="705" text-anchor="middle" class="arch-t-chip-sub">Event ⇒ Cmd Loop</text>
+  </a>
+  <a class="arch-node" href="#section-4-7">
+    <rect x="648" y="640" width="152" height="52" rx="5" class="arch-card-amber"></rect>
+    <text x="724" y="661" text-anchor="middle" class="arch-t-chip-title">#13/#40–#46 Saga</text>
+    <text x="724" y="679" text-anchor="middle" class="arch-t-chip-sub">Cross-Agg · Bridge</text>
+  </a>
+
+  <a class="arch-node" href="#section-5-1">
+    <rect x="356" y="128" width="196" height="48" rx="5" class="arch-card"></rect>
+    <text x="454" y="148" text-anchor="middle" class="arch-t-chip-title">#29–#33 Protobuf Codec</text>
+    <text x="454" y="166" text-anchor="middle" class="arch-t-chip-sub">*.proto · SnapAdapter</text>
+  </a>
+  <a class="arch-node" href="#section-5-2">
+    <rect x="568" y="128" width="196" height="48" rx="5" class="arch-card"></rect>
+    <text x="666" y="148" text-anchor="middle" class="arch-t-chip-title">#12 / #24 Repo &amp; DLQ</text>
+    <text x="666" y="166" text-anchor="middle" class="arch-t-chip-sub">ScalikeJDBC · DLQ Bury</text>
+  </a>
+  <a class="arch-node" href="#section-5-3">
+    <rect x="358" y="784" width="194" height="48" rx="5" class="arch-card-amber"></rect>
+    <text x="455" y="804" text-anchor="middle" class="arch-t-chip-title">#25 Connectors &amp; Effects</text>
+    <text x="455" y="822" text-anchor="middle" class="arch-t-chip-sub">Outbound · ServerSnapshot</text>
+  </a>
+  <a class="arch-node" href="#section-5-5">
+    <rect x="568" y="784" width="194" height="48" rx="5" class="arch-card-dark"></rect>
+    <text x="665" y="804" text-anchor="middle" class="arch-t-chip-title-dark">#38/#47/#50 DI &amp; Boot ★</text>
+    <text x="665" y="822" text-anchor="middle" class="arch-t-chip-sub-dark">Guice + PolicyBootstrap</text>
+  </a>
+
+  <a class="arch-node" href="#section-6-1">
+    <rect x="16" y="36" width="228" height="66" rx="5" class="arch-card-teal"></rect>
+    <text x="130" y="57" text-anchor="middle" class="arch-t-chip-title">#49 ApiDto &amp; 5-Layer Authz</text>
+    <text x="130" y="75" text-anchor="middle" class="arch-t-chip-sub">Principal · PEP/PDP · RowScope</text>
+    <text x="130" y="92" text-anchor="middle" class="arch-t-chip-teal">KERNEL + SEAM</text>
+  </a>
+  <a class="arch-node" href="#section-6-2">
+    <rect x="876" y="36" width="228" height="66" rx="5" class="arch-card"></rect>
+    <text x="990" y="57" text-anchor="middle" class="arch-t-chip-title">#34–#36 Controllers &amp; DSL</text>
+    <text x="990" y="75" text-anchor="middle" class="arch-t-chip-sub">PlayController · StateApi</text>
+    <text x="990" y="92" text-anchor="middle" class="arch-t-chip-tag">GLUE · HTTP → AppPort</text>
+  </a>
+  <a class="arch-node" href="#section-6-3">
+    <rect x="16" y="854" width="228" height="66" rx="5" class="arch-card"></rect>
+    <text x="130" y="875" text-anchor="middle" class="arch-t-chip-title">#37–#38 ServiceLoader</text>
+    <text x="130" y="893" text-anchor="middle" class="arch-t-chip-sub">ServiceContract · HttpBridge</text>
+    <text x="130" y="910" text-anchor="middle" class="arch-t-chip-tag">GLUE · Routes &amp; Contract</text>
+  </a>
+  <a class="arch-node" href="#section-6-4">
+    <rect x="876" y="854" width="228" height="66" rx="5" class="arch-card"></rect>
+    <text x="990" y="875" text-anchor="middle" class="arch-t-chip-title">#39 Project Scaffold</text>
+    <text x="990" y="893" text-anchor="middle" class="arch-t-chip-sub">build.sbt · dev.conf · Akka</text>
+    <text x="990" y="910" text-anchor="middle" class="arch-t-chip-tag">GLUE · ScalaPB + Play</text>
+  </a>
+
+  <line x1="28" y1="480" x2="84" y2="480" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
+  <line x1="98" y1="480" x2="186" y2="480" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <text x="142" y="466" text-anchor="middle" class="arch-t-chip-teal">DIP →</text>
+
+  <line x1="1092" y1="480" x2="1036" y2="480" class="arch-edge" marker-end="url(#map-arr-ink)"></line>
+  <line x1="1022" y1="480" x2="934" y2="480" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <text x="978" y="466" text-anchor="middle" class="arch-t-chip-teal">← DIP</text>
+
+  <line x1="348" y1="336" x2="398" y2="376" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+  <line x1="772" y1="336" x2="722" y2="376" class="arch-edge-teal" marker-end="url(#map-arr-teal)"></line>
+
+  <text x="560" y="918" text-anchor="middle" class="arch-t-chip-tag">Teal = Kernel · Amber = Seam · Neutral = Glue · Dark ★ = DI Hub · → Inward DIP</text>
+
+  <rect x="16" y="972" width="1088" height="122" rx="6" class="arch-band-red arch-dash"></rect>
+  <text x="34" y="996" class="arch-t-band-red">LAYER 5 · VERIFICATION &amp; BDD ORACLE GATE (Independent Audit Bar · Never Enters Production Runtime)</text>
+  <a class="arch-node" href="#section-7-1">
+    <rect x="34" y="1012" width="520" height="66" rx="5" class="arch-card-teal"></rect>
+    <text x="294" y="1035" text-anchor="middle" class="arch-t-chip-title">#53 Gherkin Features · TS/Scala Oracles · manifest.sha256.json</text>
+    <text x="294" y="1057" text-anchor="middle" class="arch-t-chip-sub">KERNEL · Locked Oracles &amp; Bidirectional Witness · Domain / App / HTTP</text>
+  </a>
+  <a class="arch-node" href="#section-7-2">
+    <rect x="566" y="1012" width="520" height="66" rx="5" class="arch-card-red"></rect>
+    <text x="826" y="1035" text-anchor="middle" class="arch-t-chip-title">#54 Mutation Gate · Onion DIP Gate · sbt/scalac Partition</text>
+    <text x="826" y="1057" text-anchor="middle" class="arch-t-chip-sub">GLUE · 100% Guard Mutation Kill + 0 DIP Violations + Boundary Audit</text>
+  </a>
+
+  <line x1="306" y1="972" x2="306" y2="928" class="arch-edge-red" marker-end="url(#map-arr-red)"></line>
+  <line x1="814" y1="972" x2="814" y2="928" class="arch-edge-red" marker-end="url(#map-arr-red)"></line>
 </svg>
-<figcaption>Figure 1: Five-layer Onion Architecture Artifact Type Map for Play CQRS (<code>scala-cqrs-play-service:2</code>). Solid arrows indicate <strong>inward compile-time dependencies</strong> (outer layers depend on inner Ports/Kernels; inner rings never import frameworks); dashed/accent edges show <strong>runtime DI assembly and reactive Event ⇒ Command loops</strong>.</figcaption>
+<figcaption>Figure 1: Concentric five-layer Onion Architecture Artifact Type Map for Play CQRS (<code>scala-cqrs-play-service:2</code>). From outside in: Layer 4 Interfaces, Layer 3 Infrastructure (including the DI re-assembly hub), Layer 2 Application, and the innermost Layer 1 Domain Core, with the offline Layer 5 Verification &amp; DIP Gate mounted below.</figcaption>
 </figure>
 
 <h3 id="section-2-1">How Decomposed Pieces Re-Assemble Into a Running Service</h3>
 <p>On first inspection, splitting a service into 60 artifact kinds raises an obvious question: <strong>who actually stitches <code>FundQuotaRules</code>, <code>FundOrderComputationsImpl</code>, <code>CashFundPurchaseImpl</code>, <code>BankOrderApplyEventSemanticsImpl</code>, and <code>PolicyOn*Runner</code> together at boot?</strong> Figure 2 shows both assembly backbones:</p>
 <figure class="co-arch-fig co-arch-map">
 <div class="arch-caption-head">FIGURE 02 · DECOMPOSITION &amp; RE-ASSEMBLY WIRING TOPOLOGY (GUICE DI + AKKA RUNTIME)</div>
-<svg viewBox="0 0 920 390" width="100%" role="img" aria-label="How decomposed Artifact Types re-assemble via the Guice DI module tree and ApplicationBootstrap into running Akka Sharding and Projection daemons">
+<svg viewBox="0 0 960 448" width="100%" role="img" aria-label="How decomposed Artifact Types re-assemble via the Guice DI module tree and ApplicationBootstrap into running Akka Sharding and Projection daemons">
   <defs>
     <marker id="wire-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" class="arch-head-ink"></path>
@@ -304,64 +286,68 @@
     </marker>
   </defs>
 
-  <rect x="14" y="14" width="430" height="360" rx="5" class="arch-band"></rect>
+  <rect x="14" y="14" width="452" height="420" rx="5" class="arch-band"></rect>
   <text x="28" y="38" class="arch-t-band">1. PLAY / GUICE DI MODULE TREE (STATIC WIRING)</text>
 
-  <rect x="34" y="56" width="390" height="68" rx="4" class="arch-card-dark"></rect>
-  <text x="229" y="82" text-anchor="middle" class="arch-t-title-dark">BootstrapModule (modules/BootstrapModule.scala)</text>
-  <text x="229" y="102" text-anchor="middle" class="arch-t-sub-dark">Binds AggRepositories → installs HandwrittenBindingsModule → eager ApplicationBootstrap</text>
+  <rect x="30" y="54" width="420" height="82" rx="4" class="arch-card-dark"></rect>
+  <text x="240" y="78" text-anchor="middle" class="arch-t-title-dark">BootstrapModule (modules/)</text>
+  <text x="240" y="99" text-anchor="middle" class="arch-t-sub-dark">Binds AggRepositories → HandwrittenBindingsModule</text>
+  <text x="240" y="117" text-anchor="middle" class="arch-t-sub-dark">→ eager singleton ApplicationBootstrap</text>
 
-  <rect x="34" y="148" width="390" height="62" rx="4" class="arch-card-amber"></rect>
-  <text x="229" y="172" text-anchor="middle" class="arch-t-title">HandwrittenBindingsModule (handwritten/ · never overwritten)</text>
-  <text x="229" y="192" text-anchor="middle" class="arch-t-sub">install(GeneratedBindingsModule) + install(&lt;Ctx&gt;ProjectionModule)</text>
+  <rect x="30" y="160" width="420" height="74" rx="4" class="arch-card-amber"></rect>
+  <text x="240" y="183" text-anchor="middle" class="arch-t-title">HandwrittenBindingsModule (handwritten/)</text>
+  <text x="240" y="203" text-anchor="middle" class="arch-t-sub">Safe zone · install(GeneratedBindingsModule)</text>
+  <text x="240" y="220" text-anchor="middle" class="arch-t-sub">+ install(&lt;Ctx&gt;ProjectionModule)</text>
 
-  <rect x="34" y="234" width="212" height="122" rx="4" class="arch-card-teal"></rect>
-  <text x="140" y="258" text-anchor="middle" class="arch-t-title">GeneratedBindingsModule</text>
-  <text x="140" y="278" text-anchor="middle" class="arch-t-sub">• L1 Computations → .Noop</text>
-  <text x="140" y="296" text-anchor="middle" class="arch-t-sub">• L2 Computations → *Impl</text>
-  <text x="140" y="314" text-anchor="middle" class="arch-t-sub">• L3 StoryHandler → *Impl</text>
-  <text x="140" y="332" text-anchor="middle" class="arch-t-sub">• PolicySemantics + DlqSink</text>
-  <text x="140" y="348" text-anchor="middle" class="arch-t-sub">• HttpRouter + ToolGates</text>
+  <rect x="30" y="260" width="204" height="152" rx="4" class="arch-card-teal"></rect>
+  <text x="132" y="284" text-anchor="middle" class="arch-t-chip-title">GeneratedBindingsModule</text>
+  <text x="132" y="306" text-anchor="middle" class="arch-t-chip-sub">• L1 Computations → .Noop</text>
+  <text x="132" y="325" text-anchor="middle" class="arch-t-chip-sub">• L2 Computations → *Impl</text>
+  <text x="132" y="344" text-anchor="middle" class="arch-t-chip-sub">• L3 StoryHandler → *Impl</text>
+  <text x="132" y="363" text-anchor="middle" class="arch-t-chip-sub">• PolicySemantics + DlqSink</text>
+  <text x="132" y="382" text-anchor="middle" class="arch-t-chip-sub">• HttpRouter + ToolGates</text>
 
-  <rect x="262" y="234" width="162" height="122" rx="4" class="arch-card"></rect>
-  <text x="343" y="258" text-anchor="middle" class="arch-t-title">&lt;Ctx&gt;ProjectionModule</text>
-  <text x="343" y="280" text-anchor="middle" class="arch-t-sub">#26 ApplyEventSemantics</text>
-  <text x="343" y="298" text-anchor="middle" class="arch-t-sub">→ ApplyEventSemanticsImpl</text>
-  <text x="343" y="322" text-anchor="middle" class="arch-t-mono">handwritten/ ReadModel</text>
-  <text x="343" y="340" text-anchor="middle" class="arch-t-mono">custom row fold hooks</text>
+  <rect x="246" y="260" width="204" height="152" rx="4" class="arch-card"></rect>
+  <text x="348" y="284" text-anchor="middle" class="arch-t-chip-title">&lt;Ctx&gt;ProjectionModule</text>
+  <text x="348" y="308" text-anchor="middle" class="arch-t-chip-sub">#26 ApplyEventSemantics</text>
+  <text x="348" y="328" text-anchor="middle" class="arch-t-chip-sub">→ ApplyEventSemanticsImpl</text>
+  <text x="348" y="354" text-anchor="middle" class="arch-t-mono">handwritten/ ReadModel</text>
+  <text x="348" y="373" text-anchor="middle" class="arch-t-mono">custom row fold hooks</text>
 
-  <line x1="229" y1="124" x2="229" y2="145" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
-  <line x1="140" y1="210" x2="140" y2="231" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
-  <line x1="343" y1="210" x2="343" y2="231" class="arch-edge-amber" marker-end="url(#wire-arr-amber)"></line>
+  <line x1="240" y1="136" x2="240" y2="157" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="132" y1="234" x2="132" y2="257" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="348" y1="234" x2="348" y2="257" class="arch-edge-amber" marker-end="url(#wire-arr-amber)"></line>
 
-  <rect x="468" y="14" width="438" height="360" rx="5" class="arch-band-teal"></rect>
-  <text x="482" y="38" class="arch-t-band-teal">2. AKKA RUNTIME BOOTSTRAP &amp; REACTIVE LOOP (DYNAMIC)</text>
+  <rect x="494" y="14" width="452" height="420" rx="5" class="arch-band-teal"></rect>
+  <text x="508" y="38" class="arch-t-band-teal">2. AKKA RUNTIME BOOTSTRAP &amp; REACTIVE LOOP (DYNAMIC)</text>
 
-  <rect x="488" y="56" width="398" height="68" rx="4" class="arch-card-dark"></rect>
-  <text x="687" y="82" text-anchor="middle" class="arch-t-title-dark">ApplicationBootstrap (mixes in all *Bootstrap traits)</text>
-  <text x="687" y="102" text-anchor="middle" class="arch-t-sub-dark">init&lt;Agg&gt;Aggregate + init&lt;View&gt;ReadsideProjection + initPolicyOn&lt;Cmd&gt;Projection</text>
+  <rect x="510" y="54" width="420" height="82" rx="4" class="arch-card-dark"></rect>
+  <text x="720" y="78" text-anchor="middle" class="arch-t-title-dark">ApplicationBootstrap (*Bootstrap Traits)</text>
+  <text x="720" y="99" text-anchor="middle" class="arch-t-sub-dark">init&lt;Agg&gt;Aggregate + init&lt;View&gt;ReadsideProjection</text>
+  <text x="720" y="117" text-anchor="middle" class="arch-t-sub-dark">+ initPolicyOn&lt;Cmd&gt;Projection</text>
 
-  <rect x="488" y="150" width="188" height="94" rx="4" class="arch-card-teal"></rect>
-  <text x="582" y="174" text-anchor="middle" class="arch-t-title">ClusterSharding Write Ring</text>
-  <text x="582" y="194" text-anchor="middle" class="arch-t-sub">EventSourcedBehavior</text>
-  <text x="582" y="212" text-anchor="middle" class="arch-t-sub">Behaviors → Rules + EventHandler</text>
-  <text x="582" y="230" text-anchor="middle" class="arch-t-sub">EventAdapter → Protobuf Journal</text>
+  <rect x="510" y="160" width="202" height="106" rx="4" class="arch-card-teal"></rect>
+  <text x="611" y="184" text-anchor="middle" class="arch-t-title">ClusterSharding Write</text>
+  <text x="611" y="206" text-anchor="middle" class="arch-t-sub">EventSourcedBehavior</text>
+  <text x="611" y="225" text-anchor="middle" class="arch-t-sub">Behaviors → Rules + Fold</text>
+  <text x="611" y="244" text-anchor="middle" class="arch-t-sub">EventAdapter → Protobuf</text>
 
-  <rect x="698" y="150" width="188" height="94" rx="4" class="arch-card-amber"></rect>
-  <text x="792" y="174" text-anchor="middle" class="arch-t-title">ShardedDaemonProcess</text>
-  <text x="792" y="194" text-anchor="middle" class="arch-t-sub">eventsByTag(ReadJournal)</text>
-  <text x="792" y="212" text-anchor="middle" class="arch-t-sub">① ReadSide → ViewTable</text>
-  <text x="792" y="230" text-anchor="middle" class="arch-t-sub">② PolicyMachine → EntityKey.ask</text>
+  <rect x="728" y="160" width="202" height="106" rx="4" class="arch-card-amber"></rect>
+  <text x="829" y="184" text-anchor="middle" class="arch-t-title">ShardedDaemonProcess</text>
+  <text x="829" y="206" text-anchor="middle" class="arch-t-sub">eventsByTag(ReadJournal)</text>
+  <text x="829" y="225" text-anchor="middle" class="arch-t-sub">① ReadSide → ViewTable</text>
+  <text x="829" y="244" text-anchor="middle" class="arch-t-sub">② PolicyMachine → ask</text>
 
-  <rect x="488" y="268" width="398" height="88" rx="4" class="arch-card"></rect>
-  <text x="687" y="292" text-anchor="middle" class="arch-t-title">PlayHttpBridge / ServiceLoader → StoryController → StoryImpl</text>
-  <text x="687" y="314" text-anchor="middle" class="arch-t-sub">5-Layer Authz (PEP/PDP + RowScope) → ExternPorts/EffectsPort → AggregateProtocol</text>
-  <text x="687" y="334" text-anchor="middle" class="arch-t-mono">SagaCoordinatorBootstrap drives cross-aggregate flows &amp; #46 ExternalAuthority</text>
+  <rect x="510" y="292" width="420" height="120" rx="4" class="arch-card"></rect>
+  <text x="720" y="317" text-anchor="middle" class="arch-t-title">PlayHttpBridge → StoryController → StoryImpl</text>
+  <text x="720" y="340" text-anchor="middle" class="arch-t-sub">5-Layer Authz (PEP/PDP + RowScope) → ExternPorts</text>
+  <text x="720" y="359" text-anchor="middle" class="arch-t-sub">→ EffectsPort → AggregateProtocol</text>
+  <text x="720" y="384" text-anchor="middle" class="arch-t-mono">SagaCoordinatorBootstrap + #46 ExternalAuthority</text>
 
-  <line x1="582" y1="124" x2="582" y2="147" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
-  <line x1="792" y1="124" x2="792" y2="147" class="arch-edge-amber" marker-end="url(#wire-arr-amber)"></line>
-  <line x1="676" y1="196" x2="695" y2="196" class="arch-edge" marker-end="url(#wire-arr-ink)"></line>
-  <line x1="424" y1="90" x2="485" y2="90" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="611" y1="136" x2="611" y2="157" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
+  <line x1="829" y1="136" x2="829" y2="157" class="arch-edge-amber" marker-end="url(#wire-arr-amber)"></line>
+  <line x1="712" y1="213" x2="725" y2="213" class="arch-edge" marker-end="url(#wire-arr-ink)"></line>
+  <line x1="450" y1="95" x2="507" y2="95" class="arch-edge-teal" marker-end="url(#wire-arr-teal)"></line>
 </svg>
 <figcaption>Figure 2: Static assembly walks <code>BootstrapModule → HandwrittenBindingsModule → GeneratedBindingsModule + ProjectionModule</code>, while runtime startup executes inside <code>ApplicationBootstrap</code> mixing in aggregate, readside, and reactive policy bootstraps.</figcaption>
 </figure>
@@ -505,7 +491,7 @@ override def process(envelope: EventEnvelope[Any]): Future[Done] =
 <li><strong><code>#58 policy-runner</code> (<code>PolicyOn&lt;Cmd&gt;Runner.scala</code>)</strong>: Owns <code>EventSourcedProvider.eventsByTag</code> and <code>ProjectionId</code>;</li>
 <li><strong><code>#60 projection-runtime-mechanism</code> (<code>PolicyMachine.scala</code> / <code>FailureVerdict.scala</code> / <code>PolicyEnvelope.scala</code> / <code>PolicyDlqBury.scala</code>)</strong>: Shared 4-stage execution pipeline inspecting <strong>every <code>Left(err)</code> inside <code>Future.traverse(commands)(execute)</code></strong> — burying <code>Permanent</code> verdicts via <code>PolicyDlqSink.bury</code> (advancing offsets) while failing the <code>Future</code> on <code>Retryable</code> verdicts (blocking offset commits for at-least-once replay); daemon registration traits belong to <strong><code>#59 policy-bootstrap</code></strong> (Section 5.4).</li>
 </ul>
-<pre class="code"><code class="language-scala">// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 0b925ad)
+<pre class="code"><code class="language-scala">// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ b2b61e5)
 Future
   .traverse(commands)(execute)
   .flatMap { results =&gt;

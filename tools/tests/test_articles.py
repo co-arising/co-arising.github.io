@@ -51,10 +51,10 @@ HASHES = {
     "co-arising-v2-ga-prd-to-running-guide-20261126.en.md": "aafd9b469cd2448f99d889f9e07824f2b425b16ccaa5584833cfe91527c084cf",
     "co-arising-v2-deterministic-playbook-20261126.md": "452566e71f8e6f4f7e1a11711edaca678a21daed72c350ea7fd3b4909e1345ec",
     "co-arising-v2-deterministic-playbook-20261126.en.md": "60c76b697569c51603a399e70967368702556294e7febe156fa23aaa900c0a11",
-    "play-cqrs-artifact-type-map-20261127.md": "c4439b520453c237077ee12bb207f0252a2bea8100f20b380ee92cbb08e699a5",
-    "play-cqrs-artifact-type-map-20261127.en.md": "6b0cdc728f3f3040dd7c1029092bd18ed270e955beb4c30a5852cf6444bc49e0",
-    "metarch-truthsrc-architecture-minefield-map-20261127.md": "66c390820fb4368aec1449e0a8ff6a872721ed6bf9586c6fdef6225ef567ee7c",
-    "metarch-truthsrc-architecture-minefield-map-20261127.en.md": "bb2c303586736a69fbd4090db078a5270e393409ee69f1c078a2194992f2fb65",
+    "play-cqrs-artifact-type-map-20261127.md": "30a5dad8d7ac43f814a085f3608ef975f6ef7020721a648f73bf5b2e67b7c638",
+    "play-cqrs-artifact-type-map-20261127.en.md": "d5d424b3bf150bbfac9613ce9b3c47797f0fa16ec552f0fd19cb71c49c15b6f6",
+    "metarch-truthsrc-architecture-minefield-map-20261127.md": "e9ed2922b32ab940607d38a52f13d94ae2c29c2401a231c4dfe5401b03006b08",
+    "metarch-truthsrc-architecture-minefield-map-20261127.en.md": "8396c6565e7bfe2cf259da957518b28740b852f5171ad62b8adc4641fd33558c",
 }
 
 

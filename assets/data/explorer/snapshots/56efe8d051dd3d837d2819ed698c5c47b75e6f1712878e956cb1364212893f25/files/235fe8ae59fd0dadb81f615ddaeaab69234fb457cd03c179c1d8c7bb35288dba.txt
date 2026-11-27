@@ -3,6 +3,7 @@
 // @knowledge source:bank-wealth/bankwealth#/externContracts/BankCashSubmitPort
 package example.bankwealth.v2.application.toolgates
 
+import example.bankwealth.v2.domain.values._
 import scala.concurrent.Future
 
 /** Business-only external connector port for BankCashSubmitPort (family #13). */
@@ -11,5 +12,5 @@ trait BankCashSubmitPortConnectorPort {
   def originAndCsrfValid(): Future[Boolean]
   def fundCodeActive(fundCode: String): Future[Boolean]
   def requestExists(principal: String, clientRequestId: String): Future[Boolean]
-  def payloadMatchesOriginal(principal: String, clientRequestId: String, fundCode: String, amount: String): Future[Boolean]
+  def payloadMatchesOriginal(principal: String, clientRequestId: String, fundCode: String, amount: Money): Future[Boolean]
 }
