@@ -119,6 +119,18 @@
       "title_en": "co-arising 2.0 GA Complete Guide: Core Features, End-to-End PRD-to-Running Flow, and Quick Start (CLI + MCP + Skills)",
       "deck_en": "A complete guide to co-arising 2.0.0 GA: six core capabilities, the 7-step flow from a raw PRD to running TypeScript & Scala code via coarising-distill, Z3 strict proofs, tasks-v2 derived queues, locked-oracle @cloze TDD (MCP + Hooks + AGY Workflow), and a 5-minute Quick Start.",
       "source_en": "co-arising-v2-ga-prd-to-running-guide-20261126.en.md"
+    },
+    {
+      "slug": "co-arising-v2-deterministic-playbook-20261126",
+      "title": "别再靠抽卡写业务代码了：co-arising 2.0 确定性优势、实验期实操玩法与 11 张全景图谱开箱",
+      "deck": "把 AI 的概率不确定性关进数学与编译器的确定性笼子里：详解 co-arising 2.0 十阶段确定性分层与最新 7 项硬核更新（全链路血缘、PII 合规、IDOR/行级权限、CQRS 读侧物化、Domain 变异测试与 11 张离线全景图谱 atlas.html），附实验期真实避坑与从克隆到给 PRD 的 10 分钟体验剧本。",
+      "category": "工程实践",
+      "date": "2026-11-26",
+      "source": "co-arising-v2-deterministic-playbook-20261126.md",
+      "related": "co-arising-v2-ga-prd-to-running-guide-20261126",
+      "title_en": "Stop Gambling on AI-Generated Business Logic: co-arising 2.0 Deterministic Guarantees, Experimental Hands-On Playbook, and the 11-Diagram Offline Atlas",
+      "deck_en": "Caging AI's probabilistic drift inside formal proofs and compiler gates: co-arising 2.0's 10-stage determinism map, 7 latest upgrades (end-to-end field lineage, PII compliance, resource-level IDOR & rowScope, CQRS readside, Domain mutation gate, and the 11-diagram offline atlas.html), honest experimental caveats, and a 10-minute clone-to-PRD hands-on playbook.",
+      "source_en": "co-arising-v2-deterministic-playbook-20261126.en.md"
     }
   ]
 }

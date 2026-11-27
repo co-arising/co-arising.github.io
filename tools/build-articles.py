@@ -44,6 +44,7 @@ GUIDE_SLUG = "bank-wealth-quickstart-architecture-extensibility-20261125"
 CODEGEN_EXT_SLUG = "metarch-truthsrc-extending-code-generator-20261126"
 V2_ARCH_SLUG = "co-arising-v2-ears-native-architecture-20261126"
 V2_GA_GUIDE_SLUG = "co-arising-v2-ga-prd-to-running-guide-20261126"
+V2_PLAYBOOK_SLUG = "co-arising-v2-deterministic-playbook-20261126"
 # Initial publication fixture; future valid manifest slugs stay in /zh/articles/.
 OWNED_OUTPUTS = (
     "articles/index.html",
@@ -68,6 +69,8 @@ OWNED_OUTPUTS = (
     f"articles/{V2_ARCH_SLUG}/index.html",
     f"zh/articles/{V2_GA_GUIDE_SLUG}/index.html",
     f"articles/{V2_GA_GUIDE_SLUG}/index.html",
+    f"zh/articles/{V2_PLAYBOOK_SLUG}/index.html",
+    f"articles/{V2_PLAYBOOK_SLUG}/index.html",
 )
 EDITORIAL = "本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。"
 STRATEGY_NOTE = "本文是战略思考与工程路线建议，不是 co-arising 已交付能力清单；文中比例、竞争定位及拟议工具接口不构成实测或可用性承诺。"
@@ -81,6 +84,8 @@ V2_ARCH_NOTE = "本文是 co-arising 2.0 的架构设计蓝图（ADR），文末
 V2_ARCH_NOTE_EN = "This article is the co-arising 2.0 architecture design blueprint (ADR), updated with a v2.0.0 GA implementation appendix; for the shipped toolchain walkthrough, bank pilot, and hands-on commands, also read the co-arising 2.0 GA Complete Guide and check the status page (F-32–F-34)."
 V2_GA_GUIDE_NOTE = "本文对照 @madpolaris/truthsrc v2.0.0 与 bank-wealth-demo v2-pilot 源码及实测结果编写；v2 试点验证（F-32–F-34）与 2026-11-12 的 v1 独立全服务验收（F-24–F-28）口径分开，详见状态页。"
 V2_GA_GUIDE_NOTE_EN = "This guide reflects the shipped @madpolaris/truthsrc v2.0.0 and bank-wealth-demo v2-pilot source and verification runs; v2 pilot evidence (F-32–F-34) is tracked separately from the 2026-11-12 v1 full-service acceptance run (F-24–F-28) on the status page."
+V2_PLAYBOOK_NOTE = "本文面向社区与开发者介绍 co-arising 2.0 的确定性分层、最新 7 项更新与实验期（尤其是 Skill 交互层）的动手玩法；文中所列能力与正式验收边界仍以状态页（F-32–F-35）及仓库源码为准。"
+V2_PLAYBOOK_NOTE_EN = "This hands-on playbook introduces co-arising 2.0's determinism boundaries, 7 latest upgrades, and experimental walkthrough (especially the Skill layer); formal capability and verification scopes remain tracked on the status page (F-32–F-35) and in repository source."
 NAV = (
     ("/", "Home", "首页"),
     ("/why-co-arising/", "Why co-arising", "为何 co-arising"),
@@ -511,6 +516,8 @@ def detail_page(item, related, source, locale="zh"):
         note += f"<p>{V2_ARCH_NOTE if zh else V2_ARCH_NOTE_EN}</p>"
     if item["slug"] == V2_GA_GUIDE_SLUG:
         note += f"<p>{V2_GA_GUIDE_NOTE if zh else V2_GA_GUIDE_NOTE_EN}</p>"
+    if item["slug"] == V2_PLAYBOOK_SLUG:
+        note += f"<p>{V2_PLAYBOOK_NOTE if zh else V2_PLAYBOOK_NOTE_EN}</p>"
     category = item["category"] if zh else CATEGORY_EN[item["category"]]
     counterpart_route = detail_route(item["slug"], "en" if zh else "zh")
     switch_label = "Read in English" if zh else "中文原文"

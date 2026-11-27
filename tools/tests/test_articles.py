@@ -49,6 +49,8 @@ HASHES = {
     "co-arising-v2-ears-native-architecture-20261126.en.md": "0a892cb127974bd1586be972b059d2693ca7268ecb075cba2a5c81f5cc897099",
     "co-arising-v2-ga-prd-to-running-guide-20261126.md": "f0b72ea865999ecaf9daa0a95276634de41bbad65711638cb1abeb278cfb3d85",
     "co-arising-v2-ga-prd-to-running-guide-20261126.en.md": "aafd9b469cd2448f99d889f9e07824f2b425b16ccaa5584833cfe91527c084cf",
+    "co-arising-v2-deterministic-playbook-20261126.md": "452566e71f8e6f4f7e1a11711edaca678a21daed72c350ea7fd3b4909e1345ec",
+    "co-arising-v2-deterministic-playbook-20261126.en.md": "60c76b697569c51603a399e70967368702556294e7febe156fa23aaa900c0a11",
 }
 
 
