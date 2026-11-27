@@ -1,0 +1,23 @@
+slice CreditBalance.ReserveFunds
+
+where:
+  positiveAmount  = amount > 0.00                         as "预留资金金额为正"
+  sufficientFunds = ledger.availableAmount >= amount      as "可用余额足以覆盖预留金额"
+  txNotReserved   = not (txId in ledger.reservedByTx)     as "该交易号尚未预留过资金"
+
+axioms:
+  [AX-BAL-1] ALWAYS ledger.availableAmount >= 0.00
+  [AX-BAL-2] ALWAYS ledger.reservedTotal >= 0.00
+
+rules:
+  [BAL_NON_POSITIVE_AMOUNT] IF not positiveAmount  THEN SHALL reject request with BAL_NON_POSITIVE_AMOUNT
+  [BAL_TX_ALREADY_RESERVED] IF not txNotReserved   THEN SHALL reject request with BAL_TX_ALREADY_RESERVED
+  [BAL_INSUFFICIENT_FUNDS]  IF not sufficientFunds THEN SHALL reject request with BAL_INSUFFICIENT_FUNDS
+
+  [BAL_FUNDS_RESERVED]      WHILE positiveAmount and txNotReserved and sufficientFunds
+                            WHEN ReserveFunds
+                            SHALL emit FundsReserved
+                            post:
+                              ledger.availableAmount'      = ledger.availableAmount - amount
+                              ledger.reservedTotal'        = ledger.reservedTotal + amount
+                              ledger.reservedByTx'[txId]   = amount

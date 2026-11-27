@@ -1,0 +1,57 @@
+story CashFundPurchase layer application
+
+where:
+  validSubmit = amount.currency == "CNY" and amount.amount > 0.00           as "提交金额为正数人民币"
+  extern sessionAuthenticated(principal)                                    as "客户会话已认证"
+  extern originAndCsrfValid                                                 as "来源与 CSRF 校验通过"
+  extern fundCodeActive(fundCode)                                           as "基金代码处于可申购状态"
+  extern requestExists(principal, clientRequestId)                          as "该客户请求号已存在原记录"
+  extern payloadMatchesOriginal(principal, clientRequestId, fundCode, amount) as "重入请求参数与原请求一致"
+
+axioms:
+  [AX-APP-1] ALWAYS BankCashSubmit SHALL NOT supply operationId, investorAccountId, fundCollectionAccountId
+
+rules:
+  [US-CFP-01] IF not sessionAuthenticated(principal) or not originAndCsrfValid
+              WHEN BankCashSubmitPort.submit
+              THEN SHALL reject request with UNAUTHORIZED_OR_CSRF
+
+  [US-CFP-02] IF not fundCodeActive(fundCode) or not validSubmit
+              WHEN BankCashSubmitPort.submit
+              THEN SHALL reject request with INVALID_CASH_SUBMIT
+
+  [US-CFP-03] WHILE not requestExists(principal, clientRequestId)
+              WHEN BankCashSubmitPort.submit
+                AND sessionAuthenticated(principal) AND originAndCsrfValid
+                AND fundCodeActive(fundCode) AND validSubmit
+              SHALL pin BankCashOriginal from (principal, clientRequestId)
+                AND dispatch FundOrder.RecordCashRequestSource
+                AND dispatch FundOrder.RequestFundPurchaseSettlement
+                AND respond BankCashAcknowledgement with ack.replayed == false and ack.accepted == true
+
+  [US-CFP-04] WHILE requestExists(principal, clientRequestId)
+              WHEN BankCashSubmitPort.submit
+                AND sessionAuthenticated(principal) AND originAndCsrfValid
+                AND fundCodeActive(fundCode) AND validSubmit
+                AND payloadMatchesOriginal(principal, clientRequestId, fundCode, amount)
+              SHALL respond BankCashAcknowledgement with ack.replayed == true
+                AND SHALL NOT dispatch FundOrder.RequestFundPurchaseSettlement
+
+  [US-CFP-05] IF not payloadMatchesOriginal(principal, clientRequestId, fundCode, amount)
+              WHILE requestExists(principal, clientRequestId)
+              WHEN BankCashSubmitPort.submit
+                AND sessionAuthenticated(principal) AND originAndCsrfValid
+                AND fundCodeActive(fundCode) AND validSubmit
+              THEN SHALL reject request with CASH_SOURCE_CONFLICT
+
+  [US-CFP-06] WHILE order.paymentOutcome == "succeeded" and order.taStatus != "confirmed"
+              WHEN BankOrderQuery.get
+              SHALL expose bank-order-view as view.paymentCompleted == true and view.taFinalized == false
+
+  [US-CFP-07] WHILE order.paymentOutcome == "succeeded" and order.taStatus == "confirmed"
+              WHEN BankOrderQuery.get
+              SHALL expose bank-order-view as view.paymentCompleted == true and view.taFinalized == true
+
+  [US-CFP-08] WHILE order.paymentOutcome != "succeeded"
+              WHEN BankOrderQuery.get
+              SHALL expose bank-order-view as view.paymentCompleted == false and view.taFinalized == false

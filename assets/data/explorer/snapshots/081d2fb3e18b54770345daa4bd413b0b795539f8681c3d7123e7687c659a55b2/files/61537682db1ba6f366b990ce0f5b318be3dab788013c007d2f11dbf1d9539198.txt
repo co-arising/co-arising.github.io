@@ -1,0 +1,22 @@
+slice FundQuota.ReserveSubscriptionQuota
+
+where:
+  validAmount   = amount in [quota.minPurchase..quota.maxSingleLimit]          as "单笔申购金额在合法区间内"
+  withinFundCap = quota.fundTotalUsed + amount <= quota.fundTotalCap           as "在基金申购总门限内"
+  withinAcctCap = quota.accountUsed[accountId] + amount <= quota.perAccountCap as "在单账户申购总门限内"
+
+axioms:
+  [AX-Q-1] ALWAYS quota.fundTotalUsed <= quota.fundTotalCap
+  [AX-Q-2] ALWAYS quota.accountUsed[accountId] <= quota.perAccountCap
+
+rules:
+  [QUOTA_AMOUNT_RANGE] IF not validAmount   THEN SHALL reject request with QUOTA_AMOUNT_RANGE
+  [QUOTA_FUND_CAP]     IF not withinFundCap THEN SHALL reject request with QUOTA_FUND_CAP
+  [QUOTA_ACCOUNT_CAP]  IF not withinAcctCap THEN SHALL reject request with QUOTA_ACCOUNT_CAP
+
+  [QUOTA_RESERVED]     WHILE validAmount and withinFundCap and withinAcctCap
+                       WHEN ReserveSubscriptionQuota
+                       SHALL emit SubscriptionQuotaReserved
+                       post:
+                         quota.fundTotalUsed'          = quota.fundTotalUsed + amount
+                         quota.accountUsed'[accountId] = quota.accountUsed[accountId] + amount
