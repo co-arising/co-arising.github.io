@@ -1,12 +1,12 @@
 {
   "schemaVersion": "co-arising.site-facts-lock/v1",
   "cohort": {
-    "truthsrcCommit": "9a750c20fc033dd3df677b6026019e14b8f7d064",
-    "truthsrcShort": "9a750c2",
-    "bankCommit": "6f33987bf8b95cf01f0b7d8012d69bd3aee93c88",
-    "bankShort": "6f33987",
-    "explorerSnapshot": "eae9648c150bcef208b8c848554621ddad36d97cfca85dcee541e4f69a157071",
-    "explorerSnapshotShort": "eae9648c",
+    "truthsrcCommit": "0b925ad387d2603f1d3e248a31a71831c13c112f",
+    "truthsrcShort": "0b925ad",
+    "bankCommit": "80a9acbd020870a4ffa5ceb9d4e7b299649348b9",
+    "bankShort": "80a9acb",
+    "explorerSnapshot": "3c4f536914b414c13df6946d97eaee762013a9eb3dedb454a42213a844744fc7",
+    "explorerSnapshotShort": "3c4f5369",
     "capturedDate": "2026-11-27"
   },
   "capabilities": {
@@ -127,14 +127,14 @@
     "graphKinds": 18,
     "graphEdges": 87,
     "clozeSlots": 3,
-    "evidenceSha256": "aa9914e65ef485ad4a17a257c33bf27b60de42628c5d0601cba72b257bddb382"
+    "evidenceSha256": "c76441bcdeb3997228738a689056089520aae6026ccdc532d4b56d139f5d549b"
   },
   "explorer": {
-    "activeSnapshot": "eae9648c150bcef208b8c848554621ddad36d97cfca85dcee541e4f69a157071",
+    "activeSnapshot": "3c4f536914b414c13df6946d97eaee762013a9eb3dedb454a42213a844744fc7",
     "publishedFiles": 194,
     "withheldFiles": 1,
     "totalFiles": 195,
-    "workshopBytes": 1130012
+    "workshopBytes": 1130225
   },
-  "generatedAt": "2026-11-27T11:37:19.628Z"
+  "generatedAt": "2026-11-27T12:55:44.198Z"
 }

@@ -17,7 +17,13 @@ object ApiError {
   implicit val writes: OWrites[ApiError] = Json.writes[ApiError]
 }
 
-final case class AuthContext(userId: String, roles: Seq[String], tenantId: Option[String])
+final case class AuthContext(
+  userId: String,
+  roles: Seq[String],
+  tenantId: Option[String],
+  entitlements: Set[String] = Set.empty,
+  attributes: Map[String, String] = Map.empty
+)
 
 object RoleGate {
   def check(allowedRoles: Seq[String], ctx: AuthContext): Boolean =
@@ -34,8 +40,13 @@ final class Endpoint @Inject()(cc: ControllerComponents)(implicit ec: ExecutionC
     } else {
       val roles = req.headers.get("X-Roles").toSeq.flatMap(_.split(",")).map(_.trim).filter(_.nonEmpty)
       val tenantOpt = req.headers.get("X-Tenant-Id").map(_.trim).filter(_.nonEmpty)
+      val entitlements = req.headers.get("X-Entitlements").toSeq.flatMap(_.split(",")).map(_.trim).filter(_.nonEmpty).toSet
+      val attributes = req.headers.toSimpleMap.collect {
+        case (k, v) if k.toLowerCase.startsWith("x-principal-attr-") && v.trim.nonEmpty =>
+          k.substring("x-principal-attr-".length) -> v.trim
+      }
       if (requireTenant && tenantOpt.isEmpty) Left(ApiError.forbidden("missing X-Tenant-Id for tenant-scoped endpoint"))
-      else Right(AuthContext(userOpt.getOrElse("anonymous"), roles, tenantOpt))
+      else Right(AuthContext(userOpt.getOrElse("anonymous"), roles, tenantOpt, entitlements, attributes))
     }
   }
 

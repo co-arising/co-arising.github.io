@@ -6,6 +6,7 @@ package controllers
 import javax.inject.{Inject, Singleton}
 import example.bankwealth.v2.application.services.{CashFundPurchaseEffectsPort, CashFundPurchaseExternPorts, CashFundPurchaseHandler, CashFundPurchaseRequest}
 import example.bankwealth.v2.infrastructure.api.{ApiError, AuthContext, Endpoint, OkReceipt, RoleGate, ServerSnapshotProvider}
+import example.bankwealth.v2.interfaces.api.HttpStatusMapper
 import play.api.libs.json.{JsArray, JsBoolean, JsNull, JsNumber, JsObject, JsString, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,7 +27,7 @@ final class CashFundPurchasePlayController @Inject()(
     case b: JsBoolean   => b.value
     case obj: JsObject  => jsObjToMap(obj)
     case arr: JsArray   => arr.value.map(jsValueToAny).toVector
-    case JsNull         => ""
+    case JsNull         => null
   }
 
   private def jsObjToMap(js: JsObject): Map[String, Any] =
@@ -48,7 +49,9 @@ final class CashFundPurchasePlayController @Inject()(
     if (key == "id" || key == "principal.id") Some(ctx.userId)
     else if (key == "tenantId" || key == "principal.tenantId") ctx.tenantId
     else if (key == "roles" || key == "principal.roles") Some(ctx.roles)
-    else Some(ctx.userId)
+    else if (key.startsWith("principal.attributes.")) ctx.attributes.get(key.drop(21))
+    else if (key.startsWith("attributes.")) ctx.attributes.get(key.drop(11))
+    else ctx.attributes.get(key).orElse(Some(ctx.userId))
 
   // @knowledge source:bank-wealth/bankwealth#/ports/BankCashSubmitPort/submit
   /** POST /api/v1/bankwealth/bank-cash-submit-port/submit — authz: static-roles (roles=[investor], scope=tenant) */
@@ -59,7 +62,7 @@ final class CashFundPurchasePlayController @Inject()(
     snapshots.load("BankCashSubmitPort.submit", rawPayload, principal).map { snap =>
       val appReq = CashFundPurchaseRequest(operation = "BankCashSubmitPort.submit", payload = rawPayload, stateSnapshot = snap, principal = principal)
       handler.handle(appReq, externs, effects) match {
-        case Left(err)  => Left(ApiError.badRequest(s"${err.code}: ${err.message}"))
+        case Left(err)  => Left(ApiError(HttpStatusMapper.statusForRejection(err.code), err.code, err.message))
         case Right(res) =>
           val receipt = OkReceipt(id = res.ruleId, ruleId = res.ruleId)
           Right(Json.obj("ok" -> true, "receipt" -> Json.toJson(receipt), "response" -> toJsValue(res.response), "view" -> toJsValue(res.view)))
@@ -76,7 +79,7 @@ final class CashFundPurchasePlayController @Inject()(
     snapshots.load("BankOrderQuery.get", rawPayload, principal).map { snap =>
       val appReq = CashFundPurchaseRequest(operation = "BankOrderQuery.get", payload = rawPayload, stateSnapshot = snap, principal = principal)
       handler.handle(appReq, externs, effects) match {
-        case Left(err)  => Left(ApiError.badRequest(s"${err.code}: ${err.message}"))
+        case Left(err)  => Left(ApiError(HttpStatusMapper.statusForRejection(err.code), err.code, err.message))
         case Right(res) =>
           val receipt = OkReceipt(id = res.ruleId, ruleId = res.ruleId)
           Right(Json.obj("ok" -> true, "receipt" -> Json.toJson(receipt), "response" -> toJsValue(res.response), "view" -> toJsValue(res.view)))

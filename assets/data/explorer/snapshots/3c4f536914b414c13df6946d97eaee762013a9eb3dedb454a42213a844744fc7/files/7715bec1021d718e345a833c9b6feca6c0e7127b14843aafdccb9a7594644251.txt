@@ -10,14 +10,15 @@ import example.bankwealth.v2.interfaces.http.HttpRouter
 
 @Singleton
 final class PlayHttpBridge @Inject()(cc: ControllerComponents, router: HttpRouter) extends AbstractController(cc) {
-  private def toAnyMap(js: JsObject): Map[String, Any] = js.value.map {
-    case (k, JsString(v)) => k -> v
-    case (k, JsNumber(v)) => k -> v
-    case (k, b: JsBoolean) => k -> b.value
-    case (k, obj: JsObject) => k -> toAnyMap(obj)
-    case (k, arr: JsArray) => k -> arr.value.map(_.toString).toSeq
-    case (k, JsNull) => k -> ""
-  }.toMap
+  private def jsValueToAny(v: JsValue): Any = v match {
+    case JsString(s)    => s
+    case JsNumber(n)    => n
+    case b: JsBoolean   => b.value
+    case obj: JsObject  => toAnyMap(obj)
+    case arr: JsArray   => arr.value.map(jsValueToAny).toVector
+    case JsNull         => null
+  }
+  private def toAnyMap(js: JsObject): Map[String, Any] = js.value.map { case (k, v) => k -> jsValueToAny(v) }.toMap
   private def toJsValue(v: Any): JsValue = v match {
     case null => JsNull
     case s: String => JsString(s)
