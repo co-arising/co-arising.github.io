@@ -1,0 +1,46 @@
+schemaVersion: co-arising.effect-binding/v2
+system: bank-wealth
+context: bankwealth
+architectureStyle: cqrs-es-three-phase-effect
+
+forbiddenImports:
+  - id: ARCH_DOMAIN_NO_INFRA_SCALA
+    scopePrefix: handwritten/scala/example/bankwealth/domain/
+    forbidPattern: "^import\\s+example\\.bankwealth\\.infrastructure\\."
+    reason: domain layer must never depend on infrastructure layer
+  - id: ARCH_GENERATED_DOMAIN_NO_HANDWRITTEN_TS
+    scopePrefix: v2-pilot/generated-scaffold/ts/
+    forbidPattern: "from\\s+[\"']\\.\\./\\.\\./handwritten/"
+    reason: locked generated scaffolds must depend only on generated port interfaces, never concrete handwritten files
+  - id: ARCH_GENERATED_DOMAIN_NO_INFRA_SCALA
+    scopePrefix: v2-pilot/generated-scaffold/scala/
+    forbidPattern: "^import\\s+example\\.bankwealth\\.(?:infrastructure|interfaces|application)\\."
+    reason: v2 generated Scala domain layer must remain 100% pure with zero outer-layer imports
+
+effects:
+  - name: BankCashAdmissionEffect
+    protocol: idempotent-pin-dispatch
+    idempotencyKey: "(principal, clientRequestId)"
+    timeoutMs: 3000
+    maxRetries: 3
+    compensationRequiresAbsenceProof: false
+    crashRecoveryZeroNewAuth: true
+    earsContractRef: CashFundPurchase
+
+  - name: BankTaSubmissionEffect
+    protocol: three-phase-reconcile
+    idempotencyKey: "(orderId, taSubmissionId)"
+    timeoutMs: 5000
+    maxRetries: 3
+    compensationRequiresAbsenceProof: true
+    crashRecoveryZeroNewAuth: true
+    earsContractRef: TaBridgeSettlement
+
+  - name: BankOrderViewProjection
+    protocol: read-projection
+    idempotencyKey: "(orderId, sequenceNr)"
+    timeoutMs: 2000
+    maxRetries: 5
+    compensationRequiresAbsenceProof: false
+    crashRecoveryZeroNewAuth: true
+    earsContractRef: CashFundPurchase

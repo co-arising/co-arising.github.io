@@ -413,7 +413,7 @@
   el("xp-tour").addEventListener("click", () => {
     if (!snapshot) return;
     // Select the explicit bridge; the tour does not construct a code filename.
-    const node = snapshot.maps.nodes.get("command:ReserveFunds");
+    const node = snapshot.maps.nodes.get("command:ReserveFunds") || snapshot.maps.nodes.get("cmd:CreditBalance.ReserveFunds");
     if (node?.identities.length) navigate({ view: "graph", node: node.id, knowledge: null, file: null, line: null, end: null });
   });
   for (const event of ["popstate", "hashchange", "site:locationchange"]) window.addEventListener(event, () => { renderRoute(); });
@@ -445,7 +445,7 @@
       const guide = el("xp-anchor-guide");
       if (guide) guide.innerHTML = zh ? "节点详情中的代码位置属于本次固定快照；本机实时核验请参阅 <a href='/zh/guide/#counter-reverse-query'>Counter 反查教程</a>。" : "Code locations in node details belong to this fixed snapshot. For current local verification, follow the <a href='/guide/#counter-reverse-query'>Counter reverse-query guide</a>.";
       el("xp-code-scope").textContent = snapshot.manifest.counts.publishedFiles + " / " + snapshot.manifest.counts.files + " " + t.count + " · " + snapshot.manifest.counts.withheldFiles + " " + t.withheld;
-      el("xp-tour").disabled = !snapshot.maps.nodes.get("command:ReserveFunds")?.identities.length;
+      el("xp-tour").disabled = !(snapshot.maps.nodes.get("command:ReserveFunds") || snapshot.maps.nodes.get("cmd:CreditBalance.ReserveFunds"))?.identities.length;
       fileTree();
       // Graph readiness depends on manifest/index, never a source download.
       renderRoute();
