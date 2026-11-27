@@ -1,6 +1,6 @@
 # metarch-truthsrc 战略架构地图与地下暗道排雷手册（v2.0.0 源码级全解）
 
-> **文档定位与源码基线**：本文对照 [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0**（锁定提交 [`b2b61e5`](https://github.com/co-arising/metarch-truthsrc/commit/b2b61e5c48894c25d9b935c6939519ccc214e4a9)，`bank-wealth-demo` @ `bd20e36`）全部核心源码撰写，是一份**从粗到细、从宏观主干到源码接缝**的工程作战地图。与介绍设计理念的 [co-arising 2.0 长期架构蓝图](https://co-arising.github.io/zh/articles/co-arising-v2-ears-native-architecture-20261126/) 以及面向用户的 [GA 完整指南](https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) 不同，本文把整个编译器切开，标注**模块边界、数据流向、14 条跨文件隐蔽耦合（地下暗道）**，以及一套已被两波实证的**探针排雷法、13 个已清零 Bug 与下一波 Pre-Z3/Post-Z3 靶点**，并通过 `artifact-maps.lock.json` 与仓库提交哈希机读绑定。
+> **文档定位与源码基线**：本文对照 [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0**（锁定提交 [`2f4d33d`](https://github.com/co-arising/metarch-truthsrc/commit/2f4d33da6a3964ed72ca842b8a38164342adc0ae)，`bank-wealth-demo` @ `b5cadc0`）全部核心源码撰写，是一份**从粗到细、从宏观主干到源码接缝**的工程作战地图。与介绍设计理念的 [co-arising 2.0 长期架构蓝图](https://co-arising.github.io/zh/articles/co-arising-v2-ears-native-architecture-20261126/) 以及面向用户的 [GA 完整指南](https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) 不同，本文把整个编译器切开，标注**模块边界、数据流向、14 条跨文件隐蔽耦合（地下暗道）**，以及一套已被两波实证的**探针排雷法、13 个已清零 Bug 与下一波 Pre-Z3/Post-Z3 靶点**，并通过 `artifact-maps.lock.json` 与仓库提交哈希机读绑定。
 
 <div class="co-kpi-strip" role="region" aria-label="metarch-truthsrc v2.0.0 源码规模与排雷基线">
 <div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">v2 主干与 EARS/Play 生成器 34,486 LOC + 1.0 精选 24 家族发射器 14,125 LOC</div></div>
@@ -116,7 +116,7 @@
 
 ## 二、战区与目录地图（Level 1）：六大模块与源码索引
 
-截至 `b2b61e5`，整个 v2 工程核心分布于六大战区。下表精确标注每个关键文件的职责边界、体量（LOC）及读写契约，排雷时可直接按图索骥：
+截至 `2f4d33d`，整个 v2 工程核心分布于六大战区。下表精确标注每个关键文件的职责边界、体量（LOC）及读写契约，排雷时可直接按图索骥：
 
 | 战区 | 核心文件（点击直达源码） | LOC | 核心职责 | 关键输入 / 输出契约 |
 |---|---|---:|---|---|
@@ -387,11 +387,11 @@
 
 全量回归结果已锁入 [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs)（`SPEC-S1..S20` 20/20 PASS），并通过真实 `sbt -batch stage` + Play 2.8.18 活体 HTTP 路演与 `bank-wealth-demo` 100% 变异门禁复核（详见 [状态页](https://co-arising.github.io/zh/status/)）。
 
-### 第二波按图排雷战绩（提交 `b2b61e5` · 6/6 探针全中并清零）
+### 第二波按图排雷战绩（提交 `2f4d33d` · 6/6 探针全中并清零）
 
 基于本文最初列出的 M01–M08 雷达表，我们立即落地了第二波对抗探针（`probe_wave2_mines.mjs`），全部走真实 `compileCanonicalV2` + `generateScalaCqrsPlayServiceV2`/`ForBc` + `emitV2ExecutableTests` + 离线 `scalac` + 真实 **`sbt -batch compile`**，结果 **6 组探针 100% 实锤**（共消灭 10 处底层缺陷，全部锁入 `SPEC-S18..S20`）：
 
-| 雷达编号 | 实锤缺陷与根因 | 最终修复与锁定验收（`b2b61e5`） |
+| 雷达编号 | 实锤缺陷与根因 | 最终修复与锁定验收（`2f4d33d`） |
 |---|---|---|
 | **M01** | 两子域同名不同构 `SharedInfo` VO 被 `dedupBy` 静默吞并，导致 `BetaItemRules.scala` 报 `value score is not a member` | `mergeCanonicalsForBc` 改为 `dedupStructuralChecked`：相同 Shared Kernel 正常去重，异构碰撞立即 `BC_MERGE_CONFLICT` 硬失败（`SPEC-S18`） |
 | **M03** | `type`/`match` 等 Scala 保留字通过 `compile-v2`，却在 `generate-v2` 抛 `VO_INPUT` 崩溃 | `structure-loader.mjs` 源头校验全部声明与字段，立即报 `V2_RESERVED_IDENTIFIER`（`SPEC-S18`） |
@@ -415,9 +415,9 @@
    - `node --test` + 离线 `scalac` + **真实 `sbt -batch stage` + 启动 Play 进程发真实 HTTP 请求**
 4. **实锤即上锁**：确认 Bug 后先修通用推导（守 `npm run lint:arch` 0 违规 + `emitter/parity.mjs` 24/24 全绿），再把对抗样例固化为 `SPEC-S21+`，绝不靠人眼审查结案。
 
-### Wave-3 高危潜在地雷雷达（基于 `b2b61e5` 诚实盘点）
+### Wave-3 高危潜在地雷雷达（基于 `2f4d33d` 诚实盘点）
 
-M01、M03、M04、M05、M06、M07、M08 已于 `b2b61e5` 实锤清零并锁入 `SPEC-S18..S20`；下表诚实列出目前仍待下一波对抗探针封死的 **5 个真实边界（M02 + Pre-Z3/Post-Z3 M09–M12）**：
+M01、M03、M04、M05、M06、M07、M08 已于 `2f4d33d` 实锤清零并锁入 `SPEC-S18..S20`；下表诚实列出目前仍待下一波对抗探针封死的 **5 个真实边界（M02 + Pre-Z3/Post-Z3 M09–M12）**：
 
 | 雷达编号 | 疑似地雷点 / 已知边界 | 关联暗道 | 建议对抗探针设计 | 预期杀伤面 |
 |---|---|---|---|---|

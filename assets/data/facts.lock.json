@@ -1,10 +1,10 @@
 {
   "schemaVersion": "co-arising.site-facts-lock/v1",
   "cohort": {
-    "truthsrcCommit": "b2b61e5c48894c25d9b935c6939519ccc214e4a9",
-    "truthsrcShort": "b2b61e5",
-    "bankCommit": "bd20e369110fe13e78c885c6036d3e6b7eae1d38",
-    "bankShort": "bd20e36",
+    "truthsrcCommit": "2f4d33da6a3964ed72ca842b8a38164342adc0ae",
+    "truthsrcShort": "2f4d33d",
+    "bankCommit": "b5cadc007770943bdc0bc913329a8b4f44ca4f8d",
+    "bankShort": "b5cadc0",
     "explorerSnapshot": "56efe8d051dd3d837d2819ed698c5c47b75e6f1712878e956cb1364212893f25",
     "explorerSnapshotShort": "56efe8d0",
     "capturedDate": "2026-11-27"
@@ -190,22 +190,14 @@
     "onionCheckedFiles": 126,
     "onionViolations": 0,
     "sbtRuntimeFilesCount": 71,
-    "mutationTs": {
-      "total": 12,
-      "killed": 12,
-      "killRate": 100
-    },
-    "mutationScala": {
-      "total": 7,
-      "killed": 7,
-      "killRate": 100
-    },
+    "mutationTs": null,
+    "mutationScala": null,
     "tckPassed": 8,
     "graphNodes": 88,
     "graphKinds": 18,
     "graphEdges": 87,
     "clozeSlots": 3,
-    "evidenceSha256": "90a32415247eb051e4fd41ad22bb6dd56cb30055596badd2529c84d9b90326bf"
+    "evidenceSha256": "7e6e19b6e807dc1a7e5fd753f169bdb48d7bfef6431bee77d29239c3d4b2e16a"
   },
   "explorer": {
     "activeSnapshot": "56efe8d051dd3d837d2819ed698c5c47b75e6f1712878e956cb1364212893f25",
@@ -214,5 +206,5 @@
     "totalFiles": 195,
     "workshopBytes": 1129972
   },
-  "generatedAt": "2026-11-27T16:26:50.355Z"
+  "generatedAt": "2026-11-27T16:40:36.079Z"
 }

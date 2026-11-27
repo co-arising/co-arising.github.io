@@ -1,6 +1,6 @@
 # metarch-truthsrc Strategic Architecture Map & Underground Tunnels Mine-Sweeping Manual (v2.0.0 Source-Level Atlas)
 
-> **Scope & Source Baseline**: Written directly against [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0** (pinned commit [`b2b61e5`](https://github.com/co-arising/metarch-truthsrc/commit/b2b61e5c48894c25d9b935c6939519ccc214e4a9), `bank-wealth-demo` @ `bd20e36`), this is a **coarse-to-fine, macro-to-seam engineering battle map**. Unlike the [co-arising 2.0 Long-Term Architecture Blueprint](https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/) (design philosophy) or the [GA Complete Guide](https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) (user workflow), this manual slices the compiler open to chart its **module boundaries, vertical dataflows, 14 cross-file hidden couplings ("underground tunnels")**, and an empirically validated **probe-based mine-sweeping playbook covering 13 confirmed fixes across Wave-1 & Wave-2 plus Wave-3 Pre-Z3/Post-Z3 targets**, machine-locked to the repository commit via `artifact-maps.lock.json`.
+> **Scope & Source Baseline**: Written directly against [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0** (pinned commit [`2f4d33d`](https://github.com/co-arising/metarch-truthsrc/commit/2f4d33da6a3964ed72ca842b8a38164342adc0ae), `bank-wealth-demo` @ `b5cadc0`), this is a **coarse-to-fine, macro-to-seam engineering battle map**. Unlike the [co-arising 2.0 Long-Term Architecture Blueprint](https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/) (design philosophy) or the [GA Complete Guide](https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) (user workflow), this manual slices the compiler open to chart its **module boundaries, vertical dataflows, 14 cross-file hidden couplings ("underground tunnels")**, and an empirically validated **probe-based mine-sweeping playbook covering 13 confirmed fixes across Wave-1 & Wave-2 plus Wave-3 Pre-Z3/Post-Z3 targets**, machine-locked to the repository commit via `artifact-maps.lock.json`.
 
 <div class="co-kpi-strip" role="region" aria-label="metarch-truthsrc v2.0.0 codebase scale and mine-sweeping baseline">
 <div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">34,486 LOC in v2 trunk/EARS/Play emitters + 14,125 LOC in 24 curated 1.0 families</div></div>
@@ -116,7 +116,7 @@ To hunt latent bugs systematically inside `metarch-truthsrc`, discard one miscon
 
 ## 2. Module & Directory Atlas (Level 1): Six Zones Down to Exact Source Files
 
-As of `b2b61e5`, the v2 engine spans six operational zones. Use this atlas as a direct jump-table during triage and bug-hunting:
+As of `2f4d33d`, the v2 engine spans six operational zones. Use this atlas as a direct jump-table during triage and bug-hunting:
 
 | Zone | Core Modules (clickable GitHub links) | LOC | Ownership & Responsibility | Key I/O Contract |
 |---|---|---:|---|---|
@@ -383,11 +383,11 @@ Right after fixing the first real-world 6-subdomain run ([Issue #2](https://gith
 
 All regressions are now locked in [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs) (`SPEC-S1..S20`, 20/20 PASS), verified with live `sbt -batch stage` + Play 2.8.18 HTTP roadshow and `bank-wealth-demo` 100% Mutation Gate (see the [status page](https://co-arising.github.io/status/)).
 
-### Wave-2 Empirical Sweep (Commit `b2b61e5` · 6/6 Probes Confirmed & Eliminated)
+### Wave-2 Empirical Sweep (Commit `2f4d33d` · 6/6 Probes Confirmed & Eliminated)
 
 Immediately after charting targets M01–M08 above, we ran Wave-2 adversarial probes (`probe_wave2_mines.mjs`) through real `compileCanonicalV2` + `generateScalaCqrsPlayServiceV2`/`ForBc` + `emitV2ExecutableTests` + offline `scalac` + real **`sbt -batch compile`**. **All 6 probe groups confirmed as real defects (10 underlying fixes, locked in `SPEC-S18..S20`)**:
 
-| Radar ID | Confirmed Defect & Root Cause | Fix & Regression Lock (`b2b61e5`) |
+| Radar ID | Confirmed Defect & Root Cause | Fix & Regression Lock (`2f4d33d`) |
 |---|---|---|
 | **M01** | Same-named structurally conflicting `SharedInfo` VO silently dropped by `dedupBy`, causing `value score is not a member` in `sbt` | Replaced with `dedupStructuralChecked`: identical Shared Kernel deduplicates cleanly; conflicts fail closed with `BC_MERGE_CONFLICT` (`SPEC-S18`) |
 | **M03** | Scala reserved keywords (`type`, `match`) passed `compile-v2` then crashed `generate-v2` with `VO_INPUT` | Added `RESERVED_TARGET_IDENTIFIERS` check in `structure-loader.mjs`, failing fast with `V2_RESERVED_IDENTIFIER` (`SPEC-S18`) |
@@ -411,9 +411,9 @@ Immediately after charting targets M01–M08 above, we ran Wave-2 adversarial pr
    - `node --test` + offline `scalac` + **real `sbt -batch stage` + live Play HTTP roadshow**
 4. **Lock Every Confirmed Hit**: Fix via general derivation (`npm run lint:arch` = 0 issues, `emitter/parity.mjs` = 24/24 green) and lock the probe permanently as `SPEC-S21+`.
 
-### Wave-3 High-Risk Radar (Honest Boundaries as of `b2b61e5`)
+### Wave-3 High-Risk Radar (Honest Boundaries as of `2f4d33d`)
 
-M01 and M03–M08 are eliminated and locked in `SPEC-S18..S20` at `b2b61e5`. The table below honestly inventories the **5 remaining boundaries (M02 + Pre-Z3/Post-Z3 M09–M12)** for the next probing wave:
+M01 and M03–M08 are eliminated and locked in `SPEC-S18..S20` at `2f4d33d`. The table below honestly inventories the **5 remaining boundaries (M02 + Pre-Z3/Post-Z3 M09–M12)** for the next probing wave:
 
 | Radar ID | Suspected Latent Mine / Known Boundary | Linked Tunnel | Recommended Adversarial Probe | Blast Radius |
 |---|---|---|---|---|

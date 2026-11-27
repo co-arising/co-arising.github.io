@@ -1,0 +1,156 @@
+name: site-cascade-sync
+
+on:
+  repository_dispatch:
+    types: [pilot-updated]
+  workflow_dispatch:
+    inputs:
+      bank_ref:
+        description: 'Target bank-wealth-demo branch or commit SHA'
+        required: false
+        default: 'feat/co-arising-v2-pilot'
+      base_branch:
+        description: 'Target PR base branch in co-arising.github.io'
+        required: false
+        default: 'feat/co-arising-v2-site'
+  schedule:
+    - cron: '30 9 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  sync-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine target branches & upstream refs
+        id: meta
+        run: |
+          BASE_BRANCH="${{ inputs.base_branch || 'feat/co-arising-v2-site' }}"
+          BANK_REF="${{ github.event.client_payload.bank_commit || inputs.bank_ref || 'feat/co-arising-v2-pilot' }}"
+          echo "base_branch=$BASE_BRANCH" >> "$GITHUB_OUTPUT"
+          echo "bank_ref=$BANK_REF" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout co-arising.github.io
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.meta.outputs.base_branch }}
+          path: site
+
+      - name: Checkout bank-wealth-demo
+        uses: actions/checkout@v4
+        with:
+          repository: co-arising/bank-wealth-demo
+          ref: ${{ steps.meta.outputs.bank_ref }}
+          path: bank-wealth-demo
+
+      - name: Read pinned metarch-truthsrc commit
+        id: pin
+        run: |
+          PIN_COMMIT=$(node -e "console.log(JSON.parse(require('fs').readFileSync('bank-wealth-demo/.truthsrc-pin.json','utf8')).commit)")
+          echo "commit=$PIN_COMMIT" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout pinned metarch-truthsrc
+        uses: actions/checkout@v4
+        with:
+          repository: co-arising/metarch-truthsrc
+          ref: ${{ steps.pin.outputs.commit }}
+          path: metarch-truthsrc
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run bank-wealth-demo v2:release-verify --strict-pin
+        working-directory: bank-wealth-demo
+        run: npm run v2:release-verify -- --strict-pin
+
+      - name: Rebuild Workshop HTML, Explorer snapshot, prune orphan snapshots, and sync facts.lock.json
+        working-directory: site
+        run: |
+          node tools/build-bank-workshop-v2.mjs --bank ../bank-wealth-demo --truthsrc ../metarch-truthsrc
+          node tools/build-explorer-snapshot-v2.mjs --bank ../bank-wealth-demo --truthsrc ../metarch-truthsrc
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const current = JSON.parse(fs.readFileSync("assets/data/explorer/current.json", "utf8")).snapshot;
+            const factsMd = fs.readFileSync("SITE-FACTS.md", "utf8");
+            const snapsDir = "assets/data/explorer/snapshots";
+            for (const entry of fs.readdirSync(snapsDir, { withFileTypes: true })) {
+              if (!entry.isDirectory()) continue;
+              const name = entry.name;
+              if (name !== current && !factsMd.includes(name) && !factsMd.includes(name.slice(0, 8))) {
+                fs.rmSync(path.join(snapsDir, name), { recursive: true, force: true });
+                console.log("Pruned unreferenced snapshot:", name);
+              }
+            }
+          '
+          node tools/sync-site-facts.mjs --write --truthsrc ../metarch-truthsrc --bank ../bank-wealth-demo
+
+      - name: Run full site verification gates
+        id: gates
+        working-directory: site
+        continue-on-error: true
+        run: |
+          python3 -B tools/check-site.py --strict
+          node tools/check-examples.mjs
+          python3 -B tools/check-public-payloads.py
+          node tools/check-site-consistency.mjs
+          node tools/sync-site-facts.mjs --check
+          node tools/check-freshness.mjs --mode local --max-age-hours 24
+
+      - name: Open or update site sync PR when gates pass
+        if: steps.gates.outcome == 'success'
+        working-directory: site
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Site already in sync; no PR needed."
+            exit 0
+          fi
+          BANK_SHORT=$(git -C ../bank-wealth-demo rev-parse --short HEAD)
+          TRUTHSRC_SHORT=$(git -C ../metarch-truthsrc rev-parse --short HEAD)
+          git config user.name "co-arising-bot"
+          git config user.email "co-arising-bot@users.noreply.github.com"
+          git checkout -B automation/site-sync
+          git add -A
+          git commit -m "chore(site): automated sync (${TRUTHSRC_SHORT} / ${BANK_SHORT})"
+          git push origin automation/site-sync --force-with-lease
+          BASE_BRANCH="${{ steps.meta.outputs.base_branch }}"
+          EXISTING_PR=$(gh pr list --head automation/site-sync --base "$BASE_BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$EXISTING_PR" ]; then
+            gh pr create \
+              --base "$BASE_BRANCH" \
+              --head automation/site-sync \
+              --title "chore(site): sync v2 facts & Explorer snapshot (${TRUTHSRC_SHORT} / ${BANK_SHORT})" \
+              --body "Automated site sync from \`metarch-truthsrc\` @ \`${TRUTHSRC_SHORT}\` and \`bank-wealth-demo\` @ \`${BANK_SHORT}\`. All 6 site gates passed."
+          else
+            gh pr comment "$EXISTING_PR" --body "Updated site sync branch for \`${TRUTHSRC_SHORT}\` / \`${BANK_SHORT}\`; all 6 site gates passed."
+          fi
+
+      - name: Open or comment on Freshness SLA drift issue when gates fail
+        if: steps.gates.outcome != 'success'
+        working-directory: site
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BANK_SHORT=$(git -C ../bank-wealth-demo rev-parse --short HEAD)
+          TRUTHSRC_SHORT=$(git -C ../metarch-truthsrc rev-parse --short HEAD)
+          TITLE="[Freshness SLA] co-arising.github.io cohort drift"
+          BODY="Automated site sync against \`metarch-truthsrc\` @ \`${TRUTHSRC_SHORT}\` and \`bank-wealth-demo\` @ \`${BANK_SHORT}\` detected gate failures (e.g. \`SITE-FACTS.md\` / status prose requires alignment). Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EXISTING=$(gh issue list --state open --search "\"${TITLE}\" in:title" --json number --jq '.[0].number // empty')
+          if [ -z "$EXISTING" ]; then
+            gh issue create --title "$TITLE" --body "$BODY"
+          else
+            gh issue comment "$EXISTING" --body "$BODY"
+          fi
+          exit 1
