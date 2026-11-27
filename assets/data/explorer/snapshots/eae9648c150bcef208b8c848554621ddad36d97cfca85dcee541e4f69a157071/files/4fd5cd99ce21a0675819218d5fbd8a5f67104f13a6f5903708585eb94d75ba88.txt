@@ -13,7 +13,7 @@ final class PlayHttpBridge @Inject()(cc: ControllerComponents, router: HttpRoute
   private def toAnyMap(js: JsObject): Map[String, Any] = js.value.map {
     case (k, JsString(v)) => k -> v
     case (k, JsNumber(v)) => k -> v
-    case (k, JsBoolean(v)) => k -> v
+    case (k, b: JsBoolean) => k -> b.value
     case (k, obj: JsObject) => k -> toAnyMap(obj)
     case (k, arr: JsArray) => k -> arr.value.map(_.toString).toSeq
     case (k, JsNull) => k -> ""

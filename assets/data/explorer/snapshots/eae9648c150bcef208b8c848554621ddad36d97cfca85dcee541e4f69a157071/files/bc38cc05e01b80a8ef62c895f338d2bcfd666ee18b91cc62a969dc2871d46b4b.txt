@@ -9,8 +9,8 @@ import scala.concurrent.Future
 
 @Singleton
 final class BankOrderViewQueryService @Inject()(repository: BankOrderReadsideRepository) {
-  def getById(principal: String): Future[Option[BankOrderView]] =
-    repository.findById(principal)
+  def getById(clientRequestId: String): Future[Option[BankOrderView]] =
+    repository.findById(clientRequestId)
 
   def list(page: Int = 1, pageSize: Int = 50): Future[Seq[BankOrderView]] =
     repository.list(math.max(1, page), math.min(200, math.max(1, pageSize)))

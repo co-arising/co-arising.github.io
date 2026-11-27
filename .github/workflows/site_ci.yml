@@ -35,5 +35,8 @@ jobs:
       - name: Cross-file fact consistency & orphan snapshot gate
         run: node tools/check-site-consistency.mjs
 
+      - name: Machine-verified facts.lock cohort & slot parity gate
+        run: node tools/sync-site-facts.mjs --check
+
       - name: Site tooling unit tests
         run: node --test tools/tests/*.test.mjs

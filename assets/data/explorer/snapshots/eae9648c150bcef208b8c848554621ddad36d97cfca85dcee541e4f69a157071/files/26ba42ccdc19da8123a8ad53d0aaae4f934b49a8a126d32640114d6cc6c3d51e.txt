@@ -8,8 +8,8 @@ object BankOrderReadsideSchema {
 
   val createTableDdl: String =
     """|CREATE TABLE IF NOT EXISTS bankwealth_bank_order_view (
-      |  principal VARCHAR(255) NOT NULL DEFAULT '' PRIMARY KEY,
-      |  client_request_id VARCHAR(255) NOT NULL DEFAULT '',
+      |  principal VARCHAR(255) NOT NULL DEFAULT '',
+      |  client_request_id VARCHAR(255) NOT NULL DEFAULT '' PRIMARY KEY,
       |  payment_completed BOOLEAN NOT NULL DEFAULT FALSE,
       |  ta_finalized BOOLEAN NOT NULL DEFAULT FALSE
       |);""".stripMargin

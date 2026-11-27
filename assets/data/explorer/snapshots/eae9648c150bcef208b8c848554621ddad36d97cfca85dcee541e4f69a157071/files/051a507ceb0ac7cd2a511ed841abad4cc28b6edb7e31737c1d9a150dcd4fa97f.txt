@@ -156,7 +156,8 @@ final class InterfacesHttpSpec extends AnyFunSuite {
       override def requestExists(principal: Any, clientRequestId: Any): Boolean = false
       override def payloadMatchesOriginal(principal: Any, clientRequestId: Any, fundCode: Any, amount: Any): Boolean = false
     }
-    val rt = OnionBootstrap.createRuntime(cashFundPurchaseHandler = Some(CashFundPurchaseImpl), cashFundPurchaseExterns = Some(externs))
+    val auth = new RoleBasedAuthority(_ => Some(Principal("principal-1", Set("investor"), tenantId = Some("t-1"), attributes = Map.empty, entitlements = Set.empty)))
+    val rt = OnionBootstrap.createRuntime(cashFundPurchaseHandler = Some(CashFundPurchaseImpl), cashFundPurchaseExterns = Some(externs), authority = auth)
     val req = HttpRequest(method = "POST", path = "/api/v1/bankwealth/bank-cash-submit-port/submit", body = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""), stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")))
     val res = rt.router.route(req)
     assert(res.status == 401)
@@ -173,7 +174,8 @@ final class InterfacesHttpSpec extends AnyFunSuite {
       override def requestExists(principal: Any, clientRequestId: Any): Boolean = false
       override def payloadMatchesOriginal(principal: Any, clientRequestId: Any, fundCode: Any, amount: Any): Boolean = false
     }
-    val rt = OnionBootstrap.createRuntime(cashFundPurchaseHandler = Some(CashFundPurchaseImpl), cashFundPurchaseExterns = Some(externs))
+    val auth = new RoleBasedAuthority(_ => Some(Principal("principal-1", Set("investor"), tenantId = Some("t-1"), attributes = Map.empty, entitlements = Set.empty)))
+    val rt = OnionBootstrap.createRuntime(cashFundPurchaseHandler = Some(CashFundPurchaseImpl), cashFundPurchaseExterns = Some(externs), authority = auth)
     val req = HttpRequest(method = "POST", path = "/api/v1/bankwealth/bank-cash-submit-port/submit", body = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "id_5", "clientRequestId" -> "CNY"), stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")))
     val res = rt.router.route(req)
     assert(res.status == 200)
@@ -189,7 +191,8 @@ final class InterfacesHttpSpec extends AnyFunSuite {
       override def taOutcomeRejected(orderId: Any): Boolean = false
       override def taAbsenceConfirmed(orderId: Any): Boolean = false
     }
-    val rt = OnionBootstrap.createRuntime(taBridgeSettlementHandler = Some(TaBridgeSettlementImpl), taBridgeSettlementExterns = Some(externs))
+    val auth = new RoleBasedAuthority(_ => Some(Principal("principal-1", Set("ta-bridge-service"), tenantId = Some("t-1"), attributes = Map.empty, entitlements = Set.empty)))
+    val rt = OnionBootstrap.createRuntime(taBridgeSettlementHandler = Some(TaBridgeSettlementImpl), taBridgeSettlementExterns = Some(externs), authority = auth)
     val req = HttpRequest(method = "POST", path = "/api/v1/bankwealth/bank-ta-bridge-port/ingest-outcome", body = Map[String, Any]("orderId" -> ""), stateSnapshot = Map.empty[String, Any])
     val res = rt.router.route(req)
     assert(res.status == 404)
@@ -206,8 +209,9 @@ final class InterfacesHttpSpec extends AnyFunSuite {
       override def taOutcomeRejected(orderId: Any): Boolean = false
       override def taAbsenceConfirmed(orderId: Any): Boolean = false
     }
-    val rt = OnionBootstrap.createRuntime(taBridgeSettlementHandler = Some(TaBridgeSettlementImpl), taBridgeSettlementExterns = Some(externs))
-    val req = HttpRequest(method = "POST", path = "/api/v1/bankwealth/bank-ta-bridge-port/ingest-outcome", body = Map[String, Any]("orderId" -> ""), stateSnapshot = Map.empty[String, Any])
+    val auth = new RoleBasedAuthority(_ => Some(Principal("principal-1", Set("ta-bridge-service"), tenantId = Some("t-1"), attributes = Map.empty, entitlements = Set.empty)))
+    val rt = OnionBootstrap.createRuntime(taBridgeSettlementHandler = Some(TaBridgeSettlementImpl), taBridgeSettlementExterns = Some(externs), authority = auth)
+    val req = HttpRequest(method = "POST", path = "/api/v1/bankwealth/bank-ta-bridge-port/ingest-outcome", body = Map[String, Any]("orderId" -> ""), stateSnapshot = Map[String, Any]("shares" -> 1L, "fundOrder" -> Map[String, Any]("shares" -> 1L, "nav" -> "10.0000"), "nav" -> "10.0000"))
     val res = rt.router.route(req)
     assert(res.status == 200)
     assert(res.body.get("ok").contains(true))

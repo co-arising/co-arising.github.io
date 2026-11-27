@@ -8,18 +8,19 @@ import { createRoleBasedAuthority } from "../../generated-scaffold/ts/interfaces
 import { cashFundPurchaseHandler } from "../../handwritten/cash-fund-purchase.cloze.ts";
 import { taBridgeSettlementHandler } from "../../handwritten/ta-bridge-settlement.cloze.ts";
 
-async function withServer<T>(externOverrides: Record<string, Record<string, () => boolean>>, fn: (baseUrl: string) => Promise<T>, authority?: unknown): Promise<T> {
+async function withServer<T>(externOverrides: Record<string, Record<string, () => boolean>>, fn: (baseUrl: string) => Promise<T>, authority?: unknown, loadStateSnapshot?: () => Readonly<Record<string, unknown>>): Promise<T> {
   const handlers = {
     "CashFundPurchase": cashFundPurchaseHandler,
     "TaBridgeSettlement": taBridgeSettlementHandler,
   };
-  const { server } = createHttpServer({ handlers, externOverrides: externOverrides as never, authority: authority as never, allowRequestStateSnapshot: true });
+  const { server } = createHttpServer({ handlers, externOverrides: externOverrides as never, authority: authority as never, ...(loadStateSnapshot ? { loadStateSnapshot } : {}) });
   await new Promise<void>(resolve => server.listen(0, "127.0.0.1", () => resolve()));
   const addr = server.address();
   const port = typeof addr === "object" && addr ? addr.port : 0;
   try {
     return await fn(`http://127.0.0.1:${port}`);
   } finally {
+    server.closeAllConnections?.();
     await new Promise<void>(resolve => server.close(() => resolve()));
   }
 }
@@ -32,6 +33,7 @@ async function withBareRouter<T>(fn: (baseUrl: string) => Promise<T>, authority?
   try {
     return await fn(`http://127.0.0.1:${port}`);
   } finally {
+    server.closeAllConnections?.();
     await new Promise<void>(resolve => server.close(() => resolve()));
   }
 }
@@ -206,13 +208,13 @@ test("[HTTP_US-CFP-01] POST /api/v1/bankwealth/bank-cash-submit-port/submit -> H
     const res = await fetch(`${baseUrl}/api/v1/bankwealth/bank-cash-submit-port/submit`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"","clientRequestId":"","stateSnapshot":{"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""}}}),
+      body: JSON.stringify({"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"","clientRequestId":""}),
     });
     assert.equal(res.status, 401);
     const json = await res.json() as Record<string, unknown>;
     assert.equal(json.ok, false);
     assert.equal(json.code, "UNAUTHORIZED_OR_CSRF");
-  });
+  }, createRoleBasedAuthority(() => ({"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]})), () => ({"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""}}));
 });
 
 // @CoArisingSpec(id="HTTP_US-CFP-03", witness="interfaces-http-us-cfp-03")
@@ -225,12 +227,12 @@ test("[HTTP_US-CFP-03] POST /api/v1/bankwealth/bank-cash-submit-port/submit -> H
     const res = await fetch(`${baseUrl}/api/v1/bankwealth/bank-cash-submit-port/submit`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"id_5","clientRequestId":"CNY","stateSnapshot":{"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}}}),
+      body: JSON.stringify({"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"id_5","clientRequestId":"CNY"}),
     });
     assert.equal(res.status, 200);
     const json = await res.json() as Record<string, unknown>;
     assert.equal(json.ok, true);
-  });
+  }, createRoleBasedAuthority(() => ({"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]})), () => ({"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}}));
 });
 
 // @CoArisingSpec(id="HTTP_TA-BR-01", witness="interfaces-http-ta-br-01")
@@ -249,7 +251,7 @@ test("[HTTP_TA-BR-01] POST /api/v1/bankwealth/bank-ta-bridge-port/ingest-outcome
     const json = await res.json() as Record<string, unknown>;
     assert.equal(json.ok, false);
     assert.equal(json.code, "TA_UNKNOWN_ORIGINAL");
-  });
+  }, createRoleBasedAuthority(() => ({"id":"principal-1","roles":["ta-bridge-service"],"tenantId":"tenant-1","attributes":{},"entitlements":[]})));
 });
 
 // @CoArisingSpec(id="HTTP_TA-BR-03", witness="interfaces-http-ta-br-03")
@@ -267,5 +269,5 @@ test("[HTTP_TA-BR-03] POST /api/v1/bankwealth/bank-ta-bridge-port/ingest-outcome
     assert.equal(res.status, 200);
     const json = await res.json() as Record<string, unknown>;
     assert.equal(json.ok, true);
-  });
+  }, createRoleBasedAuthority(() => ({"id":"principal-1","roles":["ta-bridge-service"],"tenantId":"tenant-1","attributes":{},"entitlements":[]})), () => ({"shares":1,"fundOrder":{"shares":1,"nav":"10.0000"},"nav":"10.0000"}));
 });

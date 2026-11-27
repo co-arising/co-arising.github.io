@@ -6,6 +6,7 @@ package example.bankwealth.v2.modules
 import com.google.inject.{AbstractModule, Provides}
 import javax.inject.Singleton
 import example.bankwealth.v2.application.connectors.OutboundConnectorsPort
+import example.bankwealth.v2.infrastructure.api.{ServerSnapshotProvider, ServerSnapshotProviderImpl}
 import example.bankwealth.v2.infrastructure.connectors.DefaultOutboundConnectors
 import example.bankwealth.v2.infrastructure.persistence.InMemoryStore
 import example.bankwealth.v2.interfaces.http.{HttpRouter, CashFundPurchaseController, TaBridgeSettlementController}
@@ -33,6 +34,7 @@ import example.bankwealth.v2.infrastructure.bootstrap.SagaCoordinatorBootstrap
 final class GeneratedBindingsModule extends AbstractModule {
   override def configure(): Unit = {
     bind(classOf[OutboundConnectorsPort]).to(classOf[DefaultOutboundConnectors])
+    bind(classOf[ServerSnapshotProvider]).to(classOf[ServerSnapshotProviderImpl])
     bind(classOf[FundQuotaComputations]).toInstance(FundQuotaComputations.Noop) // L1-only: 0 abstract methods
     bind(classOf[FundOrderComputations]).to(classOf[FundOrderComputationsImpl])
     bind(classOf[CreditBalanceComputations]).toInstance(CreditBalanceComputations.Noop) // L1-only: 0 abstract methods

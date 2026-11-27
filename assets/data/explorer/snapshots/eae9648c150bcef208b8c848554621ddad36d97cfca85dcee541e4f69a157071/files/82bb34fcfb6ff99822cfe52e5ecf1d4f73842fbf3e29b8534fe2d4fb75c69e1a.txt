@@ -24,7 +24,7 @@ test("[US-CFP-01] (primary) BankCashSubmitPort.submit -> reject UNAUTHORIZED_OR_
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, false, "expected application rejection");
   if (!outcome.ok) {
@@ -49,7 +49,7 @@ test("[US-CFP-01] (secondary) BankCashSubmitPort.submit -> reject UNAUTHORIZED_O
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, false, "expected application rejection");
   if (!outcome.ok) {
@@ -74,7 +74,7 @@ test("[US-CFP-02] (primary) BankCashSubmitPort.submit -> reject INVALID_CASH_SUB
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"succeeded","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"succeeded","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"succeeded","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"succeeded","amount":"0.00"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, false, "expected application rejection");
   if (!outcome.ok) {
@@ -99,7 +99,7 @@ test("[US-CFP-02] (secondary) BankCashSubmitPort.submit -> reject INVALID_CASH_S
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, false, "expected application rejection");
   if (!outcome.ok) {
@@ -124,12 +124,30 @@ test("[US-CFP-03] (primary) BankCashSubmitPort.submit -> pin BankCashOriginal an
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"id_5","clientRequestId":"CNY"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"id_5","clientRequestId":"CNY"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   assert.equal(pins.some(x => x.artifact === "BankCashOriginal"), true, "expected pin BankCashOriginal");
-  assert.equal(dispatches.some(x => x.target === "FundOrder.RecordCashRequestSource"), true, "expected dispatch FundOrder.RecordCashRequestSource");
-  assert.equal(dispatches.some(x => x.target === "FundOrder.RequestFundPurchaseSettlement"), true, "expected dispatch FundOrder.RequestFundPurchaseSettlement");
+  const dispatched_0 = dispatches.find(x => x.target === "FundOrder.RecordCashRequestSource");
+  assert.ok(dispatched_0, "expected dispatch FundOrder.RecordCashRequestSource");
+  assert.notEqual(dispatched_0.payload["principal"], undefined, "expected dispatched field FundOrder.RecordCashRequestSource.principal");
+  assert.notEqual(dispatched_0.payload["principal"], null, "expected non-null dispatched field FundOrder.RecordCashRequestSource.principal");
+  assert.notEqual(dispatched_0.payload["clientRequestId"], undefined, "expected dispatched field FundOrder.RecordCashRequestSource.clientRequestId");
+  assert.notEqual(dispatched_0.payload["clientRequestId"], null, "expected non-null dispatched field FundOrder.RecordCashRequestSource.clientRequestId");
+  assert.notEqual(dispatched_0.payload["fundCode"], undefined, "expected dispatched field FundOrder.RecordCashRequestSource.fundCode");
+  assert.notEqual(dispatched_0.payload["fundCode"], null, "expected non-null dispatched field FundOrder.RecordCashRequestSource.fundCode");
+  assert.notEqual(dispatched_0.payload["amount"], undefined, "expected dispatched field FundOrder.RecordCashRequestSource.amount");
+  assert.notEqual(dispatched_0.payload["amount"], null, "expected non-null dispatched field FundOrder.RecordCashRequestSource.amount");
+  const dispatched_1 = dispatches.find(x => x.target === "FundOrder.RequestFundPurchaseSettlement");
+  assert.ok(dispatched_1, "expected dispatch FundOrder.RequestFundPurchaseSettlement");
+  assert.notEqual(dispatched_1.payload["principal"], undefined, "expected dispatched field FundOrder.RequestFundPurchaseSettlement.principal");
+  assert.notEqual(dispatched_1.payload["principal"], null, "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.principal");
+  assert.notEqual(dispatched_1.payload["clientRequestId"], undefined, "expected dispatched field FundOrder.RequestFundPurchaseSettlement.clientRequestId");
+  assert.notEqual(dispatched_1.payload["clientRequestId"], null, "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.clientRequestId");
+  assert.notEqual(dispatched_1.payload["fundCode"], undefined, "expected dispatched field FundOrder.RequestFundPurchaseSettlement.fundCode");
+  assert.notEqual(dispatched_1.payload["fundCode"], null, "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.fundCode");
+  assert.notEqual(dispatched_1.payload["amount"], undefined, "expected dispatched field FundOrder.RequestFundPurchaseSettlement.amount");
+  assert.notEqual(dispatched_1.payload["amount"], null, "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.amount");
   if (outcome.ok) {
     assert.equal(outcome.responseType, "BankCashAcknowledgement");
     assert.equal(outcome.response?.["accepted"], true);
@@ -153,12 +171,30 @@ test("[US-CFP-03] (secondary) BankCashSubmitPort.submit -> pin BankCashOriginal 
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   assert.equal(pins.some(x => x.artifact === "BankCashOriginal"), true, "expected pin BankCashOriginal");
-  assert.equal(dispatches.some(x => x.target === "FundOrder.RecordCashRequestSource"), true, "expected dispatch FundOrder.RecordCashRequestSource");
-  assert.equal(dispatches.some(x => x.target === "FundOrder.RequestFundPurchaseSettlement"), true, "expected dispatch FundOrder.RequestFundPurchaseSettlement");
+  const dispatched_0 = dispatches.find(x => x.target === "FundOrder.RecordCashRequestSource");
+  assert.ok(dispatched_0, "expected dispatch FundOrder.RecordCashRequestSource");
+  assert.notEqual(dispatched_0.payload["principal"], undefined, "expected dispatched field FundOrder.RecordCashRequestSource.principal");
+  assert.notEqual(dispatched_0.payload["principal"], null, "expected non-null dispatched field FundOrder.RecordCashRequestSource.principal");
+  assert.notEqual(dispatched_0.payload["clientRequestId"], undefined, "expected dispatched field FundOrder.RecordCashRequestSource.clientRequestId");
+  assert.notEqual(dispatched_0.payload["clientRequestId"], null, "expected non-null dispatched field FundOrder.RecordCashRequestSource.clientRequestId");
+  assert.notEqual(dispatched_0.payload["fundCode"], undefined, "expected dispatched field FundOrder.RecordCashRequestSource.fundCode");
+  assert.notEqual(dispatched_0.payload["fundCode"], null, "expected non-null dispatched field FundOrder.RecordCashRequestSource.fundCode");
+  assert.notEqual(dispatched_0.payload["amount"], undefined, "expected dispatched field FundOrder.RecordCashRequestSource.amount");
+  assert.notEqual(dispatched_0.payload["amount"], null, "expected non-null dispatched field FundOrder.RecordCashRequestSource.amount");
+  const dispatched_1 = dispatches.find(x => x.target === "FundOrder.RequestFundPurchaseSettlement");
+  assert.ok(dispatched_1, "expected dispatch FundOrder.RequestFundPurchaseSettlement");
+  assert.notEqual(dispatched_1.payload["principal"], undefined, "expected dispatched field FundOrder.RequestFundPurchaseSettlement.principal");
+  assert.notEqual(dispatched_1.payload["principal"], null, "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.principal");
+  assert.notEqual(dispatched_1.payload["clientRequestId"], undefined, "expected dispatched field FundOrder.RequestFundPurchaseSettlement.clientRequestId");
+  assert.notEqual(dispatched_1.payload["clientRequestId"], null, "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.clientRequestId");
+  assert.notEqual(dispatched_1.payload["fundCode"], undefined, "expected dispatched field FundOrder.RequestFundPurchaseSettlement.fundCode");
+  assert.notEqual(dispatched_1.payload["fundCode"], null, "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.fundCode");
+  assert.notEqual(dispatched_1.payload["amount"], undefined, "expected dispatched field FundOrder.RequestFundPurchaseSettlement.amount");
+  assert.notEqual(dispatched_1.payload["amount"], null, "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.amount");
   if (outcome.ok) {
     assert.equal(outcome.responseType, "BankCashAcknowledgement");
     assert.equal(outcome.response?.["accepted"], true);
@@ -182,7 +218,7 @@ test("[US-CFP-04] (primary) BankCashSubmitPort.submit -> respond BankCashAcknowl
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"id_5","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"id_5","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   assert.equal(dispatches.filter(x => x.target === "FundOrder.RequestFundPurchaseSettlement").length, 0, "forbidden dispatch FundOrder.RequestFundPurchaseSettlement must not occur");
@@ -208,7 +244,7 @@ test("[US-CFP-04] (secondary) BankCashSubmitPort.submit -> respond BankCashAckno
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   assert.equal(dispatches.filter(x => x.target === "FundOrder.RequestFundPurchaseSettlement").length, 0, "forbidden dispatch FundOrder.RequestFundPurchaseSettlement must not occur");
@@ -234,7 +270,7 @@ test("[US-CFP-05] (primary) BankCashSubmitPort.submit -> reject CASH_SOURCE_CONF
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"id_5","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"id_5","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.01"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, false, "expected application rejection");
   if (!outcome.ok) {
@@ -259,7 +295,7 @@ test("[US-CFP-05] (secondary) BankCashSubmitPort.submit -> reject CASH_SOURCE_CO
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""}} };
+  const req = { operation: "BankCashSubmitPort.submit", payload: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""},"principal":"","fundCode":"CNY","clientRequestId":"id_6"}, stateSnapshot: {"amount":{"currency":"CNY","amount":"0.02"},"order":{"paymentOutcome":"","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, false, "expected application rejection");
   if (!outcome.ok) {
@@ -284,7 +320,7 @@ test("[US-CFP-06] (primary) BankOrderQuery.get -> expose bank-order-view", () =>
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"succeeded","taStatus":"id_5"},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"succeeded","taStatus":"id_5"}} };
+  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"succeeded","taStatus":"id_5"},"principal":"","fundCode":"","clientRequestId":"","orderId":"sample_orderId"}, stateSnapshot: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"succeeded","taStatus":"id_5"}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   if (outcome.ok) {
@@ -310,7 +346,7 @@ test("[US-CFP-06] (secondary) BankOrderQuery.get -> expose bank-order-view", () 
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"succeeded","taStatus":"id_5"},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"succeeded","taStatus":"id_5"}} };
+  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"succeeded","taStatus":"id_5"},"principal":"","fundCode":"","clientRequestId":"","orderId":"sample_orderId"}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"succeeded","taStatus":"id_5"}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   if (outcome.ok) {
@@ -336,7 +372,7 @@ test("[US-CFP-07] (primary) BankOrderQuery.get -> expose bank-order-view", () =>
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"succeeded","taStatus":"confirmed"},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"succeeded","taStatus":"confirmed"}} };
+  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"succeeded","taStatus":"confirmed"},"principal":"","fundCode":"","clientRequestId":"","orderId":"sample_orderId"}, stateSnapshot: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"succeeded","taStatus":"confirmed"}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   if (outcome.ok) {
@@ -362,7 +398,7 @@ test("[US-CFP-07] (secondary) BankOrderQuery.get -> expose bank-order-view", () 
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"succeeded","taStatus":"confirmed"},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"succeeded","taStatus":"confirmed"}} };
+  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"succeeded","taStatus":"confirmed"},"principal":"","fundCode":"","clientRequestId":"","orderId":"sample_orderId"}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"succeeded","taStatus":"confirmed"}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   if (outcome.ok) {
@@ -388,7 +424,7 @@ test("[US-CFP-08] (primary) BankOrderQuery.get -> expose bank-order-view", () =>
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"confirmed","taStatus":""},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"confirmed","taStatus":""}} };
+  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"confirmed","taStatus":""},"principal":"","fundCode":"","clientRequestId":"","orderId":"sample_orderId"}, stateSnapshot: {"amount":{"currency":"","amount":"0.00"},"order":{"paymentOutcome":"confirmed","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   if (outcome.ok) {
@@ -414,7 +450,7 @@ test("[US-CFP-08] (secondary) BankOrderQuery.get -> expose bank-order-view", () 
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"confirmed","taStatus":""},"principal":"","fundCode":"","clientRequestId":""}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"confirmed","taStatus":""}} };
+  const req = { operation: "BankOrderQuery.get", payload: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"confirmed","taStatus":""},"principal":"","fundCode":"","clientRequestId":"","orderId":"sample_orderId"}, stateSnapshot: {"amount":{"currency":"","amount":"0.01"},"order":{"paymentOutcome":"confirmed","taStatus":""}}, principal: {"id":"principal-1","roles":["investor"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = cashFundPurchaseHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   if (outcome.ok) {

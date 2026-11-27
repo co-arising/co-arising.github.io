@@ -15,7 +15,15 @@ object TaBridgeSettlementImpl extends TaBridgeSettlementHandler {
     } else {
       val sanitized: Map[String, Any] = Map("orderId" -> orderId)
       if (externs.taOutcomeConfirmed(orderId)) {
-        effects.dispatch("FundOrder.RecordFundTAConfirmed", sanitized)
+        val fundSnap = req.stateSnapshot.get("fundOrder")
+          .collect { case m: Map[_, _] => m.asInstanceOf[Map[String, Any]] }
+          .getOrElse(req.stateSnapshot)
+        val confirmedPayload: Map[String, Any] = Map(
+          "orderId" -> orderId,
+          "shares" -> fundSnap.getOrElse("shares", req.stateSnapshot.getOrElse("shares", 0L)),
+          "nav" -> fundSnap.getOrElse("nav", req.stateSnapshot.getOrElse("nav", BigDecimal("0.00")))
+        )
+        effects.dispatch("FundOrder.RecordFundTAConfirmed", confirmedPayload)
         Right(TaBridgeSettlementSuccessResponse(
           ruleId = "TA-BR-03",
           responseType = Some("TaBridgeAcknowledgement"),

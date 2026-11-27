@@ -27,7 +27,8 @@ final class TaBridgeSettlementEarsSpec extends AnyFunSuite {
     val req = TaBridgeSettlementRequest(
       operation = "BankTaBridgePort.ingestOutcome",
       payload = Map[String, Any]("orderId" -> ""),
-      stateSnapshot = Map.empty[String, Any]
+      stateSnapshot = Map.empty[String, Any],
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("ta-bridge-service"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = TaBridgeSettlementImpl.handle(req, externs, effects)
     outcome match {
@@ -55,7 +56,8 @@ final class TaBridgeSettlementEarsSpec extends AnyFunSuite {
     val req = TaBridgeSettlementRequest(
       operation = "BankTaBridgePort.ingestOutcome",
       payload = Map[String, Any]("orderId" -> ""),
-      stateSnapshot = Map.empty[String, Any]
+      stateSnapshot = Map.empty[String, Any],
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("ta-bridge-service"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = TaBridgeSettlementImpl.handle(req, externs, effects)
     outcome match {
@@ -83,12 +85,17 @@ final class TaBridgeSettlementEarsSpec extends AnyFunSuite {
     val req = TaBridgeSettlementRequest(
       operation = "BankTaBridgePort.ingestOutcome",
       payload = Map[String, Any]("orderId" -> ""),
-      stateSnapshot = Map.empty[String, Any]
+      stateSnapshot = Map[String, Any]("shares" -> 1L, "fundOrder" -> Map[String, Any]("shares" -> 1L, "nav" -> "10.0000"), "nav" -> "10.0000"),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("ta-bridge-service"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = TaBridgeSettlementImpl.handle(req, externs, effects)
     outcome match {
       case Right(res) =>
-        assert(dispatches.exists(_._1 == "FundOrder.RecordFundTAConfirmed"), "expected dispatch FundOrder.RecordFundTAConfirmed")
+        val dispatched_0 = dispatches.find(_._1 == "FundOrder.RecordFundTAConfirmed").getOrElse(fail("expected dispatch FundOrder.RecordFundTAConfirmed"))
+        assert(dispatched_0._2.get("shares").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordFundTAConfirmed.shares")
+        assert(dispatched_0._2.get("shares").map(_.toString).contains("1"), "expected snapshot-backed FundOrder.RecordFundTAConfirmed.shares")
+        assert(dispatched_0._2.get("nav").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordFundTAConfirmed.nav")
+        assert(dispatched_0._2.get("nav").map(_.toString).contains("10.0000"), "expected snapshot-backed FundOrder.RecordFundTAConfirmed.nav")
         assert(!dispatches.exists(_._1 == "FundOrder.RequestIndependentRefund"), "forbidden dispatch FundOrder.RequestIndependentRefund must not occur")
         assert(res.responseType.contains("TaBridgeAcknowledgement"))
         assert(res.response.get("state").contains("confirmed"))
@@ -114,12 +121,14 @@ final class TaBridgeSettlementEarsSpec extends AnyFunSuite {
     val req = TaBridgeSettlementRequest(
       operation = "BankTaBridgePort.ingestOutcome",
       payload = Map[String, Any]("orderId" -> ""),
-      stateSnapshot = Map.empty[String, Any]
+      stateSnapshot = Map.empty[String, Any],
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("ta-bridge-service"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = TaBridgeSettlementImpl.handle(req, externs, effects)
     outcome match {
       case Right(res) =>
-        assert(dispatches.exists(_._1 == "FundOrder.RequestIndependentRefund"), "expected dispatch FundOrder.RequestIndependentRefund")
+        val dispatched_0 = dispatches.find(_._1 == "FundOrder.RequestIndependentRefund").getOrElse(fail("expected dispatch FundOrder.RequestIndependentRefund"))
+        assert(dispatched_0._2.get("orderId").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestIndependentRefund.orderId")
         assert(!dispatches.exists(_._1 == "FundOrder.RecordFundTAConfirmed"), "forbidden dispatch FundOrder.RecordFundTAConfirmed must not occur")
         assert(res.responseType.contains("TaBridgeAcknowledgement"))
         assert(res.response.get("state").contains("refund_dispatched"))
@@ -145,7 +154,8 @@ final class TaBridgeSettlementEarsSpec extends AnyFunSuite {
     val req = TaBridgeSettlementRequest(
       operation = "BankTaBridgePort.ingestOutcome",
       payload = Map[String, Any]("orderId" -> ""),
-      stateSnapshot = Map.empty[String, Any]
+      stateSnapshot = Map.empty[String, Any],
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("ta-bridge-service"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = TaBridgeSettlementImpl.handle(req, externs, effects)
     outcome match {

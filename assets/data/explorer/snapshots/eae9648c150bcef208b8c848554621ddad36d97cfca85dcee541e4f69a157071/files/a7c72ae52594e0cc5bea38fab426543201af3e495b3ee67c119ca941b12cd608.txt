@@ -24,7 +24,7 @@ test("[TA-BR-01] (primary) BankTaBridgePort.ingestOutcome -> reject TA_UNKNOWN_O
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {} };
+  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {}, principal: {"id":"principal-1","roles":["ta-bridge-service"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = taBridgeSettlementHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, false, "expected application rejection");
   if (!outcome.ok) {
@@ -49,7 +49,7 @@ test("[TA-BR-02] (primary) BankTaBridgePort.ingestOutcome -> reject TA_INVALID_R
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {} };
+  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {}, principal: {"id":"principal-1","roles":["ta-bridge-service"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = taBridgeSettlementHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, false, "expected application rejection");
   if (!outcome.ok) {
@@ -74,10 +74,17 @@ test("[TA-BR-03] (primary) BankTaBridgePort.ingestOutcome -> dispatch FundOrder.
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {} };
+  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {"shares":1,"fundOrder":{"shares":1,"nav":"10.0000"},"nav":"10.0000"}, principal: {"id":"principal-1","roles":["ta-bridge-service"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = taBridgeSettlementHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
-  assert.equal(dispatches.some(x => x.target === "FundOrder.RecordFundTAConfirmed"), true, "expected dispatch FundOrder.RecordFundTAConfirmed");
+  const dispatched_0 = dispatches.find(x => x.target === "FundOrder.RecordFundTAConfirmed");
+  assert.ok(dispatched_0, "expected dispatch FundOrder.RecordFundTAConfirmed");
+  assert.notEqual(dispatched_0.payload["shares"], undefined, "expected dispatched field FundOrder.RecordFundTAConfirmed.shares");
+  assert.notEqual(dispatched_0.payload["shares"], null, "expected non-null dispatched field FundOrder.RecordFundTAConfirmed.shares");
+  assert.equal(String(dispatched_0.payload["shares"]), "1", "expected snapshot-backed FundOrder.RecordFundTAConfirmed.shares");
+  assert.notEqual(dispatched_0.payload["nav"], undefined, "expected dispatched field FundOrder.RecordFundTAConfirmed.nav");
+  assert.notEqual(dispatched_0.payload["nav"], null, "expected non-null dispatched field FundOrder.RecordFundTAConfirmed.nav");
+  assert.equal(String(dispatched_0.payload["nav"]), "10.0000", "expected snapshot-backed FundOrder.RecordFundTAConfirmed.nav");
   assert.equal(dispatches.filter(x => x.target === "FundOrder.RequestIndependentRefund").length, 0, "forbidden dispatch FundOrder.RequestIndependentRefund must not occur");
   if (outcome.ok) {
     assert.equal(outcome.responseType, "TaBridgeAcknowledgement");
@@ -101,10 +108,13 @@ test("[TA-BR-04] (primary) BankTaBridgePort.ingestOutcome -> dispatch FundOrder.
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {} };
+  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {}, principal: {"id":"principal-1","roles":["ta-bridge-service"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = taBridgeSettlementHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
-  assert.equal(dispatches.some(x => x.target === "FundOrder.RequestIndependentRefund"), true, "expected dispatch FundOrder.RequestIndependentRefund");
+  const dispatched_0 = dispatches.find(x => x.target === "FundOrder.RequestIndependentRefund");
+  assert.ok(dispatched_0, "expected dispatch FundOrder.RequestIndependentRefund");
+  assert.notEqual(dispatched_0.payload["orderId"], undefined, "expected dispatched field FundOrder.RequestIndependentRefund.orderId");
+  assert.notEqual(dispatched_0.payload["orderId"], null, "expected non-null dispatched field FundOrder.RequestIndependentRefund.orderId");
   assert.equal(dispatches.filter(x => x.target === "FundOrder.RecordFundTAConfirmed").length, 0, "forbidden dispatch FundOrder.RecordFundTAConfirmed must not occur");
   if (outcome.ok) {
     assert.equal(outcome.responseType, "TaBridgeAcknowledgement");
@@ -128,7 +138,7 @@ test("[TA-BR-05] (primary) BankTaBridgePort.ingestOutcome -> respond TaBridgeAck
     pin(artifact, inputs) { pins.push({ artifact, inputs }); },
     dispatch(target, payload) { dispatches.push({ target, payload }); },
   };
-  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {} };
+  const req = { operation: "BankTaBridgePort.ingestOutcome", payload: {"orderId":""}, stateSnapshot: {}, principal: {"id":"principal-1","roles":["ta-bridge-service"],"tenantId":"tenant-1","attributes":{},"entitlements":[]} };
   const outcome = taBridgeSettlementHandler.handle(req, externs, effects);
   assert.equal(outcome.ok, true, "expected application success");
   assert.equal(dispatches.filter(x => x.target === "FundOrder.RequestIndependentRefund").length, 0, "forbidden dispatch FundOrder.RequestIndependentRefund must not occur");

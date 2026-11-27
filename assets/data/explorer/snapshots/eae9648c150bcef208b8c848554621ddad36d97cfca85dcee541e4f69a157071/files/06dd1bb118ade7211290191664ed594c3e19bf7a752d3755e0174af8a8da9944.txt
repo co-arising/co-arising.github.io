@@ -16,11 +16,17 @@ export const taBridgeSettlementHandler: TaBridgeSettlementHandler = {
       return { ok: false, code: "TA_INVALID_RECEIPT", ruleId: "TA-BR-02" };
     }
 
-    // [AX-TA-1]: strip untrusted investorAccountId & fundCollectionAccountId; forward only orderId
+    // [AX-TA-1]: strip untrusted investorAccountId & fundCollectionAccountId; forward only orderId + server-trusted snapshot fields
     const sanitized = { orderId };
 
     if (externs.taOutcomeConfirmed(orderId)) {
-      effects.dispatch("FundOrder.RecordFundTAConfirmed", sanitized);
+      const snap = ((req.stateSnapshot?.fundOrder ?? req.stateSnapshot ?? {}) as Readonly<Record<string, unknown>>);
+      const confirmedPayload = {
+        orderId,
+        shares: snap.shares ?? req.stateSnapshot?.shares,
+        nav: snap.nav ?? req.stateSnapshot?.nav,
+      };
+      effects.dispatch("FundOrder.RecordFundTAConfirmed", confirmedPayload);
       return {
         ok: true,
         ruleId: "TA-BR-03",

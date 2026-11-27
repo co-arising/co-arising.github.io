@@ -25,7 +25,7 @@ final class BankOrderReadsideProjectionHandler(
   override def process(envelope: EventEnvelope[Any]): Future[Done] =
     envelope.event match {
       case e: FundOrderEntity.CashRequestSourceRecorded =>
-        val base = BankOrderView(principal = envelope.persistenceId)
+        val base = BankOrderView(clientRequestId = envelope.persistenceId)
         repository.upsert(base.copy(principal = e.principal, clientRequestId = e.clientRequestId)).map(_ => Done)
       case _ => bindings.onUnmatchedEvent(envelope)
     }

@@ -27,7 +27,8 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -55,7 +56,8 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -83,7 +85,8 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "succeeded", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "CNY", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "succeeded", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "succeeded", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -111,7 +114,8 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "CNY", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -139,14 +143,23 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "id_5", "clientRequestId" -> "CNY"),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
       case Right(res) =>
         assert(pins.exists(_._1 == "BankCashOriginal"), "expected pin BankCashOriginal")
-        assert(dispatches.exists(_._1 == "FundOrder.RecordCashRequestSource"), "expected dispatch FundOrder.RecordCashRequestSource")
-        assert(dispatches.exists(_._1 == "FundOrder.RequestFundPurchaseSettlement"), "expected dispatch FundOrder.RequestFundPurchaseSettlement")
+        val dispatched_0 = dispatches.find(_._1 == "FundOrder.RecordCashRequestSource").getOrElse(fail("expected dispatch FundOrder.RecordCashRequestSource"))
+        assert(dispatched_0._2.get("principal").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordCashRequestSource.principal")
+        assert(dispatched_0._2.get("clientRequestId").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordCashRequestSource.clientRequestId")
+        assert(dispatched_0._2.get("fundCode").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordCashRequestSource.fundCode")
+        assert(dispatched_0._2.get("amount").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordCashRequestSource.amount")
+        val dispatched_1 = dispatches.find(_._1 == "FundOrder.RequestFundPurchaseSettlement").getOrElse(fail("expected dispatch FundOrder.RequestFundPurchaseSettlement"))
+        assert(dispatched_1._2.get("principal").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.principal")
+        assert(dispatched_1._2.get("clientRequestId").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.clientRequestId")
+        assert(dispatched_1._2.get("fundCode").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.fundCode")
+        assert(dispatched_1._2.get("amount").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.amount")
         assert(res.responseType.contains("BankCashAcknowledgement"))
         assert(res.response.get("accepted").contains(true))
         assert(res.response.get("replayed").contains(false))
@@ -172,14 +185,23 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "CNY", "clientRequestId" -> "id_6"),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
       case Right(res) =>
         assert(pins.exists(_._1 == "BankCashOriginal"), "expected pin BankCashOriginal")
-        assert(dispatches.exists(_._1 == "FundOrder.RecordCashRequestSource"), "expected dispatch FundOrder.RecordCashRequestSource")
-        assert(dispatches.exists(_._1 == "FundOrder.RequestFundPurchaseSettlement"), "expected dispatch FundOrder.RequestFundPurchaseSettlement")
+        val dispatched_0 = dispatches.find(_._1 == "FundOrder.RecordCashRequestSource").getOrElse(fail("expected dispatch FundOrder.RecordCashRequestSource"))
+        assert(dispatched_0._2.get("principal").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordCashRequestSource.principal")
+        assert(dispatched_0._2.get("clientRequestId").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordCashRequestSource.clientRequestId")
+        assert(dispatched_0._2.get("fundCode").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordCashRequestSource.fundCode")
+        assert(dispatched_0._2.get("amount").exists(v => v != null), "expected non-null dispatched field FundOrder.RecordCashRequestSource.amount")
+        val dispatched_1 = dispatches.find(_._1 == "FundOrder.RequestFundPurchaseSettlement").getOrElse(fail("expected dispatch FundOrder.RequestFundPurchaseSettlement"))
+        assert(dispatched_1._2.get("principal").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.principal")
+        assert(dispatched_1._2.get("clientRequestId").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.clientRequestId")
+        assert(dispatched_1._2.get("fundCode").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.fundCode")
+        assert(dispatched_1._2.get("amount").exists(v => v != null), "expected non-null dispatched field FundOrder.RequestFundPurchaseSettlement.amount")
         assert(res.responseType.contains("BankCashAcknowledgement"))
         assert(res.response.get("accepted").contains(true))
         assert(res.response.get("replayed").contains(false))
@@ -205,7 +227,8 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "id_5", "clientRequestId" -> "id_6"),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -235,7 +258,8 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "CNY", "clientRequestId" -> "id_6"),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -265,7 +289,8 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "id_5", "clientRequestId" -> "id_6"),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -293,7 +318,8 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     val req = CashFundPurchaseRequest(
       operation = "BankCashSubmitPort.submit",
       payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""), "principal" -> "", "fundCode" -> "CNY", "clientRequestId" -> "id_6"),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> ""))
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "CNY", "amount" -> "0.02"), "order" -> Map[String, Any]("paymentOutcome" -> "", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -320,8 +346,9 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     }
     val req = CashFundPurchaseRequest(
       operation = "BankOrderQuery.get",
-      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "id_5"), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "id_5"))
+      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "id_5"), "principal" -> "", "fundCode" -> "", "clientRequestId" -> "", "orderId" -> "sample_orderId"),
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "id_5")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -350,8 +377,9 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     }
     val req = CashFundPurchaseRequest(
       operation = "BankOrderQuery.get",
-      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "id_5"), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "id_5"))
+      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "id_5"), "principal" -> "", "fundCode" -> "", "clientRequestId" -> "", "orderId" -> "sample_orderId"),
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "id_5")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -380,8 +408,9 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     }
     val req = CashFundPurchaseRequest(
       operation = "BankOrderQuery.get",
-      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "confirmed"), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "confirmed"))
+      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "confirmed"), "principal" -> "", "fundCode" -> "", "clientRequestId" -> "", "orderId" -> "sample_orderId"),
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "confirmed")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -410,8 +439,9 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     }
     val req = CashFundPurchaseRequest(
       operation = "BankOrderQuery.get",
-      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "confirmed"), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "confirmed"))
+      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "confirmed"), "principal" -> "", "fundCode" -> "", "clientRequestId" -> "", "orderId" -> "sample_orderId"),
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "succeeded", "taStatus" -> "confirmed")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -440,8 +470,9 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     }
     val req = CashFundPurchaseRequest(
       operation = "BankOrderQuery.get",
-      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "confirmed", "taStatus" -> ""), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "confirmed", "taStatus" -> ""))
+      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "confirmed", "taStatus" -> ""), "principal" -> "", "fundCode" -> "", "clientRequestId" -> "", "orderId" -> "sample_orderId"),
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.00"), "order" -> Map[String, Any]("paymentOutcome" -> "confirmed", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {
@@ -470,8 +501,9 @@ final class CashFundPurchaseEarsSpec extends AnyFunSuite {
     }
     val req = CashFundPurchaseRequest(
       operation = "BankOrderQuery.get",
-      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "confirmed", "taStatus" -> ""), "principal" -> "", "fundCode" -> "", "clientRequestId" -> ""),
-      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "confirmed", "taStatus" -> ""))
+      payload = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "confirmed", "taStatus" -> ""), "principal" -> "", "fundCode" -> "", "clientRequestId" -> "", "orderId" -> "sample_orderId"),
+      stateSnapshot = Map[String, Any]("amount" -> Map[String, Any]("currency" -> "", "amount" -> "0.01"), "order" -> Map[String, Any]("paymentOutcome" -> "confirmed", "taStatus" -> "")),
+      principal = Some(Map[String, Any]("id" -> "principal-1", "roles" -> Seq[Any]("investor"), "tenantId" -> "tenant-1", "attributes" -> Map.empty[String, Any], "entitlements" -> Seq.empty[Any]))
     )
     val outcome = CashFundPurchaseImpl.handle(req, externs, effects)
     outcome match {

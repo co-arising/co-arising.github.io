@@ -7,8 +7,8 @@ import example.bankwealth.v2.application.readmodels.bank_order_readside.BankOrde
 import scala.concurrent.Future
 
 trait BankOrderReadsideRepository {
-  def findById(principal: String): Future[Option[BankOrderView]]
+  def findById(clientRequestId: String): Future[Option[BankOrderView]]
   def list(page: Int = 1, pageSize: Int = 50): Future[Seq[BankOrderView]]
   def upsert(row: BankOrderView): Future[Unit]
-  def deleteById(principal: String): Future[Unit]
+  def deleteById(clientRequestId: String): Future[Unit]
 }
