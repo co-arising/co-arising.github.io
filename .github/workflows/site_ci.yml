@@ -1,0 +1,39 @@
+name: site-ci
+
+on:
+  push:
+    branches: [main, feat/co-arising-v2-site]
+  pull_request:
+  schedule:
+    - cron: '0 9 * * *'
+
+jobs:
+  verify-site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Static site structure & link gate
+        run: python3 -B tools/check-site.py --strict
+
+      - name: Example syntax & declared CLI gate
+        run: node tools/check-examples.mjs
+
+      - name: Public payload & snapshot integrity gate
+        run: python3 -B tools/check-public-payloads.py
+
+      - name: Cross-file fact consistency & orphan snapshot gate
+        run: node tools/check-site-consistency.mjs
+
+      - name: Site tooling unit tests
+        run: node --test tools/tests/*.test.mjs
