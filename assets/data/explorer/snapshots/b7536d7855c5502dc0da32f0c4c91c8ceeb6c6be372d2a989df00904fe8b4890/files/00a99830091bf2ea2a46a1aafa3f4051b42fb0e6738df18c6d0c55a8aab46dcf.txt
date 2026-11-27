@@ -5,8 +5,8 @@ package example.bankwealth.v2.application.process
 
 import net.imadz.infra.saga.strict.StrictDurable
 
-object TaBridgeSettlementSagaSagaModule {
-  val FlowName: String = "TaBridgeSettlementSaga"
+object TaBridgeSettlementSagaModule {
+  val FlowName: String = "TaBridgeSettlement"
   val TriggerEvent: String = "TaBridgeSettlementInitiated"
   val OrderedSteps: Vector[String] = Vector("FundOrder.RecordFundTAConfirmed", "FundOrder.RequestIndependentRefund")
 

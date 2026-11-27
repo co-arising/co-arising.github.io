@@ -4,15 +4,15 @@ syntax = "proto3";
 
 package example.bankwealth.v2.infrastructure.proto;
 
-message CashFundPurchaseSagaStartedPO {
+message TaBridgeSettlementStartedPO {
   string correlation_id = 1;
 }
 
-message CashFundPurchaseSagaStepCompletedPO {
+message TaBridgeSettlementStepCompletedPO {
   string correlation_id = 1;
   string step = 2;
 }
 
-message CashFundPurchaseSagaCompletedPO {
+message TaBridgeSettlementCompletedPO {
   string correlation_id = 1;
 }

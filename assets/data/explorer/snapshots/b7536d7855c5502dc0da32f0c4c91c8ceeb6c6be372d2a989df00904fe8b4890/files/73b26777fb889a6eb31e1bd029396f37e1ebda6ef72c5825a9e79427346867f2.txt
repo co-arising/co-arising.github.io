@@ -13,14 +13,14 @@ import javax.inject.{Inject, Singleton}
 final class SagaCoordinatorBootstrap @Inject()(
   classicSystem: akka.actor.ActorSystem,
   sharding: ClusterSharding
-) extends CashFundPurchaseSagaProcessBootstrap
-  with TaBridgeSettlementSagaProcessBootstrap
+) extends CashFundPurchaseProcessBootstrap
+  with TaBridgeSettlementProcessBootstrap
   with CashFundPurchaseEffectBootstrap
   with TaBridgeSettlementEffectBootstrap {
   private val system: ActorSystem[Nothing] = classicSystem.toTyped
 
-  initCashFundPurchaseSagaProcess(sharding)
-  initTaBridgeSettlementSagaProcess(sharding)
+  initCashFundPurchaseProcess(sharding)
+  initTaBridgeSettlementProcess(sharding)
   initCashFundPurchaseEffect(system)
   initTaBridgeSettlementEffect(system)
 }

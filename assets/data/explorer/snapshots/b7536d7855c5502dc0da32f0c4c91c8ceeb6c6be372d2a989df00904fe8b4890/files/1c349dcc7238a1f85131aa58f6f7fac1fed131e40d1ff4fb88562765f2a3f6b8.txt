@@ -7,8 +7,8 @@ akka.actor.serializers {
   proto = "akka.remote.serialization.ProtobufSerializer"
   domainProto0 = "example.bankwealth.v2.infrastructure.persistence.DomainProtoSerializer"
   strict-saga = "net.imadz.infra.saga.strict.StrictSagaSerializer"
-  cash-fund-purchase-saga-host = "example.bankwealth.v2.infrastructure.persistence.DomainProtoSerializer"
-  ta-bridge-settlement-saga-host = "example.bankwealth.v2.infrastructure.persistence.DomainProtoSerializer"
+  cash-fund-purchase-host = "example.bankwealth.v2.infrastructure.persistence.DomainProtoSerializer"
+  ta-bridge-settlement-host = "example.bankwealth.v2.infrastructure.persistence.DomainProtoSerializer"
   cash-fund-purchase-effect = "example.bankwealth.v2.infrastructure.persistence.DomainProtoSerializer"
   ta-bridge-settlement-effect = "example.bankwealth.v2.infrastructure.persistence.DomainProtoSerializer"
 }
@@ -19,8 +19,8 @@ akka.actor.serialization-bindings {
   "scalapb.GeneratedMessage" = domainProto0
   "scalapb.GeneratedOneof" = domainProto0
   "net.imadz.infra.saga.strict.StrictDurable" = strict-saga
-  "example.bankwealth.v2.application.process.CashFundPurchaseSagaSagaModule$SagaEvent" = cash-fund-purchase-saga-host
-  "example.bankwealth.v2.application.process.TaBridgeSettlementSagaSagaModule$SagaEvent" = ta-bridge-settlement-saga-host
+  "example.bankwealth.v2.application.process.CashFundPurchaseSagaModule$SagaEvent" = cash-fund-purchase-host
+  "example.bankwealth.v2.application.process.TaBridgeSettlementSagaModule$SagaEvent" = ta-bridge-settlement-host
   "example.bankwealth.v2.application.process.CashFundPurchaseEffectFace$EffectEvent" = cash-fund-purchase-effect
   "example.bankwealth.v2.application.process.TaBridgeSettlementEffectFace$EffectEvent" = ta-bridge-settlement-effect
 }
