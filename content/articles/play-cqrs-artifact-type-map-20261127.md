@@ -1,6 +1,6 @@
 # Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景
 
-> 版本锚定：`metarch-truthsrc` @ [`8950ba3`](https://github.com/co-arising/metarch-truthsrc)（`scala-cqrs-play-service:2` · `catalogSha256: 156b224f3614` · 60 族 / 14 生产者 / 64 种 `artifactKinds`） · `bank-wealth-demo` @ [`b5cadc0`](https://github.com/co-arising/bank-wealth-demo) · 本文受 `assets/data/artifact-maps.lock.json` 与 `sync-site-facts` 门禁受控同步（对应站点状态台账 `F-32` / `F-33`）。
+> 版本锚定：`metarch-truthsrc` @ [`ab207e7`](https://github.com/co-arising/metarch-truthsrc)（`scala-cqrs-play-service:2` · `catalogSha256: 156b224f3614` · 60 族 / 14 生产者 / 64 种 `artifactKinds`） · `bank-wealth-demo` @ [`b5cadc0`](https://github.com/co-arising/bank-wealth-demo) · 本文受 `assets/data/artifact-maps.lock.json` 与 `sync-site-facts` 门禁受控同步（对应站点状态台账 `F-32` / `F-33`）。
 
 在大多数代码生成器里，“一个模型生成一份巨型 `Service.scala`”看似简单，但只要业务规则、持久化、权限、长流程和读模型同时演化，生成器很快就会退化成不可维护的字符串大杂烩——**AI 和人类改一处就会污染十处，洋葱架构的依赖边界也形同虚设**。
 

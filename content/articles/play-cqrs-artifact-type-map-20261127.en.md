@@ -1,6 +1,6 @@
 # Play CQRS (scala-cqrs-play-service:2) Artifact Type Architecture Map: Onion Layers, Decomposition & Re-Assembly, and Target Code Reference
 
-> Version lock: `metarch-truthsrc` @ [`8950ba3`](https://github.com/co-arising/metarch-truthsrc) (`scala-cqrs-play-service:2` · `catalogSha256: 156b224f3614` · 60 unified families / 14 producers / 64 `artifactKinds`) · `bank-wealth-demo` @ [`b5cadc0`](https://github.com/co-arising/bank-wealth-demo) · Controlled by `assets/data/artifact-maps.lock.json` and the `sync-site-facts` CI gate (cross-referenced with `F-32` / `F-33` on the status page).
+> Version lock: `metarch-truthsrc` @ [`ab207e7`](https://github.com/co-arising/metarch-truthsrc) (`scala-cqrs-play-service:2` · `catalogSha256: 156b224f3614` · 60 unified families / 14 producers / 64 `artifactKinds`) · `bank-wealth-demo` @ [`b5cadc0`](https://github.com/co-arising/bank-wealth-demo) · Controlled by `assets/data/artifact-maps.lock.json` and the `sync-site-facts` CI gate (cross-referenced with `F-32` / `F-33` on the status page).
 
 Most code generators emit one giant `OrderService.scala` per model. That shortcut feels fast on day one, yet as soon as invariants, persistence adapters, authorization, read projections, and reactive policies evolve together, templates collapse into an untestable tangle where **AI edits leak infrastructure into business rules and Onion boundaries erode silently**.
 
