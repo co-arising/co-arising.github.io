@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>metarch-truthsrc 战略架构地图与地下暗道排雷手册（v2.0.0 源码级全解） — co-arising</title>
-  <meta name="description" content="从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、两波 13 个已实锤 Bug 的拓扑归因（SPEC-S13..S20），以及一套可直接落地的探针排雷法与 Wave-3 诚实边界雷达（与 metarch-truthsrc@2f4d33d 提交哈希机读绑定）。" />
+  <meta name="description" content="从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、四波 24 处实锤清零战报（SPEC-S13..S25），以及一套可直接落地的探针排雷法与 Wave-5 诚实边界雷达（与 metarch-truthsrc@1e87c6a 提交哈希机读绑定）。" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="metarch-truthsrc 战略架构地图与地下暗道排雷手册（v2.0.0 源码级全解）" />
-  <meta property="og:description" content="从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、两波 13 个已实锤 Bug 的拓扑归因（SPEC-S13..S20），以及一套可直接落地的探针排雷法与 Wave-3 诚实边界雷达（与 metarch-truthsrc@2f4d33d 提交哈希机读绑定）。" />
+  <meta property="og:description" content="从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、四波 24 处实锤清零战报（SPEC-S13..S25），以及一套可直接落地的探针排雷法与 Wave-5 诚实边界雷达（与 metarch-truthsrc@1e87c6a 提交哈希机读绑定）。" />
   <meta property="og:url" content="https://co-arising.github.io/zh/articles/metarch-truthsrc-architecture-minefield-map-20261127/" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -34,13 +34,13 @@
       <nav class="article-breadcrumb" aria-label="面包屑"><a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a> / <span aria-current="page">工程实践</span></nav>
       <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-27">2026-11-27</time> · 中文原文</p>
       <h1>metarch-truthsrc 战略架构地图与地下暗道排雷手册（v2.0.0 源码级全解）</h1>
-      <p class="article-deck">从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、两波 13 个已实锤 Bug 的拓扑归因（SPEC-S13..S20），以及一套可直接落地的探针排雷法与 Wave-3 诚实边界雷达（与 metarch-truthsrc@2f4d33d 提交哈希机读绑定）。</p>
+      <p class="article-deck">从宏观编译主干到六大战区源码目录、14 条跨文件隐蔽耦合「地下暗道」、四波 24 处实锤清零战报（SPEC-S13..S25），以及一套可直接落地的探针排雷法与 Wave-5 诚实边界雷达（与 metarch-truthsrc@1e87c6a 提交哈希机读绑定）。</p>
       <div class="article-actions"><a href="/content/articles/metarch-truthsrc-architecture-minefield-map-20261127.md" download="metarch-truthsrc-architecture-minefield-map-20261127.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/metarch-truthsrc-architecture-minefield-map-20261127/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文通过 artifact-maps.lock.json 与 metarch-truthsrc v2.0.0（提交 b2b61e5，bank-wealth-demo @ bd20e36）精确绑定，记录当前模块拓扑、14 条跨文件隐蔽耦合暗道、两波 13 个已实锤修复（SPEC-S13..S20）及 Wave-3 诚实边界雷达；正式产品验收基线请以状态页（F-32–F-35）为准。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
     <div class="article-layout">
       <aside class="article-sidebar">
-        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 战略俯瞰（Level 0）：整座城池的宏观地形图</a></li><li><a href="#section-2"><span class="toc-number">02</span> 战区与目录地图（Level 1）：六大模块与源码索引</a></li><li><a href="#section-3"><span class="toc-number">03</span> 核心数据流与状态机（Level 2）：一条规则如何穿越全链路？</a></li><li><a href="#section-4"><span class="toc-number">04</span> 地下暗道图（Level 3）：14 条最容易踩爆的跨文件隐蔽耦合</a></li><li><a href="#section-5"><span class="toc-number">05</span> 实战复盘（Level 4A）：上一波「按图排雷」如何 7 战 7 中？</a></li><li><a href="#section-6"><span class="toc-number">06</span> 下一波排雷手册（Level 4B）：四步探针法与 Wave-3 诚实边界雷达</a></li></ol></nav></details>
+        <details class="article-toc" open="open"><summary>阅读目录</summary><nav aria-label="文章目录"><ol><li><a href="#section-1"><span class="toc-number">01</span> 战略俯瞰（Level 0）：整座城池的宏观地形图</a></li><li><a href="#section-2"><span class="toc-number">02</span> 战区与目录地图（Level 1）：六大模块与源码索引</a></li><li><a href="#section-3"><span class="toc-number">03</span> 核心数据流与状态机（Level 2）：一条规则如何穿越全链路？</a></li><li><a href="#section-4"><span class="toc-number">04</span> 地下暗道图（Level 3）：14 条最容易踩爆的跨文件隐蔽耦合</a></li><li><a href="#section-5"><span class="toc-number">05</span> 实战复盘（Level 4A）：四波「按图排雷」战报（SPEC-S13..S25）</a></li><li><a href="#section-6"><span class="toc-number">06</span> 下一波排雷手册（Level 4B）：四步探针法与 Wave-5 诚实边界雷达</a></li></ol></nav></details>
         <p id="reading-position" class="reading-position">阅读全文</p>
         <div class="sidebar-community">
           <p class="sidebar-community-kicker">社区讨论</p>
@@ -49,13 +49,13 @@
         </div>
       </aside>
       <article id="article-body" class="article-body"><blockquote>
-<p><strong>文档定位与源码基线</strong>：本文对照 <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> <strong>v2.0.0</strong>（锁定提交 <a href="https://github.com/co-arising/metarch-truthsrc/commit/2f4d33da6a3964ed72ca842b8a38164342adc0ae"><code>2f4d33d</code></a>，<code>bank-wealth-demo</code> @ <code>b5cadc0</code>）全部核心源码撰写，是一份<strong>从粗到细、从宏观主干到源码接缝</strong>的工程作战地图。与介绍设计理念的 <a href="https://co-arising.github.io/zh/articles/co-arising-v2-ears-native-architecture-20261126/">co-arising 2.0 长期架构蓝图</a> 以及面向用户的 <a href="https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">GA 完整指南</a> 不同，本文把整个编译器切开，标注<strong>模块边界、数据流向、14 条跨文件隐蔽耦合（地下暗道）</strong>，以及一套已被两波实证的<strong>探针排雷法、13 个已清零 Bug 与下一波 Pre-Z3/Post-Z3 靶点</strong>，并通过 <code>artifact-maps.lock.json</code> 与仓库提交哈希机读绑定。</p>
+<p><strong>文档定位与源码基线</strong>：本文对照 <a href="https://github.com/co-arising/metarch-truthsrc"><code>metarch-truthsrc</code></a> <strong>v2.0.0</strong>（锁定提交 <a href="https://github.com/co-arising/metarch-truthsrc/commit/1e87c6a899cc05ffaa265b2b9c89d947975b1c78"><code>1e87c6a</code></a>，<code>bank-wealth-demo</code> @ <code>b5cadc0</code>）全部核心源码撰写，是一份<strong>从粗到细、从宏观主干到源码接缝</strong>的工程作战地图。与介绍设计理念的 <a href="https://co-arising.github.io/zh/articles/co-arising-v2-ears-native-architecture-20261126/">co-arising 2.0 长期架构蓝图</a> 以及面向用户的 <a href="https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/">GA 完整指南</a> 不同，本文把整个编译器切开，标注<strong>模块边界、数据流向、14 条跨文件隐蔽耦合（地下暗道）</strong>，以及一套已被四波实证的<strong>探针排雷法、24 项已清零缺陷（含 Wave-1..4 实锤与连带修复，锁入 <code>SPEC-S13..S25</code>）与下一波 Wave-5 诚实靶点</strong>，并通过 <code>artifact-maps.lock.json</code> 与仓库提交哈希机读绑定。</p>
 </blockquote>
 <div class="co-kpi-strip" role="region" aria-label="metarch-truthsrc v2.0.0 源码规模与排雷基线">
-<div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">v2 主干与 EARS/Play 生成器 34,486 LOC + 1.0 精选 24 家族发射器 14,125 LOC</div></div>
+<div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">v2 主干与 EARS/Play 生成器 34.5k+ LOC + 1.0 精选 24 家族发射器 14,125 LOC</div></div>
 <div><div class="kpi-num">44 / 32 / 159</div><div class="kpi-label">surface-registry 锁定的 44 个 CLI 命令、32 个 MCP 工具与 159 个诊断错误码</div></div>
 <div><div class="kpi-num red">14 条暗道</div><div class="kpi-label">横跨类型系统、1.0/2.0 桥接、测试预言机与门禁断层的隐蔽耦合拓扑</div></div>
-<div><div class="kpi-num">两波 13/13</div><div class="kpi-label">Wave-1（7/7）+ Wave-2（6/6）按图推演并实锤清零，锁定 SPEC-S13..S20</div></div>
+<div><div class="kpi-num">四波 24 雷清零</div><div class="kpi-label">Wave-1(7) + Wave-2(6) + Wave-3(5+4连带 @ 57e6440) + Wave-4(2 @ 1e87c6a)，锁定 SPEC-S13..S25</div></div>
 </div>
 
 <h2 id="section-1">一、战略俯瞰（Level 0）：整座城池的宏观地形图</h2>
@@ -165,7 +165,7 @@
 </ol>
 <hr>
 <h2 id="section-2">二、战区与目录地图（Level 1）：六大模块与源码索引</h2>
-<p>截至 <code>2f4d33d</code>，整个 v2 工程核心分布于六大战区。下表精确标注每个关键文件的职责边界、体量（LOC）及读写契约，排雷时可直接按图索骥：</p>
+<p>截至 <code>1e87c6a</code>，整个 v2 工程核心分布于六大战区。下表精确标注每个关键文件的职责边界、基准体量（LOC）及读写契约，排雷时可直接按图索骥：</p>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：战区 / 核心文件（点击直达源码） / LOC / 核心职责 / 关键输入 / 输出契约"><table>
 <thead>
 <tr>
@@ -536,7 +536,7 @@
 </ul>
 </li>
 <li><strong>T07 · <code>tools/lint.mjs</code> 架构防污染门禁</strong>：<ul>
-<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a> 用正则静态扫描全部 625 个 JS/MJS 文件：严禁在通用核心出现业务专有名词（如 <code>CreditBalance</code>、<code>FundOrder</code>、<code>bankwealth</code>），严禁在 <code>lib/runtime-profile.mjs</code> 之外硬编码 <code>net.imadz</code>，严禁活跃 <code>emitter/families/</code> 拼接硬编码 <code>'app/'</code> 路径。</li>
+<li><a href="https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs"><code>tools/lint.mjs</code></a> 用正则静态扫描全部 626 个 JS/MJS 文件：严禁在通用核心出现业务专有名词（如 <code>CreditBalance</code>、<code>FundOrder</code>、<code>bankwealth</code>），严禁在 <code>lib/runtime-profile.mjs</code> 之外硬编码 <code>net.imadz</code>，严禁活跃 <code>emitter/families/</code> 拼接硬编码 <code>'app/'</code> 路径。</li>
 </ul>
 </li>
 </ol>
@@ -570,8 +570,8 @@
     - <code>HandwrittenBindingsModule.scala</code>、<code>ServerSnapshotProviderImpl.scala</code> 与全部 <code>@cloze</code> <code>*Impl.scala</code> 文件一旦落盘就永不覆写。当上游生成器新增 DI 参数（例如控制器新增 <code>ServerSnapshotProvider</code> 注入）或更新 <code>AuthEndpointDsl</code> 签名时，全新目录能过，<strong>存量老项目原地重生成却会因旧手写绑定文件缺新绑定而编译失败</strong>。</li>
 </ol>
 <hr>
-<h2 id="section-5">五、实战复盘（Level 4A）：上一波「按图排雷」如何 7 战 7 中？</h2>
-<p>在 6 子域考试平台首轮反馈（<a href="https://github.com/co-arising/metarch-truthsrc/issues/2">Issue #2</a>、<a href="https://github.com/co-arising/metarch-truthsrc/issues/3">#3</a>、<a href="https://github.com/co-arising/metarch-truthsrc/issues/4">#4</a>）落地修复后，我们正是顺着上述暗道图反推 6 个疑似雷区，写出真实端到端探针（跑完整 <code>compileCanonicalV2</code> + <code>node --test</code> + 真实 <code>sbt -batch compile</code>），结果<strong>6 个预测全中，还顺藤摸瓜多抓出 1 个编译级 Bug（共 7/7 实锤）</strong>：</p>
+<h2 id="section-5">五、实战复盘（Level 4A）：四波「按图排雷」战报（<code>SPEC-S13..S25</code>）</h2>
+<p>在 6 子域考试平台首轮反馈（<a href="https://github.com/co-arising/metarch-truthsrc/issues/2">Issue #2</a>、<a href="https://github.com/co-arising/metarch-truthsrc/issues/3">#3</a>、<a href="https://github.com/co-arising/metarch-truthsrc/issues/4">#4</a>）落地修复后，我们顺着上述暗道图持续推进四波对抗探针排雷（均走真实 <code>compileCanonicalV2</code> + <code>node --test</code> + 离线 <code>scalac</code>/ScalaTest/Mutation Gate + 真实 <code>sbt -batch compile</code>）。<strong>Wave-1（7/7）</strong> 率先验证了按图推演法的命中率：</p>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：序号 / 实锤 Bug 症状 / 命中的暗道 / 最小对抗探针特征 / 最终修复与锁定验收"><table>
 <thead>
 <tr>
@@ -634,9 +634,9 @@
 </tr>
 </tbody>
 </table></div>
-<p>全量回归结果已锁入 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs"><code>test/scala-cqrs-play-service-v2-acceptance.spec.mjs</code></a>（<code>SPEC-S1..S20</code> 20/20 PASS），并通过真实 <code>sbt -batch stage</code> + Play 2.8.18 活体 HTTP 路演与 <code>bank-wealth-demo</code> 100% 变异门禁复核（详见 <a href="https://co-arising.github.io/zh/status/">状态页</a>）。</p>
+<p>全量回归结果已锁入 <a href="https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs"><code>test/scala-cqrs-play-service-v2-acceptance.spec.mjs</code></a>（当前累计 <code>SPEC-S1..S25</code> 25/25 PASS），并经过真实 <code>sbt -batch compile</code> / <code>stage</code> 与 100% 变异门禁复核（详见 <a href="https://co-arising.github.io/zh/status/">状态页</a>）。</p>
 <h3 id="section-5-1">第二波按图排雷战绩（提交 <code>2f4d33d</code> · 6/6 探针全中并清零）</h3>
-<p>基于本文最初列出的 M01–M08 雷达表，我们立即落地了第二波对抗探针（<code>probe_wave2_mines.mjs</code>），全部走真实 <code>compileCanonicalV2</code> + <code>generateScalaCqrsPlayServiceV2</code>/<code>ForBc</code> + <code>emitV2ExecutableTests</code> + 离线 <code>scalac</code> + 真实 <strong><code>sbt -batch compile</code></strong>，结果 <strong>6 组探针 100% 实锤</strong>（共消灭 10 处底层缺陷，全部锁入 <code>SPEC-S18..S20</code>）：</p>
+<p>基于最初列出的 M01–M08 雷达表，我们落地了第二波对抗探针（<code>probe_wave2_mines.mjs</code>），全部走真实 <code>compileCanonicalV2</code> + <code>generateScalaCqrsPlayServiceV2</code>/<code>ForBc</code> + <code>emitV2ExecutableTests</code> + 离线 <code>scalac</code> + 真实 <strong><code>sbt -batch compile</code></strong>，结果 <strong>6 组探针 100% 实锤</strong>（共消灭 10 处底层缺陷，全部锁入 <code>SPEC-S18..S20</code>）：</p>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：雷达编号 / 实锤缺陷与根因 / 最终修复与锁定验收（2f4d33d）"><table>
 <thead>
 <tr>
@@ -678,8 +678,69 @@
 </tr>
 </tbody>
 </table></div>
+<h3 id="section-5-2">第三波按图排雷战绩（提交 <code>57e6440</code> · M02/M09–M12 + 4 项连带隐雷清零）</h3>
+<p>紧接着 Wave-3 雷达表（M02 + Pre-Z3/Post-Z3 M09–M12），我们在提交 <a href="https://github.com/co-arising/metarch-truthsrc/commit/57e6440a0f10b6dd94e02d10d23bb1be23b970d7"><code>57e6440</code></a> 落地全量探针并实锤清零 <strong>全部 5 项雷达靶点 + 4 项执行期连带发现的深层隐雷</strong>，经 <code>node --test</code> + 离线 <code>scalac</code> + 100% Scala Mutation Gate + 真实 Play 2.8.18 <code>sbt -batch compile</code>（69 Scala + 2 <code>.proto</code> 零错误）验收并锁入 <code>SPEC-S21..S24</code>：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：编号 / 实锤缺陷与根因 / 最终修复与锁定验收（57e6440）"><table>
+<thead>
+<tr>
+<th scope="col">编号</th>
+<th scope="col">实锤缺陷与根因</th>
+<th scope="col">最终修复与锁定验收（<code>57e6440</code>）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M02</strong></td>
+<td>应用层锁定测试对派发命令的快照衍生字段做严格 <code>toString</code> 等值断言，手写 handler 合法归一化/重算时误杀</td>
+<td><code>scala-strict-scalatest</code> / <code>scala-scalatest</code> / <code>typescript-node-test</code> 改为非空与运行时类型合法性断言，保留 <code>bindPrincipal</code> 严格相等校验（<code>SPEC-S21</code>）</td>
+</tr>
+<tr>
+<td><strong>M09 + M10</strong></td>
+<td><strong>Pre-Z3</strong>：<code>len == 0</code> 与 <code>sum == 0</code>、<code>forall</code> 空真性/<code>exists</code> 空假性未联立；同集合复用同一量词变量 <code>x</code> 时单 Skolem 冲突；<strong>Post-Z3</strong>：边界见证未替换绑定变量且丢弃 <code>@qdef(col)</code> 致 M10 变异杀灭率仅 71.43%</td>
+<td><code>smt-encoder</code> 引入 alpha 规范化量词签名、作用域见证 <code>@qel_N</code> 与默认元素 <code>@qdef(col)</code>、联立集合公理与不同标量见证推 <code>len &gt;= 2</code>；<code>first-hit-witness</code> 与 <code>witness-materialize</code> 对齐边界见证与 <code>defaultElem</code> 合并，M10 变异杀灭率拉满至 <strong>100%</strong>（<code>SPEC-S22</code>）</td>
+</tr>
+<tr>
+<td><strong>M11</strong></td>
+<td><code>sum(scores) &gt; 100</code> 等聚合求和守卫，Z3 已解出 <code>@agg(sum:scores)</code> 目标值但 <code>witness-materialize</code> 仍填默认小样本未凑足总和</td>
+<td><code>witness-materialize</code> 实现 <code>BigInt</code> 精确按比例拆解 <code>@agg(sum:col)</code>（同时支持 <code>Seq[Int]</code> 与定点数 <code>Seq[Decimal(scale)]</code>），并与 <code>len</code>/<code>count</code> 及量词活跃元素协同分配（<code>SPEC-S22</code>）</td>
+</tr>
+<tr>
+<td><strong>M12</strong></td>
+<td><code>Map[String, ValueObject]</code> 成员访问（如 <code>state.entries[key].score</code>）在 binder、SMT、见证物化、Scala 与 TS 生成器全链路断裂</td>
+<td>端到端贯通：<code>binder</code> 穿透 <code>index -&gt; member</code> 推断类型、<code>smt-encoder</code> 发射强类型 map 子字段数组并传递 scale/enum、<code>first-hit-witness</code> 探测 <code>map-subfield</code> 并按 <code>mapPresence</code> 门控、<code>ears-simplify</code> 生成 <code>.get(k).map(_.f).getOrElse(...)</code>、<code>typescript.mjs</code> 生成 <code>?.[f] ?? fallback</code>（<code>SPEC-S23</code>）</td>
+</tr>
+<tr>
+<td><strong>连带 #1–#4</strong></td>
+<td>探针运行期顺藤摸瓜抓出 4 颗深埋真雷：① 多分支 L1 规则在 <code>v1-strict-scala</code> 1.0 单 <code>else</code> 模板下静默丢弃第二条接受分支；② <code>typescript.mjs</code> 量词体漏追踪 <code>boundVars</code> 输出 <code>cmd.x.score</code>；③ <code>ExactType</code> 嵌套 <code>post:</code> 更新对 <code>sealed abstract case class ... private (...)</code> 发射非法 <code>.copy(...)</code>；④ <code>witness-materialize</code> 将无约束 <code>ExactType</code> 单位字段填 <code>""</code> 致 <code>Money.create</code> 退回 <code>Money.Zero</code></td>
+<td>① 多分支 L1 自动切完整 First-Hit <code>if / else if / else</code>（保 1.0 parity 24/24）；② <code>typescript.mjs</code> 补齐 <code>boundVars</code>/<code>boundVarTypes</code> 与 <code>sum</code>/<code>len</code>/<code>count</code> 数值推导；③ <code>buildNestedCopy</code> 对 <code>ExactType</code> 改发 <code>.create(...).getOrElse(...)</code>；④ 未约束单位字段回退 <code>resolvedType.units?.[0]</code>（<code>SPEC-S22..S24</code>）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="section-5-3">第四波按图排雷战绩（提交 <code>1e87c6a</code> · Proto3 嵌套容器 + Play 5 层鉴权对账清零）</h3>
+<p>Wave-4 针对 <strong>T01/T05（聚合状态嵌套容器 Proto3 持久化）</strong> 与 <strong>T10（PlayController 5 层 Authz 镜像）</strong> 构造 2 子域单体（<code>orders</code> + <code>billing</code>，含 ReadModels、Stories、Authz 与 Aggregate 级嵌套容器）探针，在提交 <a href="https://github.com/co-arising/metarch-truthsrc/commit/1e87c6a899cc05ffaa265b2b9c89d947975b1c78"><code>1e87c6a</code></a> 实锤清零 2 项跨层缺陷，真 <strong><code>sbt -batch compile</code></strong>（111 Scala 源码 + 3 <code>.proto</code>，16s 零错误）通过并锁入 <code>SPEC-S25</code>：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="表格：雷达编号 / 实锤缺陷与根因 / 最终修复与锁定验收（1e87c6a）"><table>
+<thead>
+<tr>
+<th scope="col">雷达编号</th>
+<th scope="col">实锤缺陷与根因</th>
+<th scope="col">最终修复与锁定验收（<code>1e87c6a</code>）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M13</strong></td>
+<td><strong>T01 + T05 · Proto3 嵌套容器非法语法</strong>：当 Aggregate 状态含 <code>Optional[Seq[String]]</code>、<code>Seq[Optional[String]]</code> 或 <code>Map[String, Optional[TagVO]]</code> 时，Proto3 原生禁止 <code>repeated</code> / <code>map</code> 嵌套 <code>optional</code> 或 <code>repeated</code>，直接炸毁 <code>scalapb</code> / <code>sbt compile</code></td>
+<td><code>v1-strict-block-cd.mjs</code> 新增递归 Proto3 <code>BoxPO</code> 包装消息合成（<code>SeqStringBoxPO</code>、<code>OptStringBoxPO</code>、<code>OptTagVOBoxPO</code> 等）并自动向 <code>SharedValueProtoConverters.scala</code>（含零 VO 兜底）拼接 <code>encode&lt;BoxPO&gt;</code> / <code>decode&lt;BoxPO&gt;</code>，<strong>零触碰 1.0 <code>emitter/families/</code>（24/24 parity 保持全绿）</strong>（<code>SPEC-S25</code>）</td>
+</tr>
+<tr>
+<td><strong>M15</strong></td>
+<td><strong>T10 · Play 控制器 <code>principal</code> 映射缺键与 HTTP/2 头大小写漂移</strong>：<code>v1-strict-api-auth.mjs</code> 生成的 <code>PlayController</code> 构造 <code>principal</code> Map 时漏掉 <code>"entitlements"</code> 与 <code>"attributes"</code>（与 <code>HttpRouter</code> 分叉），且 <code>resolvePrincipalBinding</code> 区分 header 大小写，在 HTTP/2 小写 header 下绑定丢失</td>
+<td>补齐 <code>PlayController</code> 的 <code>"entitlements" -&gt; ctx.entitlements, "attributes" -&gt; ctx.attributes</code>，并在 <code>resolvePrincipalBinding</code> 增加大小写不敏感 <code>lookupAttr</code> 查找，彻底对齐 <code>HttpRouter</code> 与 Play 真实运行时（<code>SPEC-S25</code>）</td>
+</tr>
+</tbody>
+</table></div>
 <hr>
-<h2 id="section-6">六、下一波排雷手册（Level 4B）：四步探针法与 Wave-3 诚实边界雷达</h2>
+<h2 id="section-6">六、下一波排雷手册（Level 4B）：四步探针法与 Wave-5 诚实边界雷达</h2>
 <h3 id="section-6-1">四步对抗探针排雷法</h3>
 <ol>
 <li><strong>选暗道</strong>：从图 3 的 <code>T01–T14</code> 暗道中挑一个尚未被极端组合打过的跨模块接缝。</li>
@@ -691,10 +752,10 @@
 <li><code>node --test</code> + 离线 <code>scalac</code> + <strong>真实 <code>sbt -batch stage</code> + 启动 Play 进程发真实 HTTP 请求</strong></li>
 </ul>
 </li>
-<li><strong>实锤即上锁</strong>：确认 Bug 后先修通用推导（守 <code>npm run lint:arch</code> 0 违规 + <code>emitter/parity.mjs</code> 24/24 全绿），再把对抗样例固化为 <code>SPEC-S21+</code>，绝不靠人眼审查结案。</li>
+<li><strong>实锤即上锁</strong>：确认 Bug 后先修通用推导（守 <code>npm run lint:arch</code> 0 违规 + <code>emitter/parity.mjs</code> 24/24 全绿），再把对抗样例固化为 <code>SPEC-S26+</code>，绝不靠人眼审查结案。</li>
 </ol>
-<h3 id="section-6-2">Wave-3 高危潜在地雷雷达（基于 <code>2f4d33d</code> 诚实盘点）</h3>
-<p>M01、M03、M04、M05、M06、M07、M08 已于 <code>2f4d33d</code> 实锤清零并锁入 <code>SPEC-S18..S20</code>；下表诚实列出目前仍待下一波对抗探针封死的 <strong>5 个真实边界（M02 + Pre-Z3/Post-Z3 M09–M12）</strong>：</p>
+<h3 id="section-6-2">Wave-5 高危潜在地雷雷达（基于 <code>1e87c6a</code> 诚实盘点）</h3>
+<p>M01–M13 与 M15 已于 <code>2f4d33d</code> / <code>57e6440</code> / <code>1e87c6a</code> 四波排雷中实锤清零并锁入 <code>SPEC-S13..S25</code>；下表诚实盘点截至 <code>1e87c6a</code> 仍待 Wave-5 对抗探针继续推进的 <strong>4 个真实工程边界（M16–M19）</strong>：</p>
 <div class="article-table" tabindex="0" role="region" aria-label="表格：雷达编号 / 疑似地雷点 / 已知边界 / 关联暗道 / 建议对抗探针设计 / 预期杀伤面"><table>
 <thead>
 <tr>
@@ -707,39 +768,32 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>M02</strong></td>
-<td><strong><code>stateSnapshot</code> 严格等值误杀</strong>：手写应用层 handler 对快照衍生字段做归一化或重算时，测试里的严格 <code>assert(res == expected)</code> / <code>deepStrictEqual</code> 误报失败</td>
-<td><strong>T08</strong></td>
-<td>手写 <code>*Impl.scala</code> 返回合理派生值而非原样透传快照字段，跑 <code>verify-v2</code></td>
-<td>应用层测试成批红灯</td>
+<td><strong>M16</strong></td>
+<td><strong>纯 <code>form: decimal</code> 的 <code>ExactType</code> 双轨分叉</strong>：<code>structure-loader.mjs</code> 将非 <code>unit-decimal</code> 的 <code>ExactType</code>（如 <code>Rate</code>，<code>scale: 4</code>）归一为 <code>{ kind: 'decimal', typeName: 'Rate', scale: 4 }</code> 而非 <code>kind: 'record'</code>，导致下游桥接按 <code>BigDecimal</code> 发射，而 <code>deriveV1ValueObjectInput</code> 仍发射 <code>Rate.scala</code> / <code>RatePO</code></td>
+<td><strong>T01</strong></td>
+<td>在聚合、命令、ReadModel 与 <code>externContracts</code> 中混用 <code>form: decimal</code> 的 <code>ExactType</code>（如 <code>Rate</code>），跑全链路 <code>sbt -batch compile</code> + 锁定测试</td>
+<td>生成代码与 VO/Proto 转换签名错位</td>
 </tr>
 <tr>
-<td><strong>M09</strong></td>
-<td><strong>Pre-Z3 · <code>len</code> 与 <code>sum</code> / <code>forall</code> 未联立公理</strong>：同时约束 <code>len(items) == 0</code> 与 <code>sum(items) &gt; 0</code> 或空集合上的 <code>forall</code> 空真性（vacuous truth）时，Z3 可能构造矛盾假反例</td>
-<td><strong>T08</strong></td>
-<td>编写同时含 <code>len(items) == 0</code>、<code>sum(items) &gt; 0</code> 与 <code>forall</code> 的 <code>.ears</code>，跑 <code>compile-v2</code></td>
-<td>完备规则被 Z3 误报假缺口</td>
+<td><strong>M17</strong></td>
+<td><strong>存量仓库 <code>overwrite: false</code> 手写 DI 跨版本漂移</strong>：已有项目在升级生成器并新增 <code>ConnectorPort</code> / <code>Policy</code> / <code>Saga</code> / L2 <code>ComputationsImpl</code> 时，<code>ServerSnapshotProviderImpl.scala</code> 与 <code>HandwrittenBindingsModule.scala</code> 永不覆写会导致绑定缺失或签名漂移</td>
+<td><strong>T14</strong></td>
+<td>模拟先生成 vA 骨架落盘手写文件，再追加新 Port/Saga/L2 后原地重生成，跑 <code>sbt -batch compile</code> + 校验升级诊断</td>
+<td>存量老项目原地升级编不过或运行时 Guice 缺绑定</td>
 </tr>
 <tr>
-<td><strong>M10</strong></td>
-<td><strong>Pre-Z3 · 同集合双相反量词复用同变量名</strong>：<code>exists x in items: x &lt; 0 and exists x in items: x &gt; 100</code> 在单元素 Skolem 下冲突</td>
+<td><strong>M18</strong></td>
+<td><strong>深层 <code>k</code>-BMC + 非线性 <code>QF_NIA</code> + 双层嵌套 Map 求解包络</strong>：当单聚合同时出现 <code>Map[String, Map[String, VO]]</code>、多步 <code>k</code>-BMC 或跨集合 <code>sum</code>+双量词乘积时，Z3 可能触及非线性超时或物化退化</td>
 <td><strong>T08</strong></td>
-<td>构造需至少 2 个不同元素才能满足的双量词规则，跑 <code>compile-v2</code></td>
-<td>合法规则被判不可达</td>
+<td>构造含 <code>Map[String, Map[String, VO]]</code> 与非线性乘积/多步转移的 <code>.ears</code>，测试超时诊断与确定性降级边界</td>
+<td><code>compile-v2</code> 超时或物化样本失真</td>
 </tr>
 <tr>
-<td><strong>M11</strong></td>
-<td><strong>Post-Z3 · <code>sum(seq)</code> 见证未反向拆解为元素值</strong>：Z3 求出 <code>@agg(sum:scores) = 101</code>，但 <code>witness-materialize</code> 仍按默认 <code>[1, 2, ...]</code> 填充未凑足目标总和</td>
-<td><strong>T08</strong></td>
-<td>聚合规则含 <code>sum(scores) &gt; 100</code>，跑 <code>verify-v2 --strict</code></td>
-<td>TS/Scala 锁定测试因总和不足失败</td>
-</tr>
-<tr>
-<td><strong>M12</strong></td>
-<td><strong>Post-Z3 · 深层 <code>Map[String, ValueObject]</code> 见证物化</strong>：基础类型 <code>Map</code> 已覆盖，复杂 <code>Map[String, Record]</code> 在 <code>witness-materialize</code> 仍属薄弱带</td>
-<td><strong>T01 + T08</strong></td>
-<td>聚合状态含 <code>Map[String, LineItem]</code> 并在规则读取 <code>state.map[k].score</code>，跑 <code>verify-v2</code></td>
-<td><code>Map</code> 成员访问用例物化失真</td>
+<td><strong>M19</strong></td>
+<td><strong>增量重生成残留 <code>.proto</code> 与 <code>sbt</code> <code>src_managed</code> 清理</strong>：重命名包路径或删除旧聚合后，虽然 <code>.scala</code> 已引入 stale pruning，但残留 <code>.proto</code> 与 <code>target/scala-2.13/src_managed</code> 仍可能触发 ScalaPB 类名冲突</td>
+<td><strong>T11</strong></td>
+<td>先生成含 <code>AggA</code> 的单体并跑 <code>sbt compile</code>，删去 <code>AggA</code> 或改包名后原地增量重生成再跑 <code>sbt compile</code></td>
+<td>ScalaPB 生成重复类致增量编译失败</td>
 </tr>
 </tbody>
 </table></div>
@@ -772,7 +826,7 @@
 </tbody>
 </table></div>
 <blockquote>
-<p><strong>结语</strong>：这份地图的价值不在一次性读完，而在<strong>每次准备交付新特性或接入新多域项目前，拿出图 3 的 14 条暗道与雷达表 M01–M08，挑出最危险的 3–5 个接缝写 100 行对抗探针跑一遍真实 <code>sbt stage</code> + Play HTTP</strong>。把暗道变成亮路，把踩坑变成探针，这就是 <code>metarch-truthsrc</code> 持续逼近工业级确定性的核心打法。</p>
+<p><strong>结语</strong>：这份地图的价值不在一次性读完，而在<strong>每次准备交付新特性或接入新多域项目前，拿出图 3 的 14 条暗道与雷达表 M16–M19，挑出最危险的 3–5 个接缝写 100 行对抗探针跑一遍真实 <code>sbt stage</code> + Play HTTP</strong>。把暗道变成亮路，把踩坑变成探针，这就是 <code>metarch-truthsrc</code> 持续逼近工业级确定性的核心打法。</p>
 </blockquote></article>
     </div>
     <aside class="article-community" aria-label="加入 Discord 社区">
@@ -788,7 +842,7 @@
       <div class="article-card" lang="zh-CN">
       <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-27">2026-11-27</time></p>
       <h3><a href="/zh/articles/play-cqrs-artifact-type-map-20261127/">Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景</a></h3>
-      <p class="article-deck">对照 metarch-truthsrc @ 2f4d33d（catalog 156b224f3614）与 bank-wealth-demo @ b5cadc0 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。</p>
+      <p class="article-deck">对照 metarch-truthsrc @ 1e87c6a（catalog 156b224f3614）与 bank-wealth-demo @ b5cadc0 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。</p>
       <p class="small">中文原文</p>
     </div>
       <p><a href="/zh/articles/">返回文章索引</a></p>

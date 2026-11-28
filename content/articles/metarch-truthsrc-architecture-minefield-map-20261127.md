@@ -1,12 +1,12 @@
 # metarch-truthsrc 战略架构地图与地下暗道排雷手册（v2.0.0 源码级全解）
 
-> **文档定位与源码基线**：本文对照 [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0**（锁定提交 [`2f4d33d`](https://github.com/co-arising/metarch-truthsrc/commit/2f4d33da6a3964ed72ca842b8a38164342adc0ae)，`bank-wealth-demo` @ `b5cadc0`）全部核心源码撰写，是一份**从粗到细、从宏观主干到源码接缝**的工程作战地图。与介绍设计理念的 [co-arising 2.0 长期架构蓝图](https://co-arising.github.io/zh/articles/co-arising-v2-ears-native-architecture-20261126/) 以及面向用户的 [GA 完整指南](https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) 不同，本文把整个编译器切开，标注**模块边界、数据流向、14 条跨文件隐蔽耦合（地下暗道）**，以及一套已被两波实证的**探针排雷法、13 个已清零 Bug 与下一波 Pre-Z3/Post-Z3 靶点**，并通过 `artifact-maps.lock.json` 与仓库提交哈希机读绑定。
+> **文档定位与源码基线**：本文对照 [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0**（锁定提交 [`1e87c6a`](https://github.com/co-arising/metarch-truthsrc/commit/1e87c6a899cc05ffaa265b2b9c89d947975b1c78)，`bank-wealth-demo` @ `b5cadc0`）全部核心源码撰写，是一份**从粗到细、从宏观主干到源码接缝**的工程作战地图。与介绍设计理念的 [co-arising 2.0 长期架构蓝图](https://co-arising.github.io/zh/articles/co-arising-v2-ears-native-architecture-20261126/) 以及面向用户的 [GA 完整指南](https://co-arising.github.io/zh/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) 不同，本文把整个编译器切开，标注**模块边界、数据流向、14 条跨文件隐蔽耦合（地下暗道）**，以及一套已被四波实证的**探针排雷法、24 项已清零缺陷（含 Wave-1..4 实锤与连带修复，锁入 `SPEC-S13..S25`）与下一波 Wave-5 诚实靶点**，并通过 `artifact-maps.lock.json` 与仓库提交哈希机读绑定。
 
 <div class="co-kpi-strip" role="region" aria-label="metarch-truthsrc v2.0.0 源码规模与排雷基线">
-<div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">v2 主干与 EARS/Play 生成器 34,486 LOC + 1.0 精选 24 家族发射器 14,125 LOC</div></div>
+<div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">v2 主干与 EARS/Play 生成器 34.5k+ LOC + 1.0 精选 24 家族发射器 14,125 LOC</div></div>
 <div><div class="kpi-num">44 / 32 / 159</div><div class="kpi-label">surface-registry 锁定的 44 个 CLI 命令、32 个 MCP 工具与 159 个诊断错误码</div></div>
 <div><div class="kpi-num red">14 条暗道</div><div class="kpi-label">横跨类型系统、1.0/2.0 桥接、测试预言机与门禁断层的隐蔽耦合拓扑</div></div>
-<div><div class="kpi-num">两波 13/13</div><div class="kpi-label">Wave-1（7/7）+ Wave-2（6/6）按图推演并实锤清零，锁定 SPEC-S13..S20</div></div>
+<div><div class="kpi-num">四波 24 雷清零</div><div class="kpi-label">Wave-1(7) + Wave-2(6) + Wave-3(5+4连带 @ 57e6440) + Wave-4(2 @ 1e87c6a)，锁定 SPEC-S13..S25</div></div>
 </div>
 
 ## 一、战略俯瞰（Level 0）：整座城池的宏观地形图
@@ -116,7 +116,7 @@
 
 ## 二、战区与目录地图（Level 1）：六大模块与源码索引
 
-截至 `2f4d33d`，整个 v2 工程核心分布于六大战区。下表精确标注每个关键文件的职责边界、体量（LOC）及读写契约，排雷时可直接按图索骥：
+截至 `1e87c6a`，整个 v2 工程核心分布于六大战区。下表精确标注每个关键文件的职责边界、基准体量（LOC）及读写契约，排雷时可直接按图索骥：
 
 | 战区 | 核心文件（点击直达源码） | LOC | 核心职责 | 关键输入 / 输出契约 |
 |---|---|---:|---|---|
@@ -342,7 +342,7 @@
    - 同一个聚合若同时拥有 L1 纯规则与 L2 `@cloze` 计算规则，参数必须全部统一生成在 `<Agg>RuleParams` 下，不能分裂出 `<Agg>DomainServiceRuleParams`。
    - 同时，`SPEC-S4` 严禁非空 L2 `<Agg>Computations` trait 在生产代码提供 `val Noop`（防止线上误绑定空实现）。因此在 [`scala-strict-scalatest.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/scala-strict-scalatest.mjs) 中，L1 规则测试针对混合聚合必须传入 `null.asInstanceOf[<Agg>Computations]`（安全，因为 L1 分支永不调用宿主计算方法）。
 7. **T07 · `tools/lint.mjs` 架构防污染门禁**：
-   - [`tools/lint.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs) 用正则静态扫描全部 625 个 JS/MJS 文件：严禁在通用核心出现业务专有名词（如 `CreditBalance`、`FundOrder`、`bankwealth`），严禁在 `lib/runtime-profile.mjs` 之外硬编码 `net.imadz`，严禁活跃 `emitter/families/` 拼接硬编码 `'app/'` 路径。
+   - [`tools/lint.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs) 用正则静态扫描全部 626 个 JS/MJS 文件：严禁在通用核心出现业务专有名词（如 `CreditBalance`、`FundOrder`、`bankwealth`），严禁在 `lib/runtime-profile.mjs` 之外硬编码 `net.imadz`，严禁活跃 `emitter/families/` 拼接硬编码 `'app/'` 路径。
 
 ### 暗道网 C · 见证物化与测试预言机断层（T08–T10）
 
@@ -371,9 +371,9 @@
 
 ---
 
-## 五、实战复盘（Level 4A）：上一波「按图排雷」如何 7 战 7 中？
+## 五、实战复盘（Level 4A）：四波「按图排雷」战报（`SPEC-S13..S25`）
 
-在 6 子域考试平台首轮反馈（[Issue #2](https://github.com/co-arising/metarch-truthsrc/issues/2)、[#3](https://github.com/co-arising/metarch-truthsrc/issues/3)、[#4](https://github.com/co-arising/metarch-truthsrc/issues/4)）落地修复后，我们正是顺着上述暗道图反推 6 个疑似雷区，写出真实端到端探针（跑完整 `compileCanonicalV2` + `node --test` + 真实 `sbt -batch compile`），结果**6 个预测全中，还顺藤摸瓜多抓出 1 个编译级 Bug（共 7/7 实锤）**：
+在 6 子域考试平台首轮反馈（[Issue #2](https://github.com/co-arising/metarch-truthsrc/issues/2)、[#3](https://github.com/co-arising/metarch-truthsrc/issues/3)、[#4](https://github.com/co-arising/metarch-truthsrc/issues/4)）落地修复后，我们顺着上述暗道图持续推进四波对抗探针排雷（均走真实 `compileCanonicalV2` + `node --test` + 离线 `scalac`/ScalaTest/Mutation Gate + 真实 `sbt -batch compile`）。**Wave-1（7/7）** 率先验证了按图推演法的命中率：
 
 | 序号 | 实锤 Bug 症状 | 命中的暗道 | 最小对抗探针特征 | 最终修复与锁定验收 |
 |---|---|---|---|---|
@@ -385,11 +385,11 @@
 | **#6** | 零 VO/ExactType 项目缺 `ProtoConverters`；`[POSTCOND]` 构造器与派生事件字段错位 | **T04 + T05 + T09** | 全项目仅用基础类型 + 血缘派生事件字段 | `v1-strict-block-cd` 发射零 VO 兜底并附框架 import 保 `SBT_FRAMEWORK_IMPORT_RE`；测试改用 `resolveCanonicalEventFields`（`SPEC-S15`） |
 | **#7** | 自定义 `aliases: [bal]` 不含 `'state'` 时生成 `state.state.copy(...)` 编译失败 | **T03** | YAML 聚合声明自定义 `aliases` 且省略 `state` | `v1-strict-scala` 与 `witness-materialize` 强制把 `'state'` 并入别名集合（`SPEC-S14`） |
 
-全量回归结果已锁入 [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs)（`SPEC-S1..S20` 20/20 PASS），并通过真实 `sbt -batch stage` + Play 2.8.18 活体 HTTP 路演与 `bank-wealth-demo` 100% 变异门禁复核（详见 [状态页](https://co-arising.github.io/zh/status/)）。
+全量回归结果已锁入 [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs)（当前累计 `SPEC-S1..S25` 25/25 PASS），并经过真实 `sbt -batch compile` / `stage` 与 100% 变异门禁复核（详见 [状态页](https://co-arising.github.io/zh/status/)）。
 
 ### 第二波按图排雷战绩（提交 `2f4d33d` · 6/6 探针全中并清零）
 
-基于本文最初列出的 M01–M08 雷达表，我们立即落地了第二波对抗探针（`probe_wave2_mines.mjs`），全部走真实 `compileCanonicalV2` + `generateScalaCqrsPlayServiceV2`/`ForBc` + `emitV2ExecutableTests` + 离线 `scalac` + 真实 **`sbt -batch compile`**，结果 **6 组探针 100% 实锤**（共消灭 10 处底层缺陷，全部锁入 `SPEC-S18..S20`）：
+基于最初列出的 M01–M08 雷达表，我们落地了第二波对抗探针（`probe_wave2_mines.mjs`），全部走真实 `compileCanonicalV2` + `generateScalaCqrsPlayServiceV2`/`ForBc` + `emitV2ExecutableTests` + 离线 `scalac` + 真实 **`sbt -batch compile`**，结果 **6 组探针 100% 实锤**（共消灭 10 处底层缺陷，全部锁入 `SPEC-S18..S20`）：
 
 | 雷达编号 | 实锤缺陷与根因 | 最终修复与锁定验收（`2f4d33d`） |
 |---|---|---|
@@ -400,9 +400,30 @@
 | **M08-A/B** | **Pre-Z3**：缺 `len/count >= 0` 公理致 Z3 伪造 `-1` 假缺口；缺量词 Skolem 等价公理；**Scala 桥接**：`ears-simplify` 误给量词变量加 `p.` 前缀（`p.x.score`）；**Post-Z3**：`witness-materialize` 未消费 `@quant` 且标量父键 `x=0` 盖掉子字段 `x.score=1` | `smt-encoder` 补齐非负与量词等价公理、`ears-simplify` 追踪 `boundVars` 与整数比较、`witness-materialize` 优先拼装 `record` 子字段并还原量词元素（`SPEC-S20`） |
 | **M05 + M04** | 存量项目先无 ReadModel 后增 ReadModel 时，`HandwrittenBindingsModule` 永不覆写导致漏装 `ProjectionModule`；变异门禁逐突变体跑全量套件在大规模下易超时 | `GeneratedBindingsModule` 自动托管 `ProjectionModule`（兼容已安装的老项目）；`mutation-gate` 改为按聚合定点跑对应测试并提升基线超时至 180s（`SPEC-S19`） |
 
+### 第三波按图排雷战绩（提交 `57e6440` · M02/M09–M12 + 4 项连带隐雷清零）
+
+紧接着 Wave-3 雷达表（M02 + Pre-Z3/Post-Z3 M09–M12），我们在提交 [`57e6440`](https://github.com/co-arising/metarch-truthsrc/commit/57e6440a0f10b6dd94e02d10d23bb1be23b970d7) 落地全量探针并实锤清零 **全部 5 项雷达靶点 + 4 项执行期连带发现的深层隐雷**，经 `node --test` + 离线 `scalac` + 100% Scala Mutation Gate + 真实 Play 2.8.18 `sbt -batch compile`（69 Scala + 2 `.proto` 零错误）验收并锁入 `SPEC-S21..S24`：
+
+| 编号 | 实锤缺陷与根因 | 最终修复与锁定验收（`57e6440`） |
+|---|---|---|
+| **M02** | 应用层锁定测试对派发命令的快照衍生字段做严格 `toString` 等值断言，手写 handler 合法归一化/重算时误杀 | `scala-strict-scalatest` / `scala-scalatest` / `typescript-node-test` 改为非空与运行时类型合法性断言，保留 `bindPrincipal` 严格相等校验（`SPEC-S21`） |
+| **M09 + M10** | **Pre-Z3**：`len == 0` 与 `sum == 0`、`forall` 空真性/`exists` 空假性未联立；同集合复用同一量词变量 `x` 时单 Skolem 冲突；**Post-Z3**：边界见证未替换绑定变量且丢弃 `@qdef(col)` 致 M10 变异杀灭率仅 71.43% | `smt-encoder` 引入 alpha 规范化量词签名、作用域见证 `@qel_N` 与默认元素 `@qdef(col)`、联立集合公理与不同标量见证推 `len >= 2`；`first-hit-witness` 与 `witness-materialize` 对齐边界见证与 `defaultElem` 合并，M10 变异杀灭率拉满至 **100%**（`SPEC-S22`） |
+| **M11** | `sum(scores) > 100` 等聚合求和守卫，Z3 已解出 `@agg(sum:scores)` 目标值但 `witness-materialize` 仍填默认小样本未凑足总和 | `witness-materialize` 实现 `BigInt` 精确按比例拆解 `@agg(sum:col)`（同时支持 `Seq[Int]` 与定点数 `Seq[Decimal(scale)]`），并与 `len`/`count` 及量词活跃元素协同分配（`SPEC-S22`） |
+| **M12** | `Map[String, ValueObject]` 成员访问（如 `state.entries[key].score`）在 binder、SMT、见证物化、Scala 与 TS 生成器全链路断裂 | 端到端贯通：`binder` 穿透 `index -> member` 推断类型、`smt-encoder` 发射强类型 map 子字段数组并传递 scale/enum、`first-hit-witness` 探测 `map-subfield` 并按 `mapPresence` 门控、`ears-simplify` 生成 `.get(k).map(_.f).getOrElse(...)`、`typescript.mjs` 生成 `?.[f] ?? fallback`（`SPEC-S23`） |
+| **连带 #1–#4** | 探针运行期顺藤摸瓜抓出 4 颗深埋真雷：① 多分支 L1 规则在 `v1-strict-scala` 1.0 单 `else` 模板下静默丢弃第二条接受分支；② `typescript.mjs` 量词体漏追踪 `boundVars` 输出 `cmd.x.score`；③ `ExactType` 嵌套 `post:` 更新对 `sealed abstract case class ... private (...)` 发射非法 `.copy(...)`；④ `witness-materialize` 将无约束 `ExactType` 单位字段填 `""` 致 `Money.create` 退回 `Money.Zero` | ① 多分支 L1 自动切完整 First-Hit `if / else if / else`（保 1.0 parity 24/24）；② `typescript.mjs` 补齐 `boundVars`/`boundVarTypes` 与 `sum`/`len`/`count` 数值推导；③ `buildNestedCopy` 对 `ExactType` 改发 `.create(...).getOrElse(...)`；④ 未约束单位字段回退 `resolvedType.units?.[0]`（`SPEC-S22..S24`） |
+
+### 第四波按图排雷战绩（提交 `1e87c6a` · Proto3 嵌套容器 + Play 5 层鉴权对账清零）
+
+Wave-4 针对 **T01/T05（聚合状态嵌套容器 Proto3 持久化）** 与 **T10（PlayController 5 层 Authz 镜像）** 构造 2 子域单体（`orders` + `billing`，含 ReadModels、Stories、Authz 与 Aggregate 级嵌套容器）探针，在提交 [`1e87c6a`](https://github.com/co-arising/metarch-truthsrc/commit/1e87c6a899cc05ffaa265b2b9c89d947975b1c78) 实锤清零 2 项跨层缺陷，真 **`sbt -batch compile`**（111 Scala 源码 + 3 `.proto`，16s 零错误）通过并锁入 `SPEC-S25`：
+
+| 雷达编号 | 实锤缺陷与根因 | 最终修复与锁定验收（`1e87c6a`） |
+|---|---|---|
+| **M13** | **T01 + T05 · Proto3 嵌套容器非法语法**：当 Aggregate 状态含 `Optional[Seq[String]]`、`Seq[Optional[String]]` 或 `Map[String, Optional[TagVO]]` 时，Proto3 原生禁止 `repeated` / `map` 嵌套 `optional` 或 `repeated`，直接炸毁 `scalapb` / `sbt compile` | `v1-strict-block-cd.mjs` 新增递归 Proto3 `BoxPO` 包装消息合成（`SeqStringBoxPO`、`OptStringBoxPO`、`OptTagVOBoxPO` 等）并自动向 `SharedValueProtoConverters.scala`（含零 VO 兜底）拼接 `encode<BoxPO>` / `decode<BoxPO>`，**零触碰 1.0 `emitter/families/`（24/24 parity 保持全绿）**（`SPEC-S25`） |
+| **M15** | **T10 · Play 控制器 `principal` 映射缺键与 HTTP/2 头大小写漂移**：`v1-strict-api-auth.mjs` 生成的 `PlayController` 构造 `principal` Map 时漏掉 `"entitlements"` 与 `"attributes"`（与 `HttpRouter` 分叉），且 `resolvePrincipalBinding` 区分 header 大小写，在 HTTP/2 小写 header 下绑定丢失 | 补齐 `PlayController` 的 `"entitlements" -> ctx.entitlements, "attributes" -> ctx.attributes`，并在 `resolvePrincipalBinding` 增加大小写不敏感 `lookupAttr` 查找，彻底对齐 `HttpRouter` 与 Play 真实运行时（`SPEC-S25`） |
+
 ---
 
-## 六、下一波排雷手册（Level 4B）：四步探针法与 Wave-3 诚实边界雷达
+## 六、下一波排雷手册（Level 4B）：四步探针法与 Wave-5 诚实边界雷达
 
 ### 四步对抗探针排雷法
 
@@ -413,19 +434,18 @@
    - `generateScalaCqrsPlayServiceV2` / `generateScalaCqrsPlayServiceV2ForBc`
    - `emitV2ExecutableTests`
    - `node --test` + 离线 `scalac` + **真实 `sbt -batch stage` + 启动 Play 进程发真实 HTTP 请求**
-4. **实锤即上锁**：确认 Bug 后先修通用推导（守 `npm run lint:arch` 0 违规 + `emitter/parity.mjs` 24/24 全绿），再把对抗样例固化为 `SPEC-S21+`，绝不靠人眼审查结案。
+4. **实锤即上锁**：确认 Bug 后先修通用推导（守 `npm run lint:arch` 0 违规 + `emitter/parity.mjs` 24/24 全绿），再把对抗样例固化为 `SPEC-S26+`，绝不靠人眼审查结案。
 
-### Wave-3 高危潜在地雷雷达（基于 `2f4d33d` 诚实盘点）
+### Wave-5 高危潜在地雷雷达（基于 `1e87c6a` 诚实盘点）
 
-M01、M03、M04、M05、M06、M07、M08 已于 `2f4d33d` 实锤清零并锁入 `SPEC-S18..S20`；下表诚实列出目前仍待下一波对抗探针封死的 **5 个真实边界（M02 + Pre-Z3/Post-Z3 M09–M12）**：
+M01–M13 与 M15 已于 `2f4d33d` / `57e6440` / `1e87c6a` 四波排雷中实锤清零并锁入 `SPEC-S13..S25`；下表诚实盘点截至 `1e87c6a` 仍待 Wave-5 对抗探针继续推进的 **4 个真实工程边界（M16–M19）**：
 
 | 雷达编号 | 疑似地雷点 / 已知边界 | 关联暗道 | 建议对抗探针设计 | 预期杀伤面 |
 |---|---|---|---|---|
-| **M02** | **`stateSnapshot` 严格等值误杀**：手写应用层 handler 对快照衍生字段做归一化或重算时，测试里的严格 `assert(res == expected)` / `deepStrictEqual` 误报失败 | **T08** | 手写 `*Impl.scala` 返回合理派生值而非原样透传快照字段，跑 `verify-v2` | 应用层测试成批红灯 |
-| **M09** | **Pre-Z3 · `len` 与 `sum` / `forall` 未联立公理**：同时约束 `len(items) == 0` 与 `sum(items) > 0` 或空集合上的 `forall` 空真性（vacuous truth）时，Z3 可能构造矛盾假反例 | **T08** | 编写同时含 `len(items) == 0`、`sum(items) > 0` 与 `forall` 的 `.ears`，跑 `compile-v2` | 完备规则被 Z3 误报假缺口 |
-| **M10** | **Pre-Z3 · 同集合双相反量词复用同变量名**：`exists x in items: x < 0 and exists x in items: x > 100` 在单元素 Skolem 下冲突 | **T08** | 构造需至少 2 个不同元素才能满足的双量词规则，跑 `compile-v2` | 合法规则被判不可达 |
-| **M11** | **Post-Z3 · `sum(seq)` 见证未反向拆解为元素值**：Z3 求出 `@agg(sum:scores) = 101`，但 `witness-materialize` 仍按默认 `[1, 2, ...]` 填充未凑足目标总和 | **T08** | 聚合规则含 `sum(scores) > 100`，跑 `verify-v2 --strict` | TS/Scala 锁定测试因总和不足失败 |
-| **M12** | **Post-Z3 · 深层 `Map[String, ValueObject]` 见证物化**：基础类型 `Map` 已覆盖，复杂 `Map[String, Record]` 在 `witness-materialize` 仍属薄弱带 | **T01 + T08** | 聚合状态含 `Map[String, LineItem]` 并在规则读取 `state.map[k].score`，跑 `verify-v2` | `Map` 成员访问用例物化失真 |
+| **M16** | **纯 `form: decimal` 的 `ExactType` 双轨分叉**：`structure-loader.mjs` 将非 `unit-decimal` 的 `ExactType`（如 `Rate`，`scale: 4`）归一为 `{ kind: 'decimal', typeName: 'Rate', scale: 4 }` 而非 `kind: 'record'`，导致下游桥接按 `BigDecimal` 发射，而 `deriveV1ValueObjectInput` 仍发射 `Rate.scala` / `RatePO` | **T01** | 在聚合、命令、ReadModel 与 `externContracts` 中混用 `form: decimal` 的 `ExactType`（如 `Rate`），跑全链路 `sbt -batch compile` + 锁定测试 | 生成代码与 VO/Proto 转换签名错位 |
+| **M17** | **存量仓库 `overwrite: false` 手写 DI 跨版本漂移**：已有项目在升级生成器并新增 `ConnectorPort` / `Policy` / `Saga` / L2 `ComputationsImpl` 时，`ServerSnapshotProviderImpl.scala` 与 `HandwrittenBindingsModule.scala` 永不覆写会导致绑定缺失或签名漂移 | **T14** | 模拟先生成 vA 骨架落盘手写文件，再追加新 Port/Saga/L2 后原地重生成，跑 `sbt -batch compile` + 校验升级诊断 | 存量老项目原地升级编不过或运行时 Guice 缺绑定 |
+| **M18** | **深层 `k`-BMC + 非线性 `QF_NIA` + 双层嵌套 Map 求解包络**：当单聚合同时出现 `Map[String, Map[String, VO]]`、多步 `k`-BMC 或跨集合 `sum`+双量词乘积时，Z3 可能触及非线性超时或物化退化 | **T08** | 构造含 `Map[String, Map[String, VO]]` 与非线性乘积/多步转移的 `.ears`，测试超时诊断与确定性降级边界 | `compile-v2` 超时或物化样本失真 |
+| **M19** | **增量重生成残留 `.proto` 与 `sbt` `src_managed` 清理**：重命名包路径或删除旧聚合后，虽然 `.scala` 已引入 stale pruning，但残留 `.proto` 与 `target/scala-2.13/src_managed` 仍可能触发 ScalaPB 类名冲突 | **T11** | 先生成含 `AggA` 的单体并跑 `sbt compile`，删去 `AggA` 或改包名后原地增量重生成再跑 `sbt compile` | ScalaPB 生成重复类致增量编译失败 |
 
 ### 故障归因三方速查协议（防错怪、防越界）
 
@@ -437,4 +457,4 @@ M01、M03、M04、M05、M06、M07、M08 已于 `2f4d33d` 实锤清零并锁入 `
 | `generated-tests/` 锁定用例期望与真源一致，仅 `@cloze` 槽位行为不达标，或 `ServerSnapshotProviderImpl` 返回空快照 | **手写隔离区（Handwritten）** | 仅在 `@cloze:start..end` 或手写 provider 内修复业务实现 |
 | 生成代码自身 `sbt stage` 报类型/语法错；或锁定测试传参违反真源结构/Authz 协议；或增量生成路径/清理缺陷 | **编译器 / 生成器（`metarch-truthsrc`）** | 提上游 Issue 附精确文件行号与最小复现 → 按四步探针法修复并锁入 `SPEC-S*` |
 
-> **结语**：这份地图的价值不在一次性读完，而在**每次准备交付新特性或接入新多域项目前，拿出图 3 的 14 条暗道与雷达表 M01–M08，挑出最危险的 3–5 个接缝写 100 行对抗探针跑一遍真实 `sbt stage` + Play HTTP**。把暗道变成亮路，把踩坑变成探针，这就是 `metarch-truthsrc` 持续逼近工业级确定性的核心打法。
+> **结语**：这份地图的价值不在一次性读完，而在**每次准备交付新特性或接入新多域项目前，拿出图 3 的 14 条暗道与雷达表 M16–M19，挑出最危险的 3–5 个接缝写 100 行对抗探针跑一遍真实 `sbt stage` + Play HTTP**。把暗道变成亮路，把踩坑变成探针，这就是 `metarch-truthsrc` 持续逼近工业级确定性的核心打法。

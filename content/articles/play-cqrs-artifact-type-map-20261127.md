@@ -1,6 +1,6 @@
 # Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景
 
-> 版本锚定：`metarch-truthsrc` @ [`2f4d33d`](https://github.com/co-arising/metarch-truthsrc)（`scala-cqrs-play-service:2` · `catalogSha256: 156b224f3614` · 60 族 / 14 生产者 / 64 种 `artifactKinds`） · `bank-wealth-demo` @ [`b5cadc0`](https://github.com/co-arising/bank-wealth-demo) · 本文受 `assets/data/artifact-maps.lock.json` 与 `sync-site-facts` 门禁受控同步（对应站点状态台账 `F-32` / `F-33`）。
+> 版本锚定：`metarch-truthsrc` @ [`1e87c6a`](https://github.com/co-arising/metarch-truthsrc)（`scala-cqrs-play-service:2` · `catalogSha256: 156b224f3614` · 60 族 / 14 生产者 / 64 种 `artifactKinds`） · `bank-wealth-demo` @ [`b5cadc0`](https://github.com/co-arising/bank-wealth-demo) · 本文受 `assets/data/artifact-maps.lock.json` 与 `sync-site-facts` 门禁受控同步（对应站点状态台账 `F-32` / `F-33`）。
 
 在大多数代码生成器里，“一个模型生成一份巨型 `Service.scala`”看似简单，但只要业务规则、持久化、权限、长流程和读模型同时演化，生成器很快就会退化成不可维护的字符串大杂烩——**AI 和人类改一处就会污染十处，洋葱架构的依赖边界也形同虚设**。
 
@@ -49,7 +49,7 @@
 > 点击下图任意节点，可直接跳转到对应洋葱层与 Artifact Type 的详细拆解与真实样例代码；左侧目录支持按洋葱层次展开或折叠全部子类目。
 
 <figure class="co-arch-fig co-arch-map">
-<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 2f4d33d) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
+<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 1e87c6a) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
 <svg viewBox="0 0 1120 1110" width="100%" role="img" aria-label="Play CQRS 五层同心洋葱架构 Artifact Type 全景地图：从最内层 Domain Core 到 Application、Infrastructure、Interfaces 与 Verification 闸门层">
   <defs>
     <marker id="map-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -500,7 +500,7 @@ override def process(envelope: EventEnvelope[Any]): Future[Done] =
 - **`#60 projection-runtime-mechanism` (`PolicyMachine.scala` / `FailureVerdict.scala` / `PolicyEnvelope.scala` / `PolicyDlqBury.scala`)**：共享 4 段效果管线，并**显式检查 `Future.traverse(commands)(execute)` 返回列表中的每一个 `Left(err)`**——`Permanent` 送入 `PolicyDlqSink.bury` 后推进 offset，`Retryable` 则返回失败 `Future` 以阻断 offset 提交触发重放；此外守护进程注册 trait 对应 **`#59 policy-bootstrap`**（见第 5.4 节）。
 
 ```scala
-// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 2f4d33d)
+// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 1e87c6a)
 Future
   .traverse(commands)(execute)
   .flatMap { results =>

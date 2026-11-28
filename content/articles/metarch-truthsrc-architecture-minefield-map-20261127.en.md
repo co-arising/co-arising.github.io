@@ -1,12 +1,12 @@
 # metarch-truthsrc Strategic Architecture Map & Underground Tunnels Mine-Sweeping Manual (v2.0.0 Source-Level Atlas)
 
-> **Scope & Source Baseline**: Written directly against [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0** (pinned commit [`2f4d33d`](https://github.com/co-arising/metarch-truthsrc/commit/2f4d33da6a3964ed72ca842b8a38164342adc0ae), `bank-wealth-demo` @ `b5cadc0`), this is a **coarse-to-fine, macro-to-seam engineering battle map**. Unlike the [co-arising 2.0 Long-Term Architecture Blueprint](https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/) (design philosophy) or the [GA Complete Guide](https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) (user workflow), this manual slices the compiler open to chart its **module boundaries, vertical dataflows, 14 cross-file hidden couplings ("underground tunnels")**, and an empirically validated **probe-based mine-sweeping playbook covering 13 confirmed fixes across Wave-1 & Wave-2 plus Wave-3 Pre-Z3/Post-Z3 targets**, machine-locked to the repository commit via `artifact-maps.lock.json`.
+> **Scope & Source Baseline**: Written directly against [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0** (pinned commit [`1e87c6a`](https://github.com/co-arising/metarch-truthsrc/commit/1e87c6a899cc05ffaa265b2b9c89d947975b1c78), `bank-wealth-demo` @ `b5cadc0`), this is a **coarse-to-fine, macro-to-seam engineering battle map**. Unlike the [co-arising 2.0 Long-Term Architecture Blueprint](https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/) (design philosophy) or the [GA Complete Guide](https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) (user workflow), this manual slices the compiler open to chart its **module boundaries, vertical dataflows, 14 cross-file hidden couplings ("underground tunnels")**, and an empirically validated **probe-based mine-sweeping playbook covering 24 confirmed fixes across Waves 1–4 (locked in `SPEC-S13..S25`) plus Wave-5 honest targets**, machine-locked to the repository commit via `artifact-maps.lock.json`.
 
 <div class="co-kpi-strip" role="region" aria-label="metarch-truthsrc v2.0.0 codebase scale and mine-sweeping baseline">
-<div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">34,486 LOC in v2 trunk/EARS/Play emitters + 14,125 LOC in 24 curated 1.0 families</div></div>
+<div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">34.5k+ LOC in v2 trunk/EARS/Play emitters + 14,125 LOC in 24 curated 1.0 families</div></div>
 <div><div class="kpi-num">44 / 32 / 159</div><div class="kpi-label">surface-registry lock: 44 CLI commands, 32 MCP tools, 159 diagnostic error codes</div></div>
 <div><div class="kpi-num red">14 Tunnels</div><div class="kpi-label">Hidden cross-file couplings spanning types, 1.0/2.0 bridge, oracles, and verify gates</div></div>
-<div><div class="kpi-num">13 / 13 Hit</div><div class="kpi-label">Wave-1 (7/7) + Wave-2 (6/6) predicted and empirically eliminated (locked in SPEC-S13..S20)</div></div>
+<div><div class="kpi-num">4 Waves · 24 Cleared</div><div class="kpi-label">Wave-1(7) + Wave-2(6) + Wave-3(5+4 bonus @ 57e6440) + Wave-4(2 @ 1e87c6a), locked in SPEC-S13..S25</div></div>
 </div>
 
 ## 1. Strategic Overview (Level 0): The Macro Terrain Map
@@ -116,7 +116,7 @@ To hunt latent bugs systematically inside `metarch-truthsrc`, discard one miscon
 
 ## 2. Module & Directory Atlas (Level 1): Six Zones Down to Exact Source Files
 
-As of `2f4d33d`, the v2 engine spans six operational zones. Use this atlas as a direct jump-table during triage and bug-hunting:
+As of `1e87c6a`, the v2 engine spans six operational zones. Use this atlas as a direct jump-table during triage and bug-hunting:
 
 | Zone | Core Modules (clickable GitHub links) | LOC | Ownership & Responsibility | Key I/O Contract |
 |---|---|---:|---|---|
@@ -342,7 +342,7 @@ On the surface the compiler pipeline looks clean and modular. What actually brea
    - Aggregates mixing L1 deterministic rules and L2 `@cloze` rules must unify all params under `<Agg>RuleParams` (never splitting out `<Agg>DomainServiceRuleParams`).
    - Because `SPEC-S4` forbids exposing `val Noop` on non-empty `<Agg>Computations` in production code, [`scala-strict-scalatest.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/lib/v2/test-emitter/scala-strict-scalatest.mjs) passes `null.asInstanceOf[<Agg>Computations]` for L1 rule tests on hybrid aggregates.
 7. **T07 · `tools/lint.mjs` Architecture Guard**:
-   - [`tools/lint.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs) scans all 625 JS/MJS files: zero domain/business identifiers in generic core, zero `net.imadz` literals outside `lib/runtime-profile.mjs`, and zero hardcoded `'app/'` paths inside active `emitter/families/`.
+   - [`tools/lint.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/tools/lint.mjs) scans all 626 JS/MJS files: zero domain/business identifiers in generic core, zero `net.imadz` literals outside `lib/runtime-profile.mjs`, and zero hardcoded `'app/'` paths inside active `emitter/families/`.
 
 ### Network C · Witness Materialization & Oracle Faults (T08–T10)
 
@@ -367,9 +367,9 @@ On the surface the compiler pipeline looks clean and modular. What actually brea
 
 ---
 
-## 5. Empirical Retrospective (Level 4A): How Tunnel-Guided Probing Scored 7/7
+## 5. Empirical Retrospective (Level 4A): Four-Wave Mine-Sweeping Battle Report (`SPEC-S13..S25`)
 
-Right after fixing the first real-world 6-subdomain run ([Issue #2](https://github.com/co-arising/metarch-truthsrc/issues/2), [#3](https://github.com/co-arising/metarch-truthsrc/issues/3), [#4](https://github.com/co-arising/metarch-truthsrc/issues/4)), we used the tunnel map above to hypothesize 6 latent bugs and built a real adversarial probe (`compileCanonicalV2` + `node --test` + real `sbt -batch compile`). **All 6 hypotheses confirmed as real bugs, plus 1 newly discovered compile bug (7/7 total)**:
+Right after fixing the first real-world 6-subdomain run ([Issue #2](https://github.com/co-arising/metarch-truthsrc/issues/2), [#3](https://github.com/co-arising/metarch-truthsrc/issues/3), [#4](https://github.com/co-arising/metarch-truthsrc/issues/4)), we used the tunnel map above to drive four consecutive waves of real adversarial probes (`compileCanonicalV2` + `node --test` + offline `scalac`/ScalaTest/Mutation Gate + real `sbt -batch compile`). **Wave-1 (7/7)** validated the methodology on the very first run:
 
 | # | Confirmed Bug Symptom | Tunnel Traversed | Minimal Adversarial Probe | Fix & Regression Lock |
 |---|---|---|---|---|
@@ -381,11 +381,11 @@ Right after fixing the first real-world 6-subdomain run ([Issue #2](https://gith
 | **#6** | Zero-VO project missed `ProtoConverters`; `[POSTCOND]` arity mismatched derived event fields | **T04 + T05 + T09** | Primitive-only project with lineage-derived event fields | Emitted zero-VO fallback in `v1-strict-block-cd` with framework import; shared `resolveCanonicalEventFields` (`SPEC-S15`) |
 | **#7** | Custom `aliases: [bal]` omitting `'state'` emitted invalid `state.state.copy(...)` | **T03** | YAML aggregate with custom `aliases` excluding `state` | Normalized aggregate aliases to always include `'state'` across bridge & witness (`SPEC-S14`) |
 
-All regressions are now locked in [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs) (`SPEC-S1..S20`, 20/20 PASS), verified with live `sbt -batch stage` + Play 2.8.18 HTTP roadshow and `bank-wealth-demo` 100% Mutation Gate (see the [status page](https://co-arising.github.io/status/)).
+All regressions are locked in [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs) (`SPEC-S1..S25`, 25/25 PASS), verified with real `sbt -batch compile` / `stage` and 100% Mutation Gate runs (see the [status page](https://co-arising.github.io/status/)).
 
 ### Wave-2 Empirical Sweep (Commit `2f4d33d` · 6/6 Probes Confirmed & Eliminated)
 
-Immediately after charting targets M01–M08 above, we ran Wave-2 adversarial probes (`probe_wave2_mines.mjs`) through real `compileCanonicalV2` + `generateScalaCqrsPlayServiceV2`/`ForBc` + `emitV2ExecutableTests` + offline `scalac` + real **`sbt -batch compile`**. **All 6 probe groups confirmed as real defects (10 underlying fixes, locked in `SPEC-S18..S20`)**:
+Immediately after charting targets M01–M08, we ran Wave-2 adversarial probes (`probe_wave2_mines.mjs`) through real `compileCanonicalV2` + `generateScalaCqrsPlayServiceV2`/`ForBc` + `emitV2ExecutableTests` + offline `scalac` + real **`sbt -batch compile`**. **All 6 probe groups confirmed as real defects (10 underlying fixes, locked in `SPEC-S18..S20`)**:
 
 | Radar ID | Confirmed Defect & Root Cause | Fix & Regression Lock (`2f4d33d`) |
 |---|---|---|
@@ -396,9 +396,30 @@ Immediately after charting targets M01–M08 above, we ran Wave-2 adversarial pr
 | **M08-A/B** | **Pre-Z3**: missing `len/count >= 0` caused Z3 fake `-1` gap; missing quantifier Skolem equivalence; **Scala bridge**: `ears-simplify` emitted `p.x.score`; **Post-Z3**: `witness-materialize` ignored `@quant` and let scalar `x=0` shadow `x.score=1` | Added `len/count >= 0` + Skolem axioms in `smt-encoder`, `boundVars` + integer comparisons in `ears-simplify`, and record-subfield-first + `@quant` materialization in `witness-materialize` (`SPEC-S20`) |
 | **M05 + M04** | Pre-existing repos adding their first ReadModel later never installed `ProjectionModule` due to `overwrite: false` on `HandwrittenBindingsModule`; full-suite mutation runs risked timeouts at scale | Moved `ProjectionModule` installation into compiler-owned `GeneratedBindingsModule` (preserving existing handwritten setups); targeted per-aggregate specs and 180s baseline timeout in `mutation-gate` (`SPEC-S19`) |
 
+### Wave-3 Empirical Sweep (Commit `57e6440` · M02/M09–M12 + 4 Bonus Mines Eliminated)
+
+Targeting the entire Wave-3 radar (M02 + Pre-Z3/Post-Z3 M09–M12), commit [`57e6440`](https://github.com/co-arising/metarch-truthsrc/commit/57e6440a0f10b6dd94e02d10d23bb1be23b970d7) confirmed and eliminated **all 5 radar mines plus 4 bonus deep defects uncovered during execution**, verified via `node --test`, offline `scalac`, 100% Scala Mutation Gate, and real Play 2.8.18 `sbt -batch compile` (69 Scala + 2 `.proto`, 0 errors) and locked into `SPEC-S21..S24`:
+
+| ID | Confirmed Defect & Root Cause | Fix & Regression Lock (`57e6440`) |
+|---|---|---|
+| **M02** | Locked application tests asserted verbatim `toString` equality on dispatched command snapshot fields, falsely failing handwritten handlers that normalize or recompute derived values | Relaxed `scala-strict-scalatest`, `scala-scalatest`, and `typescript-node-test` to non-null + runtime type-validity assertions while preserving strict equality for `bindPrincipal` (`SPEC-S21`) |
+| **M09 + M10** | **Pre-Z3**: uncoupled `len == 0` / `sum == 0` and vacuous `forall`/`exists`; opposing quantifiers reusing variable `x` collided under a single Skolem; **Post-Z3**: boundary witnesses failed to substitute bound vars and dropped `@qdef(col)`, leaving M10 mutation kill rate at 71.43% | Added alpha-normalized quantifier signatures, scoped witnesses `@qel_N`, default element `@qdef(col)`, coupled collection axioms, and distinct-scalar `len >= 2` in `smt-encoder`; aligned `first-hit-witness` and `witness-materialize` (`defaultElem` + `activeElements`), raising M10 mutation kill rate to **100%** (`SPEC-S22`) |
+| **M11** | Rules guarding `sum(scores) > 100` solved `@agg(sum:scores)` in Z3, but `witness-materialize` still emitted small default lists that fell short of the target sum | Implemented exact `BigInt` scaled decomposition of `@agg(sum:col)` in `witness-materialize` for both `Seq[Int]` and fixed-scale `Seq[Decimal(scale)]`, cooperating with `len`/`count` and active quantifier elements (`SPEC-S22`) |
+| **M12** | `Map[String, ValueObject]` member access (`state.entries[key].score`) was broken across binder, SMT, witness materialization, Scala, and TS emitters | Wired end-to-end: `binder` type inference through `index -> member`, typed map-subfield SMT arrays with scale/enum propagation, `map-subfield` probing & `mapPresence` gating in `first-hit-witness`, Scala `.get(k).map(_.f).getOrElse(...)` in `ears-simplify`, and TS `?.[f] ?? fallback` in `typescript.mjs` (`SPEC-S23`) |
+| **Bonus #1–#4** | Real probes surfaced 4 additional latent defects: (1) multi-branch L1 commands dropped extra acceptance rules in 1.0's single-`else` template; (2) `typescript.mjs` emitted `cmd.x.score` inside quantifiers; (3) nested `ExactType` `post:` updates emitted invalid `.copy(...)` on `sealed abstract case class ... private (...)`; (4) unconstrained `ExactType` unit fields materialized as `""`, making `Money.create` fall back to `Money.Zero` | (1) Emitted full First-Hit `if / else if / else` for multi-branch L1 in `v1-strict-scala` (24/24 1.0 parity intact); (2) tracked `boundVars`/`boundVarTypes` and `sum`/`len`/`count` in `typescript.mjs`; (3) emitted `.create(...).getOrElse(...)` in `buildNestedCopy`; (4) defaulted unconstrained unit fields to `resolvedType.units?.[0]` (`SPEC-S22..S24`) |
+
+### Wave-4 Empirical Sweep (Commit `1e87c6a` · Proto3 Nested Containers + Play 5-Layer Authz Parity)
+
+Wave-4 targeted **T01/T05 (Proto3 persistence for nested containers on Aggregate state)** and **T10 (PlayController 5-layer Authz parity)** using a 2-subdomain monolith probe (`orders` + `billing` with ReadModels, Stories, Authz, and nested containers). Commit [`1e87c6a`](https://github.com/co-arising/metarch-truthsrc/commit/1e87c6a899cc05ffaa265b2b9c89d947975b1c78) eliminated both cross-layer defects, verified by real **`sbt -batch compile`** (111 Scala sources + 3 `.proto` files, 0 errors in 16s) and locked into `SPEC-S25`:
+
+| Radar ID | Confirmed Defect & Root Cause | Fix & Regression Lock (`1e87c6a`) |
+|---|---|---|
+| **M13** | **T01 + T05 · Invalid Proto3 Nested Containers**: Aggregate states declaring `Optional[Seq[String]]`, `Seq[Optional[String]]`, or `Map[String, Optional[TagVO]]` broke `scalapb` / `sbt compile` because Proto3 forbids nested `repeated`/`optional` inside `repeated`/`map` | Added recursive Proto3 `BoxPO` wrapper synthesis (`SeqStringBoxPO`, `OptStringBoxPO`, `OptTagVOBoxPO`, etc.) in `v1-strict-block-cd.mjs` and spliced `encode<BoxPO>` / `decode<BoxPO>` into `SharedValueProtoConverters.scala` (including zero-VO fallback) without touching 1.0 `emitter/families/` (24/24 parity preserved) (`SPEC-S25`) |
+| **M15** | **T10 · PlayController Principal Map & HTTP/2 Header Case Drift**: `v1-strict-api-auth.mjs` omitted `"entitlements"` and `"attributes"` from `PlayController`'s `principal` map (diverging from `HttpRouter`), and `resolvePrincipalBinding` used case-sensitive header lookups that broke under HTTP/2 lowercased headers | Added `"entitlements" -> ctx.entitlements, "attributes" -> ctx.attributes` in `PlayController` and case-insensitive `lookupAttr` in `resolvePrincipalBinding`, restoring full parity between `HttpRouter` and live Play (`SPEC-S25`) |
+
 ---
 
-## 6. Next-Wave Mine-Sweeping Playbook (Level 4B): Probe Method & Wave-3 Honest Radar
+## 6. Next-Wave Mine-Sweeping Playbook (Level 4B): Probe Method & Wave-5 Honest Radar
 
 ### The 4-Step Adversarial Probe Method
 
@@ -409,19 +430,18 @@ Immediately after charting targets M01–M08 above, we ran Wave-2 adversarial pr
    - `generateScalaCqrsPlayServiceV2` / `generateScalaCqrsPlayServiceV2ForBc`
    - `emitV2ExecutableTests`
    - `node --test` + offline `scalac` + **real `sbt -batch stage` + live Play HTTP roadshow**
-4. **Lock Every Confirmed Hit**: Fix via general derivation (`npm run lint:arch` = 0 issues, `emitter/parity.mjs` = 24/24 green) and lock the probe permanently as `SPEC-S21+`.
+4. **Lock Every Confirmed Hit**: Fix via general derivation (`npm run lint:arch` = 0 issues, `emitter/parity.mjs` = 24/24 green) and lock the probe permanently as `SPEC-S26+`.
 
-### Wave-3 High-Risk Radar (Honest Boundaries as of `2f4d33d`)
+### Wave-5 High-Risk Radar (Honest Boundaries as of `1e87c6a`)
 
-M01 and M03–M08 are eliminated and locked in `SPEC-S18..S20` at `2f4d33d`. The table below honestly inventories the **5 remaining boundaries (M02 + Pre-Z3/Post-Z3 M09–M12)** for the next probing wave:
+M01–M13 and M15 have been empirically confirmed, eliminated, and locked in `SPEC-S13..S25` across `2f4d33d`, `57e6440`, and `1e87c6a`. The table below honestly inventories the **4 remaining engineering boundaries (M16–M19)** queued for Wave-5 probing:
 
 | Radar ID | Suspected Latent Mine / Known Boundary | Linked Tunnel | Recommended Adversarial Probe | Blast Radius |
 |---|---|---|---|---|
-| **M02** | **Strict `stateSnapshot` equality false failures**: handwritten app handler recomputes/normalizes derived snapshot fields, tripping strict `deepStrictEqual` / `assert(res == expected)` | **T08** | Handwritten `*Impl.scala` returning derived values rather than verbatim passthrough → `verify-v2` | Bulk false-red application tests |
-| **M09** | **Pre-Z3 · Uncoupled `len`/`sum`/`forall` axioms**: combining `len(items) == 0` with `sum(items) > 0` or vacuous truth of `forall` on empty lists can still produce spurious Z3 counterexamples | **T08** | Rules mixing `len(items) == 0`, `sum(items) > 0`, and `forall` → `compile-v2` | False gap diagnostics on complete specs |
-| **M10** | **Pre-Z3 · Reusing one quantifier variable for opposing conditions**: `exists x in items: x < 0 and exists x in items: x > 100` conflicts under single-element Skolemization unless distinct variable names are used | **T08** | Dual-element witness rules reusing the same variable name → `compile-v2` | Reachable rule flagged unreachable |
-| **M11** | **Post-Z3 · `sum(seq)` witness synthesis**: Z3 solves `@agg(sum:scores) = 101`, but `witness-materialize` still fills default `[1, 2, ...]` without hitting the target sum | **T08** | Domain rule guarding `sum(scores) > 100` → `verify-v2 --strict` | Locked TS/Scala tests fail due to under-summed fixtures |
-| **M12** | **Post-Z3 · Deep `Map[String, ValueObject]` witnesses**: primitive maps are covered, while nested record-valued maps remain thin in `witness-materialize` | **T01 + T08** | Aggregate state with `Map[String, LineItem]` reading `state.map[k].score` → `verify-v2` | Distorted map-member fixtures |
+| **M16** | **Plain `form: decimal` `ExactType` Dual-Track Divergence**: `structure-loader.mjs` resolves non-`unit-decimal` `ExactType`s (e.g., `Rate`, `scale: 4`) to `{ kind: 'decimal', typeName: 'Rate', scale: 4 }` rather than `kind: 'record'`, so downstream Scala bridges emit `BigDecimal` while `deriveV1ValueObjectInput` still emits `Rate.scala` / `RatePO` | **T01** | Mix a `form: decimal` `ExactType` (`Rate`) across Aggregate, Command, ReadModel, and `externContracts` → real `sbt -batch compile` + locked tests | Type/converter signature mismatch between VO/Proto and bridges |
+| **M17** | **Cross-Version `overwrite: false` Handwritten DI Drift**: When pre-existing repos upgrade and add new `ConnectorPort`, `Policy`, `Saga`, or L2 `ComputationsImpl` bindings, preserved `ServerSnapshotProviderImpl.scala` and `HandwrittenBindingsModule.scala` can drift out of sync | **T14** | Generate vA scaffold + handwritten files, add new Port/Saga/L2 bindings, regenerate in place → `sbt -batch compile` + upgrade diagnostics | Existing repos fail compile or miss Guice runtime bindings |
+| **M18** | **Deep `k`-BMC + Nonlinear `QF_NIA` + Nested `Map[String, Map[String, VO]]` Solver Envelope**: Combining multi-step `k`-BMC, nonlinear products, or doubly nested maps can approach Z3 timeout or materialization limits | **T08** | Author `.ears` with `Map[String, Map[String, VO]]`, nonlinear arithmetic, and multi-step transitions → test timeout diagnostics and deterministic bounds | `compile-v2` solver timeout or distorted fixture synthesis |
+| **M19** | **Incremental Regeneration Stale `.proto` & `sbt` `src_managed` Cleanup**: While stale `.scala` files are pruned, renaming packages or removing aggregates can leave old `.proto` / `target/scala-2.13/src_managed` artifacts behind | **T11** | Generate + `sbt compile` a monolith with `AggA`, remove/rename `AggA`, regenerate in place, and re-run `sbt compile` | Duplicate ScalaPB generated classes break incremental `sbt` |
 
 ### 30-Second Failure Attribution Protocol
 
@@ -431,4 +451,4 @@ M01 and M03–M08 are eliminated and locked in `SPEC-S18..S20` at `2f4d33d`. The
 | Locked oracle matches truth, but `@cloze` implementation or `ServerSnapshotProviderImpl` diverges | **Handwritten Isolation Zone** | Fix logic strictly inside `@cloze:start..end` or handwritten provider |
 | Generated code fails `sbt stage`, locked oracle sends inputs violating truth/Authz contracts, or incremental packaging leaves stale artifacts | **Compiler / Generator (`metarch-truthsrc`)** | File upstream issue with file:line & minimal repro → fix via 4-step probe and lock in `SPEC-S*` |
 
-> **Closing Takeaway**: Do not read this map once and file it away. Before every major release or multi-subdomain onboarding, pick the 3–5 riskiest seams from Figure 3 and radar targets M01–M08, write a 100-line adversarial probe, and run it through real `sbt stage` + Play HTTP. Turning underground tunnels into lit corridors and turning surprises into locked probes is how `metarch-truthsrc` converges on industrial-grade determinism.
+> **Closing Takeaway**: Do not read this map once and file it away. Before every major release or multi-subdomain onboarding, pick the 3–5 riskiest seams from Figure 3 and radar targets M16–M19, write a 100-line adversarial probe, and run it through real `sbt stage` + Play HTTP. Turning underground tunnels into lit corridors and turning surprises into locked probes is how `metarch-truthsrc` converges on industrial-grade determinism.

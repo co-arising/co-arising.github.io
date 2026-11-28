@@ -5,7 +5,7 @@
   "maps": {
     "scala-cqrs-play-service:2": {
       "slug": "play-cqrs-artifact-type-map-20261127",
-      "truthsrcShort": "2f4d33d",
+      "truthsrcShort": "1e87c6a",
       "bankShort": "b5cadc0",
       "catalogSha256": "156b224f36141e33507879d5f35a5e8be2d572fe431781d6b9ff315812abf068",
       "totalUnifiedFamilies": 60,
@@ -19,8 +19,8 @@
   "architectureMaps": {
     "metarch-truthsrc:v2": {
       "slug": "metarch-truthsrc-architecture-minefield-map-20261127",
-      "truthsrcCommit": "2f4d33da6a3964ed72ca842b8a38164342adc0ae",
-      "truthsrcShort": "2f4d33d",
+      "truthsrcCommit": "1e87c6a899cc05ffaa265b2b9c89d947975b1c78",
+      "truthsrcShort": "1e87c6a",
       "bankShort": "b5cadc0",
       "zhRoute": "/zh/articles/metarch-truthsrc-architecture-minefield-map-20261127/",
       "enRoute": "/articles/metarch-truthsrc-architecture-minefield-map-20261127/"
