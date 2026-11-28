@@ -1,6 +1,6 @@
 # Play CQRS (scala-cqrs-play-service:2) Artifact Type Architecture Map: Onion Layers, Decomposition & Re-Assembly, and Target Code Reference
 
-> Version lock: `metarch-truthsrc` @ [`2f4d33d`](https://github.com/co-arising/metarch-truthsrc) (`scala-cqrs-play-service:2` · `catalogSha256: 156b224f3614` · 60 unified families / 14 producers / 64 `artifactKinds`) · `bank-wealth-demo` @ [`b5cadc0`](https://github.com/co-arising/bank-wealth-demo) · Controlled by `assets/data/artifact-maps.lock.json` and the `sync-site-facts` CI gate (cross-referenced with `F-32` / `F-33` on the status page).
+> Version lock: `metarch-truthsrc` @ [`ab207e7`](https://github.com/co-arising/metarch-truthsrc) (`scala-cqrs-play-service:2` · `catalogSha256: 156b224f3614` · 60 unified families / 14 producers / 64 `artifactKinds`) · `bank-wealth-demo` @ [`b5cadc0`](https://github.com/co-arising/bank-wealth-demo) · Controlled by `assets/data/artifact-maps.lock.json` and the `sync-site-facts` CI gate (cross-referenced with `F-32` / `F-33` on the status page).
 
 Most code generators emit one giant `OrderService.scala` per model. That shortcut feels fast on day one, yet as soon as invariants, persistence adapters, authorization, read projections, and reactive policies evolve together, templates collapse into an untestable tangle where **AI edits leak infrastructure into business rules and Onion boundaries erode silently**.
 
@@ -49,7 +49,7 @@ Every Artifact Type in `co-arising` carries an explicit architectural role so ne
 > Click any node in Figure 1 to jump directly to that layer's Artifact Type breakdown and Scala code sample. Use the 2-level collapsible Onion-layer sidebar on the left to expand or collapse individual layers.
 
 <figure class="co-arch-fig co-arch-map">
-<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 2f4d33d) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
+<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 8950ba3) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
 <svg viewBox="0 0 1120 1110" width="100%" role="img" aria-label="Concentric 5-layer Onion Architecture Artifact Type Map for Play CQRS showing Domain Core, Application, Infrastructure, Interfaces/Runtime, and Verification Oracle Gate with Kernel/Seam/Glue roles and inward DIP edges">
   <defs>
     <marker id="map-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -500,7 +500,7 @@ override def process(envelope: EventEnvelope[Any]): Future[Done] =
 - **`#60 projection-runtime-mechanism` (`PolicyMachine.scala` / `FailureVerdict.scala` / `PolicyEnvelope.scala` / `PolicyDlqBury.scala`)**: Shared 4-stage execution pipeline inspecting **every `Left(err)` inside `Future.traverse(commands)(execute)`** — burying `Permanent` verdicts via `PolicyDlqSink.bury` (advancing offsets) while failing the `Future` on `Retryable` verdicts (blocking offset commits for at-least-once replay); daemon registration traits belong to **`#59 policy-bootstrap`** (Section 5.4).
 
 ```scala
-// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 2f4d33d)
+// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 8950ba3)
 Future
   .traverse(commands)(execute)
   .flatMap { results =>

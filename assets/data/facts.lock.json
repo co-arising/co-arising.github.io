@@ -1,8 +1,8 @@
 {
   "schemaVersion": "co-arising.site-facts-lock/v1",
   "cohort": {
-    "truthsrcCommit": "2f4d33da6a3964ed72ca842b8a38164342adc0ae",
-    "truthsrcShort": "2f4d33d",
+    "truthsrcCommit": "ab207e7d2fae55feffafd9c9a13d61ccd6b9d829",
+    "truthsrcShort": "ab207e7",
     "bankCommit": "b5cadc007770943bdc0bc913329a8b4f44ca4f8d",
     "bankShort": "b5cadc0",
     "explorerSnapshot": "56efe8d051dd3d837d2819ed698c5c47b75e6f1712878e956cb1364212893f25",
@@ -206,5 +206,5 @@
     "totalFiles": 195,
     "workshopBytes": 1129972
   },
-  "generatedAt": "2026-11-27T16:40:36.079Z"
+  "generatedAt": "2026-11-28T02:25:00.000Z"
 }

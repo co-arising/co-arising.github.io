@@ -95,8 +95,19 @@ V2_PLAYBOOK_NOTE = "本文面向社区与开发者介绍 co-arising 2.0 的确�
 V2_PLAYBOOK_NOTE_EN = "This hands-on playbook introduces co-arising 2.0's determinism boundaries, 7 latest upgrades, and experimental walkthrough (especially the Skill layer); formal capability and verification scopes remain tracked on the status page (F-32–F-35) and in repository source."
 PLAY_CQRS_MAP_NOTE = "本文是与 metarch-truthsrc (scala-cqrs-play-service:2) 及 bank-wealth-demo 源码提交精确锁定的 Play CQRS Artifact Type 架构地图；当上游新增或升级任何 Artifact Type，或扩展新的目标技术栈（如 Rust）时，须通过 sync-site-facts 与 artifact-maps.lock.json 门禁同步更新本双语地图。"
 PLAY_CQRS_MAP_NOTE_EN = "This is a commit-pinned Play CQRS Artifact Type architecture map synchronized to metarch-truthsrc (scala-cqrs-play-service:2) and bank-wealth-demo; whenever any Artifact Type evolves upstream or a new target stack (such as Rust) is added, sync-site-facts and artifact-maps.lock.json require updating this bilingual map."
-MINEFIELD_MAP_NOTE = "本文通过 artifact-maps.lock.json 与 metarch-truthsrc v2.0.0（提交 b2b61e5，bank-wealth-demo @ bd20e36）精确绑定，记录当前模块拓扑、14 条跨文件隐蔽耦合暗道、两波 13 个已实锤修复（SPEC-S13..S20）及 Wave-3 诚实边界雷达；正式产品验收基线请以状态页（F-32–F-35）为准。"
-MINEFIELD_MAP_NOTE_EN = "Commit-pinned via artifact-maps.lock.json to metarch-truthsrc v2.0.0 (commit b2b61e5, bank-wealth-demo @ bd20e36), this engineering manual maps the current module topology, 14 cross-file hidden couplings, 13 empirically confirmed fixes across Wave-1 & Wave-2 (SPEC-S13..S20), and Wave-3 honest boundaries; formal product evidence remains tracked on the status page (F-32–F-35)."
+def _load_minefield_cohort():
+    lock_path = ROOT / "assets" / "data" / "artifact-maps.lock.json"
+    try:
+        data = json.loads(lock_path.read_text(encoding="utf-8"))
+        entry = data.get("architectureMaps", {}).get("metarch-truthsrc:v2", {})
+        return entry.get("truthsrcShort", "ab207e7"), entry.get("bankShort", "b5cadc0")
+    except Exception:
+        return "ab207e7", "b5cadc0"
+
+
+_MINEFIELD_TS_SHORT, _MINEFIELD_BANK_SHORT = _load_minefield_cohort()
+MINEFIELD_MAP_NOTE = f"本文通过 artifact-maps.lock.json 与 metarch-truthsrc v2.0.0（提交 {_MINEFIELD_TS_SHORT}，bank-wealth-demo @ {_MINEFIELD_BANK_SHORT}）精确绑定，记录当前模块拓扑、14 条跨文件隐蔽耦合暗道、八波 36 项已实锤修复（SPEC-S13..S31）及 Wave-9 诚实边界雷达；正式产品验收基线请以状态页（F-32–F-35）为准。"
+MINEFIELD_MAP_NOTE_EN = f"Commit-pinned via artifact-maps.lock.json to metarch-truthsrc v2.0.0 (commit {_MINEFIELD_TS_SHORT}, bank-wealth-demo @ {_MINEFIELD_BANK_SHORT}), this engineering manual maps the current module topology, 14 cross-file hidden couplings, 36 empirically confirmed fixes across Waves 1–8 (SPEC-S13..S31), and Wave-9 honest boundaries; formal product evidence remains tracked on the status page (F-32–F-35)."
 NAV = (
     ("/", "Home", "首页"),
     ("/why-co-arising/", "Why co-arising", "为何 co-arising"),
