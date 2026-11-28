@@ -1,12 +1,12 @@
 # metarch-truthsrc Strategic Architecture Map & Underground Tunnels Mine-Sweeping Manual (v2.0.0 Source-Level Atlas)
 
-> **Scope & Source Baseline**: Written directly against [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0** (pinned commit [`1e87c6a`](https://github.com/co-arising/metarch-truthsrc/commit/1e87c6a899cc05ffaa265b2b9c89d947975b1c78), `bank-wealth-demo` @ `b5cadc0`), this is a **coarse-to-fine, macro-to-seam engineering battle map**. Unlike the [co-arising 2.0 Long-Term Architecture Blueprint](https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/) (design philosophy) or the [GA Complete Guide](https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) (user workflow), this manual slices the compiler open to chart its **module boundaries, vertical dataflows, 14 cross-file hidden couplings ("underground tunnels")**, and an empirically validated **probe-based mine-sweeping playbook covering 24 confirmed fixes across Waves 1–4 (locked in `SPEC-S13..S25`) plus Wave-5 honest targets**, machine-locked to the repository commit via `artifact-maps.lock.json`.
+> **Scope & Source Baseline**: Written directly against [`metarch-truthsrc`](https://github.com/co-arising/metarch-truthsrc) **v2.0.0** (pinned commit [`8950ba3`](https://github.com/co-arising/metarch-truthsrc/commit/8950ba3b390169ef592bee6459e79ec663a937d6), `bank-wealth-demo` @ `b5cadc0`), this is a **coarse-to-fine, macro-to-seam engineering battle map**. Unlike the [co-arising 2.0 Long-Term Architecture Blueprint](https://co-arising.github.io/articles/co-arising-v2-ears-native-architecture-20261126/) (design philosophy) or the [GA Complete Guide](https://co-arising.github.io/articles/co-arising-v2-ga-prd-to-running-guide-20261126/) (user workflow), this manual slices the compiler open to chart its **module boundaries, vertical dataflows, 14 cross-file hidden couplings ("underground tunnels")**, and an empirically validated **probe-based mine-sweeping playbook covering 29 confirmed fixes across Waves 1–6 (locked in `SPEC-S13..S28`) plus Wave-7 honest targets**, machine-locked to the repository commit via `artifact-maps.lock.json`.
 
 <div class="co-kpi-strip" role="region" aria-label="metarch-truthsrc v2.0.0 codebase scale and mine-sweeping baseline">
 <div><div class="kpi-num">34.5k + 14.1k</div><div class="kpi-label">34.5k+ LOC in v2 trunk/EARS/Play emitters + 14,125 LOC in 24 curated 1.0 families</div></div>
 <div><div class="kpi-num">44 / 32 / 159</div><div class="kpi-label">surface-registry lock: 44 CLI commands, 32 MCP tools, 159 diagnostic error codes</div></div>
 <div><div class="kpi-num red">14 Tunnels</div><div class="kpi-label">Hidden cross-file couplings spanning types, 1.0/2.0 bridge, oracles, and verify gates</div></div>
-<div><div class="kpi-num">4 Waves · 24 Cleared</div><div class="kpi-label">Wave-1(7) + Wave-2(6) + Wave-3(5+4 bonus @ 57e6440) + Wave-4(2 @ 1e87c6a), locked in SPEC-S13..S25</div></div>
+<div><div class="kpi-num">6 Waves · 29 Cleared</div><div class="kpi-label">Waves 1–4(24 @ 1e87c6a) + Wave-5(3 @ 93a6350) + Wave-6(2 @ 8950ba3), locked in SPEC-S13..S28</div></div>
 </div>
 
 ## 1. Strategic Overview (Level 0): The Macro Terrain Map
@@ -116,7 +116,7 @@ To hunt latent bugs systematically inside `metarch-truthsrc`, discard one miscon
 
 ## 2. Module & Directory Atlas (Level 1): Six Zones Down to Exact Source Files
 
-As of `1e87c6a`, the v2 engine spans six operational zones. Use this atlas as a direct jump-table during triage and bug-hunting:
+As of `8950ba3`, the v2 engine spans six operational zones. Use this atlas as a direct jump-table during triage and bug-hunting:
 
 | Zone | Core Modules (clickable GitHub links) | LOC | Ownership & Responsibility | Key I/O Contract |
 |---|---|---:|---|---|
@@ -367,9 +367,9 @@ On the surface the compiler pipeline looks clean and modular. What actually brea
 
 ---
 
-## 5. Empirical Retrospective (Level 4A): Four-Wave Mine-Sweeping Battle Report (`SPEC-S13..S25`)
+## 5. Empirical Retrospective (Level 4A): Six-Wave Mine-Sweeping Battle Report (`SPEC-S13..S28`)
 
-Right after fixing the first real-world 6-subdomain run ([Issue #2](https://github.com/co-arising/metarch-truthsrc/issues/2), [#3](https://github.com/co-arising/metarch-truthsrc/issues/3), [#4](https://github.com/co-arising/metarch-truthsrc/issues/4)), we used the tunnel map above to drive four consecutive waves of real adversarial probes (`compileCanonicalV2` + `node --test` + offline `scalac`/ScalaTest/Mutation Gate + real `sbt -batch compile`). **Wave-1 (7/7)** validated the methodology on the very first run:
+Right after fixing the first real-world 6-subdomain run ([Issue #2](https://github.com/co-arising/metarch-truthsrc/issues/2), [#3](https://github.com/co-arising/metarch-truthsrc/issues/3), [#4](https://github.com/co-arising/metarch-truthsrc/issues/4)), we used the tunnel map above to drive six consecutive waves of real adversarial probes (`compileCanonicalV2` + `node --test` + offline `scalac`/ScalaTest/Mutation Gate + real `sbt -batch compile`). **Wave-1 (7/7)** validated the methodology on the very first run:
 
 | # | Confirmed Bug Symptom | Tunnel Traversed | Minimal Adversarial Probe | Fix & Regression Lock |
 |---|---|---|---|---|
@@ -381,7 +381,7 @@ Right after fixing the first real-world 6-subdomain run ([Issue #2](https://gith
 | **#6** | Zero-VO project missed `ProtoConverters`; `[POSTCOND]` arity mismatched derived event fields | **T04 + T05 + T09** | Primitive-only project with lineage-derived event fields | Emitted zero-VO fallback in `v1-strict-block-cd` with framework import; shared `resolveCanonicalEventFields` (`SPEC-S15`) |
 | **#7** | Custom `aliases: [bal]` omitting `'state'` emitted invalid `state.state.copy(...)` | **T03** | YAML aggregate with custom `aliases` excluding `state` | Normalized aggregate aliases to always include `'state'` across bridge & witness (`SPEC-S14`) |
 
-All regressions are locked in [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs) (`SPEC-S1..S25`, 25/25 PASS), verified with real `sbt -batch compile` / `stage` and 100% Mutation Gate runs (see the [status page](https://co-arising.github.io/status/)).
+All regressions are locked in [`test/scala-cqrs-play-service-v2-acceptance.spec.mjs`](https://github.com/co-arising/metarch-truthsrc/blob/main/test/scala-cqrs-play-service-v2-acceptance.spec.mjs) (`SPEC-S1..S28`, 28/28 PASS), verified with real `sbt -batch compile` / `stage` and 100% Mutation Gate runs (see the [status page](https://co-arising.github.io/status/)).
 
 ### Wave-2 Empirical Sweep (Commit `2f4d33d` · 6/6 Probes Confirmed & Eliminated)
 
@@ -417,9 +417,28 @@ Wave-4 targeted **T01/T05 (Proto3 persistence for nested containers on Aggregate
 | **M13** | **T01 + T05 · Invalid Proto3 Nested Containers**: Aggregate states declaring `Optional[Seq[String]]`, `Seq[Optional[String]]`, or `Map[String, Optional[TagVO]]` broke `scalapb` / `sbt compile` because Proto3 forbids nested `repeated`/`optional` inside `repeated`/`map` | Added recursive Proto3 `BoxPO` wrapper synthesis (`SeqStringBoxPO`, `OptStringBoxPO`, `OptTagVOBoxPO`, etc.) in `v1-strict-block-cd.mjs` and spliced `encode<BoxPO>` / `decode<BoxPO>` into `SharedValueProtoConverters.scala` (including zero-VO fallback) without touching 1.0 `emitter/families/` (24/24 parity preserved) (`SPEC-S25`) |
 | **M15** | **T10 · PlayController Principal Map & HTTP/2 Header Case Drift**: `v1-strict-api-auth.mjs` omitted `"entitlements"` and `"attributes"` from `PlayController`'s `principal` map (diverging from `HttpRouter`), and `resolvePrincipalBinding` used case-sensitive header lookups that broke under HTTP/2 lowercased headers | Added `"entitlements" -> ctx.entitlements, "attributes" -> ctx.attributes` in `PlayController` and case-insensitive `lookupAttr` in `resolvePrincipalBinding`, restoring full parity between `HttpRouter` and live Play (`SPEC-S25`) |
 
+### Wave-5 Empirical Sweep (Commit `93a6350` · Nested-Map Stack Overflow + Handwritten Method Sync + Package-Rename Pruning)
+
+Wave-5 probed all four **M16–M19** targets through real `sbt -batch compile` + Z3 + TS/Scala + Mutation Gate: **M16 (`form: decimal` `ExactType`)** (66 Scala + 2 `.proto`, 0 errors) and **M18B (nonlinear `QF_NIA` `qty * unitPrice`)** verified healthy end-to-end, while **3 confirmed high-impact defects (M18A / M17 / M19)** were detonated, eliminated in commit [`93a6350`](https://github.com/co-arising/metarch-truthsrc/commit/93a63508caf9f221f39a9a7f04ea9727b7ae1efc), and locked into `SPEC-S26..S27`:
+
+| Radar ID | Confirmed Defect & Root Cause | Fix & Regression Lock (`93a6350`) |
+|---|---|---|
+| **M18A** | **T08 · Nested `Map[String, Map[String, VO]]` Stack Overflow + Invalid Scala `_.`**: `state.grid[row][col].score` triggered infinite mutual recursion (`encVal <-> encBool` → `RangeError: Maximum call stack size exceeded`) in `smt-encoder.mjs`; `ears-simplify` emitted invalid Scala `_.`; unconstrained map presence caused Z3 to default `present=false` and wipe witnesses | Broke `encVal`/`encBool` recursion, generalized `extractIndexedAccess` to arbitrary-depth nested `(Array Int ...)` SMT arrays with `hasPresence` gating, and wired arbitrary-depth indexing across `ears-simplify`, `typescript.mjs`, `first-hit-witness`, and `witness-materialize`; TS + Scala + **100% Mutation Gate** + real **`sbt -batch compile`** (54 Scala + 2 `.proto`, 0 errors in 15s) pass (`SPEC-S26`) |
+| **M17** | **T14 · Evolving Existing Repos with New L2 Commands or `externContracts` Broke `sbt`**: `overwrite: false` skipped `ScorerComputationsImpl.scala` and `EnginePortConnectorImpl.scala`, so adding `scoreBeta` / `checkBeta` caused `sbt compile` to fail with `class needs to be abstract` | Added non-destructive `syncMissingScalaMethods` (appends only missing `override def` stubs before the class's closing `}`, preserving 100% of existing user code/comments) plus `handwrittenDrift` diagnostics when `HandwrittenBindingsModule` lacks `GeneratedBindingsModule`; real **`sbt -batch compile`** (62 Scala + 1 `.proto`, 0 errors in 14s) pass (`SPEC-S27`) |
+| **M19** | **T11 · Package Rename Left Stale `handwritten/` Starter Files Breaking `sbt`**: Renaming `packageName` pruned old `generated-scaffold/` files but left unmodified starter `ServerSnapshotProviderImpl` / `HandwrittenBindingsModule` under `handwritten/scala/<oldPkg>/`, causing `not found: type` in `sbt` | Persisted `packageName` and `starterHandwrittenHashes` in `.truthsrc/generated-scala-manifest.json`: automatically prunes untouched starter files (matching starter SHA-256) and old-package `src_managed` proto caches, while preserving user-modified files and reporting `STALE_HANDWRITTEN_FILE`; real **`sbt -batch compile`** (69 Scala + 2 `.proto`, 0 errors in 16s) pass (`SPEC-S27`) |
+
+### Wave-6 Empirical Sweep (Commit `8950ba3` · Event-Triggered Policy Lineage + Null-Safe `Optional[VO]` Member Access)
+
+Wave-6 probed **T01/T08/T09** across reactive Policy stories, Map `post:` mutations, and `Optional[ValueObject]` member chains: **M21 (`state.buckets'[bucket] = ...` + `state.note' = none`)** verified healthy end-to-end (49 Scala + 1 `.proto`, 0 errors + 100% Mutation Gate), while **2 deep defects (M20 / M23)** were confirmed, eliminated in commit [`8950ba3`](https://github.com/co-arising/metarch-truthsrc/commit/8950ba3b390169ef592bee6459e79ec663a937d6), and locked into `SPEC-S28`:
+
+| Radar ID | Confirmed Defect & Root Cause | Fix & Regression Lock (`8950ba3`) |
+|---|---|---|
+| **M20** | **T09 · False `V2_LINEAGE_UNCONSUMED_NUMERIC_FIELD` Error on Event-Triggered Policy Stories**: When a reactive story declared `WHEN event Trade.TradeConfirmed SHALL dispatch Ledger.PostEntry`, `verifyDispatchLineage` marked `amount: Money` as `@PROPAGATED` but failed to record it in `consumedEventFields`, causing `compile-v2` to fail closed | Passed `consumedEventFields` into `verifyDispatchLineage` so every `@PROPAGATED` field consumed by an event-triggered story is registered; full reactive Policy build with `Money`/`TagVO`/`Optional[String]` passed real **`sbt -batch compile`** (87 Scala + 3 `.proto`, 0 errors in 22s) (`SPEC-S28`) |
+| **M23** | **T01 + T08 · `Optional[ValueObject]` Member Access Failed `scalac` & Risked TS Null Dereference**: Guards like `state.profile is some AND state.profile.score < 50` emitted `state.profile.score < BigDecimal("50")` in Scala (`value score is not a member of Option[ProfileVO]`) and unguarded `.score` in TS under conjunction reordering | Added `stepFieldType` and arbitrary-depth optional chaining across `ears-simplify` (`.map(_.score).getOrElse(0L)`, switching to `.flatMap` for nested `Optional`) and `typescript.mjs` (`(state.profile?.score ?? 0)`); TS + Scala + **100% Mutation Gate** + real **`sbt -batch compile`** (52 Scala + 2 `.proto`, 0 errors in 20s) pass (`SPEC-S28`) |
+
 ---
 
-## 6. Next-Wave Mine-Sweeping Playbook (Level 4B): Probe Method & Wave-5 Honest Radar
+## 6. Next-Wave Mine-Sweeping Playbook (Level 4B): Probe Method & Wave-7 Honest Radar
 
 ### The 4-Step Adversarial Probe Method
 
@@ -430,18 +449,18 @@ Wave-4 targeted **T01/T05 (Proto3 persistence for nested containers on Aggregate
    - `generateScalaCqrsPlayServiceV2` / `generateScalaCqrsPlayServiceV2ForBc`
    - `emitV2ExecutableTests`
    - `node --test` + offline `scalac` + **real `sbt -batch stage` + live Play HTTP roadshow**
-4. **Lock Every Confirmed Hit**: Fix via general derivation (`npm run lint:arch` = 0 issues, `emitter/parity.mjs` = 24/24 green) and lock the probe permanently as `SPEC-S26+`.
+4. **Lock Every Confirmed Hit**: Fix via general derivation (`npm run lint:arch` = 0 issues, `emitter/parity.mjs` = 24/24 green) and lock the probe permanently as `SPEC-S29+`.
 
-### Wave-5 High-Risk Radar (Honest Boundaries as of `1e87c6a`)
+### Wave-7 High-Risk Radar (Honest Boundaries as of `8950ba3`)
 
-M01–M13 and M15 have been empirically confirmed, eliminated, and locked in `SPEC-S13..S25` across `2f4d33d`, `57e6440`, and `1e87c6a`. The table below honestly inventories the **4 remaining engineering boundaries (M16–M19)** queued for Wave-5 probing:
+M01–M23 (29 confirmed defects eliminated + 3 boundary seams empirically verified healthy) are closed and locked in `SPEC-S13..S28` through commits `2f4d33d`, `57e6440`, `1e87c6a`, `93a6350`, and `8950ba3`. The table below honestly inventories the **4 remaining engineering boundaries (M24–M27)** queued for Wave-7 probing:
 
 | Radar ID | Suspected Latent Mine / Known Boundary | Linked Tunnel | Recommended Adversarial Probe | Blast Radius |
 |---|---|---|---|---|
-| **M16** | **Plain `form: decimal` `ExactType` Dual-Track Divergence**: `structure-loader.mjs` resolves non-`unit-decimal` `ExactType`s (e.g., `Rate`, `scale: 4`) to `{ kind: 'decimal', typeName: 'Rate', scale: 4 }` rather than `kind: 'record'`, so downstream Scala bridges emit `BigDecimal` while `deriveV1ValueObjectInput` still emits `Rate.scala` / `RatePO` | **T01** | Mix a `form: decimal` `ExactType` (`Rate`) across Aggregate, Command, ReadModel, and `externContracts` → real `sbt -batch compile` + locked tests | Type/converter signature mismatch between VO/Proto and bridges |
-| **M17** | **Cross-Version `overwrite: false` Handwritten DI Drift**: When pre-existing repos upgrade and add new `ConnectorPort`, `Policy`, `Saga`, or L2 `ComputationsImpl` bindings, preserved `ServerSnapshotProviderImpl.scala` and `HandwrittenBindingsModule.scala` can drift out of sync | **T14** | Generate vA scaffold + handwritten files, add new Port/Saga/L2 bindings, regenerate in place → `sbt -batch compile` + upgrade diagnostics | Existing repos fail compile or miss Guice runtime bindings |
-| **M18** | **Deep `k`-BMC + Nonlinear `QF_NIA` + Nested `Map[String, Map[String, VO]]` Solver Envelope**: Combining multi-step `k`-BMC, nonlinear products, or doubly nested maps can approach Z3 timeout or materialization limits | **T08** | Author `.ears` with `Map[String, Map[String, VO]]`, nonlinear arithmetic, and multi-step transitions → test timeout diagnostics and deterministic bounds | `compile-v2` solver timeout or distorted fixture synthesis |
-| **M19** | **Incremental Regeneration Stale `.proto` & `sbt` `src_managed` Cleanup**: While stale `.scala` files are pruned, renaming packages or removing aggregates can leave old `.proto` / `target/scala-2.13/src_managed` artifacts behind | **T11** | Generate + `sbt compile` a monolith with `AggA`, remove/rename `AggA`, regenerate in place, and re-run `sbt compile` | Duplicate ScalaPB generated classes break incremental `sbt` |
+| **M24** | **Flow-Sensitive Narrowing for Scalar `Optional[Int]` / `Optional[Decimal]` / `Optional[String]`**: While `Optional[VO]` member access is now end-to-end safe, `state.optLimit is some AND requested > state.optLimit` is still strictly rejected by `binder.mjs` pending explicit unwrap or flow-sensitive narrowing + Scala/TS lowering | **T01 + T08** | Aggregate state with `Optional[Int]` / `Optional[Decimal]` compared inside `is some` guards → `compile-v2` + `verify-v2` | Expressiveness gap for optional scalar bounds |
+| **M25** | **Multi-Story Shared Port & Non-String `GET` Query Coercion**: When `GET` routes take `Int` / `Bool` / `Decimal` query params or multiple stories share an inbound Port, verify parameter parsing alignment across `PlayController`, `HttpRouter`, and `interfaces-http` | **T10** | `GET` route with `page: Int` / `onlyActive: Bool` and shared Port → real `sbt stage` + HTTP roadshow | 400 coercion errors or controller type mismatch |
+| **M26** | **Tight `forall`+`sum` Lower-Bound Coupling & `Seq[VO]` Field-Level `sum`/Append Folds**: Combining `forall x in scores: x > 0` with `sum(scores) < len(scores)`, or `post:` append/remove folds on `Seq[VO]`, still awaits tighter SMT axioms and fold lowering | **T08 + T09** | `.ears` combining `forall`, `len`, `sum` bounds and `Seq[VO]` `post:` mutations → `compile-v2` + mutation gate | Spurious Z3 gaps on tightly coupled sum/quantifier specs |
+| **M27** | **Guided Migration CLI for User-Edited Stale Handwritten Files**: Wave-5 safely preserves user-modified files and reports `handwrittenDrift` / `staleHandwrittenFiles`, but large package refactors still require manual migration | **T14** | Add an interactive `migrate-handwritten-v2` helper or `check-v2` fix suggestion for drifted handwritten bindings | Manual refactor friction on major package renames |
 
 ### 30-Second Failure Attribution Protocol
 
@@ -451,4 +470,4 @@ M01–M13 and M15 have been empirically confirmed, eliminated, and locked in `SP
 | Locked oracle matches truth, but `@cloze` implementation or `ServerSnapshotProviderImpl` diverges | **Handwritten Isolation Zone** | Fix logic strictly inside `@cloze:start..end` or handwritten provider |
 | Generated code fails `sbt stage`, locked oracle sends inputs violating truth/Authz contracts, or incremental packaging leaves stale artifacts | **Compiler / Generator (`metarch-truthsrc`)** | File upstream issue with file:line & minimal repro → fix via 4-step probe and lock in `SPEC-S*` |
 
-> **Closing Takeaway**: Do not read this map once and file it away. Before every major release or multi-subdomain onboarding, pick the 3–5 riskiest seams from Figure 3 and radar targets M16–M19, write a 100-line adversarial probe, and run it through real `sbt stage` + Play HTTP. Turning underground tunnels into lit corridors and turning surprises into locked probes is how `metarch-truthsrc` converges on industrial-grade determinism.
+> **Closing Takeaway**: Do not read this map once and file it away. Before every major release or multi-subdomain onboarding, pick the 3–5 riskiest seams from Figure 3 and radar targets M24–M27, write a 100-line adversarial probe, and run it through real `sbt stage` + Play HTTP. Turning underground tunnels into lit corridors and turning surprises into locked probes is how `metarch-truthsrc` converges on industrial-grade determinism.

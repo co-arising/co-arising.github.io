@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景 — co-arising</title>
-  <meta name="description" content="对照 metarch-truthsrc @ 1e87c6a（catalog 156b224f3614）与 bank-wealth-demo @ b5cadc0 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。" />
+  <meta name="description" content="对照 metarch-truthsrc @ 8950ba3（catalog 156b224f3614）与 bank-wealth-demo @ b5cadc0 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景" />
-  <meta property="og:description" content="对照 metarch-truthsrc @ 1e87c6a（catalog 156b224f3614）与 bank-wealth-demo @ b5cadc0 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。" />
+  <meta property="og:description" content="对照 metarch-truthsrc @ 8950ba3（catalog 156b224f3614）与 bank-wealth-demo @ b5cadc0 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。" />
   <meta property="og:url" content="https://co-arising.github.io/zh/articles/play-cqrs-artifact-type-map-20261127/" />
   <meta property="og:image" content="https://co-arising.github.io/assets/img/og-image.png" />
   <meta property="og:site_name" content="co-arising" />
@@ -34,7 +34,7 @@
       <nav class="article-breadcrumb" aria-label="面包屑"><a href="/zh/">首页</a> / <a href="/zh/articles/">文章</a> / <span aria-current="page">工程实践</span></nav>
       <p class="article-meta"><span>工程实践</span> · <time datetime="2026-11-27">2026-11-27</time> · 中文原文</p>
       <h1>Play CQRS（scala-cqrs-play-service:2）Artifact Type 架构地图：洋葱分层、分解粘合与目标代码全景</h1>
-      <p class="article-deck">对照 metarch-truthsrc @ 1e87c6a（catalog 156b224f3614）与 bank-wealth-demo @ b5cadc0 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。</p>
+      <p class="article-deck">对照 metarch-truthsrc @ 8950ba3（catalog 156b224f3614）与 bank-wealth-demo @ b5cadc0 的全景工程地图：拆解架构哲学、可点击交互式 SVG 架构图、按洋葱五层组织的可折叠目录，逐一剖析 60 族（含新增 #55–#60 PolicyMachine 族）/ 64 种 Artifact Type 中 Kernel 与 Glue 的职责分工、Guice DI 与 ApplicationBootstrap 粘合机制及未来 Rust/Axum 扩展契约。</p>
       <div class="article-actions"><a href="/content/articles/play-cqrs-artifact-type-map-20261127.md" download="play-cqrs-artifact-type-map-20261127.md">下载原始 Markdown</a> · <a href="#article-body">阅读全文</a> · <a href="/articles/play-cqrs-artifact-type-map-20261127/">Read in English</a> · <a class="action-discord" href="https://discord.gg/PwYrRpJu75">加入 Discord 社区 <span aria-hidden="true">↗</span></a></div>
     </header>
     <aside class="editorial-note" aria-label="editorial distinction"><p>本文整理自公开分享对话，保留原文观点、引文与来源链接。所引外部数据和结论未在本次发布中独立核验，宜结合原始来源阅读。</p><p>本文是与 metarch-truthsrc (scala-cqrs-play-service:2) 及 bank-wealth-demo 源码提交精确锁定的 Play CQRS Artifact Type 架构地图；当上游新增或升级任何 Artifact Type，或扩展新的目标技术栈（如 Rust）时，须通过 sync-site-facts 与 artifact-maps.lock.json 门禁同步更新本双语地图。</p><p><a href="/zh/status/">当前已交付能力与证据请以状态页为准</a>。发布说明不改写下方原文观点。</p></aside>
@@ -49,7 +49,7 @@
         </div>
       </aside>
       <article id="article-body" class="article-body"><blockquote>
-<p>版本锚定：<code>metarch-truthsrc</code> @ <a href="https://github.com/co-arising/metarch-truthsrc"><code>1e87c6a</code></a>（<code>scala-cqrs-play-service:2</code> · <code>catalogSha256: 156b224f3614</code> · 60 族 / 14 生产者 / 64 种 <code>artifactKinds</code>） · <code>bank-wealth-demo</code> @ <a href="https://github.com/co-arising/bank-wealth-demo"><code>b5cadc0</code></a> · 本文受 <code>assets/data/artifact-maps.lock.json</code> 与 <code>sync-site-facts</code> 门禁受控同步（对应站点状态台账 <code>F-32</code> / <code>F-33</code>）。</p>
+<p>版本锚定：<code>metarch-truthsrc</code> @ <a href="https://github.com/co-arising/metarch-truthsrc"><code>8950ba3</code></a>（<code>scala-cqrs-play-service:2</code> · <code>catalogSha256: 156b224f3614</code> · 60 族 / 14 生产者 / 64 种 <code>artifactKinds</code>） · <code>bank-wealth-demo</code> @ <a href="https://github.com/co-arising/bank-wealth-demo"><code>b5cadc0</code></a> · 本文受 <code>assets/data/artifact-maps.lock.json</code> 与 <code>sync-site-facts</code> 门禁受控同步（对应站点状态台账 <code>F-32</code> / <code>F-33</code>）。</p>
 </blockquote>
 <p>在大多数代码生成器里，“一个模型生成一份巨型 <code>Service.scala</code>”看似简单，但只要业务规则、持久化、权限、长流程和读模型同时演化，生成器很快就会退化成不可维护的字符串大杂烩——<strong>AI 和人类改一处就会污染十处，洋葱架构的依赖边界也形同虚设</strong>。</p>
 <p><code>metarch-truthsrc</code> 的 <a href="https://github.com/co-arising/metarch-truthsrc/tree/main/generators/scala-cqrs-play-service"><code>scala-cqrs-play-service:2</code></a> 选择了相反的工程路径：<strong>极度细粒度的正交分解（60 族统一产出 × 64 种 <code>artifactKinds</code>——在 v1/v2 原 54 族基础上新增 <code>#55</code>–<code>#60</code> 反应式策略族） + 严格向内依赖的洋葱边界 + 最后在基础设施最外缘通过 Guice DI 与 <code>ApplicationBootstrap</code> 重新粘合</strong>。本文按“<strong>架构哲学 → 可点击交互式全景图与粘合拓扑 → 从内到外五层逐一拆解（附样例代码与边界判断） → 端到端串联实例 → 升级同步与未来 Rust 扩展契约</strong>”展开。</p>
@@ -90,7 +90,7 @@
 <p>点击下图任意节点，可直接跳转到对应洋葱层与 Artifact Type 的详细拆解与真实样例代码；左侧目录支持按洋葱层次展开或折叠全部子类目。</p>
 </blockquote>
 <figure class="co-arch-fig co-arch-map">
-<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 1e87c6a) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
+<div class="arch-caption-head">FIGURE 01 · PLAY CQRS (scala-cqrs-play-service:2 @ 8950ba3) ONION ARTIFACT TYPE MAP (CLICKABLE)</div>
 <svg viewBox="0 0 1120 1110" width="100%" role="img" aria-label="Play CQRS 五层同心洋葱架构 Artifact Type 全景地图：从最内层 Domain Core 到 Application、Infrastructure、Interfaces 与 Verification 闸门层">
   <defs>
     <marker id="map-arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -491,7 +491,7 @@ override def process(envelope: EventEnvelope[Any]): Future[Done] =
 <li><strong><code>#58 policy-runner</code> (<code>PolicyOn&lt;Cmd&gt;Runner.scala</code>)</strong>：封装 <code>EventSourcedProvider.eventsByTag</code> 与 <code>ProjectionId</code>；</li>
 <li><strong><code>#60 projection-runtime-mechanism</code> (<code>PolicyMachine.scala</code> / <code>FailureVerdict.scala</code> / <code>PolicyEnvelope.scala</code> / <code>PolicyDlqBury.scala</code>)</strong>：共享 4 段效果管线，并<strong>显式检查 <code>Future.traverse(commands)(execute)</code> 返回列表中的每一个 <code>Left(err)</code></strong>——<code>Permanent</code> 送入 <code>PolicyDlqSink.bury</code> 后推进 offset，<code>Retryable</code> 则返回失败 <code>Future</code> 以阻断 offset 提交触发重放；此外守护进程注册 trait 对应 <strong><code>#59 policy-bootstrap</code></strong>（见第 5.4 节）。</li>
 </ul>
-<pre class="code"><code class="language-scala">// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 1e87c6a)
+<pre class="code"><code class="language-scala">// application/projection/policy/PolicyMachine.scala (metarch-truthsrc scala-cqrs-play-service:2 @ 8950ba3)
 Future
   .traverse(commands)(execute)
   .flatMap { results =&gt;
